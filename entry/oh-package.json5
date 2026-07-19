@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "YaoCore entry module",
+  "main": "",
+  "author": "Zhang HaoXuan",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

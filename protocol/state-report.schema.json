@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.example/protocol/v2/state-report.schema.json",
+  "title": "YaoCore v2 IoTDA SmartHomeService state report",
+  "type": "object",
+  "required": ["services"],
+  "properties": {
+    "services": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["service_id", "properties", "event_time"],
+        "properties": {
+          "service_id": {
+            "const": "SmartHomeService"
+          },
+          "properties": {
+            "$ref": "#/$defs/properties"
+          },
+          "event_time": {
+            "$ref": "#/$defs/timestamp"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{8}T[0-9]{6}Z$"
+    },
+    "properties": {
+      "type": "object",
+      "required": [
+        "Door_01_Online",
+        "Light_01_Online",
+        "Sensor_01_Online",
+        "Presence_01_Online",
+        "AC_01_Online",
+        "Gateway_Online",
+        "Gateway_RSSI"
+      ],
+      "properties": {
+        "DeviceInventoryJson": {
+          "type": "string",
+          "maxLength": 8192,
+          "description": "JSON-encoded dynamic device state array keyed by stable device_id."
+        },
+        "Door_01_Online": {
+          "type": "boolean"
+        },
+        "Light_01_Online": {
+          "type": "boolean"
+        },
+        "Sensor_01_Online": {
+          "type": "boolean"
+        },
+        "Presence_01_Online": {
+          "type": "boolean"
+        },
+        "Presence_01_Detected": {
+          "type": "boolean"
+        },
+        "AC_01_Online": {
+          "type": "boolean"
+        },
+        "Door_01_Status": {
+          "enum": ["OPEN", "CLOSED", "UNKNOWN"]
+        },
+        "Door_01_LastRequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "Door_01_LastSeq": {
+          "$ref": "#/$defs/sequence"
+        },
+        "Light_01_Status": {
+          "enum": ["ON", "OFF", "UNKNOWN"]
+        },
+        "Light_01_Brightness": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "Light_01_LastRequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "Light_01_LastSeq": {
+          "$ref": "#/$defs/sequence"
+        },
+        "Light_01_StateSource": {
+          "$ref": "#/$defs/stateSource"
+        },
+        "Light_01_TriggerDeviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "Light_01_AutomationId": {
+          "$ref": "#/$defs/automationIdentifier"
+        },
+        "Room_01_Temperature": {
+          "type": "number",
+          "minimum": -40,
+          "maximum": 125
+        },
+        "Room_01_Humidity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "AC_01_Status": {
+          "enum": ["ON", "OFF", "UNKNOWN"]
+        },
+        "AC_01_TargetTemp": {
+          "type": "number",
+          "minimum": 16,
+          "maximum": 30
+        },
+        "AC_01_Mode": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "AC_01_LastRequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "AC_01_LastSeq": {
+          "$ref": "#/$defs/sequence"
+        },
+        "AC_01_StateSource": {
+          "$ref": "#/$defs/stateSource"
+        },
+        "AC_01_TriggerDeviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "AC_01_AutomationId": {
+          "$ref": "#/$defs/automationIdentifier"
+        },
+        "Door_01_StateSource": {
+          "$ref": "#/$defs/stateSource"
+        },
+        "Gateway_Online": {
+          "type": "boolean"
+        },
+        "Gateway_RSSI": {
+          "type": "integer",
+          "minimum": -127,
+          "maximum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "requestIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,126}$"
+    },
+    "deviceIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "automationIdentifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "stateSource": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 31
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    }
+  },
+  "additionalProperties": false
+}

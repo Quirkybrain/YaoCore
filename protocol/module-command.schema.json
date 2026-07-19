@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/module-command.schema.json",
+  "title": "YaoCore gateway-to-module command v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "requestId", "targetDevice", "action", "value", "source"],
+  "properties": {
+    "protocolVersion": { "const": "1.0" },
+    "requestId": { "type": "string", "minLength": 1, "maxLength": 127 },
+    "targetDevice": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$", "maxLength": 63 },
+    "action": { "enum": ["OPEN", "CLOSE", "STOP", "ON", "OFF", "SET_BRIGHTNESS", "SET_COLOR", "SET_TARGET_TEMPERATURE", "SET_MODE", "SET_POSITION", "SET_SPEED", "SET_VOLUME"] },
+    "value": { "type": ["null", "boolean", "number", "string"] },
+    "source": { "type": "string", "minLength": 1, "maxLength": 31 },
+    "triggerDeviceId": { "type": "string", "maxLength": 63 },
+    "automationId": { "type": "string", "maxLength": 63 }
+  }
+}

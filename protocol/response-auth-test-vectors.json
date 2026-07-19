@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "algorithm": "HMAC-SHA256",
+  "keyId": "app-key-v1",
+  "canonicalFormat": "YAOCORE-RESPONSE-V1\\nkind\\ncorrelation\\nsha256_lower_hex(body_utf8)",
+  "notes": "Public interoperability data only. Never use this secret in a deployed gateway.",
+  "vectors": [
+    {
+      "name": "discover-response",
+      "secret": "0123456789abcdef0123456789abcdef",
+      "kind": "discover",
+      "correlation": "00112233445566778899aabbccddeeff",
+      "body": "{\"protocolVersion\":\"2.0\",\"gatewayId\":\"gateway_01\"}",
+      "bodySha256": "4d66e9571deecc0156ea4383a393058c6755c79bb60ff613d4ab070702b111a0",
+      "canonical": "YAOCORE-RESPONSE-V1\\ndiscover\\n00112233445566778899aabbccddeeff\\n4d66e9571deecc0156ea4383a393058c6755c79bb60ff613d4ab070702b111a0",
+      "signature": "71165b69b2a7cb8cdcce63764f89e8df5005ca946e98f2c8269fed4ae86faa54"
+    }
+  ]
+}

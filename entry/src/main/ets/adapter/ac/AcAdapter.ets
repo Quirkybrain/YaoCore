@@ -1,0 +1,18 @@
+/*
+ * YaoCore (爻构) - Open-source smart home system
+ * Copyright (c) 2026 Zhang HaoXuan
+ * Author: Zhang HaoXuan
+ * Created: 2026-07-17
+ * Source: https://github.com/Quirkybrain/YaoCore
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { ControlResult } from '../../common/types/CommandTypes';
+
+export interface AcAdapter {
+  getBrand(): string;
+  powerOn(): Promise<ControlResult>;
+  powerOff(): Promise<ControlResult>;
+  setTargetTemperature(temp: number): Promise<ControlResult>;
+  setMode(mode: string): Promise<ControlResult>;
+}

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.example/protocol/v2/discover-response.schema.json",
+  "title": "YaoCore v2 gateway discovery response",
+  "type": "object",
+  "required": [
+    "protocolVersion",
+    "gatewayId",
+    "gatewayName",
+    "serviceId",
+    "generatedAt",
+    "security",
+    "devices"
+  ],
+  "properties": {
+    "protocolVersion": {
+      "const": "2.0"
+    },
+    "gatewayId": {
+      "$ref": "#/$defs/deviceIdentifier"
+    },
+    "gatewayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63
+    },
+    "serviceId": {
+      "const": "SmartHomeService"
+    },
+    "generatedAt": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "security": {
+      "type": "object",
+      "required": ["alg", "keyId", "timeWindowSeconds", "nonceTtlSeconds"],
+      "properties": {
+        "alg": {
+          "const": "HMAC-SHA256"
+        },
+        "keyId": {
+          "const": "app-key-v1"
+        },
+        "timeWindowSeconds": {
+          "const": 120
+        },
+        "nonceTtlSeconds": {
+          "const": 300
+        }
+      },
+      "additionalProperties": false
+    },
+    "devices": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/device"
+      }
+    }
+  },
+  "$defs": {
+    "requestIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,126}$"
+    },
+    "deviceIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{8}T[0-9]{6}Z$"
+    },
+    "device": {
+      "type": "object",
+      "required": [
+        "deviceId",
+        "deviceName",
+        "roomName",
+        "deviceType",
+        "online",
+        "updatedAt"
+      ],
+      "properties": {
+        "deviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "deviceName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63
+        },
+        "roomName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 31
+        },
+        "deviceType": {
+          "enum": ["door", "light", "sensor", "ac", "switch", "camera", "curtain", "fan", "speaker"]
+        },
+        "brand": {
+          "type": "string",
+          "maxLength": 31
+        },
+        "online": {
+          "type": "boolean"
+        },
+        "power": {
+          "type": "boolean"
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "brightness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-F]{6}$"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": -40,
+          "maximum": 125
+        },
+        "humidity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "presence": {
+          "type": "boolean"
+        },
+        "targetTemp": {
+          "type": "number",
+          "minimum": 16,
+          "maximum": 30
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 15
+        },
+        "lastRequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "lastSeq": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "stateSource": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 31
+        },
+        "triggerDeviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "automationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

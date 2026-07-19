@@ -1,0 +1,385 @@
+{
+  "profile": {
+    "version": "2.0",
+    "productId": "YaoCoreGatewayV2",
+    "productName": "YaoCore ESP32-S3M Smart Home Gateway",
+    "deviceType": "SmartHomeGateway",
+    "manufacturerId": "YaoCore",
+    "manufacturerName": "YaoCore",
+    "protocolType": "MQTT",
+    "dataFormat": "json",
+    "description": "Source-of-truth product model for a YaoCore smart-home gateway. Adapt it to the export template of the target IoTDA instance before console import."
+  },
+  "services": [
+    {
+      "serviceId": "SmartHomeService",
+      "serviceType": "SmartHomeService",
+      "description": "Door, light, environment, air conditioner, and gateway connectivity state.",
+      "properties": [
+        {
+          "propertyName": "DeviceInventoryJson",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 8192,
+          "description": "Dynamic device-state array keyed by stable device_id; enables multiple devices of the same type or brand while fixed properties remain backward compatible."
+        },
+        {
+          "propertyName": "DeviceInventoryJson2",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 8192,
+          "description": "Dynamic inventory page 2."
+        },
+        {
+          "propertyName": "DeviceInventoryJson3",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 8192,
+          "description": "Dynamic inventory page 3."
+        },
+        {
+          "propertyName": "DeviceInventoryJson4",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 8192,
+          "description": "Dynamic inventory page 4."
+        },
+        {
+          "propertyName": "Door_01_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "Light_01_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "Sensor_01_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "Presence_01_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "AC_01_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "Door_01_Status",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 16,
+          "enumList": ["OPEN", "CLOSED", "UNKNOWN"]
+        },
+        {
+          "propertyName": "Door_01_LastRequestId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 127
+        },
+        {
+          "propertyName": "Door_01_LastSeq",
+          "dataType": "int",
+          "required": false,
+          "method": "R",
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "propertyName": "Light_01_Status",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 16,
+          "enumList": ["ON", "OFF", "UNKNOWN"]
+        },
+        {
+          "propertyName": "Light_01_Brightness",
+          "dataType": "int",
+          "required": false,
+          "method": "R",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%"
+        },
+        {
+          "propertyName": "Light_01_Color",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 7,
+          "description": "RGB color in uppercase #RRGGBB format. Dynamic external lights expose the same field inside DeviceInventoryJson."
+        },
+        {
+          "propertyName": "Light_01_LastRequestId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 127
+        },
+        {
+          "propertyName": "Light_01_LastSeq",
+          "dataType": "int",
+          "required": false,
+          "method": "R",
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "propertyName": "Light_01_StateSource",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 31
+        },
+        {
+          "propertyName": "Light_01_TriggerDeviceId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 63
+        },
+        {
+          "propertyName": "Light_01_AutomationId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 63
+        },
+        {
+          "propertyName": "Room_01_Temperature",
+          "dataType": "decimal",
+          "required": false,
+          "method": "R",
+          "min": -40,
+          "max": 125,
+          "step": 0.1,
+          "unit": "°C"
+        },
+        {
+          "propertyName": "Room_01_Humidity",
+          "dataType": "decimal",
+          "required": false,
+          "method": "R",
+          "min": 0,
+          "max": 100,
+          "step": 0.1,
+          "unit": "%RH"
+        },
+        {
+          "propertyName": "Presence_01_Detected",
+          "dataType": "boolean",
+          "required": false,
+          "method": "R"
+        },
+        {
+          "propertyName": "AC_01_Status",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 16,
+          "enumList": ["ON", "OFF", "UNKNOWN"]
+        },
+        {
+          "propertyName": "AC_01_TargetTemp",
+          "dataType": "decimal",
+          "required": false,
+          "method": "R",
+          "min": 16,
+          "max": 30,
+          "step": 0.5,
+          "unit": "°C"
+        },
+        {
+          "propertyName": "AC_01_Mode",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 32,
+          "enumList": ["AUTO", "COOL", "HEAT", "DRY", "FAN", "ECO", "SLEEP"]
+        },
+        {
+          "propertyName": "AC_01_LastRequestId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 127
+        },
+        {
+          "propertyName": "AC_01_LastSeq",
+          "dataType": "int",
+          "required": false,
+          "method": "R",
+          "min": 0,
+          "max": 2147483647
+        },
+        {
+          "propertyName": "AC_01_StateSource",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 31
+        },
+        {
+          "propertyName": "AC_01_TriggerDeviceId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 63
+        },
+        {
+          "propertyName": "AC_01_AutomationId",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 63
+        },
+        {
+          "propertyName": "Door_01_StateSource",
+          "dataType": "string",
+          "required": false,
+          "method": "R",
+          "maxLength": 31
+        },
+        {
+          "propertyName": "Gateway_Online",
+          "dataType": "boolean",
+          "required": true,
+          "method": "R"
+        },
+        {
+          "propertyName": "Gateway_RSSI",
+          "dataType": "int",
+          "required": true,
+          "method": "R",
+          "min": -127,
+          "max": 0,
+          "step": 1,
+          "unit": "dBm"
+        }
+      ],
+      "commands": [
+        {
+          "commandName": "SetDeviceStatus",
+          "description": "Dispatch one explicit, idempotent device action through the gateway; diagnostics use Action=PING.",
+          "paras": [
+            {
+              "paraName": "RequestId",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 127
+            },
+            {
+              "paraName": "CmdId",
+              "dataType": "int",
+              "required": true,
+              "min": 3001,
+              "max": 3001
+            },
+            {
+              "paraName": "Seq",
+              "dataType": "int",
+              "required": true,
+              "min": 0,
+              "max": 2147483647
+            },
+            {
+              "paraName": "TargetDevice",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 63
+            },
+            {
+              "paraName": "Action",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 47
+            },
+            {
+              "paraName": "Value",
+              "dataType": "string",
+              "required": false,
+              "maxLength": 63,
+              "description": "Compact JSON atom text: quoted JSON string, number text, true/false, or omitted when the action has no value."
+            },
+            {
+              "paraName": "Timestamp",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 16
+            },
+            {
+              "paraName": "Nonce",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 64
+            },
+            {
+              "paraName": "Alg",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 32,
+              "enumList": ["HMAC-SHA256"]
+            },
+            {
+              "paraName": "KeyId",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 63,
+              "enumList": ["app-key-v1"]
+            },
+            {
+              "paraName": "Sign",
+              "dataType": "string",
+              "required": true,
+              "maxLength": 64
+            }
+          ],
+          "responses": [
+            {
+              "responseName": "SetDeviceStatusResponse",
+              "paras": [
+                {
+                  "paraName": "RequestId",
+                  "dataType": "string",
+                  "required": true,
+                  "maxLength": 127
+                },
+                {
+                  "paraName": "ResultCode",
+                  "dataType": "int",
+                  "required": true,
+                  "min": 0,
+                  "max": 9999
+                },
+                {
+                  "paraName": "Message",
+                  "dataType": "string",
+                  "required": true,
+                  "maxLength": 256
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

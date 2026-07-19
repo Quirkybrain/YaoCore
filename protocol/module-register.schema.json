@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/module-register.schema.json",
+  "title": "YaoCore external module registration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "moduleId", "commandPort", "commandPath", "heartbeatSeconds", "sequence", "device"],
+  "properties": {
+    "protocolVersion": { "const": "1.0" },
+    "moduleId": { "$ref": "#/$defs/id" },
+    "commandPort": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "commandPath": { "type": "string", "pattern": "^/", "maxLength": 63 },
+    "heartbeatSeconds": { "type": "integer", "minimum": 5, "maximum": 300 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deviceId", "name", "room", "brand", "protocol", "deviceType"],
+      "properties": {
+        "deviceId": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 63 },
+        "room": { "type": "string", "minLength": 1, "maxLength": 31 },
+        "brand": { "type": "string", "minLength": 1, "maxLength": 31 },
+        "protocol": { "type": "string", "minLength": 1, "maxLength": 31 },
+        "deviceType": { "enum": ["door", "light", "sensor", "ac", "switch", "camera", "curtain", "fan", "speaker"] }
+      }
+    },
+    "state": { "$ref": "module-state.schema.json#/$defs/state" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    }
+  }
+}

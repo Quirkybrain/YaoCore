@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/module-command-ack.schema.json",
+  "title": "YaoCore module command acknowledgement v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["requestId", "resultCode", "message", "reportedState"],
+  "properties": {
+    "requestId": { "type": "string", "minLength": 1, "maxLength": 127 },
+    "resultCode": { "type": "integer" },
+    "message": { "type": "string", "maxLength": 127 },
+    "reportedState": { "$ref": "module-state.schema.json#/$defs/state" }
+  }
+}

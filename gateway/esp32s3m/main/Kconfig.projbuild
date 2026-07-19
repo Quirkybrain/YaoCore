@@ -1,0 +1,300 @@
+menu "YaoCore Gateway"
+
+config YAOCORE_PROV_POP
+    string "BLE provisioning proof-of-possession (8-64 bytes)"
+    default ""
+    help
+        Per-device secret used by ESP-IDF Protocomm Security1. The phone must
+        provide exactly the same value during BLE Wi-Fi provisioning. Do not
+        commit a production value to source control.
+
+config YAOCORE_PROV_RESET_HOLD_SECONDS
+    int "BOOT button hold time to reset Wi-Fi (seconds)"
+    range 3 15
+    default 5
+    help
+        Hold the active-low BOOT button on GPIO0 for this duration while the
+        firmware is running to erase only Wi-Fi credentials and reboot into
+        BLE provisioning mode.
+
+config YAOCORE_GATEWAY_ID
+    string "Gateway device ID"
+    default "gateway_01"
+    help
+        1-63 ASCII characters. The first character must be alphanumeric;
+        remaining characters may also contain underscore, dot, colon or dash.
+
+config YAOCORE_GATEWAY_NAME
+    string "Gateway display name"
+    default "YaoCore ESP32-S3M"
+    help
+        Human-readable UTF-8 name, limited to 63 encoded bytes so BLE identity,
+        mDNS and authenticated HTTP discovery expose the same value.
+
+config YAOCORE_COMMAND_SECRET
+    string "App/gateway HMAC secret (minimum 16 bytes)"
+    default ""
+
+config YAOCORE_LOCAL_PORT
+    int "Local HTTP port"
+    range 1024 65535
+    default 9200
+
+config YAOCORE_DISCOVERY_UDP_PORT
+    int "UDP discovery port"
+    range 1024 65535
+    default 9200
+
+config YAOCORE_BOARD_LED_GPIO
+    int "Board LED GPIO (-1 disables)"
+    range -1 48
+    default 1
+
+config YAOCORE_BOARD_LED_ACTIVE_LOW
+    bool "Board LED is active-low"
+    default y
+
+config YAOCORE_DOOR_GPIO
+    int "Door actuator output GPIO (-1 disables door device)"
+    range -1 48
+    default -1
+    help
+        GPIO connected to the real lock/relay/actuator input. There is no
+        logical fallback when it is disabled.
+
+config YAOCORE_DOOR_OPEN_LEVEL
+    int "Door actuator OPEN level (0 or 1)"
+    range 0 1
+    default 1
+
+config YAOCORE_DOOR_FEEDBACK_GPIO
+    int "Door contact/position feedback GPIO (-1 disables feedback)"
+    range -1 48
+    default -1
+    help
+        When configured, OPEN/CLOSE is acknowledged only after this input
+        matches the requested physical position.
+
+config YAOCORE_DOOR_FEEDBACK_OPEN_LEVEL
+    int "Door feedback level meaning OPEN (0 or 1)"
+    range 0 1
+    default 1
+
+config YAOCORE_DOOR_FEEDBACK_PULLUP
+    bool "Enable internal pull-up on door feedback"
+    default y
+
+config YAOCORE_DOOR_FEEDBACK_TIMEOUT_MS
+    int "Door feedback confirmation timeout (ms)"
+    range 100 10000
+    default 2000
+
+config YAOCORE_DOOR_FEEDBACK_POLL_INTERVAL_MS
+    int "Door feedback polling interval (ms)"
+    range 10 1000
+    default 50
+    help
+        Polling remains active after commands so manual door/contact changes
+        are propagated to LAN and cloud state.
+
+config YAOCORE_DOOR_FEEDBACK_DEBOUNCE_MS
+    int "Door feedback stable debounce time (ms)"
+    range 20 5000
+    default 150
+
+config YAOCORE_LIGHT_GPIO
+    int "Light LEDC PWM GPIO (-1 disables light device)"
+    range -1 48
+    default -1
+    help
+        Must connect to a dimmable LED driver/MOSFET PWM input. Brightness is
+        represented by real 0..100 LEDC duty, never by a binary GPIO fallback.
+
+config YAOCORE_LIGHT_PWM_ACTIVE_LOW
+    bool "Light PWM is active-low"
+    default n
+
+config YAOCORE_LIGHT_PWM_FREQUENCY_HZ
+    int "Light PWM frequency (Hz)"
+    range 100 20000
+    default 5000
+
+config YAOCORE_LIGHT_DEFAULT_BRIGHTNESS
+    int "Brightness used by ON when currently off"
+    range 1 100
+    default 100
+
+config YAOCORE_SHT30_ENABLE
+    bool "Enable real SHT30 temperature/humidity sensor"
+    default n
+
+if YAOCORE_SHT30_ENABLE
+
+config YAOCORE_SHT30_I2C_PORT
+    int "SHT30 I2C controller"
+    range 0 1
+    default 0
+
+config YAOCORE_SHT30_SDA_GPIO
+    int "SHT30 SDA GPIO"
+    range 0 48
+    default 8
+
+config YAOCORE_SHT30_SCL_GPIO
+    int "SHT30 SCL GPIO"
+    range 0 48
+    default 9
+
+config YAOCORE_SHT30_I2C_FREQUENCY_HZ
+    int "SHT30 I2C frequency (Hz)"
+    range 10000 1000000
+    default 100000
+
+config YAOCORE_SHT30_ADDRESS
+    hex "SHT30 7-bit I2C address"
+    range 0x44 0x45
+    default 0x44
+
+config YAOCORE_SHT30_SAMPLE_INTERVAL_MS
+    int "SHT30 sample interval (ms)"
+    range 1000 60000
+    default 5000
+
+endif
+
+config YAOCORE_PIR_GPIO
+    int "PIR motion input GPIO (-1 disables presence sensor)"
+    range -1 48
+    default -1
+
+config YAOCORE_PIR_ACTIVE_LEVEL
+    int "PIR active level (0 or 1)"
+    range 0 1
+    default 1
+
+config YAOCORE_PIR_TIMEOUT_SECONDS
+    int "PIR no-motion light-off timeout (seconds)"
+    range 5 3600
+    default 60
+
+config YAOCORE_PIR_LIGHT_BRIGHTNESS
+    int "PIR triggered light brightness"
+    range 1 100
+    default 100
+
+config YAOCORE_PRESENCE_LIGHT_AUTOMATION_ENABLE
+    bool "Enable offline presence sensor -> light automation"
+    default y
+    help
+        When both PIR and PWM light hardware are configured, presence turns on
+        a previously-off light and no-presence turns it off only while this
+        rule still owns it. A phone, scene or cloud light command releases
+        ownership so automation cannot undo a manual choice.
+
+config YAOCORE_PRESENCE_LIGHT_TARGET_ID
+    string "Presence automation target light deviceId"
+    default "Light_01"
+    help
+        Stable deviceId of the light controlled by the local presence rule.
+        Set this to DemoRgbLight_01 to drive the Arduino RGB demonstration
+        light through its registered external module.
+
+config YAOCORE_TEMPERATURE_AC_AUTOMATION_ENABLE
+    bool "Enable offline Sensor_01 temperature -> AC_01 automation"
+    default n
+    help
+        Requires SHT30 and the confirmed UART air-conditioner bridge. The rule
+        turns AC on at the high threshold and turns it off at the low threshold
+        only if the rule originally turned it on. Every action still requires
+        a matching downstream full-state ACK.
+
+if YAOCORE_TEMPERATURE_AC_AUTOMATION_ENABLE
+
+config YAOCORE_TEMPERATURE_AC_ON_THRESHOLD
+    int "Temperature threshold to turn AC on (deg C)"
+    range 18 40
+    default 28
+
+config YAOCORE_TEMPERATURE_AC_OFF_THRESHOLD
+    int "Temperature threshold to turn automation-owned AC off (deg C)"
+    range 16 38
+    default 26
+
+endif
+
+config YAOCORE_AC_UART_PORT
+    int "Air-conditioner southbound UART controller"
+    range 1 2
+    default 1
+
+config YAOCORE_AC_UART_TX_GPIO
+    int "Air-conditioner bridge UART TX GPIO (-1 disables AC device)"
+    range -1 48
+    default -1
+
+config YAOCORE_AC_UART_RX_GPIO
+    int "Air-conditioner bridge UART RX GPIO (-1 disables AC device)"
+    range -1 48
+    default -1
+
+config YAOCORE_AC_UART_BAUD_RATE
+    int "Air-conditioner bridge UART baud rate"
+    range 1200 2000000
+    default 115200
+
+config YAOCORE_AC_ACK_TIMEOUT_MS
+    int "Air-conditioner structured ACK timeout (ms)"
+    range 200 10000
+    default 2000
+
+config YAOCORE_AC_HEALTH_INTERVAL_SECONDS
+    int "Air-conditioner UART health query interval (seconds)"
+    range 5 3600
+    default 30
+    help
+        Send a low-frequency STATUS_QUERY after this interval. The query and
+        business commands share one transaction mutex, so UART frames and ACKs
+        can never overlap.
+
+config YAOCORE_AC_HEALTH_FAILURE_THRESHOLD
+    int "Air-conditioner consecutive health failures before offline"
+    range 1 10
+    default 3
+    help
+        AC_01 changes to offline only after this many consecutive STATUS_QUERY
+        or recovery HANDSHAKE failures. One valid full-state response restores
+        online immediately.
+
+config YAOCORE_AC_BRAND
+    string "Air-conditioner protocol brand"
+    default "GREE"
+    help
+        Supported exact values: GREE, MIDEA, HAIER, GENERIC. This value is
+        carried in every southbound UART request so the separate MCU can select
+        its IR/native protocol implementation.
+
+config YAOCORE_IOTDA_ENABLE
+    bool "Enable Huawei Cloud IoTDA MQTTS"
+    default n
+
+config YAOCORE_IOTDA_BROKER_URI
+    string "IoTDA MQTTS URI"
+    depends on YAOCORE_IOTDA_ENABLE
+    default "mqtts://example.iotda.cn-north-4.myhuaweicloud.com:8883"
+
+config YAOCORE_IOTDA_DEVICE_ID
+    string "IoTDA device ID / MQTT username"
+    depends on YAOCORE_IOTDA_ENABLE
+    default ""
+
+config YAOCORE_IOTDA_PASSWORD
+    string "IoTDA device secret (password is derived before each connection)"
+    depends on YAOCORE_IOTDA_ENABLE
+    default ""
+
+config YAOCORE_IOTDA_REPORT_INTERVAL_SECONDS
+    int "IoTDA periodic full-state report interval (seconds)"
+    range 5 3600
+    default 30
+
+endmenu

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.example/protocol/v2/cloud-command.schema.json",
+  "title": "YaoCore v2 IoTDA SetDeviceStatus command envelope",
+  "description": "The direct IoTDA REST body contains service_id, command_name, and paras. object_device_id is optional at the top level for an IoTDA MQTT downlink or a custom proxy wrapper and never appears inside paras.",
+  "type": "object",
+  "required": ["service_id", "command_name", "paras"],
+  "properties": {
+    "object_device_id": {
+      "$ref": "#/$defs/cloudIdentifier",
+      "description": "Optional top-level routing field. Omit it from a direct IoTDA REST CreateCommand request because the device ID is in the URI."
+    },
+    "service_id": {
+      "const": "SmartHomeService"
+    },
+    "command_name": {
+      "const": "SetDeviceStatus"
+    },
+    "paras": {
+      "type": "object",
+      "required": [
+        "RequestId",
+        "CmdId",
+        "Seq",
+        "TargetDevice",
+        "Action",
+        "Timestamp",
+        "Nonce",
+        "Alg",
+        "KeyId",
+        "Sign"
+      ],
+      "properties": {
+        "RequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "CmdId": {
+          "const": 3001
+        },
+        "Seq": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "TargetDevice": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "Action": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{0,46}$"
+        },
+        "Value": {
+          "type": "string",
+          "maxLength": 63,
+          "description": "Compact JSON atom text: quoted/escaped JSON for a string, JSON number text, true/false, or omitted when the command has no value."
+        },
+        "Timestamp": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "Nonce": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{8,64}$"
+        },
+        "Alg": {
+          "const": "HMAC-SHA256"
+        },
+        "KeyId": {
+          "const": "app-key-v1"
+        },
+        "Sign": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "cloudIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+    },
+    "requestIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,126}$"
+    },
+    "deviceIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{8}T[0-9]{6}Z$"
+    }
+  },
+  "additionalProperties": false
+}

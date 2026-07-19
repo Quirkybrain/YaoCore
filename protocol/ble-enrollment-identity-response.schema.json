@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/ble-enrollment-identity-response.schema.json",
+  "title": "YaoCore Security1 enrollment identity response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "serviceId", "gatewayId", "gatewayName"],
+  "properties": {
+    "protocolVersion": {
+      "const": "2.0"
+    },
+    "serviceId": {
+      "const": "YaoCoreGateway"
+    },
+    "gatewayId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "gatewayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63
+    }
+  }
+}

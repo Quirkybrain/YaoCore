@@ -1,0 +1,13 @@
+{
+  "description": "Public interoperability fixture only; never use this secret in production.",
+  "masterSecret": "YaoCore-module-test-secret-2026",
+  "moduleId": "module.vendor.demo.01",
+  "derivedModuleKeyHex": "8a2da31dd65603f15b8e380b3e1bfda2e7f1463b63496c1dbe48899074171ea5",
+  "kind": "heartbeat",
+  "timestamp": "20260717T120000Z",
+  "nonce": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
+  "body": "{\"protocolVersion\":\"1.0\",\"moduleId\":\"module.vendor.demo.01\",\"sequence\":1}",
+  "bodySha256": "2c88e1bdbb601ff944e661fa2d2993538961d4f40b07babf9dbf678f4a848109",
+  "canonical": "YAOCORE-MODULE-V1\nheartbeat\nmodule.vendor.demo.01\n20260717T120000Z\n00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff\nHMAC-SHA256\napp-key-v1\n2c88e1bdbb601ff944e661fa2d2993538961d4f40b07babf9dbf678f4a848109",
+  "signature": "a57143ab00530a5632925d6d5d14c45eacac2d3874ec7b74f1122c1a6842b7e4"
+}

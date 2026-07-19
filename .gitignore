@@ -1,0 +1,80 @@
+# IDE and local workspace
+.idea/
+.vscode/
+.preview/
+.agents/
+local.properties
+layout.json
+/build-profile.json5
+
+# HarmonyOS / OpenHarmony / Node generated output
+.hvigor/
+**/build/
+oh_modules/
+node_modules/
+dist/
+*.hap
+*.hsp
+*.har
+*.abc
+*.an
+*.log
+
+# ESP-IDF generated output and per-device configuration
+gateway/esp32s3m/sdkconfig
+gateway/esp32s3m/sdkconfig.old
+gateway/esp32s3m/managed_components/
+gateway/esp32s3m/build/
+gateway/esp32s3m/build_*/
+gateway/esp32s3m/sdkconfig.ci.*
+*.elf
+*.bin
+*.map
+*.uf2
+flasher_args.json
+compile_commands.json
+
+# Arduino per-device configuration and generated output
+devices/**/config.h
+devices/**/.arduinoIDE/
+devices/**/build/
+
+# Secrets, signing material and certificates
+signing/
+*.p12
+*.pfx
+*.pem
+*.p7b
+*.key
+*.cer
+*.crt
+*.token
+*.secret
+.env
+.env.*
+!.env.example
+
+# Generated packages, caches and temporary files
+tmp_pdf_extract/
+**/__pycache__/
+/*.jpeg
+/*.jpg
+/*.png
+/*.pcap
+/.tmp_*
+*.py[cod]
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Private event/submission material is intentionally not published
+docs/*比赛*
+docs/*赛题*
+docs/*竞赛*
+docs/*验收*
+docs/*提交*
+docs/*演示视频*
+tools/test_competition_*.py
+tools/test_submission_*.py
+tools/package_submission.ps1

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/module-state.schema.json",
+  "title": "YaoCore external module state event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "moduleId", "deviceId", "sequence", "state"],
+  "properties": {
+    "protocolVersion": { "const": "1.0" },
+    "moduleId": { "$ref": "#/$defs/id" },
+    "deviceId": { "$ref": "#/$defs/id" },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "state": { "$ref": "#/$defs/state" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 63,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "percent": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "online": { "type": "boolean" },
+        "power": { "type": "boolean" },
+        "open": { "type": "boolean" },
+        "brightness": { "$ref": "#/$defs/percent" },
+        "color": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+        "temperature": { "type": "number", "minimum": -50, "maximum": 100 },
+        "humidity": { "type": "number", "minimum": 0, "maximum": 100 },
+        "presence": { "type": "boolean" },
+        "targetTemperature": { "type": "number", "minimum": 16, "maximum": 30 },
+        "mode": { "enum": ["AUTO", "COOL", "HEAT", "DRY", "FAN", "ECO", "SLEEP"] },
+        "position": { "$ref": "#/$defs/percent" },
+        "speed": { "$ref": "#/$defs/percent" },
+        "volume": { "$ref": "#/$defs/percent" }
+      },
+      "dependentRequired": {
+        "temperature": ["humidity"],
+        "humidity": ["temperature"]
+      }
+    }
+  }
+}

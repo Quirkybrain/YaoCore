@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.example/protocol/v2/local-control-request.schema.json",
+  "title": "YaoCore v2 signed local control request",
+  "type": "object",
+  "required": [
+    "request_id",
+    "cmd_id",
+    "seq",
+    "target",
+    "payload",
+    "timestamp",
+    "nonce",
+    "alg",
+    "key_id",
+    "sign"
+  ],
+  "properties": {
+    "request_id": {
+      "$ref": "#/$defs/requestIdentifier"
+    },
+    "cmd_id": {
+      "const": 2001
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "target": {
+      "$ref": "#/$defs/deviceIdentifier"
+    },
+    "payload": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]{0,46}$"
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 63
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "timestamp": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{8,64}$"
+    },
+    "alg": {
+      "const": "HMAC-SHA256"
+    },
+    "key_id": {
+      "const": "app-key-v1"
+    },
+    "sign": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "$defs": {
+    "requestIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,126}$"
+    },
+    "deviceIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{8}T[0-9]{6}Z$"
+    }
+  },
+  "additionalProperties": false
+}

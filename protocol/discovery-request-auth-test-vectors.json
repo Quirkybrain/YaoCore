@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "canonicalFormat": "YAOCORE-DISCOVER-V2\\nchallenge\\ntimestamp\\nnonce\\nalg\\nkey_id",
+  "vectors": [
+    {
+      "name": "fresh-discovery-request",
+      "secret": "0123456789abcdef",
+      "challenge": "0123456789abcdef0123456789abcdef",
+      "timestamp": "20260716T120000Z",
+      "nonce": "fedcba98765432100123456789abcdef",
+      "alg": "HMAC-SHA256",
+      "key_id": "app-key-v1",
+      "canonical": "YAOCORE-DISCOVER-V2\\n0123456789abcdef0123456789abcdef\\n20260716T120000Z\\nfedcba98765432100123456789abcdef\\nHMAC-SHA256\\napp-key-v1",
+      "signature": "97efb70951b827c43a2596a354a591081e50a0239b2f03f697228dcdbfbf664e"
+    }
+  ]
+}

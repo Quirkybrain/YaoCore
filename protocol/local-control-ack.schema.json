@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.example/protocol/v2/local-control-ack.schema.json",
+  "title": "YaoCore v2 local control acknowledgement",
+  "type": "object",
+  "required": ["request_id", "seq", "result_code", "message", "server_time"],
+  "properties": {
+    "request_id": {
+      "$ref": "#/$defs/requestIdentifier"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "result_code": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9999
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 127
+    },
+    "error_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 47
+    },
+    "server_time": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "idempotent_replay": {
+      "type": "boolean",
+      "description": "True only when this response is a cached ACK for an exact authenticated retransmission."
+    },
+    "reported_state": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/deviceState"
+        },
+        {
+          "$ref": "#/$defs/gatewayState"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result_code": {
+            "const": 0
+          }
+        },
+        "required": ["result_code"]
+      },
+      "then": {
+        "required": ["reported_state"]
+      }
+    }
+  ],
+  "$defs": {
+    "requestIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,126}$"
+    },
+    "deviceIdentifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,62}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{8}T[0-9]{6}Z$"
+    },
+    "deviceState": {
+      "type": "object",
+      "required": ["deviceId", "online", "updatedAt"],
+      "properties": {
+        "deviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "online": {
+          "type": "boolean"
+        },
+        "power": {
+          "type": "boolean"
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "brightness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-F]{6}$"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": -40,
+          "maximum": 125
+        },
+        "humidity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "presence": {
+          "type": "boolean"
+        },
+        "targetTemp": {
+          "type": "number",
+          "minimum": 16,
+          "maximum": 30
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 15
+        },
+        "lastRequestId": {
+          "$ref": "#/$defs/requestIdentifier"
+        },
+        "lastSeq": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "stateSource": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 31
+        },
+        "triggerDeviceId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "automationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": false
+    },
+    "gatewayState": {
+      "type": "object",
+      "required": ["gatewayId", "online", "boardLed", "updatedAt"],
+      "properties": {
+        "gatewayId": {
+          "$ref": "#/$defs/deviceIdentifier"
+        },
+        "online": {
+          "type": "boolean"
+        },
+        "boardLed": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "ble_permission_reason",
+      "value": "Discover and connect to nearby YaoCore gateways and securely send home Wi-Fi credentials."
+    },
+    {
+      "name": "module_desc",
+      "value": "YaoCore smart home control module"
+    },
+    {
+      "name": "entryability_desc",
+      "value": "YaoCore"
+    },
+    {
+      "name": "entryability_label",
+      "value": "YaoCore"
+    }
+  ]
+}

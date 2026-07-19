@@ -1,0 +1,51 @@
+<svg width="108" height="108" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="14" y1="8" x2="94" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071B2D"/>
+      <stop offset="0.58" stop-color="#0B3242"/>
+      <stop offset="1" stop-color="#06131F"/>
+    </linearGradient>
+    <linearGradient id="jade" x1="29" y1="26" x2="80" y2="83" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#66F2E1"/>
+      <stop offset="1" stop-color="#19A9BA"/>
+    </linearGradient>
+    <linearGradient id="bronze" x1="31" y1="20" x2="78" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F1D18A"/>
+      <stop offset="0.5" stop-color="#B98235"/>
+      <stop offset="1" stop-color="#FFE2A1"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="108" height="108" rx="25" fill="url(#bg)"/>
+  <path d="M54 12L87 31V77L54 96L21 77V31L54 12Z" stroke="url(#bronze)" stroke-width="2.2" opacity="0.95"/>
+  <path d="M54 18L81 34.5V73.5L54 90L27 73.5V34.5L54 18Z" stroke="#2BD7D0" stroke-width="1" opacity="0.34"/>
+
+  <path d="M21 42H13M95 42H87M21 66H13M95 66H87M42 19V12M66 19V12M42 96V89M66 96V89"
+        stroke="#2BD7D0" stroke-width="1.5" stroke-linecap="round" opacity="0.72"/>
+  <circle cx="13" cy="42" r="2" fill="#67F4E6"/>
+  <circle cx="95" cy="42" r="2" fill="#67F4E6"/>
+  <circle cx="13" cy="66" r="2" fill="#D8AA5B"/>
+  <circle cx="95" cy="66" r="2" fill="#D8AA5B"/>
+  <circle cx="42" cy="12" r="2" fill="#D8AA5B"/>
+  <circle cx="66" cy="12" r="2" fill="#67F4E6"/>
+  <circle cx="42" cy="96" r="2" fill="#67F4E6"/>
+  <circle cx="66" cy="96" r="2" fill="#D8AA5B"/>
+
+  <g filter="url(#glow)" stroke-linecap="round" stroke-width="5">
+    <path d="M34 35H74" stroke="url(#bronze)"/>
+    <path d="M34 43H49M59 43H74" stroke="url(#jade)"/>
+    <path d="M34 51H74" stroke="url(#bronze)"/>
+    <path d="M34 59H49M59 59H74" stroke="url(#jade)"/>
+    <path d="M34 67H74" stroke="url(#bronze)"/>
+    <path d="M34 75H49M59 75H74" stroke="url(#jade)"/>
+  </g>
+
+  <path d="M54 29V79" stroke="#DDFBF6" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>
+  <circle cx="54" cy="43" r="2.6" fill="#EED18C"/>
+  <circle cx="54" cy="59" r="2.6" fill="#69F3E2"/>
+  <circle cx="54" cy="75" r="2.6" fill="#EED18C"/>
+</svg>

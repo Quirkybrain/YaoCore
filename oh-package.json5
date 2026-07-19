@@ -1,0 +1,10 @@
+{
+  "modelVersion": "5.0.0",
+  "name": "yaocore",
+  "version": "1.0.0",
+  "description": "YaoCore HarmonyOS 6 smart home app",
+  "main": "",
+  "author": "Zhang HaoXuan",
+  "license": "Apache-2.0",
+  "dependencies": {}
+}

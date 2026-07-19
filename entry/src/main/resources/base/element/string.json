@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "ble_permission_reason",
+      "value": "用于发现并连接附近的爻构网关，安全发送家庭 Wi-Fi 配置。"
+    },
+    {
+      "name": "module_desc",
+      "value": "爻构智能家居控制模块"
+    },
+    {
+      "name": "entryability_desc",
+      "value": "爻构"
+    },
+    {
+      "name": "entryability_label",
+      "value": "爻构"
+    }
+  ]
+}

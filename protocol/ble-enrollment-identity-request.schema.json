@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/ble-enrollment-identity-request.schema.json",
+  "title": "YaoCore Security1 enrollment identity request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["op", "protocolVersion"],
+  "properties": {
+    "op": {
+      "const": "get_identity"
+    },
+    "protocolVersion": {
+      "const": "2.0"
+    }
+  }
+}

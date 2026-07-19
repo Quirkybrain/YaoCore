@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yaocore.local/schema/module-heartbeat.schema.json",
+  "title": "YaoCore external module heartbeat v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "moduleId", "sequence"],
+  "properties": {
+    "protocolVersion": { "const": "1.0" },
+    "moduleId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$", "maxLength": 63 },
+    "sequence": { "type": "integer", "minimum": 0 }
+  }
+}
