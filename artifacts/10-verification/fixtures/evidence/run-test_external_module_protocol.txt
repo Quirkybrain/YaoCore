@@ -1,0 +1,123 @@
+test_all_module_contract_files_are_valid_json (test_external_module_protocol.ExternalModuleProtocolTests.test_all_module_contract_files_are_valid_json) ... ok
+test_command_requires_authenticated_final_state_before_router_update (test_external_module_protocol.ExternalModuleProtocolTests.test_command_requires_authenticated_final_state_before_router_update) ... ERROR
+test_dynamic_cloud_inventory_preserves_unique_devices_and_metadata (test_external_module_protocol.ExternalModuleProtocolTests.test_dynamic_cloud_inventory_preserves_unique_devices_and_metadata) ... ERROR
+test_gateway_exposes_authenticated_southbound_endpoints (test_external_module_protocol.ExternalModuleProtocolTests.test_gateway_exposes_authenticated_southbound_endpoints) ... ERROR
+test_module_telemetry_is_authenticated_and_does_not_block_command_tcp (test_external_module_protocol.ExternalModuleProtocolTests.test_module_telemetry_is_authenticated_and_does_not_block_command_tcp)
+Heartbeat/state telemetry uses signed UDP; physical command ACK stays on TCP. ... ERROR
+test_per_module_hmac_vector (test_external_module_protocol.ExternalModuleProtocolTests.test_per_module_hmac_vector) ... ok
+test_registration_is_peer_bound_and_identity_safe (test_external_module_protocol.ExternalModuleProtocolTests.test_registration_is_peer_bound_and_identity_safe) ... ERROR
+test_sensor_rules_are_capability_based_and_asynchronous (test_external_module_protocol.ExternalModuleProtocolTests.test_sensor_rules_are_capability_based_and_asynchronous) ... ERROR
+
+======================================================================
+ERROR: test_command_requires_authenticated_final_state_before_router_update (test_external_module_protocol.ExternalModuleProtocolTests.test_command_requires_authenticated_final_state_before_router_update)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 71, in test_command_requires_authenticated_final_state_before_router_update
+    transport = self.read_main("external_module.c")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/external_module.c'
+
+======================================================================
+ERROR: test_dynamic_cloud_inventory_preserves_unique_devices_and_metadata (test_external_module_protocol.ExternalModuleProtocolTests.test_dynamic_cloud_inventory_preserves_unique_devices_and_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 89, in test_dynamic_cloud_inventory_preserves_unique_devices_and_metadata
+    cloud = self.read_main("cloud_iotda.c")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/cloud_iotda.c'
+
+======================================================================
+ERROR: test_gateway_exposes_authenticated_southbound_endpoints (test_external_module_protocol.ExternalModuleProtocolTests.test_gateway_exposes_authenticated_southbound_endpoints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 51, in test_gateway_exposes_authenticated_southbound_endpoints
+    local = self.read_main("local_server.c")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/local_server.c'
+
+======================================================================
+ERROR: test_module_telemetry_is_authenticated_and_does_not_block_command_tcp (test_external_module_protocol.ExternalModuleProtocolTests.test_module_telemetry_is_authenticated_and_does_not_block_command_tcp)
+Heartbeat/state telemetry uses signed UDP; physical command ACK stays on TCP.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 97, in test_module_telemetry_is_authenticated_and_does_not_block_command_tcp
+    local = self.read_main("local_server.c")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/local_server.c'
+
+======================================================================
+ERROR: test_registration_is_peer_bound_and_identity_safe (test_external_module_protocol.ExternalModuleProtocolTests.test_registration_is_peer_bound_and_identity_safe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 61, in test_registration_is_peer_bound_and_identity_safe
+    local = self.read_main("local_server.c")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/local_server.c'
+
+======================================================================
+ERROR: test_sensor_rules_are_capability_based_and_asynchronous (test_external_module_protocol.ExternalModuleProtocolTests.test_sensor_rules_are_capability_based_and_asynchronous)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 81, in test_sensor_rules_are_capability_based_and_asynchronous
+    automation = self.read_main("automation_engine.c")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_external_module_protocol.py", line 25, in read_main
+    return (MAIN / name).read_text(encoding="utf-8")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/automation_engine.c'
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.002s
+
+FAILED (errors=6)
