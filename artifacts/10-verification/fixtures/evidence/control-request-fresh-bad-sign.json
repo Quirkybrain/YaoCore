@@ -1,0 +1,1 @@
+{"request_id":"req-wp002-live-0002","cmd_id":2001,"seq":2,"target":"Light_01","payload":{"action":"SET_BRIGHTNESS","value":43},"timestamp":"20261016T155542Z","nonce":"wp002live0002","alg":"HMAC-SHA256","key_id":"app-key-v1","sign":"0000000000000000000000000000000000000000000000000000000000000000"}

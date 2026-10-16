@@ -1,0 +1,11 @@
+test_control_ack_is_authenticated_and_strictly_correlated (test_app_response_auth.AppResponseAuthenticationTests.test_control_ack_is_authenticated_and_strictly_correlated) ... ok
+test_discovery_is_challenged_and_authenticated_before_parsing (test_app_response_auth.AppResponseAuthenticationTests.test_discovery_is_challenged_and_authenticated_before_parsing) ... ok
+test_discovery_request_vector_is_fresh_and_replay_resistant (test_app_response_auth.AppResponseAuthenticationTests.test_discovery_request_vector_is_fresh_and_replay_resistant) ... ok
+test_freshness_and_online_contracts_are_wired (test_app_response_auth.AppResponseAuthenticationTests.test_freshness_and_online_contracts_are_wired) ... ok
+test_public_response_vector_matches_protocol (test_app_response_auth.AppResponseAuthenticationTests.test_public_response_vector_matches_protocol) ... ok
+test_security_service_implements_full_response_canonicalization (test_app_response_auth.AppResponseAuthenticationTests.test_security_service_implements_full_response_canonicalization) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.002s
+
+OK

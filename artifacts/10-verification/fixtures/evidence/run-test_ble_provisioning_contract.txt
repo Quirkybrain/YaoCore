@@ -1,0 +1,48 @@
+setUpClass (test_ble_provisioning_contract.BleGatewaySourceContractTests) ... ERROR
+test_minimal_wifi_config_vectors_are_documented (test_ble_provisioning_contract.BleProvisioningVectorTests.test_minimal_wifi_config_vectors_are_documented) ... ok
+test_negative_rssi_int32_uses_ten_byte_varint (test_ble_provisioning_contract.BleProvisioningVectorTests.test_negative_rssi_int32_uses_ten_byte_varint) ... ok
+test_rfc7748_acceptance_vector_is_documented (test_ble_provisioning_contract.BleProvisioningVectorTests.test_rfc7748_acceptance_vector_is_documented) ... ok
+test_security1_session_step0_protobuf_vector (test_ble_provisioning_contract.BleProvisioningVectorTests.test_security1_session_step0_protobuf_vector) ... ok
+test_wifi_scan_request_vectors (test_ble_provisioning_contract.BleProvisioningVectorTests.test_wifi_scan_request_vectors) ... ok
+setUpClass (test_ble_provisioning_contract.HarmonyBleClientContractTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_ble_provisioning_contract.BleGatewaySourceContractTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_ble_provisioning_contract.py", line 139, in setUpClass
+    cls.network_source = read(GATEWAY / "main" / "network_manager.c")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_ble_provisioning_contract.py", line 47, in read
+    return path.read_text(encoding="utf-8", errors="replace")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/main/network_manager.c'
+
+======================================================================
+ERROR: setUpClass (test_ble_provisioning_contract.HarmonyBleClientContractTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_ble_provisioning_contract.py", line 238, in setUpClass
+    cls.sdkconfig = read(GATEWAY / "sdkconfig.defaults")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quirkybrain/code/harmony-projects/YaoCore/artifacts/10-verification/fixtures/tools/test_ble_provisioning_contract.py", line 47, in read
+    return path.read_text(encoding="utf-8", errors="replace")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/quirkybrain/code/harmony-projects/YaoCore/gateway/esp32s3m/sdkconfig.defaults'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.010s
+
+FAILED (errors=2)
