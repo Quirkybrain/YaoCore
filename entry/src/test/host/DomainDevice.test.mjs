@@ -405,6 +405,26 @@ test('T09_O1_gateSerializesOperations', async () => {
   assert.deepEqual(order, ['first-start', 'first-end', 'second']);
 });
 
+test('T09_O1_gateAllowsLegitQueueWithinTimeout', async () => {
+  // D-023: the bounded wait is a global queue budget. Two legitimate serial
+  // operations that each finish inside the budget must both succeed.
+  const gate = new DomainOperationGate(200);
+  const order = [];
+  const first = gate.run(async () => {
+    order.push('first-start');
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    order.push('first-end');
+    return 'first';
+  });
+  const second = gate.run(async () => {
+    order.push('second');
+    return 'second';
+  });
+  assert.equal(await withTimeout(first, 1000), 'first');
+  assert.equal(await withTimeout(second, 1000), 'second');
+  assert.deepEqual(order, ['first-start', 'first-end', 'second']);
+});
+
 test('T09_C10_assignRoomRejectsRoomFromAnotherFamily', async () => {
   const { h, familyId } = await setup();
   const otherFamily = await h.families.createFamily('Other', 'Bob');
@@ -492,6 +512,28 @@ test('T09_C10_commitFailureEmitsNoDeviceEvent', async () => {
   (error) => error.code === 'STORAGE_RDB_ERROR');
   assert.equal(events, 0);
   assert.equal(await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01')), undefined);
+});
+
+test('T09_C10_commitFailureRollsBackDiagnostics', async () => {
+  const { h, familyId } = await setup();
+  const opt = options(h, familyId);
+  await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01', { updatedAt: T1 })], { isPartial: true }), opt);
+  let record = await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01'));
+  assert.equal(record.merge.lastResult, DeviceMergeResult.ADDED);
+  assert.equal(record.hasPartialState, true);
+
+  h.rdb.failCommit = true;
+  // The full snapshot would clear the partial flag and rewrite the merge
+  // diagnostics, but its commit fails; both caches must roll back (R2-05).
+  await assert.rejects(h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01', { updatedAt: T1 })]), opt),
+  (error) => error.code === 'STORAGE_RDB_ERROR');
+  record = await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01'));
+  assert.equal(record.merge.lastResult, DeviceMergeResult.ADDED);
+  assert.equal(record.hasPartialState, true);
+  assert.equal(record.state.snapshot.updatedAt, T1);
+  assert.equal(h.rdb.failCommit, false);
 });
 
 test('T09_C10_removeDevicesForGatewayReadsRouteOutsideTransaction', async () => {

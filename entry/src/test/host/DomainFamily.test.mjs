@@ -314,6 +314,64 @@ test('T09_C08_codeKekMultipleReceiptsFollowD022', async () => {
   assert.equal(await h.families.getMember(family.familyId, 'member-c'), undefined);
 });
 
+test('T09_C08_sameReceiptReplayDoesNotConsumeUse', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 2, 86400000));
+  h.invites.receiptMemberId = 'member-a';
+  const first = await service.importReceipt(created.record.inviteId, 'receipt-a');
+  assert.equal(first.memberId, 'member-a');
+  let stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 1);
+  assert.equal((await h.families.listMembers(family.familyId)).length, 2);
+
+  // DES-B §3.4: the same receipt is accepted once. Replaying it (even on a
+  // multi-use CODE_KEK invitation) must not consume another use or add a row.
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-a'),
+    (error) => error.code === 'INVITE_RECEIPT_INVALID');
+  stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 1);
+  assert.equal((await h.families.listMembers(family.familyId)).length, 2);
+
+  // A second receipt for the same member is the same acceptance, not a new use.
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-a-retry'),
+    (error) => error.code === 'INVITE_RECEIPT_INVALID');
+  stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 1);
+  assert.equal((await h.families.listMembers(family.familyId)).length, 2);
+
+  // A different receipt for a different member still consumes a use (D-022).
+  h.invites.receiptMemberId = 'member-b';
+  const second = await service.importReceipt(created.record.inviteId, 'receipt-b');
+  assert.equal(second.memberId, 'member-b');
+  stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 2);
+  assert.equal(stored.acceptedByMemberId, 'member-b');
+  assert.equal((await h.families.listMembers(family.familyId)).length, 3);
+  assert.equal((await h.families.getMember(family.familyId, 'member-a')).status,
+    MemberStatus.ACTIVE);
+  assert.equal((await h.families.getMember(family.familyId, 'member-b')).status,
+    MemberStatus.ACTIVE);
+});
+
+test('T09_C08_keyWrapReceiptReplayIsRejectedWithoutExtraConsumption', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createInvitationForJoinRequest('YCR1.fake.join',
+    new CreateInvitationInput(family.familyId, MemberRole.MEMBER, [], InviteMode.KEY_WRAP));
+  h.invites.receiptMemberId = 'member-a';
+  await service.importReceipt(created.record.inviteId, 'receipt-a');
+  // KEY_WRAP maxUses=1, so the exhausted-invitation check keeps the closed
+  // R-01/D-022 INVITE_MAX_USES precedence; either way no extra use is consumed.
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-a'),
+    (error) => error.code === 'INVITE_MAX_USES');
+  const stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 1);
+  assert.equal((await h.families.listMembers(family.familyId)).length, 2);
+  assert.equal((await h.families.getMember(family.familyId, 'member-b')), undefined);
+});
+
 test('T09_C08_acceptedCodeKekCanStillBeRevokedWhileUsesRemain', async () => {
   const { h, service } = await setup();
   const family = await createFamily(service);

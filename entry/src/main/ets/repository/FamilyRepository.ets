@@ -768,6 +768,16 @@ export class FamilyRepository implements MemberRoomGrantPort {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
     DateTimeUtil.parseUtcCompact(patch.acceptedAt);
+    if (FamilyRepository.isDuplicateReceipt(record, patch)) {
+      // DES-B §3.4 / ADR-003 §5.4: a receipt is accepted once. Replaying the
+      // same receipt (or the same member's acceptance) must not consume a use
+      // or touch a member row (wp-028 R2-01). Rejection is preferred over
+      // idempotent success so an Admin retry surfaces the duplicate
+      // deterministically. An exhausted invitation keeps the existing
+      // INVITE_MAX_USES precedence (checked above) and is equally side-effect
+      // free.
+      throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+    }
     // D-022: ACCEPTED records each receipt and is not a terminal state. The
     // invitation stays usable while usedCount < maxUses and not expired.
     await tx.execute('UPDATE invitation SET status = ?, accepted_at = ?, ' +
@@ -777,6 +787,23 @@ export class FamilyRepository implements MemberRoomGrantPort {
   }
 
   // ---- Internals ----------------------------------------------------------
+
+  /**
+   * A receipt identifies one acceptance. The same receipt text, or a second
+   * receipt for the member that already accepted, is a replay rather than a
+   * new use of a multi-use CODE_KEK invitation (DES-B §3.4; D-022 does not
+   * make an acceptance repeatable).
+   */
+  private static isDuplicateReceipt(record: InvitationRecord, patch: InvitationPatch): boolean {
+    if (record.receipt !== undefined && record.receipt.length > 0 &&
+      patch.receipt !== undefined && record.receipt === patch.receipt) {
+      return true;
+    }
+    return record.acceptedByMemberId !== undefined &&
+      record.acceptedByMemberId.length > 0 &&
+      patch.acceptedByMemberId !== undefined &&
+      record.acceptedByMemberId === patch.acceptedByMemberId;
+  }
 
   private async switchActiveFamilyInternal(familyId: string): Promise<void> {
     const family = await this.readFamily(this.rdb, familyId);

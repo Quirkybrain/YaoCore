@@ -20,11 +20,25 @@
  *   CONFIGURATION_ERROR (field=nestedGateOperation).
  * - A reentrant call that yields first cannot be told apart from an ordinary
  *   concurrent caller without async-context support. The gate therefore also
- *   guards every queued operation with a bounded wait (default 2000 ms). If the
- *   queue cannot start an operation in that window, the caller receives
- *   CONFIGURATION_ERROR (field=nestedOperationOrQueueTimeout) and the queued
- *   body is never executed. This converts an O-1 deadlock into a deterministic
- *   failure instead of an unbounded hang.
+ *   guards every queued operation with a bounded wait (default 2000 ms,
+ *   constructor-injectable; D-023). If the queue cannot start an operation in
+ *   that window, the caller receives CONFIGURATION_ERROR
+ *   (field=nestedOperationOrQueueTimeout) and the queued body is never
+ *   executed. This converts an O-1 deadlock into a deterministic failure
+ *   instead of an unbounded hang.
+ *
+ * Bounded-wait semantics (D-023):
+ * - The budget is a GLOBAL queue-wait bound, not a nested-call detector: it
+ *   also applies to legitimate independent callers that queue behind a slow
+ *   operation.
+ * - Valid domain operations are expected to complete well below the default
+ *   2000 ms. A caller that knows its operation may run longer must serialize
+ *   at the call site (await the previous operation) instead of relying on the
+ *   gate queue; the composition root may inject a larger budget through
+ *   `new DomainOperationGate(ms)`.
+ * - A positive value is the budget; a value <= 0 disables the bounded wait.
+ *   Disabling it is not recommended because an asynchronous reentrant call
+ *   would then hang until the outer operation settles.
  *
  * The gate itself is dependency-injected (no global singleton). The composition
  * root must share one instance across C-08..C-11. If no gate is supplied, a

@@ -119,9 +119,12 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
         }
       }
       const events: DeviceChangeEvent[] = [];
-      const result = await this.rdb.transaction<DiscoverApplyResult>(
-        async (tx: RdbTransaction): Promise<DiscoverApplyResult> => {
-          return this.applyDiscoverInTransaction(tx, snapshot, familyId, options, events);
+      const result = await this.runTransactionWithDiagnostics<DiscoverApplyResult>(
+        async (): Promise<DiscoverApplyResult> => {
+          return this.rdb.transaction<DiscoverApplyResult>(
+            async (tx: RdbTransaction): Promise<DiscoverApplyResult> => {
+              return this.applyDiscoverInTransaction(tx, snapshot, familyId, options, events);
+            });
         });
       // Events are notifications, never a fact source: dispatch only after the
       // transaction committed (wp-026 R-12).
@@ -592,26 +595,29 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     const removeSceneReferences = options === undefined ? true : options.removeSceneReferences;
     return this.gate.run(async (): Promise<DeviceRemovalResult> => {
       const events: DeviceChangeEvent[] = [];
-      const result = await this.rdb.transaction<DeviceRemovalResult>(
-        async (tx: RdbTransaction): Promise<DeviceRemovalResult> => {
-          const row = await this.readRow(tx, key);
-          if (row === undefined ||
-            SqlCells.requiredString(row, 'family_id') !== checkedFamily) {
-            throw AppErrors.of('DEVICE_NOT_FOUND', []);
-          }
-          let cleanup: SceneCleanupSummary | undefined = undefined;
-          if (removeSceneReferences) {
-            cleanup = await this.scenes.removeDeviceReferences(tx, checkedFamily, key);
-          }
-          await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
-            [key.gatewayId, key.deviceId]);
-          await tx.execute('INSERT OR IGNORE INTO gw_dismissed_device ' +
-            '(gateway_id, device_id, dismissed_at) VALUES (?, ?, ?)',
-          [key.gatewayId, key.deviceId, DateTimeUtil.formatUtcCompact(nowMs)]);
-          this.mergeStates.delete(key.globalId());
-          this.partialKeys.delete(key.globalId());
-          events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_DISMISSED, key));
-          return new DeviceRemovalResult(true, key, true, cleanup);
+      const result = await this.runTransactionWithDiagnostics<DeviceRemovalResult>(
+        async (): Promise<DeviceRemovalResult> => {
+          return this.rdb.transaction<DeviceRemovalResult>(
+            async (tx: RdbTransaction): Promise<DeviceRemovalResult> => {
+              const row = await this.readRow(tx, key);
+              if (row === undefined ||
+                SqlCells.requiredString(row, 'family_id') !== checkedFamily) {
+                throw AppErrors.of('DEVICE_NOT_FOUND', []);
+              }
+              let cleanup: SceneCleanupSummary | undefined = undefined;
+              if (removeSceneReferences) {
+                cleanup = await this.scenes.removeDeviceReferences(tx, checkedFamily, key);
+              }
+              await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
+                [key.gatewayId, key.deviceId]);
+              await tx.execute('INSERT OR IGNORE INTO gw_dismissed_device ' +
+                '(gateway_id, device_id, dismissed_at) VALUES (?, ?, ?)',
+              [key.gatewayId, key.deviceId, DateTimeUtil.formatUtcCompact(nowMs)]);
+              this.mergeStates.delete(key.globalId());
+              this.partialKeys.delete(key.globalId());
+              events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_DISMISSED, key));
+              return new DeviceRemovalResult(true, key, true, cleanup);
+            });
         });
       this.dispatchEvents(events);
       return result;
@@ -623,23 +629,26 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     const key = new DeviceKey(DeviceRepository.requireGatewayId(gatewayId), deviceId);
     return this.gate.run(async (): Promise<boolean> => {
       const events: DeviceChangeEvent[] = [];
-      const restored = await this.rdb.transaction<boolean>(
-        async (tx: RdbTransaction): Promise<boolean> => {
-          const rows = await tx.query('SELECT device_id FROM gw_dismissed_device ' +
-            'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
-          if (rows.length === 0) {
-            return false;
-          }
-          await tx.execute('DELETE FROM gw_dismissed_device ' +
-            'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
-          // Old snapshot is deliberately not restored: the next discover re-adds
-          // the device in the unassigned/disabled pool (DES-B §5.3.4).
-          await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
-            [key.gatewayId, key.deviceId]);
-          this.mergeStates.delete(key.globalId());
-          this.partialKeys.delete(key.globalId());
-          events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_RESTORED, key));
-          return true;
+      const restored = await this.runTransactionWithDiagnostics<boolean>(
+        async (): Promise<boolean> => {
+          return this.rdb.transaction<boolean>(
+            async (tx: RdbTransaction): Promise<boolean> => {
+              const rows = await tx.query('SELECT device_id FROM gw_dismissed_device ' +
+                'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
+              if (rows.length === 0) {
+                return false;
+              }
+              await tx.execute('DELETE FROM gw_dismissed_device ' +
+                'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
+              // Old snapshot is deliberately not restored: the next discover
+              // re-adds the device in the unassigned/disabled pool (DES-B §5.3.4).
+              await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
+                [key.gatewayId, key.deviceId]);
+              this.mergeStates.delete(key.globalId());
+              this.partialKeys.delete(key.globalId());
+              events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_RESTORED, key));
+              return true;
+            });
         });
       this.dispatchEvents(events);
       return restored;
@@ -659,34 +668,37 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
           routeFamilyId = route.familyId;
         }
       }
-      return this.rdb.transaction<number>(async (tx: RdbTransaction): Promise<number> => {
-        const rows = await tx.query('SELECT ' + DEVICE_COLUMNS +
-          ' FROM device_state WHERE gateway_id = ?', [checked]);
-        const families: string[] = [];
-        const seenFamilies: Map<string, boolean> = new Map<string, boolean>();
-        if (routeFamilyId !== undefined) {
-          seenFamilies.set(routeFamilyId, true);
-          families.push(routeFamilyId);
-        }
-        let removed = 0;
-        for (let index = 0; index < rows.length; index++) {
-          const familyId = SqlCells.requiredString(rows[index], 'family_id');
-          if (!seenFamilies.has(familyId)) {
-            seenFamilies.set(familyId, true);
-            families.push(familyId);
-          }
-          const deviceId = SqlCells.requiredString(rows[index], 'device_id');
-          await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
-            [checked, deviceId]);
-          this.mergeStates.delete(checked + ':' + deviceId);
-          this.partialKeys.delete(checked + ':' + deviceId);
-          removed++;
-        }
-        for (let index = 0; index < families.length; index++) {
-          await this.scenes.removeGatewayReferences(tx, families[index], checked);
-        }
-        return removed;
-      });
+      return this.runTransactionWithDiagnostics<number>(
+        async (): Promise<number> => {
+          return this.rdb.transaction<number>(async (tx: RdbTransaction): Promise<number> => {
+            const rows = await tx.query('SELECT ' + DEVICE_COLUMNS +
+              ' FROM device_state WHERE gateway_id = ?', [checked]);
+            const families: string[] = [];
+            const seenFamilies: Map<string, boolean> = new Map<string, boolean>();
+            if (routeFamilyId !== undefined) {
+              seenFamilies.set(routeFamilyId, true);
+              families.push(routeFamilyId);
+            }
+            let removed = 0;
+            for (let index = 0; index < rows.length; index++) {
+              const familyId = SqlCells.requiredString(rows[index], 'family_id');
+              if (!seenFamilies.has(familyId)) {
+                seenFamilies.set(familyId, true);
+                families.push(familyId);
+              }
+              const deviceId = SqlCells.requiredString(rows[index], 'device_id');
+              await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
+                [checked, deviceId]);
+              this.mergeStates.delete(checked + ':' + deviceId);
+              this.partialKeys.delete(checked + ':' + deviceId);
+              removed++;
+            }
+            for (let index = 0; index < families.length; index++) {
+              await this.scenes.removeGatewayReferences(tx, families[index], checked);
+            }
+            return removed;
+          });
+        });
     });
   }
 
@@ -870,6 +882,40 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
       throw AppErrors.of('DEVICE_NOT_FOUND', []);
     }
     return this.stateFromRow(row);
+  }
+
+  /**
+   * Diagnostics (`mergeStates`/`partialKeys`) are process-local projections of
+   * durable device facts. They are mutated while the RDB transaction is open,
+   * so a failed commit must restore them to the pre-transaction snapshot;
+   * otherwise a later read would report an ADDED/PARTIAL result that the
+   * database rolled back (wp-028 R2-05).
+   */
+  private async runTransactionWithDiagnostics<T>(operation: () => Promise<T>): Promise<T> {
+    const mergeBackup: Map<string, DeviceMergeState> = new Map<string, DeviceMergeState>();
+    this.mergeStates.forEach((state: DeviceMergeState, key: string): void => {
+      mergeBackup.set(key, state);
+    });
+    const partialBackup: Map<string, boolean> = new Map<string, boolean>();
+    this.partialKeys.forEach((value: boolean, key: string): void => {
+      partialBackup.set(key, value);
+    });
+    try {
+      return await operation();
+    } catch (error) {
+      this.mergeStates.clear();
+      mergeBackup.forEach((state: DeviceMergeState, key: string): void => {
+        this.mergeStates.set(key, state);
+      });
+      this.partialKeys.clear();
+      partialBackup.forEach((value: boolean, key: string): void => {
+        this.partialKeys.set(key, value);
+      });
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
   }
 
   private async mapVisibleRecords(tx: RdbTransaction,
