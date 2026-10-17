@@ -3,9 +3,10 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4，冻结签名未变更）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；冻结签名未变更）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -89,6 +90,25 @@
 | `RISK-BLE-DONE-ACK` | `yaocore-done` 响应体形状未定义 | `RISK` | GATT 读写成功即视为 ACK；若返回 JSON 则仅识别 `status`/`ok`，未知字段不阻断 |
 | `RISK-PARTIAL-DISCOVER` | 单设备解析失败时的快照语义 | `RISK` | `DiscoverySnapshot.isPartial=true`；部分快照不得触发“网关已移除”判定 |
 | `UNRESOLVED-CLOUD-COMPLETION` | 云完成判定（PB-02） | `UNRESOLVED`（DES-B） | 不在 DES-A 范围；由 C-15/T-14 处置，不影响本文 LAN ACK |
+
+### 0.5 T-12 裁定同步（2026-10-17）
+
+> **裁定人**：solution-architect（任务 `wp-046-t12-rulings`）。**输入**：REV-T12-001 `artifacts/70-review/t12-review.md`、REV-T12-002 `artifacts/70-review/t12-review-b.md`、REV-T12-003 `artifacts/70-review/t12-review-c.md`、`artifacts/50-implementation/t12-fix-report.md`、`t12-fix2-report.md`。**边界**：本节只澄清既有契约语义与命名，不重写冻结签名、不改变 G-004 的网关结果码/双轨判定/安全语义；实现代码对齐另列后续任务。
+
+| 裁定 | 结论 | 落点 | 实现状态（@ `d9d868a`） |
+|---|---|---|---|
+| **R-1 草稿重签** | `request.credentialDraftId` 一次性消费；C-19 探针成功后**必须**以新 draft id 重签同一命令密钥并写入 `result.credentialDraftId`；C-23/C-07 只能使用 `result.credentialDraftId`；失败/取消销毁原/新 id；重签失败 fail-closed | §5.1.6、§10.3、§16.8、§16.9、§16.11 | 已实现（`BindingProbe.LazyDraftCredentialPort.reissue()`；`BleProvisioningService` post-probe 清理） |
+| **R-2/D-4 错误码命名** | 响应头验签/相关性唯一使用 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH`；`CONTROL_RESPONSE_AUTH_FAILED` 退役；`ACK_CORRELATION_MISMATCH` 仅保留给 ACK body `request_id`/`seq`；protocomm 非零 `Status` 统一保留 `PROVISIONING_SECURITY_HANDSHAKE_FAILED`，不新增细分 code | §3.2.3、§8.2、§14.4、§15.5、§16.4、§16.10、§17.2、§17.4、§18.7；CB §4.2/§4.5 | C-05/C-17/C-03/C-19 已符合；C-20 mock 仍产出退役别名，列入后续对齐（不改本轮代码） |
+| **R3-01 歧义写失败** | 非确认 busy 的写失败（无法证明写未发生）→ `PROVISIONING_GATT_INCOMPLETE`（非重试），清理会话并断开；本次配网终止，重试时从 Security1 step0 重来；确认 busy 才允许同一密文重试一次（适配器以 `retryable=write-busy` 标记；`details` 白名单相应增补 `retryable`） | §3.2.1、§16.2、§16.10、§16.11 | 已实现（`mapWriteError` 仅 `2900011`/`2901004` 标记 `retryable=write-busy`；其他写失败 `GATT_INCOMPLETE`） |
+
+> **未决/后续**：C-20 `MockGatewayService` 的 `CONTROL_RESPONSE_AUTH_FAILED`/header→`ACK_CORRELATION_MISMATCH` 映射与本节目标不一致（见 CB §4.5 对齐状态）；不在 `wp-046` 改代码，须由后续实现任务修复并重跑 host 测试。T-19 仍需在真实设备确认 `2900011`/`2901004`/`2900099` 的平台语义（R3-02）与 protocomm 非零 `Status` 的固件行为。
+
+**发现并记录的下游冲突（不在本轮修改）**：
+
+1. `artifacts/40-detailed-design/des-001b-domain-presentation.md` 的 C-23 配网流（约 L3867-3869）仍把 `submit` 生成的原始 `draftId` 传给 `commitBinding(result, draftId, familyId)`，并写有“`result.credentialDraftId` 必须等于 `draftId`”。按 R-1，原 id 已被 C-19 探针消费，必须改为 `commitBinding(result, result.credentialDraftId, familyId)`；失败清理也必须销毁 `result.credentialDraftId`（若存在），而不是只销毁原 id。该文件不在 `wp-046` 写范围，列入 Change Impact/后续 DES-B 同步。
+2. 同文件 §10.2（约 L3410）仍把 `CONTROL_RESPONSE_AUTH_FAILED` 作为 ACK 错误示例；按 R-2/D-4，header 失败应为 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`，ACK body 失败才是 `ACK_CORRELATION_MISMATCH`。同样列入后续文档同步。
+3. `artifacts/50-implementation/t11-transport.md`（历史实现报告，约 L168/L326）记录了旧的 `CONTROL_RESPONSE_AUTH_FAILED`/mock 映射；作为历史证据保留，不回写；CQG/后续报告应以 CB §4.5 为准。
+4. DES-A §3.2.1 的 `details` 白名单原先不含 `retryable`，与 R2-01 的 `retryable=write-busy` 标记冲突；本轮已按 R3-01 边界增补 `retryable`（仅限非敏感机械标记）。
 
 ---
 
@@ -447,7 +467,7 @@ export class AppError extends Error {
 
 **规则**：
 - `code` 是稳定机读字符串；同一语义不得在不同组件使用不同 code。
-- `details` 只允许非敏感字段：`gatewayId`、`deviceId`、`requestId`、`seq`、`httpStatus`、`attempt`、`state`、`field`。**禁止**放入 secret、PoP、Wi-Fi 密码、token、完整证书、session key。
+- `details` 只允许非敏感字段：`gatewayId`、`deviceId`、`requestId`、`seq`、`httpStatus`、`attempt`、`state`、`field`、`retryable`（仅限非敏感机械标记，如 `write-busy`；T-12 裁定同步，2026-10-17）。**禁止**放入 secret、PoP、Wi-Fi 密码、token、完整证书、session key。
 - `i18nKey` 由 `ErrorCatalog` 统一映射（§24）；业务代码不拼接文案。
 - `message` 仅用于开发日志，英文、不含用户数据；UI 不展示 `message`（CB §2.3/§4.4）。
 - `AppError` 可被 `throw`；`Promise` 方法以 reject 返回 `AppError`。禁止抛出裸 `Error`/`string`。
@@ -505,8 +525,8 @@ export class Result<T> {
 | 传输 | `TLS_PROFILE_INCONSISTENT` | SECURITY | 否 | `errors.app.tls_profile_inconsistent` |
 | 传输 | `TLS_PIN_CONFIG_INVALID` | SECURITY | 否 | `errors.app.tls_pin_config_invalid` |
 | 传输 | `TLS_VERIFIER_UNAVAILABLE` | SECURITY | 否 | `errors.app.tls_verifier_unavailable` |
-| 网关 | `CONTROL_RESPONSE_AUTH_FAILED` | GATEWAY | 否 | `errors.app.control_response_auth_failed` |
-| 网关 | `ACK_CORRELATION_MISMATCH` | GATEWAY | 否 | `errors.app.ack_correlation_mismatch` |
+| 网关 | `CONTROL_RESPONSE_AUTH_FAILED`（**DEPRECATED**，仅兼容读取） | GATEWAY | 否 | `errors.app.control_response_auth_failed` |
+| 网关 | `ACK_CORRELATION_MISMATCH`（仅 ACK body `request_id`/`seq`） | GATEWAY | 否 | `errors.app.ack_correlation_mismatch` |
 | 网关 | `ACK_PROTOCOL_VIOLATION` | GATEWAY | 否 | `errors.app.ack_protocol_violation` |
 | 网关 | `ACK_STATE_MISMATCH` | GATEWAY | 否 | `errors.app.ack_state_mismatch` |
 | 网关 | `GATEWAY_ID_MISMATCH` | GATEWAY | 否 | `errors.app.gateway_id_mismatch` |
@@ -573,6 +593,7 @@ export class Result<T> {
 
 > 说明：`HTTP_<status>` 的具体 i18n 键统一为 `errors.app.http_error`，以 `{status}` 参数区分；不得为每个 HTTP 码建一个键。
 > 说明：网关 `result_code` 的 i18n 键为 `errors.gateway.<error_code>`，见 §24；不在本表重复。
+> **T-12 裁定同步（2026-10-17）**：响应头验签/相关性失败的唯一 canonical code 为 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH`（SECURITY）；`CONTROL_RESPONSE_AUTH_FAILED` 已退役，禁止新发（仅兼容读取，i18n 同键）；`ACK_CORRELATION_MISMATCH` 只表示 ACK body 的 `request_id`/`seq` 不等，不得用于响应头 correlation。完整映射与代码对齐状态见 CB §4.5。
 
 #### 3.2.4 网关结果码（仅类型分离，语义引用 CB §4.1）
 
@@ -1381,6 +1402,7 @@ export class BleProvisioningResult {
 
 - `port`：有 TLS 时取 `tls.port`；否则 `DEFAULT_GATEWAY_PORT`。
 - `credentialDraftId` 指向 C-06 `SecretDraftStore` 中的一次性命令密钥；C-07 在 `commitBinding` 中消费并清除。重新配网且已绑定 secret 时可传空串，表示沿用现有 Asset Store 值（仅当 `expectedGatewayId` 已绑定且用户未更换密钥）。
+- **草稿重签（R-1 裁定，2026-10-17）**：`request.credentialDraftId` 是一次性消费输入；C-19 在绑定探针中消费原 draft，仅在探针与 LED 确认全部成功后以新 id 重签同一命令密钥，并把**新 id** 放入 `result.credentialDraftId`。C-23/C-07 必须使用 `result.credentialDraftId`；原 `request.credentialDraftId` 在探针开始后即失效。失败/取消必须销毁原 id 与新 id。详见 §16.8。
 - `BleProvisioningResult` **不含** PoP、Wi-Fi 密码、session key、命令密钥明文。
 
 #### 5.1.7 家庭/成员/房间/场景/云配置基础模型
@@ -2203,6 +2225,8 @@ export class ClockSkewTracker {
 | 随机失败 | `CRYPTO_OPERATION_FAILED` |
 | canonical 字段非法（空/换行） | `PROTOCOL_VALUE_OUT_OF_RANGE` |
 
+> **T-12 裁定同步（2026-10-17）**：本表 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH` 是响应头验签/相关性的唯一 canonical code（SECURITY）；`CONTROL_RESPONSE_AUTH_FAILED` 已退役。C-17/C-18 原样传播，不在调用层重命名。见 CB §4.5。
+
 ### 8.3 状态机与不变量（`DES-A-C05-STATE`）
 
 1. **canonical 精确性**：任何字段都不得包含未转义 LF/CR；`JsonAtom.encode` 保证 value 安全；结构校验在签名前完成。
@@ -2586,6 +2610,8 @@ export class InvitedGateway {
 10. `result.credentialDraftId` 非空时只在此方法内消费；重复调用同一 draftId → `PROVISIONING_SECRET_DRAFT_EXPIRED`（一次性）。
 
 > `BleProvisioningResult` 不含 `familyId` 是有意为之：BLE 层不依赖家庭仓储；C-23 在调用 `commitBinding` 时传入当前 `familyId`。`commitBinding` 的三个参数语义固定：`result`（身份/IP/草稿引用）、`draftId`（一次性命令密钥）、`familyId`（归属）；DES-B 不得改变前两个参数语义。
+>
+> **R-1 裁定（2026-10-17）**：C-23 只能把 `result.credentialDraftId` 作为 `draftId` 传入 `commitBinding`；禁止传 `request.credentialDraftId`（已被 C-19 探针消费，C-07 的相等校验将拒绝）。"draftId 必须等于 result.credentialDraftId"的既有规则不变。
 
 **`applyInvitedGateway`**：
 - 与 `commitBinding` 相同的 route/secret 补偿；`entry.commandSecret` 由调用方在返回后销毁。
@@ -3471,8 +3497,9 @@ export class PendingCommand {
 | DNS/连接拒绝/网络不可达 | `GATEWAY_UNREACHABLE` | 是 | 精确重传 |
 | 连接/读超时 | `GATEWAY_TIMEOUT` | 是 | 精确重传 |
 | HTTP 4xx/5xx 且无有效签名 ACK | `HTTP_<status>` | 5xx 是；4xx 否 | 不构成执行确认 |
-| 响应头缺失/alg/keyId 不符/签名不等 | `CONTROL_RESPONSE_AUTH_FAILED` | 否 | fail-closed |
-| correlation 不等 | `ACK_CORRELATION_MISMATCH` | 否 | 不应用状态 |
+| 响应头缺失/alg/keyId 不符/签名不等 | `RESPONSE_AUTH_FAILED` | 否 | fail-closed；C-05 唯一 canonical |
+| 响应头 correlation 不等（第 2..5 步） | `RESPONSE_CORRELATION_MISMATCH` | 否 | 不解析 body、不应用状态 |
+| ACK body `request_id`/`seq` 不等（第 6..7 步） | `ACK_CORRELATION_MISMATCH` | 否 | 协议缺陷；不应用状态 |
 | ACK schema/`reported_state` 结构非法 | `ACK_PROTOCOL_VIOLATION` | 否 | 不应用状态 |
 | ACK 目标不一致 | `ACK_STATE_MISMATCH` | 否 | 不应用状态 |
 | DEV-ONLY 标记 | `DEV_SIMULATOR_REJECTED` | 否 | 生产强制 |
@@ -3486,6 +3513,7 @@ export class PendingCommand {
 - `HTTP_<status>` 的 `status` 是数字；`details` 含 `httpStatus`。
 - `ControlOutcome` 非零结果不是异常；只有“无法获得可信 ACK”才是异常。这样 VM 可以统一处理“执行失败”与“传输失败”。
 - 所有错误不得包含 secret/完整 body/证书。
+- **T-12 裁定同步（2026-10-17）**：响应头（第 2..5 步）失败使用 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`；ACK body（第 6..7 步）失败使用 `ACK_PROTOCOL_VIOLATION`/`ACK_CORRELATION_MISMATCH`。`CONTROL_RESPONSE_AUTH_FAILED` 已退役，仅兼容读取；不得把 header correlation 映射为 `ACK_CORRELATION_MISMATCH`。见 §18.7 与 CB §4.5。
 
 ### 14.5 档案选择与失败语义（`DES-A-C17-STATE` 续）
 
@@ -3676,7 +3704,7 @@ export interface DiscoveryTransport {
 |---|---|
 | 手动地址格式非法/非 LAN | `MANUAL_ADDRESS_REJECTED` |
 | 未绑定 gatewayId | `MANUAL_ADDRESS_NOT_BOUND` |
-| 验签/identity 不一致 | `GATEWAY_ID_MISMATCH` / `CONTROL_RESPONSE_AUTH_FAILED` |
+| 验签/identity 不一致 | `GATEWAY_ID_MISMATCH` / `RESPONSE_AUTH_FAILED`（canonical，见 CB §4.5） |
 | 无候选 | `DISCOVERY_NO_CANDIDATES`（warning，不一定是异常） |
 | UDP 未实现/未注入 | `DISCOVERY_TRANSPORT_UNAVAILABLE`（warning） |
 | 候选 discover 结构非法 | `DISCOVERY_INVALID_RESPONSE`（warning；其他候选继续） |
@@ -3742,7 +3770,7 @@ export interface BleScanListener {
 export class BleProvisioningRequest {
   readonly device: BleProvisioningDevice;
   readonly pop: string;                   // 用户输入；仅内存
-  readonly credentialDraftId?: string;    // 新绑定时必填；重新配网且已有 secret 时为空
+  readonly credentialDraftId?: string;    // 新绑定时必填；一次性输入，C-19 探针消费后重签新 id（见 §16.8）
   readonly ssid: string;
   readonly wifiPassword: string;          // 仅内存；成功后清零
   readonly familyId: string;
@@ -3907,8 +3935,13 @@ export class GattRequestQueue {
   reset(): void;
 }
 ```
-- 写失败/读失败/超时/取消 → 清理会话，断开；重新连接后从 Security1 step0 重来（BLE §4.2）。
-- GATT busy → 重试一次（50ms），仍失败 → `PROVISIONING_GATT_BUSY`。
+- 写失败/读失败/超时/取消 → 清理会话，断开；本次配网终止，用户/上层重试时从 Security1 step0 重来（BLE §4.2）。
+- **确认 busy**（平台确认写调用未被受理，例如 `2900011` GATT busy / `2901004` connection congested；适配器以 `retryable=write-busy` 标记）→ 在 `writeRead` 内 50ms 后重试一次，**复用同一密文字节**，不重新加密、不推进 CTR；仍失败 → `PROVISIONING_GATT_BUSY`（retryable）。重试只允许发生在“确认写未发生”的前提下。
+- **歧义写失败**（写调用失败但无法证明写未发生，例如 `2900099`、`2900001`、`2901005..2901007`、未知码或无数字码）→ **不得重发同一密文**；立即 `PROVISIONING_GATT_INCOMPLETE`（retryable=false），清理会话并断开；本次配网终止，重试时从 Security1 step0 重新开始（**R3-01 裁定，2026-10-17**）。
+- **读 busy/读失败** → 不重发；终止并清理会话。
+- **队列超时** → `GattRequestQueue` 永久 `broken`，后续请求立即 `PROVISIONING_GATT_BUSY`；不得开始第二笔 GATT 操作。
+
+> `AppError.retryable` 是调用方级提示（VM 可重新发起整次配网），**不等于**通道自动重发；通道自动重发只允许“确认 busy”的同密文一次。`GATT_INCOMPLETE` 的 retryable=false 表示本次会话不得继续，但用户仍可显式重试（新会话/新 keypair）。
 
 ### 16.3 `proto-ver` 能力门禁（`DES-A-C19-STATE`）
 
@@ -3974,6 +4007,11 @@ export class Security1Session {
 5. `encrypt/decrypt`：仅 `ESTABLISHED`；使用**同一个连续 CTR 流**，按请求/响应顺序；不得重新 init；不得跳过失败消息后继续复用（BLE §4.2-86）。
 6. `destroy()`：清零 key/iv/popDigest/client priv；`state=DESTROYED`；后续调用抛 `CRYPTO_STREAM_BROKEN`/`PROVISIONING_SECURITY_HANDSHAKE_FAILED`。
 7. 任何写/读/超时/取消/断开 → `BROKEN` + `destroy()`；重新连接后从 `NEW`/step0 开始；不存在 CTR 会话复用（BLE §7-182）。
+
+**protocomm 非零 `Status`（R-2 / D-4 裁定，2026-10-17）**：
+- `SessionResp0/1.status`、Wi-Fi envelope `status`、`resp_set_config`/`resp_get_status` 内层 `Status` 非 0 → 统一 `PROVISIONING_SECURITY_HANDSHAKE_FAILED`（`retryable=true`）；`details.field` 记录阶段（`step0Response`/`step1Response`/`configStatus`/`wifiStatusResponse` 等），但 `field` 不是稳定细分码。
+- **保留统一，不新增** `PROVISIONING_PROTOCOMM_*` 细分 stable code：所有非零 status 的恢复动作相同（销毁会话 → 断开 → 从 step0 重来），细分不改变重试/UI 策略，却会新增 i18n 键与代码面；T-19 若证明不同 status 需要不同恢复语义，再走 Change Impact。
+- **边界**：Wi-Fi 业务失败（`AuthError`、`NetworkNotFound`、30s 未连接）仍使用 §16.10 的专用 code；PoP 校验不等仍为 `PROVISIONING_POP_INVALID`；不得把这两类折叠进 `SECURITY_HANDSHAKE_FAILED`。
 
 **PoP 纪律**：
 - PoP 逐设备、≥128 bit 随机熵（生产建议），不得由 MAC 推导、不得共用（SC-04；BLE §6-153）。
@@ -4138,6 +4176,18 @@ export class DraftCredentialPort implements GatewayCredentialPort {
    - 超过退避预算 → 同上；提示检查网络/命令密钥；不得无限刷新。
 6. **绑定写入不在 C-19 内**：C-23 调 C-07 `commitBinding(result, draftId, familyId)`；C-19 不 import 仓储实现（CG §4.4）。
 
+**草稿所有权与重签（R-1 裁定，2026-10-17）**：
+
+1. `request.credentialDraftId`（非空时）是**一次性输入**：C-19 在首次实际读取命令密钥的探针中以 `SecretDraftPort.take(id)` 消费；原 id 在 `take` 后立即失效，不得再次 `take` 或非消费 `peek`。
+2. 探针与 LED 确认全部成功后，C-19 **必须**把同一命令密钥写入**新的 draft id**（`put()` 复制 `SecureBytes`，原文随后 `destroy()`），并以新 id 填入 `BleProvisioningResult.credentialDraftId`。返回原 id 或返回已失效 id 均属契约违反。
+3. `BleProvisioningResult.credentialDraftId` 是 C-07 `commitBinding` 的唯一可消费句柄；C-23 必须原样传递 `result.credentialDraftId`，不得传 `request.credentialDraftId`。C-07 的 `draftId === result.credentialDraftId` 校验（§10.3-1）不变。
+4. 失败/取消/超时/探针失败/LED 未确认/结果交付前监听器异常：销毁原 id 与已重签的新 id（若存在）；不得留下任何 live draft；命令密钥不落盘。
+5. **重签失败 fail-closed**：`put` 失败、密钥已销毁或 store 不可用 → 不返回 `BleProvisioningResult`、不调用 `commitBinding`、不写绑定；销毁全部相关 draft，并按底层原因原样终止（`PROVISIONING_CREDENTIAL_MISSING` / `PROVISIONING_SECRET_DRAFT_EXPIRED` / `SECRET_DESTROYED` / `CONFIGURATION_ERROR`）。不得降级为“返回原 id”或伪造空 id 走沿用旧 secret。
+6. **空 draft 路径**：`request.credentialDraftId` 为空且 `expectedGatewayId` 已绑定 → 探针使用 `credentials` 读取已有 secret；成功时 `result.credentialDraftId` 必须为空串，C-07 按 §10.3 沿用旧 secret、不重写。
+7. **签名不变**：`BleProvisioningRequest.credentialDraftId?: string`、`BleProvisioningResult.credentialDraftId: string`、`commitBinding(result, draftId, familyId)` 均保持冻结签名。
+8. **替代方案（未采纳）**：单 draft 两阶段（peek/lease → commit 后销毁）。不采纳原因：(a) 需扩展 C-06 `SecretDraftPort` 的非消费读取/租约 API，破坏 `take` 一次性语义与既有 host 测试；(b) 原 id 在探针期间仍可能被 C-23 误传/误消费，无法像重签一样在结果交付前使旧句柄失效；(c) 需新增生命周期状态与并发保护，收益仅是少一次 `put`。当前方案在“探针成功 → 绑定提交”之间只保留唯一 live draft，且失败路径可清零，故保留实现并固化为契约。
+9. **所有权转移**：`provision` 成功返回 `BleProvisioningResult` 后，草稿所有权转移给 C-23/C-07；C-19 不再销毁该 id。C-23 必须在同一业务流中调用 `commitBinding`（由 C-07 消费并清除），或在放弃结果时显式 `drafts.destroy(result.credentialDraftId)`；TTL 10 分钟只是最后兜底。
+
 ### 16.9 状态机与清理（`DES-A-C19-STATE` 续）
 
 ```ts
@@ -4196,7 +4246,7 @@ IDLE → PERMISSION → SCANNING → CONNECTING → DISCOVERING
 2. `connection.disconnect()`；
 3. 注销所有 BLE 监听器；
 4. `Security1Session.destroy()`；
-5. `SecretDraftStore.destroy(draftId)`（仅取消/失败；成功交给 C-07 消费）；
+5. `SecretDraftStore.destroy(request.credentialDraftId)` 与 `destroy(重签后的新 id，若存在)`（取消/失败；成功交给 C-07 消费；重签语义见 §16.8）；
 6. 清零 PoP/Wi-Fi 密码/session key/临时字节；
 7. 状态置 `CANCELLED`/`FAILED`/`BOUND`；
 8. 释放 `GattRequestQueue`。
@@ -4211,11 +4261,13 @@ IDLE → PERMISSION → SCANNING → CONNECTING → DISCOVERING
 | 多台同名/同服务设备且用户未选择 | `PROVISIONING_MULTIPLE_DEVICES` |
 | 连接失败 | `PROVISIONING_CONNECT_FAILED` |
 | 端点缺失/重名/不可读写 | `PROVISIONING_GATT_INCOMPLETE` |
-| GATT busy | `PROVISIONING_GATT_BUSY` |
+| 确认 busy（平台确认写未受理；可同密文重试一次）或 GATT 队列超时（需重连） | `PROVISIONING_GATT_BUSY` |
+| 歧义写失败（非确认 busy；写调用失败但无法证明写未发生） | `PROVISIONING_GATT_INCOMPLETE`（非重试；清理会话并断开，本次配网终止；重试时从 step0 重来，禁止重发同一密文） |
 | MTU <247 | `PROVISIONING_MTU_TOO_SMALL` |
 | `proto-ver` 不兼容 | `PROVISIONING_CAPABILITY_UNSUPPORTED` |
 | PoP/设备证明失败 | `PROVISIONING_POP_INVALID` |
 | Security1 编解码/流失败 | `PROVISIONING_SECURITY_HANDSHAKE_FAILED` |
+| protocomm 非零 `Status`（session/config/status） | `PROVISIONING_SECURITY_HANDSHAKE_FAILED`（统一；`details.field` 标阶段；见 §16.4） |
 | identity 非法/多余字段 | `PROVISIONING_IDENTITY_INVALID` |
 | Wi-Fi 扫描失败 | `PROVISIONING_WIFI_SCAN_FAILED` |
 | AuthError | `PROVISIONING_WIFI_AUTH_ERROR` |
@@ -4226,7 +4278,10 @@ IDLE → PERMISSION → SCANNING → CONNECTING → DISCOVERING
 | identity 与 discover 不一致 | `PROVISIONING_BINDING_IDENTITY_MISMATCH` |
 | board LED 未确认 | `PROVISIONING_BOARD_LED_UNCONFIRMED` |
 | 取消 | `PROVISIONING_CANCELLED` |
-| 草稿缺失/过期 | `PROVISIONING_CREDENTIAL_MISSING` / `PROVISIONING_SECRET_DRAFT_EXPIRED` |
+| 草稿缺失/过期/已被探针消费 | `PROVISIONING_CREDENTIAL_MISSING` / `PROVISIONING_SECRET_DRAFT_EXPIRED` |
+| 探针成功后重签草稿失败 | `PROVISIONING_CREDENTIAL_MISSING` / `PROVISIONING_SECRET_DRAFT_EXPIRED` / `SECRET_DESTROYED` / `CONFIGURATION_ERROR`（fail-closed；不返回结果、不写绑定） |
+
+> **T-12 裁定同步（2026-10-17）**：R3-01 明确“歧义写失败 → `PROVISIONING_GATT_INCOMPLETE`（非重试）”的边界；该复用不新增 stable code/i18n 键，端点发现失败与歧义写失败的共同语义是“GATT 层不完整、不得继续”，区别仅在触发阶段。R-2/D-4 明确 protocomm 非零 `Status` 保留统一 `PROVISIONING_SECURITY_HANDSHAKE_FAILED`，不新增细分 stable code。与 `GATT_BUSY` 的区别是“平台是否确认写未发生”：确认 busy 才允许同一密文重试一次；歧义失败必须终止并断开，重试时重新连接。证据见 REV-T12-002/003 与 `t12-fix2-report.md`。
 
 ### 16.11 依赖注入与测试 seam（`DES-A-C19-SEAM`）
 
@@ -4239,6 +4294,9 @@ IDLE → PERMISSION → SCANNING → CONNECTING → DISCOVERING
   - `IdentityNegotiator`：v2.1 成功、v2.1→v2.0 重试、两次失败、多余字段、pin 大写/多 pin/`tls=false` 携带 pin；
   - `WifiProvisioningFlow`：扫描分页、AuthError/NetworkNotFound/超时、失败后重建 session；
   - 绑定探针：identity 不一致、签名失败、LED 未确认、退避次数。
+  - 草稿重签（R-1）：成功路径只有 `result.credentialDraftId` 可用（`take` 原 id 失败）；失败/取消/`onCompleted` 抛错后 `drafts.size()==0`；重签失败 fail-closed 且不产生结果；C-23 传 `result.credentialDraftId` 成功、传 `request.credentialDraftId` 被 C-07 拒绝。
+  - 写失败边界（R3-01）：确认 busy → 2 次写尝试、1 次完成写、同密文、50ms；歧义写失败（`ble:2900099`/无标记/无数字码/`ble:2900001`/`ble:2901005..2901007`）→ 1 次写尝试、0 次完成写、无延迟、`GATT_INCOMPLETE`；读 busy/队列超时终止。
+  - protocomm 非零 Status（R-2）：`step0Response`/`step1Response`/`configStatus`/`wifiStatusResponse` 非 0 → `SECURITY_HANDSHAKE_FAILED`；Wi-Fi `AuthError`/`NetworkNotFound`/30s 超时仍用专用 code；错误 PoP 仍 `POP_INVALID`。
 - device/ohosTest：
   - 真实 `OhosBleTransport`（扫描/连接/MTU/0x2901/读写）；
   - `MockBleProvisioningClient` 端到端状态机；
@@ -4257,6 +4315,7 @@ IDLE → PERMISSION → SCANNING → CONNECTING → DISCOVERING
 | BLE §2..§7 | GATT/Security1/protobuf/状态机 |
 | WP2 §3.3-D/§5 | 向量 |
 | T-12 | 本组件主交付 |
+| T-12 裁定 R-1/R-2/R3-01（2026-10-17） | §16.2/§16.4/§16.8/§16.10/§16.11；CB §4.5 |
 
 ---
 ## 17. C-20 MockGatewayService / MockBleProvisioningClient
@@ -4295,7 +4354,7 @@ export class MockScenario {
   readonly idempotentReplay?: boolean;
   readonly omitReportedState?: boolean;   // 触发 ACK_PROTOCOL_VIOLATION
   readonly badSignature?: boolean;        // 触发 RESPONSE_AUTH_FAILED
-  readonly badCorrelation?: boolean;      // 触发 ACK_CORRELATION_MISMATCH
+  readonly badCorrelation?: boolean;      // 触发 RESPONSE_CORRELATION_MISMATCH（header）
   static normal(): MockScenario;
   static offline(): MockScenario;
   static ackLost(): MockScenario;
@@ -4341,7 +4400,7 @@ export class MockBleProvisioningClient implements IBleProvisioningClient {
 | `resultCode=1004` | 正常 | 签名 ACK 但 `result_code=1004` | 非零不抛异常、`ackAccepted=false` |
 | `omitReportedState` | 正常 | `result_code=0` 但无 `reported_state` | `ACK_PROTOCOL_VIOLATION` |
 | `badSignature` | 抛 `RESPONSE_AUTH_FAILED` | 同左 | fail-closed |
-| `badCorrelation` | 抛 `ACK_CORRELATION_MISMATCH` | 同左 | 不应用状态 |
+| `badCorrelation` | 抛 `RESPONSE_CORRELATION_MISMATCH`（header；R-2/D-4 canonical） | 同左 | 不应用状态 |
 
 **确定性**：
 - `MockScenario.seed` 驱动延迟抖动/随机选择；同一 seed + 同一输入序列 → 同一输出。
@@ -4373,7 +4432,8 @@ export class MockBleProvisioningClient implements IBleProvisioningClient {
 
 ### 17.4 错误（`DES-A-C20-ERR`）
 
-- Mock 产出的错误必须是 `AppError`，code 与生产一致（`GATEWAY_UNREACHABLE`/`GATEWAY_TIMEOUT`/`TLS_PIN_MISMATCH`/`TLS_HANDSHAKE_FAILED`/`DEV_SIMULATOR_REJECTED`/`CONTROL_RESPONSE_AUTH_FAILED`/`ACK_CORRELATION_MISMATCH`/`ACK_PROTOCOL_VIOLATION`）。
+- Mock 产出的错误必须是 `AppError`，code 与生产一致（`GATEWAY_UNREACHABLE`/`GATEWAY_TIMEOUT`/`TLS_PIN_MISMATCH`/`TLS_HANDSHAKE_FAILED`/`DEV_SIMULATOR_REJECTED`/`RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`/`ACK_CORRELATION_MISMATCH`（仅 ACK body）/`ACK_PROTOCOL_VIOLATION`）。
+- **T-12 裁定同步（2026-10-17）**：`CONTROL_RESPONSE_AUTH_FAILED` 已退役，mock 不得再产出；当前实现（`MockGatewayService.ets:302-306`）仍把 header 失败转换为退役 code，列入后续代码对齐任务（CB §4.5）。Mock 的 `badCorrelation` 场景是 header 语义，目标 code 为 `RESPONSE_CORRELATION_MISMATCH`；ACK body 的 `request_id`/`seq` 不等由 `ControlAckMapper` 的期望校验覆盖。
 - Mock 不得用“测试专用错误码”绕过生产判定；测试可通过 `scenario.resultCode` 注入网关码。
 - Mock 失败不得泄露测试 secret；`details` 只含非敏感字段。
 
@@ -4505,6 +4565,7 @@ YAOCORE-RESPONSE-V1\n<kind>\n<correlation>\n<sha256_lower_hex(body_utf8)>
 - 未知 `result_code` → `gatewayResult.known=false`、`success=false`、记录偏差；禁止乐观成功。
 - `success` 字段永不参与判定（ADR-001 §1.2-4）。
 - `message` 不进入用户文案（CB §2.3）。
+- **T-12 裁定同步（2026-10-17）**：第 2..5 步失败的唯一 canonical code 为 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH`；第 6..7 步为 `ACK_PROTOCOL_VIOLATION` / `ACK_CORRELATION_MISMATCH`。§14.4 已按本分层修正；`CONTROL_RESPONSE_AUTH_FAILED` 退役，`ACK_CORRELATION_MISMATCH` 不得用于 header correlation。CB §4.5 记录映射与后续 mock 对齐任务。
 
 ### 18.8 别名回退与 `protocolDeviation`
 
