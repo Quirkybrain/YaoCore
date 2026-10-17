@@ -4769,6 +4769,23 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --
 hvigorw --mode module -p module=entry@ohosTest -p product=default onDeviceTest --no-daemon
 ```
 
+**`List.test.ets` 最小骨架**（T-05 可直接扩展）：
+```ts
+import { describe, it, expect } from '@ohos/hypium';
+import { DateTimeUtilSuite } from './foundation/DateTimeUtil.test';
+import { CanonicalSuite } from './security/CanonicalBuilder.test';
+import { ProtocolSuite } from './protocol/DiscoverMapper.test';
+
+export default function desAHostSuite(): void {
+  describe('DES-A host', () => {
+    DateTimeUtilSuite();
+    CanonicalSuite();
+    ProtocolSuite();
+  });
+}
+```
+> 每个 `*Suite` 文件导出同名函数，内部用 `describe/it/expect`；`List.test.ets` 只做聚合，避免循环 import。
+
 **证据纪律**：
 - `hvigorw test` 退出码 0 + 用例数/通过数才是 PASS；仅编译测试 HAP 不算。
 - 无设备/无签名 → `onDeviceTest` 标记 `UNAVAILABLE`/`BLOCKED`，不得写 PASS（CP-03；BB §5.6）。
