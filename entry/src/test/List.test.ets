@@ -20,6 +20,7 @@ import { ControlRequestSerializerSuite } from './protocol/ControlRequestSerializ
 import { IdentityParserSuite } from './protocol/IdentityParser.test';
 import { StateReportMapperSuite } from './protocol/StateReportMapper.test';
 import { SecurityHostSuite } from './security/SecurityHost.test';
+import { StorageHostSuite } from './storage/StorageHost.test';
 
 export default function testsuite() {
   hostBaselineTest();
@@ -31,4 +32,5 @@ export default function testsuite() {
   IdentityParserSuite();
   StateReportMapperSuite();
   SecurityHostSuite();
+  StorageHostSuite();
 }
