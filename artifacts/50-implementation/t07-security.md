@@ -23,11 +23,11 @@
 
 | 项 | 结果 | 证据 |
 |---|---|---|
-| C-04 CryptoService（SHA-256/HMAC/HKDF/PBKDF2/X25519/CTR/GCM/Random/CT-compare） | **实现完成** | 7 个产品文件；`Crypto.test.mjs` 14 用例 |
-| C-05 SecurityService（canonical/sign/verify/nonce/skew） | **实现完成** | 6 个产品文件；`Security.test.mjs` 16 用例 |
+| C-04 CryptoService（SHA-256/HMAC/HKDF/PBKDF2/X25519/CTR/GCM/Random/CT-compare） | **实现完成** | 6 个产品文件；`Crypto.test.mjs` 14 用例（T-07 时） |
+| C-05 SecurityService（canonical/sign/verify/nonce/skew） | **实现完成** | 5 个产品文件；`Security.test.mjs` 16 用例 |
 | V-01 四条控制 HMAC 向量 | **4/4 canonical + sign 复算一致** | `Security.test.mjs` + Node `crypto` oracle |
 | 发现请求 / 响应验签向量 | **各 1/1 复算一致** | 同上 |
-| Node host 测试 | **PASS 118/118**（新增 30） | `entry/src/test/evidence/t07-host-node-tests.tap` |
+| Node host 测试 | **PASS 118/118**（T-07 revision ee67879；修复后 122/122 见 `t07-fix-report.md`） | `entry/src/test/evidence/t07-host-node-tests.tap` |
 | `ohpm install` | **PASS**（exit 0） | `evidence/t07-ohpm-install.log` |
 | `hvigorw clean assembleHap --no-daemon` | **PASS**（BUILD SUCCESSFUL，35 tasks） | `evidence/t07-hvigor-assemble.log` |
 | `codelinter -c code-linter.json5 -p default .` | **PASS**（No defects found） | `evidence/t07-codelinter.log` |
@@ -41,7 +41,7 @@
 
 ## 1. 实现范围与文件清单
 
-### 1.1 C-04（`entry/src/main/ets/service/crypto/`，7 文件）
+### 1.1 C-04（`entry/src/main/ets/service/crypto/`，T-07 时 6 文件）
 
 ```text
 CryptoPort.ets          # CryptoPort/X25519KeyPair/X25519KeyHandle/AesCtrStream/GcmCiphertext
@@ -52,6 +52,10 @@ X25519KeyCodec.ets      # SPKI/PKCS#8 DER <-> 32B raw（严格前缀/长度）
 CryptoRandomSource.ets  # RandomPort -> CryptoPort.randomBytes
 ```
 
+> 勘误（wp-018-fix-t07）：本节 T-07 时产品文件为 6 个、C-05 为 5 个（评审 R-06）。
+> 修复新增 `CryptoErrorClassifier.ets`（R-01 的可 host 测试分类器），当前 crypto 目录为 7 个文件；
+> 测试数由 118 增至 122。详见 `t07-fix-report.md`。
+
 关键实现：
 
 - **SHA-256/HMAC-SHA256**：`createMd('SHA256')` / `createMac('SHA256') + createSymKeyGenerator('HMAC')`，输出必须 32B。
@@ -59,12 +63,12 @@ CryptoRandomSource.ets  # RandomPort -> CryptoPort.randomBytes
 - **PBKDF2-SHA256**：`createKdf('PBKDF2|SHA256')`，强制 `iterations >= 120000`、salt 16B、输出 32B。
 - **X25519**：raw 32B；DER 前缀 `302a300506032b656e032100` / `302e020100300506032b656e04220420`；全零共享秘密拒绝（低阶点防护）。
 - **AES-256-CTR**：单实例连续 `updateSync`，`ACTIVE→BROKEN/DESTROYED`，`bytesProcessed` 单调，输出长度必须等于输入；失败即销毁且终止。
-- **AES-256-GCM**：key 32B / iv 12B / tag 16B；解密失败映射 `CRYPTO_TAG_MISMATCH`，不返回部分明文；**仅邀请容器**，LAN 控制路径未实现 GCM（`EXT-GCM-001` 保持归档）。
+- **AES-256-GCM**：key 32B / iv 12B / tag 16B；仅认证解密失败（平台 crypto operation 错误）映射 `CRYPTO_TAG_MISMATCH`，其他创建/初始化失败按 R-01 分层映射；不返回部分明文；**仅邀请容器**，LAN 控制路径未实现 GCM（`EXT-GCM-001` 保持归档）。
 - **随机**：`createRandom().generateRandomSync(n)`；长度必须精确且不得全零。
 - **常数时间比较**：遍历 `max(a.length,b.length)`，长度差并入累加器，无提前返回。
-- **错误映射**：provider 只抛 `CryptoProviderError(kind)`；平台 message/code 不进入 `AppError` 文本。
+- **错误映射**：provider 只抛 `CryptoProviderError(kind)`；wp-018-fix-t07 后按 CREATE→`CRYPTO_UNAVAILABLE`、KEY_CONVERSION→`CRYPTO_INVALID_KEY`、OPERATION→`CRYPTO_OPERATION_FAILED`、GCM 认证失败→`CRYPTO_TAG_MISMATCH` 分层（R-01）；平台 message/code 不进入 `AppError` 文本。
 
-### 1.2 C-05（`entry/src/main/ets/service/security/`，6 文件）
+### 1.2 C-05（`entry/src/main/ets/service/security/`，5 文件）
 
 ```text
 CanonicalBuilder.ets  # Control/Discover/Response/Cloud canonical + ResponseKind
@@ -226,7 +230,7 @@ ClockSkewTracker.ets  # server_time 偏差提示，不影响成功判定
 | `ohpm install` | 0 | `install completed in 0s 51ms` |
 | `hvigorw clean assembleHap --no-daemon` | 0 | `BUILD SUCCESSFUL in 5 s 468 ms`；35 tasks（34 executed / 1 up-to-date）；仅 unsigned HAP warning |
 | `codelinter -c code-linter.json5 -p default .` | 0 | `No defects found in your code.` |
-| `entry/src/test/run-host-tests.sh` | 0 | `tests 118 / pass 118 / fail 0`；`duration_ms 1217` |
+| `entry/src/test/run-host-tests.sh` | 0 | `tests 118 / pass 118 / fail 0`；`duration_ms 1217`（T-07 revision；wp-018-fix-t07 后为 122/122） |
 | `hvigorw test --no-daemon`（附加） | 124（Previewer 挂起） | `UnitTestArkTS` 3.238 s 完成；无 ArkTS ERROR；随后 `> hvigor Linux`，与 T-05/T-06 环境阻塞一致 |
 
 证据文件（`entry/src/test/evidence/`）：

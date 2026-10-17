@@ -19,6 +19,10 @@ import {
   CryptoProviderError,
 } from '../../main/ets/service/crypto/CryptoProvider.ets';
 import { X25519KeyCodec } from '../../main/ets/service/crypto/X25519KeyCodec.ets';
+import {
+  CryptoFailureStage,
+  classifyCryptoFailure,
+} from '../../main/ets/service/crypto/CryptoErrorClassifier.ets';
 import { TestCryptoProvider } from './TestCryptoProvider.ets';
 
 const utf8 = (text) => new TextEncoder().encode(text);
@@ -334,6 +338,73 @@ test('C04_CryptoService_randomBytesContractIsExactAndNonZero', async () => {
     },
   });
   await expectCodeAsync(() => new CryptoService(broken).randomBytes(16), 'CRYPTO_UNAVAILABLE');
+});
+
+test('C04_CryptoErrorClassifier_mapsDesAErrorTable', () => {
+  const platformError = (code) => Object.assign(new Error('platform detail'), { code });
+
+  // R-01: creation/initialisation failure -> CRYPTO_UNAVAILABLE.
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.CREATE, new Error('create failed')),
+    CryptoErrorKind.UNAVAILABLE);
+  // Key conversion/DER wrapping -> CRYPTO_INVALID_KEY.
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.KEY_CONVERSION,
+    new Error('convert failed')), CryptoErrorKind.INVALID_KEY);
+  // Platform operation failure -> CRYPTO_OPERATION_FAILED.
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.OPERATION,
+    new Error('operation failed')), CryptoErrorKind.OPERATION_FAILED);
+  // GCM authenticated-decryption failure (17630001) -> CRYPTO_TAG_MISMATCH.
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.GCM_DECRYPT_FINAL,
+    platformError(17630001)), CryptoErrorKind.AUTH_TAG);
+  // Other GCM doFinal failures (parameter/call/memory) are not tag mismatches.
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.GCM_DECRYPT_FINAL,
+    platformError(401)), CryptoErrorKind.OPERATION_FAILED);
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.GCM_DECRYPT_FINAL,
+    platformError(17620003)), CryptoErrorKind.OPERATION_FAILED);
+  assert.equal(classifyCryptoFailure(CryptoFailureStage.GCM_DECRYPT_FINAL,
+    new Error('no platform code')), CryptoErrorKind.OPERATION_FAILED);
+});
+
+test('C04_CryptoErrorClassifier_preservesExplicitProviderKind', () => {
+  for (const kind of [CryptoErrorKind.UNAVAILABLE, CryptoErrorKind.INVALID_KEY,
+    CryptoErrorKind.OPERATION_FAILED, CryptoErrorKind.AUTH_TAG]) {
+    const error = new CryptoProviderError(kind);
+    for (const stage of [CryptoFailureStage.CREATE, CryptoFailureStage.KEY_CONVERSION,
+      CryptoFailureStage.OPERATION, CryptoFailureStage.GCM_DECRYPT_FINAL]) {
+      assert.equal(classifyCryptoFailure(stage, error), kind);
+    }
+  }
+});
+
+test('C04_X25519KeyCodec_prefixesAreDefensiveCopies', () => {
+  const spki = X25519KeyCodec.SPKI_PREFIX;
+  const pkcs8 = X25519KeyCodec.PKCS8_PREFIX;
+  assert.equal(hex(spki), '302a300506032b656e032100');
+  assert.equal(hex(pkcs8), '302e020100300506032b656e04220420');
+
+  // Mutating a returned prefix must not poison later DER wrapping (R-07).
+  spki.fill(0xff);
+  pkcs8.fill(0xff);
+  assert.equal(hex(X25519KeyCodec.SPKI_PREFIX), '302a300506032b656e032100');
+  assert.equal(hex(X25519KeyCodec.PKCS8_PREFIX), '302e020100300506032b656e04220420');
+  const publicDer = X25519KeyCodec.rawToDerPublicKey(new Uint8Array(32).fill(1));
+  const privateDer = X25519KeyCodec.rawToDerPrivateKey(new Uint8Array(32).fill(1));
+  assert.equal(hex(publicDer.subarray(0, 12)), '302a300506032b656e032100');
+  assert.equal(hex(privateDer.subarray(0, 16)), '302e020100300506032b656e04220420');
+});
+
+test('C04_CryptoService_gcmOperationFailureIsNotTagMismatch', async () => {
+  // R-01: only an authenticated-decryption failure may surface as
+  // CRYPTO_TAG_MISMATCH; other provider failures stay CRYPTO_OPERATION_FAILED.
+  const key = new Uint8Array(32).fill(3);
+  const iv = new Uint8Array(12).fill(4);
+  const failing = fakeProvider({
+    decryptAesGcm: async () => {
+      throw new CryptoProviderError(CryptoErrorKind.OPERATION_FAILED);
+    },
+  });
+  await expectCodeAsync(() => new CryptoService(failing)
+    .decryptAesGcm(key, iv, new Uint8Array(0), new Uint8Array(1), new Uint8Array(16)),
+  'CRYPTO_OPERATION_FAILED');
 });
 
 test('C04_CryptoService_inputLengthMismatchFromProviderFailsClosed', async () => {

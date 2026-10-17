@@ -4,6 +4,11 @@
  * Contract: DES-A §7.1.1, §7.1.3, §7.3
  *
  * Port-only surface consumed by C-05/C-13/C-19. No @ohos import here.
+ *
+ * Location exception (T-07 R-08 / T-06 R-13): DES-A §7 nominally places this
+ * port under contracts/**. T-07/T-19 write scopes do not include contracts/,
+ * so it stays in service/crypto/ with no duplicate implementation; migrate the
+ * file once C-17 assembles the composition root.
  */
 import { AppErrors } from '../../common/types/AppError';
 

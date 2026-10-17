@@ -98,10 +98,13 @@ export default function securityDeviceTest() {
       const sealed = await crypto.encryptAesGcm(key, iv, aad, plaintext);
       expect(BytesUtil.hexLower(sealed.ciphertext)).assertEqual(
         'cea7403d4d606b6e074ec5d3baf39d18');
+      // NIST GCM case 13 with a 16B zero plaintext (Node crypto recomputation).
       expect(BytesUtil.hexLower(sealed.tag)).assertEqual(
-        '530f8afbc74536b9a963b4f1c4cb738b');
+        'd0d1c8a799996bf0265b98b5d48ab919');
       const opened = await crypto.decryptAesGcm(key, iv, aad, sealed.ciphertext, sealed.tag);
       expect(opened.length).assertEqual(16);
+      expect(BytesUtil.hexLower(opened)).assertEqual(
+        '00000000000000000000000000000000');
 
       const tampered = new Uint8Array(sealed.tag);
       tampered[0] = tampered[0] ^ 0xff;
@@ -112,6 +115,14 @@ export default function securityDeviceTest() {
         code = String((error as Error).message);
       }
       expect(code).assertEqual('CRYPTO_TAG_MISMATCH');
+
+      // R-02 memory-lifecycle assertion skeleton (device only): clearMem()
+      // itself is not observable from ArkTS, so this proves the failure path
+      // still leaves the provider usable after key/DER cleanup. Heap/secret
+      // verification remains tracked by T-19 on a real device.
+      const reopened = await crypto.decryptAesGcm(key, iv, aad, sealed.ciphertext, sealed.tag);
+      expect(BytesUtil.hexLower(reopened)).assertEqual(
+        '00000000000000000000000000000000');
     });
 
     it('C04_x25519RejectsWrongRawLength', 0, async () => {
