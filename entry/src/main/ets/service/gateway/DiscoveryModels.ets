@@ -131,7 +131,9 @@ export class DiscoveryBeacon {
 
   constructor(address: GatewayAddress, gatewayIdHint: string | undefined,
     gatewayNameHint: string | undefined, receivedAtMs: number, raw?: Uint8Array) {
-    if (!IpAddressUtil.isValidIpv4(address.ip) || !IpAddressUtil.isValidPort(address.port)) {
+    // F-10: locator sources must not point the app at loopback/link-local/
+    // multicast/broadcast destinations even though they can never verify.
+    if (!IpAddressUtil.isAllowedLanIpv4(address.ip) || !IpAddressUtil.isValidPort(address.port)) {
       throw AppErrors.of('DISCOVERY_INVALID_RESPONSE', []);
     }
     if (!Number.isFinite(receivedAtMs) || receivedAtMs < 0) {

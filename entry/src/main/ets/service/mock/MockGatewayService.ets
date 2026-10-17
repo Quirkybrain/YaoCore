@@ -55,10 +55,13 @@ function defaultMockDelay(delayMs: number): Promise<void> {
 class MockRecord {
   readonly key: string;
   readonly applied: boolean;
+  /** ack-lost: the exact ACK produced by the lost first attempt (T-11 F-12). */
+  readonly outcome?: ControlOutcome;
 
-  constructor(key: string, applied: boolean) {
+  constructor(key: string, applied: boolean, outcome?: ControlOutcome) {
     this.key = key;
     this.applied = applied;
+    this.outcome = outcome;
   }
 }
 
@@ -116,10 +119,15 @@ export class MockGatewayService implements IGatewayClient, DeviceControlPort {
       const existing = this.records.get(key);
       if (existing === undefined) {
         const outcome = await this.ackOutcome(command, false, false);
-        this.records.set(key, new MockRecord(key, true));
+        this.records.set(key, new MockRecord(key, true, outcome));
         throw AppErrors.of('GATEWAY_TIMEOUT', []);
       }
-      return this.ackOutcome(command, true, true);
+      if (existing.outcome === undefined) {
+        throw AppErrors.of('GATEWAY_TIMEOUT', []);
+      }
+      // F-12: exact retransmission returns the original ACK (same
+      // request_id/seq); no new identity is invented for the retry.
+      return existing.outcome;
     }
     if (this.scenario.mode === MockMode.REPLAY) {
       const existing = this.records.get(key);

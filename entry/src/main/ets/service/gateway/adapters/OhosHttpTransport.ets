@@ -115,7 +115,11 @@ export class OhosHttpTransport implements HttpTransport {
         method: request.method === 'POST' ? http.RequestMethod.POST : http.RequestMethod.GET,
         expectDataType: http.HttpDataType.ARRAY_BUFFER,
         connectTimeout: request.connectTimeoutMs,
-        readTimeout: request.readTimeoutMs
+        readTimeout: request.readTimeoutMs,
+        // T-11 F-02: the SDK default is true. A cached /discover response would
+        // carry a stale challenge and every HMAC/correlation check would fail.
+        // Never serve a signed LAN request from the HTTP cache.
+        usingCache: false
       };
       options.header = OhosHttpTransport.clearHeader(request);
       if (request.body !== undefined) {

@@ -8,6 +8,13 @@
 - **Task**: T-11 / `wp-035-transport`（task 分支 `task/wp-035-transport`，父分支 `feat/yaocore-app`，base commit `4ae8af24`）
 - **Workflow**: STANDARD / GATED_AUTO
 - **Target Stage**: `implementation`
+
+> **Post-review correction（2026-10-17，`wp-037-fix-t11`）**：REVIEW-T11-001 的
+> F-01/F-02/F-03/F-04/F-05/F-09/F-10/F-11/F-12 已修复；逐条处置、当前
+> revision 的命令证据与测试计数见 `artifacts/50-implementation/t11-fix-report.md`。
+> 本文件 §2.1 中“不重试验签/协议”的原始表述对非 2xx 响应**不成立**，修复后
+> 的语义见该行修正与修复报告 F-01。本文件其余 §5 的 335 条证据对应原始
+> revision `698883f`，未被改写；修复 revision 的 host 总数为 **355/355**。
 - **上游契约**:
   - DES-001A §14（C-17）、§15（C-18）、§17（C-20）、§18（协议配方）、§19（PB-03）、§21（发现与 PB-01）、§22/§23（fake/host 边界）
   - ADR-002 §4/§6/§7；contract-baseline §3/§4/§8.6；project-constraints SC-11/SC-13/SC-15、PR-03/PR-06/PR-13、CP-01/CP-03
@@ -121,7 +128,8 @@ entry/src/ohosTest/ets/test/README.md            # 目录说明
 | control 流水线 | seq→签名→`ControlRequestSerializer`→发送/重传→DEV-ONLY→验签→`ControlAckMapper` | C17_control_success |
 | ACK 判定链 | 签名/correlation/`result_code`/`reported_state`/目标/动作由 C-05+C-03 执行；非零不抛异常 | C17_control_doesNotRetrySignedGatewayError |
 | 精确重传 | 同 `request_id/seq/timestamp/nonce/sign/body`；失败后不重新签名 | C17_control_retriesExactBytesOnTimeout |
-| 重试策略 | `maxAttempts=3`，延迟 300/900ms；仅网络/超时/无有效 ACK 的 5xx；不重试验签/协议/TLS/DEV-ONLY | C17_control_exhaustsThreeAttempts |
+| 重试策略 | `maxAttempts=3`，延迟 300/900ms；仅网络/超时/完全无 ACK 认证材料的 5xx；带认证材料的非 2xx 响应验签/协议失败**原样抛出、不重试**（F-01）；4xx 不重试；TLS/DEV-ONLY 不重试 | C17_control_exhaustsThreeAttempts*、C17_control_http500With* |
+| 可观测性 | 成功路径记录 `lan.control.transport.ms` 与 `lan.control.commit.ms`；TLS pin/handshake/profile 失败记录 gatewayId/profile/errorCode/time 安全事件（F-05 修复） | C17 指标/日志断言 |
 | 幂等 | `idempotent_replay` 原样映射；已应用状态不重复应用由 `AckExpectation.alreadyApplied` 支持 | C17/C20 重放用例 |
 | DEV-ONLY | `X-YaoCore-Simulator` 大小写不敏感拒绝 `DEV-ONLY`/`DEV_SIMULATOR_ONLY`，先于验签/解析 | C17_devOnlyResponse |
 | 错误分类 | `GATEWAY_UNREACHABLE/TIMEOUT`、`HTTP_<status>`、`TLS_*`、`ACK_*`、`GATEWAY_NOT_BOUND`；不复用网关数值空间 | §5 负例 |
@@ -149,7 +157,7 @@ entry/src/ohosTest/ets/test/README.md            # 目录说明
 |---|---|---|
 | `normal` | 4 设备快照；控制经**真实** `CanonicalBuilder` + `ResponseVerifier` + `ControlAckMapper` | C20_normal_* |
 | `offline` | `GATEWAY_UNREACHABLE` | C20_offline |
-| `ack-lost` | 首次 `GATEWAY_TIMEOUT`；同命令重试返回原 ACK + `idempotent_replay`，`shouldApplyState=false` | C20_ackLost |
+| `ack-lost` | 首次 `GATEWAY_TIMEOUT`；同命令重试返回**首次生成的同一 ACK**（同 `request_id`/`seq`，不再生成新身份；F-12 修复） | C20_ackLost |
 | `replay` | 同命令重放；同目标异内容返回签名 `1005`，`ackAccepted=false` | C20_replay |
 | `timeout` | 注入 delay 后 `GATEWAY_TIMEOUT`（无真实 sleep） | C20_timeout |
 | `dev-only` | 以 `I GatewayClient` 视角抛出生产拒收码 `DEV_SIMULATOR_REJECTED` | C20_devOnly |
@@ -316,7 +324,7 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --
 | D-2 | `LocalGatewayService` 构造器 | 在 §14.1.2 参数外增加 `routes`、`addresses`、可选 `delay` | §14.6 要求 `GatewayRoutePort`；`send()` 需要路由；`delay` 为 host 确定性重试 seam |
 | D-3 | `HttpResponse.tlsVerification` | 新增可选字段 | `probe().tlsPinMatched` 只能由 transport 在 pin 校验后提供；避免二次连接 |
 | D-4 | C-05 错误码传播 | header 验签/correlation 失败抛 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`（§18.7 + TEST-001 SEC-N07/N08）；`CONTROL_RESPONSE_AUTH_FAILED`/`ACK_CORRELATION_MISMATCH` 用于 C-20 mock 与 C-03 体内 correlation | DES-A §14.4 与 §18.7/测试计划命名不一致；当前选择与 §18.7 + TEST-001 一致，建议架构评审统一 |
-| D-5 | `ControlPolicy.validate` 签名 | 保持 §14.2.3 `(deviceType, isSupported, action, value)`；C-17 传 `undefined/true`，只执行动作/值域规则；设备类型矩阵由 C-10/C-11 预检调用 | `GatewayTarget` 无 deviceType；C-10 已有 `isSupported` 预检 |
+| D-5 | `ControlPolicy.validate` 签名 | 保持 §14.2.3 `(deviceType, isSupported, action, value)`；C-17 直接调用传 `undefined/true`，只执行动作/值域规则；**C-10 `DeviceCommandRunner` 在 `port.send` 前用持久 `deviceType` 调用 `ControlPolicy`**（F-04 修复），设备类型矩阵不再依赖未兑现的预检假设 | `GatewayTarget` 无 deviceType；C-17 直接调用方无法提供类型；矩阵由 C-10 强制执行 |
 | D-6 | Mock `dev-only` | 以 `IGatewayClient` 返回 `DEV_SIMULATOR_REJECTED`，不伪造 header | `IGatewayClient` 无 header 通道；原始 header 拒收由 C-17 host 测试覆盖 |
 | D-7 | Mock 位置 | `entry/src/main/ets/service/mock/**`（§17 允许的 fallback） | 供 host/T-15+ 共享；生产 import 零命中 + HAP 探针；T-19/T-20 仍需 source-map 正式检查 |
 | D-8 | `MockGatewayService` 构造器 | 增加 `crypto` 与可选 `delay` | 用真实 ACK 链生成/验签；host 无 sleep |

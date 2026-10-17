@@ -223,6 +223,7 @@ test('C17_control_success_appliesAckChain', async () => {
   assert.equal(sent.payload.action, 'SET_BRIGHTNESS');
   assert.equal(sent.payload.value, 42);
   assert.match(sent.nonce, /^[0-9a-f]{32}$/);
+  assert.equal(ctx.metrics.count('lan.control.transport.ms'), 1);
   assert.equal(ctx.metrics.count('lan.control.commit.ms'), 1);
 });
 
@@ -264,6 +265,83 @@ test('C17_control_retriesHttp500WithoutSignedAck', async () => {
   assert.equal(outcome.ackAccepted, true);
   assert.equal(ctx.transport.requests.length, 2);
   assert.equal(ctx.delays.length, 1);
+  assert.equal(ctx.metrics.count('lan.control.transport.ms'), 2);
+});
+
+test('C17_control_exhaustsThreeAttemptsOnUnsignedHttp500', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async () => new HttpResponse(500, HttpHeaders.from([]),
+    utf8('upstream failure'), ctx.clock.nowMs()));
+  await expectCode(() => ctx.service.control(target(), command()), 'HTTP_500');
+  assert.equal(ctx.transport.requests.length, 3);
+  assert.deepEqual(ctx.delays, [300, 900]);
+});
+
+// T-11 F-01: non-2xx responses that DO carry ACK material must fail closed and
+// must never be retried. Only a response with no authentication material is a
+// plain HTTP failure.
+test('C17_control_http500WithBadSignatureFailsClosedWithoutRetry', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const body = ackBody(parsed);
+    return new HttpResponse(500,
+      signedResponseHeaders('control', `${parsed.request_id}:${parsed.seq}`, body,
+        Buffer.from('ffffffffffffffff', 'utf8')), body, ctx.clock.nowMs());
+  });
+  await expectCode(() => ctx.service.control(target(), command()), 'RESPONSE_AUTH_FAILED');
+  assert.equal(ctx.transport.requests.length, 1);
+  assert.deepEqual(ctx.delays, []);
+});
+
+test('C17_control_http500WithBadCorrelationFailsClosedWithoutRetry', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const body = ackBody(parsed);
+    return new HttpResponse(500,
+      signedResponseHeaders('control', 'wrong:correlation', body, SECRET), body,
+      ctx.clock.nowMs());
+  });
+  await expectCode(() => ctx.service.control(target(), command()),
+    'RESPONSE_CORRELATION_MISMATCH');
+  assert.equal(ctx.transport.requests.length, 1);
+  assert.deepEqual(ctx.delays, []);
+});
+
+test('C17_control_http500WithSignedMalformedAckIsProtocolViolation', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const malformed = ackBody(parsed, { omitReportedState: true });
+    return new HttpResponse(500,
+      signedResponseHeaders('control', `${parsed.request_id}:${parsed.seq}`, malformed, SECRET),
+      malformed, ctx.clock.nowMs());
+  });
+  await expectCode(() => ctx.service.control(target(), command()), 'ACK_PROTOCOL_VIOLATION');
+  assert.equal(ctx.transport.requests.length, 1);
+  assert.deepEqual(ctx.delays, []);
+});
+
+test('C17_control_http422WithBadSignatureFailsClosedWithoutRetry', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const body = ackBody(parsed);
+    return new HttpResponse(422,
+      signedResponseHeaders('control', `${parsed.request_id}:${parsed.seq}`, body,
+        Buffer.from('ffffffffffffffff', 'utf8')), body, ctx.clock.nowMs());
+  });
+  await expectCode(() => ctx.service.control(target(), command()), 'RESPONSE_AUTH_FAILED');
+  assert.equal(ctx.transport.requests.length, 1);
+});
+
+test('C17_control_http4xxWithoutAckMaterialDoesNotRetry', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async () => new HttpResponse(404, HttpHeaders.from([]),
+    utf8('not found'), ctx.clock.nowMs()));
+  await expectCode(() => ctx.service.control(target(), command()), 'HTTP_404');
+  assert.equal(ctx.transport.requests.length, 1);
 });
 
 test('C17_control_doesNotRetrySignedGatewayError', async () => {
@@ -291,6 +369,22 @@ test('C17_control_exhaustsThreeAttemptsOnTransportFailure', async () => {
   await expectCode(() => ctx.service.control(target(), command()), 'GATEWAY_UNREACHABLE');
   assert.equal(ctx.transport.requests.length, 3);
   assert.deepEqual(ctx.delays, [300, 900]);
+});
+
+test('C17_controlNormalizesAcModeBeforeSigning', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const body = ackBody(parsed);
+    return new HttpResponse(200,
+      signedResponseHeaders('control', `${parsed.request_id}:${parsed.seq}`, body, SECRET), body,
+      ctx.clock.nowMs());
+  });
+  const acCommand = new DeviceControlCommand(GATEWAY, 'AC_01', DeviceAction.SET_MODE,
+    FIXED_MS, 'cool');
+  const outcome = await ctx.service.control(target(), acCommand);
+  assert.equal(outcome.ackAccepted, true);
+  assert.equal(parseRequest(ctx.transport.requests[0]).payload.value, 'COOL');
 });
 
 test('C17_control_badSignatureFailsClosedWithoutRetry', async () => {
@@ -360,6 +454,11 @@ test('C17_pBlockedSendsNoRequest', async () => {
   await expectCode(() => ctx.service.control(target(TransportProfile.P_BLOCKED), command()),
     'GATEWAY_PROFILE_BLOCKED');
   assert.equal(ctx.transport.requests.length, 0);
+  const event = ctx.logger.records.find((entry) => entry.message === 'tls_security_event');
+  assert.ok(event, 'P-BLOCKED must produce a TLS security event');
+  assert.equal(event.field('gatewayId'), GATEWAY);
+  assert.equal(event.field('profile'), String(TransportProfile.P_BLOCKED));
+  assert.equal(event.field('errorCode'), 'GATEWAY_PROFILE_BLOCKED');
 });
 
 test('C17_tlsProfileWithMissingPinsSendsNoRequest', async () => {
@@ -380,6 +479,25 @@ test('C17_tlsPinMismatchNeverFallsBackToCleartext', async () => {
   assert.equal(ctx.transport.requests[0].url.startsWith('https://'), true);
   assert.equal(ctx.transport.tlsPolicies[0].pins[0], PIN_A);
   assert.equal(ctx.transport.tlsPolicies[0].pinAlg, 'sha256-spki-der');
+  const event = ctx.logger.records.find((entry) => entry.message === 'tls_security_event');
+  assert.ok(event, 'pin mismatch must produce a TLS security event');
+  assert.equal(event.field('errorCode'), 'TLS_PIN_MISMATCH');
+  assert.equal(event.field('profile'), String(TransportProfile.P_TLS_PIN));
+  assert.equal(event.field('atMs'), String(FIXED_MS));
+});
+
+test('C17_tlsHandshakeFailureIsLoggedWithoutSecret', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async () => {
+    throw AppErrors.of('TLS_HANDSHAKE_FAILED', []);
+  });
+  await expectCode(() => ctx.service.control(target(TransportProfile.P_TLS_PIN, [PIN_A]), command()),
+    'TLS_HANDSHAKE_FAILED');
+  const events = ctx.logger.records.filter((entry) => entry.message === 'tls_security_event');
+  assert.equal(events.length, 1);
+  assert.equal(events[0].field('errorCode'), 'TLS_HANDSHAKE_FAILED');
+  assert.equal(JSON.stringify(events[0].fields).includes('0123456789abcdef'), false,
+    'security events must not contain secrets');
 });
 
 test('C17_tlsProbeReturnsMatchedPinAndRuntimeProfile', async () => {
@@ -395,6 +513,64 @@ test('C17_tlsProbeReturnsMatchedPinAndRuntimeProfile', async () => {
   assert.equal(result.profile, TransportProfile.P_TLS_PIN);
   assert.equal(result.tlsPinMatched, PIN_A);
   assert.equal(result.snapshot.gatewayId, GATEWAY);
+});
+
+// T-11 F-03: the service layer must independently fail closed when a transport
+// returns a P-TLS-PIN response without (or with inconsistent) pin evidence.
+test('C17_tlsProbeWithoutVerificationEvidenceFailsClosed', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const body = discoverBody();
+    return new HttpResponse(200,
+      signedResponseHeaders('discover', discoverChallenge(request), body, SECRET), body,
+      ctx.clock.nowMs());
+  });
+  await expectCode(() => ctx.service.probe(target(TransportProfile.P_TLS_PIN, [PIN_A])),
+    'TLS_VERIFIER_UNAVAILABLE');
+  assert.equal(ctx.transport.requests.length, 1);
+  const event = ctx.logger.records.find((entry) => entry.message === 'tls_security_event');
+  assert.ok(event);
+  assert.equal(event.field('errorCode'), 'TLS_VERIFIER_UNAVAILABLE');
+});
+
+test('C17_tlsProbeWithPinOutsideRouteFailsClosed', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const body = discoverBody();
+    return new HttpResponse(200,
+      signedResponseHeaders('discover', discoverChallenge(request), body, SECRET), body,
+      ctx.clock.nowMs(), new TlsVerification(PIN_B, 'TLSv1.3', PIN_B));
+  });
+  await expectCode(() => ctx.service.probe(target(TransportProfile.P_TLS_PIN, [PIN_A])),
+    'TLS_PIN_MISMATCH');
+  assert.equal(ctx.transport.requests.length, 1);
+});
+
+test('C17_tlsProbeWithInconsistentPeerSpkiFailsClosed', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const body = discoverBody();
+    return new HttpResponse(200,
+      signedResponseHeaders('discover', discoverChallenge(request), body, SECRET), body,
+      ctx.clock.nowMs(), new TlsVerification(PIN_A, 'TLSv1.3', PIN_B));
+  });
+  await expectCode(() => ctx.service.probe(target(TransportProfile.P_TLS_PIN, [PIN_A])),
+    'TLS_HANDSHAKE_FAILED');
+  assert.equal(ctx.transport.requests.length, 1);
+});
+
+test('C17_tlsControlWithMatchingEvidenceSucceeds', async () => {
+  const ctx = setup();
+  ctx.transport.setHandler(async (request) => {
+    const parsed = parseRequest(request);
+    const body = ackBody(parsed);
+    return new HttpResponse(200,
+      signedResponseHeaders('control', `${parsed.request_id}:${parsed.seq}`, body, SECRET), body,
+      ctx.clock.nowMs(), new TlsVerification(PIN_A, 'TLSv1.3', PIN_A));
+  });
+  const outcome = await ctx.service.control(target(TransportProfile.P_TLS_PIN, [PIN_A]), command());
+  assert.equal(outcome.ackAccepted, true);
+  assert.equal(ctx.transport.requests.length, 1);
 });
 
 test('C17_cleartextDisabledRefusesHmacWithoutFallback', async () => {
@@ -461,4 +637,38 @@ test('C17_controlPolicyNormalizesColorAndAcceptsMatrix', () => {
     DeviceAction.SET_TARGET_TEMPERATURE, 24));
   assert.doesNotThrow(() => ControlPolicy.validate(DeviceType.DOOR, true, DeviceAction.OPEN));
   assert.doesNotThrow(() => ControlPolicy.validate(undefined, true, DeviceAction.PING));
+});
+
+// T-11 F-11: set-* actions require a value; AC mode is normalized to the
+// uppercase AC_MODES vocabulary before signing.
+test('C17_controlPolicyRequiresValueForSetActions', () => {
+  const required = [
+    DeviceAction.SET_BRIGHTNESS,
+    DeviceAction.SET_COLOR,
+    DeviceAction.SET_TARGET_TEMPERATURE,
+    DeviceAction.SET_MODE,
+  ];
+  for (const action of required) {
+    assert.throws(() => ControlPolicy.validate(undefined, true, action),
+      (error) => error instanceof AppError && error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE',
+      `${action} must require a value`);
+  }
+  assert.throws(() => ControlPolicy.validate(DeviceType.LIGHT, true,
+    DeviceAction.SET_BRIGHTNESS, undefined),
+  (error) => error instanceof AppError && error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  assert.throws(() => ControlPolicy.validate(DeviceType.AC, true,
+    DeviceAction.SET_MODE, undefined),
+  (error) => error instanceof AppError && error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  // Value-less boolean actions stay valid.
+  assert.doesNotThrow(() => ControlPolicy.validate(DeviceType.LIGHT, true,
+    DeviceAction.TURN_ON, undefined));
+});
+
+test('C17_controlPolicyNormalizesAcModeCase', () => {
+  assert.equal(ControlPolicy.normalizeValue(DeviceAction.SET_MODE, 'cool'), 'COOL');
+  assert.doesNotThrow(() => ControlPolicy.validate(DeviceType.AC, true,
+    DeviceAction.SET_MODE, 'cool'));
+  assert.throws(() => ControlPolicy.validate(DeviceType.AC, true,
+    DeviceAction.SET_MODE, 'TURBO'),
+  (error) => error instanceof AppError && error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
 });

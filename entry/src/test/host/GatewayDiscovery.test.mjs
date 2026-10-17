@@ -37,6 +37,7 @@ const FAMILY = '123e4567-e89b-12d3-a456-426614174000';
 const GW_A = 'gateway_01';
 const GW_B = 'gateway_02';
 const PIN_A = 'a'.repeat(64);
+const PIN_B = 'b'.repeat(64);
 
 const alias = (gatewayId) => 'yaocore.gateway.hmac.' + gatewayId;
 
@@ -193,6 +194,27 @@ test('C18_lastKnown_profileMismatchIsPBlockedEvidence', async () => {
   assert.equal(report.candidates[0].errorCode, 'TLS_PROFILE_INCONSISTENT');
 });
 
+// T-11 F-03: a P-TLS-PIN route must not be promoted to verified without the
+// matched pin evidence, even if a fake client claims the right profile.
+test('C18_lastKnown_tlsRouteWithoutPinEvidenceIsNotVerified', async () => {
+  const ctx = setup([route(GW_A, '192.168.1.20', TransportProfile.P_TLS_PIN, [PIN_A])]);
+  ctx.client.setHandler(async (target) => new ProbeResult(true, target.gatewayId,
+    'Gateway', target.profile, undefined, 3));
+  const report = await ctx.service.discoverBound(new DiscoveryOptions(FAMILY, false, false, 200));
+  assert.equal(report.verified.length, 0);
+  assert.equal(report.candidates[0].errorCode, 'TLS_VERIFIER_UNAVAILABLE');
+  assert.ok(report.warnings.some((item) => item.code === 'TLS_VERIFIER_UNAVAILABLE'));
+});
+
+test('C18_lastKnown_tlsRouteWithPinOutsidePinsIsNotVerified', async () => {
+  const ctx = setup([route(GW_A, '192.168.1.20', TransportProfile.P_TLS_PIN, [PIN_A])]);
+  ctx.client.setHandler(async (target) => new ProbeResult(true, target.gatewayId,
+    'Gateway', target.profile, PIN_B, 3));
+  const report = await ctx.service.discoverBound(new DiscoveryOptions(FAMILY, false, false, 200));
+  assert.equal(report.verified.length, 0);
+  assert.equal(report.candidates[0].errorCode, 'TLS_PIN_MISMATCH');
+});
+
 test('C18_candidates_areDedupedAndLatencyOrdered', async () => {
   const ctx = setup([route(GW_A, '192.168.1.20')]);
   ctx.client.setHandler(async (target) => probeOk(target, 30));
@@ -240,6 +262,35 @@ test('C18_mdns_scanFailureIsWarningOnly', async () => {
   assert.equal(report.candidates.length, 0);
   assert.ok(report.warnings.some((item) => item.code === 'DISCOVERY_TRANSPORT_UNAVAILABLE'));
   assert.ok(report.warnings.some((item) => item.code === 'DISCOVERY_NO_CANDIDATES'));
+});
+
+// T-11 F-09: mDNS profile incompatibility must be classified as
+// TLS_PROFILE_INCONSISTENT, not GATEWAY_ID_MISMATCH.
+test('C18_mdns_profileMismatchIsTlsProfileInconsistent', async () => {
+  const ctx = setup([route(GW_A, '192.168.1.20', TransportProfile.P_TLS_PIN, [PIN_A])]);
+  ctx.mdns.beacons = [new DiscoveryBeacon(new GatewayAddress('192.168.1.55', 9200), GW_A,
+    'Gateway ' + GW_A, FIXED_MS)];
+  ctx.client.setHandler(async (target) => new ProbeResult(true, target.gatewayId,
+    'Gateway', TransportProfile.P_HMAC, undefined, 3));
+  const report = await ctx.service.discoverBound(new DiscoveryOptions(FAMILY, true, false, 200));
+  const candidate = report.candidates.find((item) => item.source === DiscoverySource.MDNS);
+  assert.ok(candidate);
+  assert.equal(candidate.verified, false);
+  assert.equal(candidate.errorCode, 'TLS_PROFILE_INCONSISTENT');
+  assert.ok(report.warnings.some((item) => item.code === 'TLS_PROFILE_INCONSISTENT'));
+});
+
+// T-11 F-10: locator sources must not direct the app to loopback/link-local.
+test('C18_beacon_rejectsNonLanAddresses', () => {
+  assert.throws(() => new DiscoveryBeacon(new GatewayAddress('127.0.0.1', 9200), GW_A,
+    'Loopback', FIXED_MS), (error) => error instanceof AppError &&
+    error.code === 'DISCOVERY_INVALID_RESPONSE');
+  assert.throws(() => new DiscoveryBeacon(new GatewayAddress('169.254.1.1', 9200), GW_A,
+    'Link local', FIXED_MS), (error) => error instanceof AppError &&
+    error.code === 'DISCOVERY_INVALID_RESPONSE');
+  assert.throws(() => new DiscoveryBeacon(new GatewayAddress('0.0.0.0', 9200), GW_A,
+    'Unspecified', FIXED_MS), (error) => error instanceof AppError &&
+    error.code === 'DISCOVERY_INVALID_RESPONSE');
 });
 
 test('C18_udp_unresolvedPB01_isWarningWhenRequested', async () => {
@@ -316,6 +367,32 @@ test('C18_manual_rateLimitAndFailureBudget', async () => {
   await assert.rejects(() => ctx.service.probeManual(GW_A,
     new GatewayAddress('192.168.1.30', 9200)),
   (error) => error.code === 'MANUAL_ADDRESS_REJECTED');
+});
+
+test('C18_manual_explicitResetClearsFailureBudgetAndInterval', async () => {
+  const ctx = setup([route(GW_A, '192.168.1.20')]);
+  ctx.client.setHandler(async () => {
+    throw AppErrors.of('GATEWAY_UNREACHABLE', []);
+  });
+  await assert.rejects(() => ctx.service.probeManual(GW_A,
+    new GatewayAddress('192.168.1.30', 9200)), (error) => error.code === 'GATEWAY_UNREACHABLE');
+  for (let index = 0; index < 4; index++) {
+    ctx.clock.advance(2000);
+    await assert.rejects(() => ctx.service.probeManual(GW_A,
+      new GatewayAddress('192.168.1.30', 9200)), (error) => error.code === 'GATEWAY_UNREACHABLE');
+  }
+  ctx.clock.advance(2000);
+  await assert.rejects(() => ctx.service.probeManual(GW_A,
+    new GatewayAddress('192.168.1.30', 9200)),
+  (error) => error.code === 'MANUAL_ADDRESS_REJECTED');
+
+  // A user-initiated retry/address change resets the budget and interval gate.
+  ctx.client.setHandler(async (target) => probeOk(target, 2));
+  ctx.service.resetManualFailures(GW_A);
+  const candidate = await ctx.service.probeManual(GW_A,
+    new GatewayAddress('192.168.1.30', 9200));
+  assert.equal(candidate.verified, true);
+  assert.equal(ctx.addresses.updates.length, 1);
 });
 
 test('C18_probeLastKnown_returnsUndefinedWithoutAddress', async () => {

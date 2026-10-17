@@ -57,23 +57,53 @@ export class SequenceRandom implements RandomPort {
   }
 }
 
+export class LoggerEntry {
+  readonly level: string;
+  readonly tag: string;
+  readonly message: string;
+  readonly fields: ReadonlyArray<NameValue>;
+
+  constructor(level: string, tag: string, message: string,
+    fields?: ReadonlyArray<NameValue>) {
+    this.level = level;
+    this.tag = tag;
+    this.message = message;
+    this.fields = fields === undefined ? [] : fields;
+  }
+
+  field(name: string): string | undefined {
+    for (let index = 0; index < this.fields.length; index++) {
+      if (this.fields[index].name === name) {
+        return this.fields[index].value;
+      }
+    }
+    return undefined;
+  }
+}
+
 export class RecordingLogger implements LoggerPort {
   readonly entries: string[] = [];
+  /** Structured copy for security-event/metric assertions (T-11 F-05). */
+  readonly records: LoggerEntry[] = [];
 
   debug(tag: string, message: string, fields?: ReadonlyArray<NameValue>): void {
     this.entries.push('D ' + tag + ' ' + message);
+    this.records.push(new LoggerEntry('debug', tag, message, fields));
   }
 
   info(tag: string, message: string, fields?: ReadonlyArray<NameValue>): void {
     this.entries.push('I ' + tag + ' ' + message);
+    this.records.push(new LoggerEntry('info', tag, message, fields));
   }
 
   warn(tag: string, message: string, fields?: ReadonlyArray<NameValue>): void {
     this.entries.push('W ' + tag + ' ' + message);
+    this.records.push(new LoggerEntry('warn', tag, message, fields));
   }
 
   error(tag: string, message: string, fields?: ReadonlyArray<NameValue>): void {
     this.entries.push('E ' + tag + ' ' + message);
+    this.records.push(new LoggerEntry('error', tag, message, fields));
   }
 }
 

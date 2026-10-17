@@ -367,6 +367,61 @@ test('T09_C10_commandRunnerPrechecksAndControlFlow', async () => {
   assert.equal(h.control.commands.length, before);
 });
 
+// T-11 F-04: C-10 enforces the DES-A §14.2.3 action x deviceType matrix locally
+// before port.send; unsupported combinations never reach the gateway.
+test('T09_C10_commandRunnerEnforcesActionDeviceTypeMatrix', async () => {
+  const { h, familyId } = await setup();
+  const room = await h.rooms.createRoom(familyId, 'Living');
+  await h.devices.applyDiscoverSnapshot(discovery([
+    snapshotDevice('Door_01', { deviceType: DeviceType.DOOR, deviceTypeRaw: 'door' }),
+    snapshotDevice('Light_01', { deviceType: DeviceType.LIGHT, deviceTypeRaw: 'light' }),
+    snapshotDevice('AC_01', { deviceType: DeviceType.AC, deviceTypeRaw: 'ac' }),
+    snapshotDevice('Sensor_01', { deviceType: DeviceType.SENSOR, deviceTypeRaw: 'sensor' }),
+  ]), options(h, familyId));
+  for (const deviceId of ['Door_01', 'Light_01', 'AC_01', 'Sensor_01']) {
+    await h.devices.assignRoom(familyId, new DeviceKey(GATEWAY_ID, deviceId), room.roomId);
+  }
+  const runner = new DeviceCommandRunner(h.control, h.devices, h.clock, h.logger, h.metrics);
+  const run = (deviceId, action, value) => runner.run(
+    command(GATEWAY_ID, deviceId, action, 1700000000000, value), { familyId, precheck: true });
+
+  const doorOpen = await run('Door_01', DeviceAction.OPEN, undefined);
+  assert.equal(doorOpen.ackAccepted, true);
+  assert.equal(h.control.commands.length, 1);
+
+  const doorBrightness = await run('Door_01', DeviceAction.SET_BRIGHTNESS, 42);
+  expectCode(doorBrightness.error, 'CONFIGURATION_ERROR');
+  assert.equal(h.control.commands.length, 1, 'door + SET_BRIGHTNESS must not reach the port');
+
+  const lightBrightness = await run('Light_01', DeviceAction.SET_BRIGHTNESS, 42);
+  assert.equal(lightBrightness.ackAccepted, true);
+  assert.equal(h.control.commands.length, 2);
+
+  const lightMode = await run('Light_01', DeviceAction.SET_MODE, 'COOL');
+  expectCode(lightMode.error, 'CONFIGURATION_ERROR');
+  assert.equal(h.control.commands.length, 2, 'light + SET_MODE must not reach the port');
+
+  const acMode = await run('AC_01', DeviceAction.SET_MODE, 'cool');
+  assert.equal(acMode.ackAccepted, true);
+  assert.equal(h.control.commands.length, 3);
+
+  const acTemp = await run('AC_01', DeviceAction.SET_TARGET_TEMPERATURE, 24);
+  assert.equal(acTemp.ackAccepted, true);
+  assert.equal(h.control.commands.length, 4);
+
+  const acTempOutOfRange = await run('AC_01', DeviceAction.SET_TARGET_TEMPERATURE, 31);
+  expectCode(acTempOutOfRange.error, 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  assert.equal(h.control.commands.length, 4);
+
+  const sensorOn = await run('Sensor_01', DeviceAction.TURN_ON, true);
+  expectCode(sensorOn.error, 'CONFIGURATION_ERROR');
+  assert.equal(h.control.commands.length, 4, 'sensor control must not reach the port');
+
+  const lightMissingValue = await run('Light_01', DeviceAction.SET_BRIGHTNESS, undefined);
+  expectCode(lightMissingValue.error, 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  assert.equal(h.control.commands.length, 4, 'missing required value must not reach the port');
+});
+
 test('T09_C10_renameAndAssignNeverTouchTheNetwork', async () => {
   const { h, familyId } = await setup();
   const room = await h.rooms.createRoom(familyId, 'Living');

@@ -16,6 +16,7 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import type { CancellationToken, ClockPort, LoggerPort } from '../../common/types/Ports';
 import { GatewayAddress, GatewayRoute } from '../../model/GatewayRoute';
+import { TransportProfile } from '../../model/DeviceTypes';
 import type { GatewayAddressPort, GatewayRoutePort } from '../../repository/GatewayPorts';
 import type { IGatewayClient, GatewayTarget, ProbeResult } from './GatewayTransportPorts';
 import { GatewayTarget as GatewayTargetValue } from './GatewayTransportPorts';
@@ -212,8 +213,20 @@ export class GatewayDiscoveryService {
   }
 
   /**
+   * F-10: explicit user action (retry / address change) clears the manual
+   * failure budget and the >=2s interval gate. Automatic discovery never calls
+   * this, so the rate limit cannot be bypassed opportunistically.
+   */
+  resetManualFailures(gatewayId: string): void {
+    this.manualFailures.delete(gatewayId);
+    this.lastManualProbeMs.delete(gatewayId);
+  }
+
+  /**
    * Probes one bound route and returns a verified candidate only when the
-   * signed discover identity and runtime profile match the route.
+   * signed discover identity, runtime profile and (for P-TLS-PIN) pin evidence
+   * match the route. This is an independent service-layer fail-closed check in
+   * addition to the C-17 probe check (T-11 F-03).
    */
   private async probeRoute(route: GatewayRoute, source: DiscoverySource,
     address: GatewayAddress): Promise<DiscoveryCandidate> {
@@ -225,9 +238,7 @@ export class GatewayDiscoveryService {
     if (probe.gatewayId !== route.gatewayId) {
       throw AppErrors.gateway('GATEWAY_ID_MISMATCH', route.gatewayId);
     }
-    if (probe.profile !== route.profile) {
-      throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
-    }
+    this.requireRouteTlsEvidence(route, probe);
     return new DiscoveryCandidate(address, source, undefined, probe.gatewayName, true,
       probe.gatewayId, probe.profile, probe.latencyMs, this.nowMs());
   }
@@ -242,13 +253,19 @@ export class GatewayDiscoveryService {
     try {
       const target = GatewayDiscoveryService.targetOf(route, beacon.address);
       const probe = await this.withProbeTimeout(this.client.probe(target));
-      if (!probe.reachable || probe.gatewayId !== route.gatewayId ||
-        probe.profile !== route.profile) {
-        const code = probe.reachable ? 'GATEWAY_ID_MISMATCH' : 'GATEWAY_UNREACHABLE';
-        warnings.push(AppErrors.gateway(code, route.gatewayId));
-        candidates.push(this.unverifiedBeacon(beacon, DiscoverySource.MDNS, code));
+      if (!probe.reachable) {
+        warnings.push(AppErrors.gateway('GATEWAY_UNREACHABLE', route.gatewayId));
+        candidates.push(this.unverifiedBeacon(beacon, DiscoverySource.MDNS, 'GATEWAY_UNREACHABLE'));
         return;
       }
+      if (probe.gatewayId !== route.gatewayId) {
+        warnings.push(AppErrors.gateway('GATEWAY_ID_MISMATCH', route.gatewayId));
+        candidates.push(this.unverifiedBeacon(beacon, DiscoverySource.MDNS, 'GATEWAY_ID_MISMATCH'));
+        return;
+      }
+      // F-09: profile incompatibility is TLS_PROFILE_INCONSISTENT, not an
+      // identity mismatch. requireRouteTlsEvidence also checks pin evidence.
+      this.requireRouteTlsEvidence(route, probe);
       candidates.push(new DiscoveryCandidate(beacon.address, DiscoverySource.MDNS,
         beacon.gatewayIdHint, probe.gatewayName, true, probe.gatewayId, probe.profile,
         probe.latencyMs, this.nowMs()));
@@ -257,6 +274,38 @@ export class GatewayDiscoveryService {
       warnings.push(appError);
       candidates.push(this.unverifiedBeacon(beacon, DiscoverySource.MDNS, appError.code));
     }
+  }
+
+  /**
+   * F-03/F-09: verified P-TLS-PIN candidates need a matched pin that belongs to
+   * the bound route. A probe without evidence is never promoted to verified.
+   */
+  private requireRouteTlsEvidence(route: GatewayRoute, probe: ProbeResult): void {
+    if (probe.profile !== route.profile) {
+      this.logTlsEvent(route, 'TLS_PROFILE_INCONSISTENT');
+      throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
+    }
+    if (route.profile !== TransportProfile.P_TLS_PIN) {
+      return;
+    }
+    if (probe.tlsPinMatched === undefined) {
+      this.logTlsEvent(route, 'TLS_VERIFIER_UNAVAILABLE');
+      throw AppErrors.of('TLS_VERIFIER_UNAVAILABLE', []);
+    }
+    if (route.pins.indexOf(probe.tlsPinMatched) < 0) {
+      this.logTlsEvent(route, 'TLS_PIN_MISMATCH');
+      throw AppErrors.of('TLS_PIN_MISMATCH', []);
+    }
+  }
+
+  /** F-05: gatewayId/profile/errorCode/time only; no secret or certificate. */
+  private logTlsEvent(route: GatewayRoute, errorCode: string): void {
+    this.logger.warn('GatewayDiscovery', 'tls_security_event', [
+      new NameValue('gatewayId', route.gatewayId),
+      new NameValue('profile', String(route.profile)),
+      new NameValue('errorCode', errorCode),
+      new NameValue('atMs', String(this.nowMs()))
+    ]);
   }
 
   private unverified(route: GatewayRoute, source: DiscoverySource, address: GatewayAddress,

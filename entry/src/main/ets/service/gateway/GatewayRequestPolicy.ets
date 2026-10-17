@@ -69,8 +69,12 @@ export class GatewayRequestPolicy {
 /**
  * DES-A §14.2.3 control policy. C-17 cannot see the device repository, so
  * `deviceType`/`isSupported` are optional prechecks supplied by C-10/C-11 when
- * available; without them the action/value-only rules still apply. The device
- * type matrix is enforced whenever the caller supplies the type.
+ * available; without them the action/value-only rules still apply.
+ *
+ * T-11 F-04: C-10 DeviceCommandRunner now calls this policy with the persisted
+ * device type before `port.send`, so the action x deviceType matrix is enforced
+ * on direct device commands as well. C-17 direct `control()` callers that cannot
+ * supply a type only get the action/value rules.
  */
 export class ControlPolicy {
   static validate(deviceType: DeviceType | undefined, isSupported: boolean,
@@ -97,15 +101,22 @@ export class ControlPolicy {
   }
 
   /**
-   * App normalizes color to uppercase before signing (DES-A §14.2.3). Other
-   * values are returned unchanged. The caller uses this value both in the
-   * canonical signing input and in the ACK expectation.
+   * App normalizes color and AC mode to uppercase before signing (DES-A
+   * §14.2.3). Other values are returned unchanged. The caller uses this value
+   * both in the canonical signing input and in the ACK expectation.
    */
   static normalizeValue(action: DeviceAction, value?: CommandValue): CommandValue | undefined {
-    if (action === DeviceAction.SET_COLOR && typeof value === 'string') {
+    if ((action === DeviceAction.SET_COLOR || action === DeviceAction.SET_MODE) &&
+      typeof value === 'string') {
       return value.toUpperCase();
     }
     return value;
+  }
+
+  /** F-11: these actions are meaningless without a value (DES-A §14.2.3). */
+  private static requiresValue(action: DeviceAction): boolean {
+    return action === DeviceAction.SET_BRIGHTNESS || action === DeviceAction.SET_COLOR ||
+      action === DeviceAction.SET_TARGET_TEMPERATURE || action === DeviceAction.SET_MODE;
   }
 
   private static validateDeviceType(deviceType: DeviceType): void {
@@ -153,6 +164,9 @@ export class ControlPolicy {
     }
     const kind = DeviceConstants.actionToValueKind(action);
     if (value === undefined) {
+      if (ControlPolicy.requiresValue(action)) {
+        throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'value');
+      }
       return;
     }
     if (kind === ActionValueKind.BOOLEAN) {

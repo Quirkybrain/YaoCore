@@ -96,8 +96,9 @@ export class MdnsDiscoveryTransport implements DiscoveryTransport {
     }
     const ip = resolved.host.address;
     const port = resolved.port;
-    // C-02 GatewayAddress is IPv4-only in v1.
-    if (!IpAddressUtil.isValidIpv4(ip) || !IpAddressUtil.isValidPort(port)) {
+    // C-02 GatewayAddress is IPv4-only in v1. F-10: mDNS is an untrusted
+    // locator source, so loopback/link-local/multicast directions are dropped.
+    if (!IpAddressUtil.isAllowedLanIpv4(ip) || !IpAddressUtil.isValidPort(port)) {
       return undefined;
     }
     const hint = this.readHint(resolved.serviceAttribute);

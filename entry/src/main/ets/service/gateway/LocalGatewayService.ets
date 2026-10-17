@@ -10,14 +10,22 @@
  * Security invariants:
  * - P-TLS-PIN failures never fall back to cleartext (P-BLOCKED).
  * - Automatic retries are exact byte-for-byte replays; no re-signing.
+ * - A response that carries ACK authentication material is only trusted after
+ *   full verification. Non-2xx responses with material are never downgraded to
+ *   HTTP_<status> and are never retried (T-11 F-01).
  * - A response is never parsed or applied before DEV-ONLY rejection + HMAC
  *   verification + correlation + ACK schema/state checks.
+ * - P-TLS-PIN responses must carry successful pin evidence from the transport;
+ *   the service re-checks it fail-closed (T-11 F-03).
  * - Secrets stay inside GatewayCredentialPort.withCommandSecret callbacks.
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { ProtocolConstants, ProtocolHeaders } from '../../common/constants/ProtocolConstants';
 import { HttpHeaders } from '../../common/types/HttpHeaders';
+import { JsonKind } from '../../common/types/JsonNode';
+import { JsonParser } from '../../common/utils/JsonParser';
+import { Utf8 } from '../../common/utils/Utf8';
 import type { ClockPort, LoggerPort, MetricsPort } from '../../common/types/Ports';
 import { TransportProfile } from '../../model/DeviceTypes';
 import { GatewayAddress, GatewayRoute } from '../../model/GatewayRoute';
@@ -174,9 +182,13 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
     const execution = await this.performDiscover(target,
       credentials === undefined ? this.credentials : credentials);
     const runtime = this.resolveRuntimeProfile(target);
+    // Defense in depth: performDiscover already checked the evidence, but probe
+    // is the binding-probe contract and must never report a P-TLS-PIN target as
+    // reachable without a pin that belongs to the route (T-11 F-03).
+    const tlsPinMatched = this.requireTlsEvidence(target, runtime,
+      execution.tlsVerification);
     return new ProbeResult(true, execution.snapshot.gatewayId, execution.snapshot.gatewayName,
-      runtime.profile, execution.tlsVerification === undefined ? undefined :
-        execution.tlsVerification.matchedPin, execution.latencyMs, execution.snapshot);
+      runtime.profile, tlsPinMatched, execution.latencyMs, execution.snapshot);
   }
 
   async control(target: GatewayTarget, command: DeviceControlCommand): Promise<ControlOutcome> {
@@ -248,7 +260,8 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
           new DiscoverSigningInput(target.gatewayId), secret);
         const request = this.buildRequest('GET', target, ProtocolConstants.DISCOVER_PATH,
           this.mergeHeaders(signed.headers, false), undefined);
-        const response = await this.transport.send(request, runtime.tlsPolicy);
+        const response = await this.sendTransport(target, request, runtime);
+        this.requireTlsEvidence(target, runtime, response.tlsVerification);
         this.rejectDevOnly(response);
         if (response.statusCode < 200 || response.statusCode >= 300) {
           throw AppErrors.transport(HTTP_STATUS_CODE_PREFIX + String(response.statusCode),
@@ -277,7 +290,12 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
       }
       pending.attempts = attempt;
       try {
-        const response = await this.transport.send(request, runtime.tlsPolicy);
+        const transportStartedAtMs = this.requireClock();
+        const response = await this.sendTransport(target, request, runtime);
+        const transportMs = Math.max(0, this.requireClock() - transportStartedAtMs);
+        this.metrics.record('lan.control.transport.ms', transportMs,
+          [new NameValue('attempt', String(attempt))]);
+        this.requireTlsEvidence(target, runtime, response.tlsVerification);
         this.rejectDevOnly(response);
         const attemptOutcome = await this.classifyControlResponse(response, expectation, secret);
         if (attemptOutcome !== undefined) {
@@ -289,6 +307,9 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
         }
         lastError = AppErrors.transport(HTTP_STATUS_CODE_PREFIX + String(response.statusCode),
           response.statusCode);
+        if (!LocalGatewayService.isRetryable(lastError)) {
+          throw lastError;
+        }
       } catch (error) {
         lastError = error instanceof AppError ? error : AppErrors.transport('LOCAL_REQUEST_FAILED');
         if (!LocalGatewayService.isRetryable(lastError)) {
@@ -313,8 +334,13 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
 
   /**
    * Returns an outcome when the response carries a trusted ACK; undefined when
-   * a 4xx/5xx response has no valid signed ACK and must be classified as HTTP_*.
-   * Verification/protocol failures on a 2xx response are thrown unchanged.
+   * a 4xx/5xx response has no ACK authentication material at all and must be
+   * classified as HTTP_<status>.
+   *
+   * T-11 F-01 / DES-A §14.3/§18.9: a response that DOES carry ACK material
+   * (any X-YaoCore-Response-* header or an ACK-shaped body) is authoritative
+   * only after full verification. Verification/protocol failures are thrown
+   * unchanged and are never retried, including on 5xx.
    */
   private async classifyControlResponse(response: HttpResponse, expectation: AckExpectation,
     secret: Uint8Array): Promise<ControlOutcome | undefined> {
@@ -322,13 +348,92 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
     if (!httpFailure) {
       return this.mapControlAck(response, expectation, secret);
     }
-    try {
-      return await this.mapControlAck(response, expectation, secret);
-    } catch (error) {
-      // A signed ACK with a gateway error is still authoritative. A response
-      // that cannot be verified is just an HTTP failure, retryable for 5xx.
+    if (!LocalGatewayService.hasAckAuthenticationMaterial(response)) {
       return undefined;
     }
+    return this.mapControlAck(response, expectation, secret);
+  }
+
+  /**
+   * F-01: distinguishes "no authentication material" (plain HTTP error) from
+   * "material present but possibly bad" (must fail closed). Reading the body
+   * here is classification only; it is never trusted without verification.
+   */
+  private static hasAckAuthenticationMaterial(response: HttpResponse): boolean {
+    const headers = response.headers;
+    if (headers.has(ProtocolHeaders.RESPONSE_ALG) ||
+      headers.has(ProtocolHeaders.RESPONSE_KEY_ID) ||
+      headers.has(ProtocolHeaders.RESPONSE_CORRELATION) ||
+      headers.has(ProtocolHeaders.RESPONSE_SIGN)) {
+      return true;
+    }
+    if (response.body.length === 0) {
+      return false;
+    }
+    try {
+      const root = JsonParser.parse(Utf8.decode(response.body));
+      return root.kind === JsonKind.OBJECT && root.has('request_id') && root.has('seq');
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * F-03: the service layer independently requires P-TLS-PIN responses to carry
+   * verification evidence whose matched pin belongs to the bound route and
+   * whose peer SPKI equals that pin. A transport that skips the check cannot
+   * turn this into a reachable P-TLS-PIN result.
+   */
+  private requireTlsEvidence(target: GatewayTarget, runtime: RuntimeProfile,
+    verification: TlsVerification | undefined): string | undefined {
+    if (runtime.profile !== TransportProfile.P_TLS_PIN) {
+      return undefined;
+    }
+    if (verification === undefined) {
+      this.logSecurityEvent(target.gatewayId, runtime.profile, 'TLS_VERIFIER_UNAVAILABLE');
+      throw AppErrors.of('TLS_VERIFIER_UNAVAILABLE', []);
+    }
+    if (target.pins.indexOf(verification.matchedPin) < 0) {
+      this.logSecurityEvent(target.gatewayId, runtime.profile, 'TLS_PIN_MISMATCH');
+      throw AppErrors.of('TLS_PIN_MISMATCH', []);
+    }
+    if (verification.matchedPin !== verification.peerSpkiSha256Hex) {
+      this.logSecurityEvent(target.gatewayId, runtime.profile, 'TLS_HANDSHAKE_FAILED');
+      throw AppErrors.of('TLS_HANDSHAKE_FAILED', []);
+    }
+    return verification.matchedPin;
+  }
+
+  /**
+   * F-05 / DES-A §14.5: pin/handshake/profile security events record only
+   * gatewayId, profile, errorCode and time. No certificate, secret or body.
+   */
+  private logSecurityEvent(gatewayId: string, profile: TransportProfile, errorCode: string): void {
+    this.logger.warn('LocalGatewayService', 'tls_security_event', [
+      new NameValue('gatewayId', gatewayId),
+      new NameValue('profile', String(profile)),
+      new NameValue('errorCode', errorCode),
+      new NameValue('atMs', String(this.safeNowMs()))
+    ]);
+  }
+
+  /** Transport seam with TLS-failure security logging (F-05). */
+  private async sendTransport(target: GatewayTarget, request: HttpRequest,
+    runtime: RuntimeProfile): Promise<HttpResponse> {
+    try {
+      return await this.transport.send(request, runtime.tlsPolicy);
+    } catch (error) {
+      const appError = error instanceof AppError ? error : AppErrors.transport('LOCAL_REQUEST_FAILED');
+      if (LocalGatewayService.isTlsFailure(appError.code)) {
+        this.logSecurityEvent(target.gatewayId, runtime.profile, appError.code);
+      }
+      throw appError;
+    }
+  }
+
+  private safeNowMs(): number {
+    const value = this.clock.nowMs();
+    return Number.isFinite(value) ? Math.floor(value) : 0;
   }
 
   private async mapControlAck(response: HttpResponse, expectation: AckExpectation,
@@ -364,6 +469,7 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
 
   private resolveRuntimeProfile(target: GatewayTarget): RuntimeProfile {
     if (target.profile === TransportProfile.P_BLOCKED) {
+      this.logSecurityEvent(target.gatewayId, target.profile, 'GATEWAY_PROFILE_BLOCKED');
       throw AppErrors.gateway('GATEWAY_PROFILE_BLOCKED', target.gatewayId);
     }
     if (target.profile === TransportProfile.P_HMAC) {
@@ -372,15 +478,18 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
         throw AppErrors.of('CONFIGURATION_ERROR', []);
       }
       if (target.pins.length !== 0) {
+        this.logSecurityEvent(target.gatewayId, target.profile, 'TLS_PROFILE_INCONSISTENT');
         throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
       }
       return new RuntimeProfile(TransportProfile.P_HMAC);
     }
     if (target.pins.length < 1 || target.pins.length > ProtocolConstants.MAX_PIN_COUNT) {
+      this.logSecurityEvent(target.gatewayId, target.profile, 'TLS_PROFILE_INCONSISTENT');
       throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
     }
     for (let index = 0; index < target.pins.length; index++) {
       if (!ProtocolConstants.PIN_PATTERN.test(target.pins[index])) {
+        this.logSecurityEvent(target.gatewayId, target.profile, 'TLS_PROFILE_INCONSISTENT');
         throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
       }
     }
@@ -406,6 +515,7 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
       throw AppErrors.gateway('GATEWAY_NOT_BOUND', route.gatewayId);
     }
     if (route.profile === TransportProfile.P_TLS_PIN && !route.tlsEnabled) {
+      this.logSecurityEvent(route.gatewayId, route.profile, 'TLS_PROFILE_INCONSISTENT');
       throw AppErrors.of('TLS_PROFILE_INCONSISTENT', []);
     }
     return new GatewayTarget(route.gatewayId, route.familyId,
@@ -454,5 +564,9 @@ export class LocalGatewayService implements IGatewayClient, DeviceControlPort {
       return status >= 500;
     }
     return false;
+  }
+
+  private static isTlsFailure(code: string): boolean {
+    return code === 'GATEWAY_PROFILE_BLOCKED' || code.startsWith('TLS_');
   }
 }

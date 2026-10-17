@@ -6,6 +6,10 @@
  * Prechecks the local SSOT, sends exactly one command through DeviceControlPort
  * (no platform import, no network code here), then applies the ACK state.
  * A rejected precheck never calls the port.
+ *
+ * T-11 F-04: the precheck now includes the DES-A §14.2.3 action x deviceType
+ * matrix via ControlPolicy, so a direct C-10 command (e.g. door + SET_BRIGHTNESS)
+ * is rejected locally instead of being sent to the gateway.
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
@@ -15,6 +19,7 @@ import { DeviceControlCommand, ControlOutcome } from '../../model/ControlModels'
 import { DeviceKey } from '../../model/DeviceKey';
 import { DeviceRepository } from '../../repository/DeviceRepository';
 import type { DeviceControlPort } from '../../repository/DomainPorts';
+import { ControlPolicy } from '../gateway/GatewayRequestPolicy';
 import {
   ControlApplyContext,
   ControlApplyResult,
@@ -71,6 +76,17 @@ export class DeviceCommandRunner {
         if (precheck && !record.isSupported) {
           // Read-only degraded device types never receive a command (D-011).
           return this.reject(command, startedAt, 'CONFIGURATION_ERROR');
+        }
+        if (precheck) {
+          // DES-A §14.2.3 matrix: sensor/read-only and action != deviceType are
+          // rejected before any transport call (T-11 F-04).
+          try {
+            ControlPolicy.validate(record.state.snapshot.deviceType, record.isSupported,
+              command.action, command.value);
+          } catch (failure) {
+            const code = failure instanceof AppError ? failure.code : 'CONFIGURATION_ERROR';
+            return this.reject(command, startedAt, code);
+          }
         }
       }
     }
