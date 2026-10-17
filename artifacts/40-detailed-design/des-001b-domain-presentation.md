@@ -3,9 +3,9 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）；**T-18 裁定同步（2026-10-18）见 §0.9/§23.7**（R2-03 C-09/C-11/C-19/C-23/C-28 增量登记、F-06 D-12 白名单扩展、`GAP-T18-01`/`TRUST-T18-01`；不改变冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-09/C-11/C-19/C-23/C-28 公共签名/端口增量（`EXT-DES-B-28..32`），裁定 D-12 采用文件/符号级白名单扩展（不迁移 UI 类型），并登记 `GAP-T18-01`/`TRUST-T18-01`；见 §0.9/§2.3/§12.1.1/§18.1/§23.7。不改变冻结签名与 G-004 语义。
-- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-18 裁定同步，§0.9/§23.7）
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）；**T-18 裁定同步（2026-10-18）见 §0.9/§23.7**（R2-03 C-09/C-11/C-19/C-23/C-28 增量登记、F-06 D-12 白名单扩展、`GAP-T18-01`/`TRUST-T18-01`；不改变冻结签名与 G-004 语义）；**T-20 收口（2026-10-18）见 §0.10/§2.3/§18.1/§23.7**（F-02 13 条 D-12 例外正式化；不改变冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-09/C-11/C-19/C-23/C-28 公共签名/端口增量（`EXT-DES-B-28..32`），裁定 D-12 采用文件/符号级白名单扩展（不迁移 UI 类型），并登记 `GAP-T18-01`/`TRUST-T18-01`；见 §0.9/§2.3/§12.1.1/§18.1/§23.7。不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/F-02 把 13 条 pages 既有 service/repository DTO/UI 枚举 import（10 条 `import type` + 3 条含运行时值的 import）正式纳入 §2.3 D-12 与 §18.1 文件/符号级 allowlist，`status` 定稿为 `accepted`；同步登记端口物理位置例外与 checker 读取契约（§18.1；DES-A §27.6）。不改变任何冻结签名、页面/服务契约与 G-004 语义。
+- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-20 收口，§0.10/§2.3/§18.1/§23.7）
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
 - **Target Stage**: `implementation`
@@ -163,6 +163,22 @@
 - **不改变**：DES-A/DES-B 冻结方法名/参数顺序/返回类型/错误码语义；`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 的 canonical/HMAC/ACK/安全语义。
 - **Change Impact**：见 §23.7 与 DES-A §27.5；T-18 代码证据（`a9d0bb5` 复审、`74e9157` R2 修复、host 690/690、clean assembleHap、codelinter 0 error、i18n blocking=0）继续有效，但 R2-03 的关闭仅指“契约已登记”，T-20 `check_layering.py` 落地与 T-19 设备矩阵仍未完成。
 - **证据边界**：设备/模拟器/Previewer/真实 BLE/权限弹窗/AP 扫描/LAN/云/TLS 仍 `BLOCKED`；本节不宣告 CQG-T18 设备 PASS、IG-3 或 Stage Gate。
+
+### 0.10 T-20 收口（2026-10-18）
+
+> **性质**：F-02（R3-01）的契约收口与 F-01 的工具侧配套登记，不是新的架构裁定。**依据**：`artifacts/70-review/final-system-review.md` F-01/F-02/§7.1/§7.2、`artifacts/60-testing/test-report.md` §3.2/§8.2-1/§8.2-4、`tools/contract/layering_allowlist.json` 的 13 条 `pending-T-20` 与 `tools/contract/check_layering.py` 的实际放行逻辑。**边界**：不修改实现代码/工具文件，不放宽 `service/**`/`repository/**` 目录，不改变冻结签名/G-004 语义；冲突只记录。
+
+| 项 | 结论 | 落点 |
+|---|---|---|
+| **F-02 13 条 D-12 例外** | 按 T-18 既有裁定方向（文件/符号级白名单，不迁移 UI 类型）正式纳入 `pages/**` 白名单；10 条 `import type` + 3 条含运行时值的 import 全部 `status: accepted`。 | §2.3 D-12 注记；§18.1 `T20-D12-01..13` |
+| **3 条值 import 说明** | `FamilyManagePage` 的 `CreateInvitationInput`/`FamilyJoinPhase` 用于构造表单输入与比较 join 阶段；`ProvisioningPage` 的 `BleProvisioningDevice`/`ProvisioningState`/`WifiAp` 中仅 `ProvisioningState` 是运行时枚举值，`BleProvisioningDevice`/`WifiAp` 仅作类型注解（同一 value import 语句）；`SettingsPage` 的 `CloudTransportState` 用于云状态分支。以上均**不构造/调用 service 实现、无 I/O、无仓储写**。 | §18.1 |
+| **端口位置例外（F-01）** | 端口物理位置不在 `contracts/**` 的现状由 DES-A §27.6 逐文件/符号登记（17 条：16 个端口/契约文件 + 1 个纯映射 seam）；本文件 §18.1 定义 checker 读取 `port_location_exceptions` 的契约与失败语义。 | §18.1；DES-A §27.6 |
+| **迁移建议** | `model/**` 迁移仍为可选独立重构（P2/P3），不是 G-013/G-014 前置；任何迁移需独立 Change Impact，且不得与 allowlist 定稿并行。 | §18.1；§23.7 |
+| **Gate 语义** | `check_layering` 0 violation ≠ D-12 已完全收口、≠ 端口位置合规；T-20 后 used+pending 必须视为门禁失败；G-014 记录“例外已登记，迁移未完成”。 | §18.1；§23.7 |
+
+- **上游基线**：G-004 `contract-baseline.md` @ `697762c` 仍 VALID；F-02 只登记 UI import 例外，不改变 CB 的 API/错误/契约语义。
+- **不改变**：DES-A/DES-B 冻结方法名/参数顺序/返回类型/错误语义；`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 canonical/HMAC/ACK/安全语义；页面/组件无需改签名。
+- **证据边界**：本节只做契约登记；不宣告 T-19 设备矩阵、T-21 README、T-22 集成或 Stage Gate 完成。
 
 ---
 
@@ -468,7 +484,7 @@ entry/src/main/resources/
 | D-09 | `repository/**` 不得 import `service/**` 实现；跨仓储协调通过 `contracts/**` 端口 + C-28 组合根 | `check_layering.py` |
 | D-10 | `service/{family,room,scene,cloud,i18n}/**` 不得 import `@ohos.*`；平台适配器只在 `adapters/**` | `check_host_safe_imports.py` |
 | D-11 | `viewmodel/**` 只通过构造注入引用 C-07..C-15 用例类/接口（含 `GatewayRepository`/`DeviceRepository`）与 `contracts/**`；可 import `common/**`/`model/**`/C-14 `I18nService`；不得 import `@ohos.*`、`service/{gateway,ble,crypto}/**`、`*/adapters/**`，不得自行 `new` 服务 | `check_layering.py` + `check_host_safe_imports.py` |
-| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`，以及 **`app/PageVmFactory` 的 `PageVmFactoryPort`（仅 `import type`）**；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件、**`viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯 UI 词汇（枚举/只读状态类型，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import `*ViewModel`/端口或构造/调用 VM）**、C-10/C-11/C-15 只读结果 DTO（必须 `import type`），以及 **`components/support/UiMapping.ets` 对 `service/ac/AcModels` 的纯值 import（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`；仅预览构造，无 I/O；`DeviceCards.ets` 仅 `import type AcViewState`）**；**不得 import `app/**`、`repository/**` 实现、传输/存储/crypto、`service/**` 实现类（`service/ac/AcModels` 为已登记纯值例外），也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29）；T-18 例外为文件/符号级 allowlist |
+| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`，以及 **`app/PageVmFactory` 的 `PageVmFactoryPort`（仅 `import type`）**，以及 **§18.1 表 `T20-D12-01..13` 的 pages 既有只读 DTO/UI 枚举（文件/符号级；含 3 条值 import；不得调用 service 实现/无 I/O）**；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件、**`viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯 UI 词汇（枚举/只读状态类型，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import `*ViewModel`/端口或构造/调用 VM）**、C-10/C-11/C-15 只读结果 DTO（必须 `import type`），以及 **`components/support/UiMapping.ets` 对 `service/ac/AcModels` 的纯值 import（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`；仅预览构造，无 I/O；`DeviceCards.ets` 仅 `import type AcViewState`）**；**不得 import `app/**`、`repository/**` 实现、传输/存储/crypto、`service/**` 实现类（`service/ac/AcModels` 为已登记纯值例外），也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29）；T-18/T-20 例外为文件/符号级 allowlist |
 | D-13 | `adapter/ac/**` 只 import `common/**`、`model/**`；不得 import 仓储/传输/网络 | 评审 + 静态扫描 |
 | D-14 | 生产 `entry/src/main/ets/**` 不得 import `entry/src/ohosTest/**`/`Mock*`；组合根不得出现 `DEV-ONLY` 分支 | `check_production_mock_exclusion.py` |
 | D-15 | `service/cloud/**` 只能通过 `HttpTransport`/`CloudCredentialPort`/`CloudConfigStore` 访问外部；不得直接 `@ohos.net.http` | 评审 + 静态扫描 |
@@ -478,6 +494,8 @@ entry/src/main/resources/
 > **T-17 裁定同步（2026-10-18；`artifacts/70-review/t17-review.md` U-01）**：D-12 与 D-17 按维度分工——D-12 管 UI import 白名单，D-17 管 `app/**` 依赖方向与可见性。旧 D-17“只能被 `entryability/**`/`pages/Index.ets` 引用”与旧 D-12 未列 `ShellTheme`/`ShellBootstrap` 的文字均被本表取代。若两条规则在具体 import 上交叉，按“更严格者优先”执行；任何放宽必须走 Change Impact，不得在实现/评审中静默修改。`app→viewmodel` 是单向边，`viewmodel/**` 不得为工厂/适配反向 import `app/**`。
 
 > **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03/F-06）**：D-12 对 T-18 的实际 UI 依赖采用“白名单扩展”，不做 `model/**` 类型迁移。新增允许项仅限：`pages/**` → `app/PageVmFactory`（`import type PageVmFactoryPort`）；`components/**` → `viewmodel/core/{ViewModelCore,DoorConfirmationTracker}`（纯枚举/只读 UI 状态，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import VM/端口/构造或调用 VM）；`components/support/UiMapping.ets` → `service/ac/AcModels`（纯值 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`，仅预览构造；`DeviceCards.ets` 仅 `import type AcViewState`）；components → C-10/C-11/C-15 只读结果 DTO（`import type`）。`check_layering.py` 必须把上述例外编码为**文件/符号级 allowlist**，不得放宽为“components 可 import 整个 viewmodel/service”；未来新增例外必须走 Change Impact 并更新 §0.9/§18.1。若 `viewmodel/core/ViewModelCore.ets`/`DoorConfirmationTracker.ets` 新增 `@ohos`、repository 实现或 transport 依赖，必须先把纯 UI 词汇拆到 `model/**` 或独立无依赖模块，否则检查器按 D-12 失败。
+
+> **T-20 收口（2026-10-18；`final-system-review.md` F-02/§7.1）**：pages 既有的 13 条 service/repository DTO/枚举 import（10 条 `import type` + 3 条含运行时值的 import）已按“公共只读 DTO/UI 枚举”正式纳入 D-12，**文件/符号级**条目见 §18.1 `T20-D12-01..13`。`tools/contract/layering_allowlist.json` 的 `status` 由 `pending-T-20` 改为 `accepted`；**不得**把本裁定解释为 pages 可 import `service/**`/`repository/**` 整目录或任意实现类。迁移到 `model/**` 仍是独立可选重构（P2/P3），不是 G-013/G-014 前置。端口物理位置例外见 DES-A §27.6，与本条是不同维度。
 
 **依赖图（DES-B 新增边）**：
 
@@ -5555,6 +5573,226 @@ tools/
   4. `components/**` → `repository/DomainModels.ets` 仅允许 `import type` 的 C-10/C-11/C-15 只读结果 DTO（当前实际为 `DeviceRecord`、`SceneExecutionResult`）；值 import、repository 实现、transport/storage/crypto 一律拒绝。
   5. 生产 `pages/**`/`components/**` 无 `@Provide`/`@Consume`；D-17 允许 `app→viewmodel` 工厂/端口适配，拒绝反向 import。
   - 检查器必须有 fixture 自测：合法树通过；上述每一类违规 import/构造/装饰器都必须失败。allowlist 纳入版本控制，新增例外需评审与 Change Impact（§18.3-4）。检查器落地前，评审执行等价静态扫描并记录命令/结果（T-17 同款要求）；不得以“评审人工通过”替代 T-20 工具证据。
+
+- **T-20 收口（2026-10-18；`final-system-review.md` F-01/F-02/§7.1/§7.2）— pages D-12 定稿与端口位置读取契约**：
+  1. **D-12 定稿**：`pages/**` 既有 13 条 service/repository DTO/UI 枚举 import 采用**文件/符号级** `accepted` 例外（`T20-D12-01..13`）；10 条 `import type`，3 条为含运行时值的 import。**不得**放宽为 `pages/**` 可 import `service/**`/`repository/**` 整目录，也不得把 `status: accepted` 解释为 service 实现可构造/调用。
+  2. **status 强制**：T-20 后 `used && status !== "accepted"` 必须视为门禁违规（`check_layering.py` 退出码 1 或在 Gate 包装中失败）；`pending-T-20` 不得原样进入 G-013/G-014。报告必须保留 `exceptions_used` 明细与 `unused_exceptions`。
+  3. **端口位置例外（F-01）**：`layering_allowlist.json` 新增顶层数组 `port_location_exceptions`，逐条与 DES-A §27.6.2 的表格及机器可读 JSON 一致（17 条：16 个端口/契约文件 + 1 个 `pure-seam`）。checker 必须用它替换 `_is_storage_port_path`（`check_layering.py:550-561`）与 `_is_viewmodel_service_port`（`:564-578`）的硬编码路径集合；未登记端口路径必须按 D-09/D-11 失败。
+  4. **符号级匹配**：端口例外必须校验 `record.symbols ⊆ entry.symbols`；新增符号、值 import 实现类、或文件新增 `@ohos.*`/repository/transport 依赖时，例外失效并失败。禁止路径通配/目录放宽。`port_location_exceptions` 只替代 D-09/D-11 的端口路径判断；pages/components 的 D-12 仍按 `entries` 匹配，两者同时适用时取更严格者。
+  5. **fixture**：至少覆盖“合法登记通过”“未登记端口路径失败”“超出 symbols 失败”“`pending-*` 状态失败”“`GattEndpointMap` pure-seam 通过”；与 F-06 的 D-03（`contracts/**` 违规 import）和 D-05（`repository/**` 平台 import）负例一并补齐。
+  6. **Gate 语义**：`check_layering` 0 violation **不等于** D-12 已完全收口，也**不等于**端口位置合规；G-014 必须逐项记录“例外已登记、迁移未完成”，不得写成 PASS。
+
+**T20-D12 条目表（13 条，与下方 JSON 逐条一致）**：
+
+| ID | 页面 | import 目标 | 符号 | 类型 | 理由 | 迁移/关闭 |
+|---|---|---|---|---|---|---|
+| `T20-D12-01` | `pages/DeviceControlPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | C-10 只读记录类型；页面只读字段/渲染 | P2 迁到 `model/DeviceRecord.ets` |
+| `T20-D12-02` | `pages/HomePage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 |
+| `T20-D12-03` | `pages/RoomsPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 |
+| `T20-D12-04` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneExecutionProgress`、`SceneExecutionResult`、`SceneStepResult` | `import type` | C-11 只读执行结果；页面只读展示 | P2 迁到 `model/SceneExecutionModels.ets` |
+| `T20-D12-05` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneRunState` | `import type` | C-11 枚举仅作类型/状态读取 | P2 |
+| `T20-D12-06` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView`、`InvitationView`、`InviteCreation` | `import type` | C-08 只读视图/结果值；页面不构造 service | P2 迁到 `model/FamilyViewModels.ets` |
+| `T20-D12-07` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `CreateInvitationInput`、`FamilyJoinPhase` | **value** | 页面本地表单输入构造 + join 阶段比较；经 VM 调用，无 service 实现 import/构造、无 I/O | P2；可拆为 `model/**` 输入类型 + UI 枚举 |
+| `T20-D12-08` | `pages/ProfilePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView` | `import type` | C-08 只读视图类型 | P2 |
+| `T20-D12-09` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `BleProvisioningDevice`、`ProvisioningState`、`WifiAp` | **value** | 同一 value import 语句：`ProvisioningState` 运行时枚举；`BleProvisioningDevice`/`WifiAp` 仅类型注解；无 service 实现构造/调用、无 I/O | P2/P3；DTO/枚举拆到 `model/ProvisioningModels.ets` |
+| `T20-D12-10` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `ProvisioningProgress` | `import type` | C-19 只读进度类型 | P2/P3 |
+| `T20-D12-11` | `pages/RoomManagePage.ets` | `service/room/RoomService.ets` | `RoomDeletionPreview` | `import type` | C-09 只读删除预览；**符号声明在实现文件内**，因此必须符号级放行 | P3 迁到 `model/RoomModels.ets` |
+| `T20-D12-12` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudTransportState` | **value** | 云状态 UI 分支的运行时枚举；无 service 实现构造/调用、无 I/O | P2 迁到 `model/CloudModels.ets` |
+| `T20-D12-13` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudConfigView` | `import type` | C-15 只读配置视图类型 | P2 |
+
+**`layering_allowlist.json` — `entries` 定稿（13 条，可直接替换现有 `pending-T-20` 条目）**：
+
+```json
+[
+  {
+    "id": "T20-D12-01",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/DeviceControlPage.ets",
+    "import": "entry/src/main/ets/repository/DomainModels.ets",
+    "symbols": ["DeviceRecord"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-01.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-02",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/HomePage.ets",
+    "import": "entry/src/main/ets/repository/DomainModels.ets",
+    "symbols": ["DeviceRecord"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-02.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-03",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/RoomsPage.ets",
+    "import": "entry/src/main/ets/repository/DomainModels.ets",
+    "symbols": ["DeviceRecord"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-03.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-04",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/ScenePage.ets",
+    "import": "entry/src/main/ets/repository/DomainModels.ets",
+    "symbols": ["SceneExecutionProgress", "SceneExecutionResult", "SceneStepResult"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-11 execution DTO type imports; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-04.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-05",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/ScenePage.ets",
+    "import": "entry/src/main/ets/repository/DomainModels.ets",
+    "symbols": ["SceneRunState"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-11 enum type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-05.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-06",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/FamilyManagePage.ets",
+    "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+    "symbols": ["FamilyMemberView", "InvitationView", "InviteCreation"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-08 view/result type imports; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-06.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-07",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/FamilyManagePage.ets",
+    "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+    "symbols": ["CreateInvitationInput", "FamilyJoinPhase"],
+    "type_only": false,
+    "status": "accepted",
+    "reason": "T-20 F-02 value import: page-local form input construction and join-phase comparison; passed to VM; no service implementation import/construction, no I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-07.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-08",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/ProfilePage.ets",
+    "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+    "symbols": ["FamilyMemberView"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-08 view type import; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-08.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-09",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
+    "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+    "symbols": ["BleProvisioningDevice", "ProvisioningState", "WifiAp"],
+    "type_only": false,
+    "status": "accepted",
+    "reason": "T-20 F-02 value import: same statement mixes runtime enum ProvisioningState with type-only BleProvisioningDevice/WifiAp; no service implementation construction/call, no I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-09.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-10",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
+    "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+    "symbols": ["ProvisioningProgress"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-19 progress type import; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-10.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-11",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/RoomManagePage.ets",
+    "import": "entry/src/main/ets/service/room/RoomService.ets",
+    "symbols": ["RoomDeletionPreview"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-09 deletion-preview type import; symbol is declared in the implementation file, so only symbol-level allowance is safe; no service construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-11.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-12",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/SettingsPage.ets",
+    "import": "entry/src/main/ets/service/cloud/CloudModels.ets",
+    "symbols": ["CloudTransportState"],
+    "type_only": false,
+    "status": "accepted",
+    "reason": "T-20 F-02 value import: runtime cloud transport-state enum for UI branching; no service implementation construction/call, no I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-12.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  },
+  {
+    "id": "T20-D12-13",
+    "rule": "D-12",
+    "from": "entry/src/main/ets/pages/SettingsPage.ets",
+    "import": "entry/src/main/ets/service/cloud/CloudModels.ets",
+    "symbols": ["CloudConfigView"],
+    "type_only": true,
+    "status": "accepted",
+    "reason": "T-20 F-02: pages read-only C-15 config-view type import; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-13.",
+    "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
+  }
+]
+```
+
+> **字段说明**：现有 `load_allowlist()` 只读取 `rule`/`from`/`import`/`symbols`/`type_only`/`status`/`reason`/`evidence`；上面的 `id` 是审计用稳定 ID，当前 checker 会忽略，不影响匹配。落地时可保留 `id`，也可在保持 13 条一一对应的前提下删除；不得删除或合并 `symbols`/`type_only` 不同的条目。
+
+**端口位置例外 schema（`port_location_exceptions`，与 DES-A §27.6 逐条一致）**：
+
+```json
+{
+  "id": "PORT-LOC-01",
+  "path": "entry/src/main/ets/common/types/Ports.ets",
+  "symbols": ["ClockPort", "RandomPort", "IdPort", "LoggerPort", "MetricsPort", "CancellationToken", "HmacSignerPort"],
+  "kind": "port-only",
+  "status": "accepted-location-exception",
+  "owner": "C-01 / solution-architect",
+  "reason": "T-06 write scope excluded contracts/; pure interfaces with no platform import.",
+  "close_condition": "Move to contracts/Ports.ets, update imports, delete this entry after full regression.",
+  "evidence": "artifacts/70-review/final-system-review.md F-01/§7.2; file header LOCATION EXCEPTION"
+}
+```
+
+**端口位置例外索引（17 条；符号/原因/evidence 的权威表见 DES-A §27.6.2）**：
+
+| ID | 文件 | kind | status | owner | 关闭条件（摘要） |
+|---|---|---|---|---|---|
+| `PORT-LOC-01` | `common/types/Ports.ets` | `port-only` | `accepted-location-exception` | C-01 / solution-architect | 迁 `contracts/Ports.ets` |
+| `PORT-LOC-02` | `service/crypto/CryptoPort.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-04 / solution-architect | 端口/值类型拆分迁移 |
+| `PORT-LOC-03` | `service/storage/RdbStore.ets` | `port-only` | `accepted-location-exception` | C-06 / solution-architect | 迁 `contracts/RdbStore.ets` + `model/**` |
+| `PORT-LOC-04` | `service/storage/PreferencesStore.ets` | `port-only` | `accepted-location-exception` | C-06 / solution-architect | 迁 `contracts/PreferencesStore.ets` |
+| `PORT-LOC-05` | `service/storage/SecretStore.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-06 / solution-architect | 迁端口；`SecretAlias` 移 `model/**`/`common/**` |
+| `PORT-LOC-06` | `service/storage/SecretDraftPort.ets` | `port-only` | `accepted-location-exception` | C-06 / solution-architect | 迁 `contracts/SecretDraftPort.ets` |
+| `PORT-LOC-07` | `service/storage/MigrationPort.ets` | `port-only` | `accepted-location-exception` | C-06 / solution-architect | 迁 `contracts/MigrationPort.ets` |
+| `PORT-LOC-08` | `service/ble/BleProvisioningPorts.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-19 / solution-architect | 端口/ DTO 拆到 `contracts/**`/`model/**` |
+| `PORT-LOC-09` | `service/ble/GattEndpointMap.ets` | `pure-seam` | `accepted-location-exception` | C-19 / solution-architect | 迁 `common/**`/`model/**` 或 VM 常量下沉 |
+| `PORT-LOC-10` | `service/gateway/GatewayTransportPorts.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-17 / solution-architect | 端口/ DTO 拆分迁移 |
+| `PORT-LOC-11` | `service/gateway/DiscoveryModels.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-18 / solution-architect | 拆 `model/DiscoveryModels.ets` + `contracts/DiscoveryTransport.ets` |
+| `PORT-LOC-12` | `service/cloud/CloudPorts.ets` | `port-only` | `accepted-location-exception` | C-15 / solution-architect | 迁 `contracts/CloudPorts.ets`；`TimerPort` 拆分 |
+| `PORT-LOC-13` | `service/i18n/I18nPorts.ets` | `port-only` | `accepted-location-exception` | C-14 / solution-architect | 迁 `contracts/I18nPorts.ets` |
+| `PORT-LOC-14` | `service/scene/SceneTimerPort.ets` | `port-only` | `accepted-location-exception` | C-11 / solution-architect | 迁 `contracts/SceneTimerPort.ets` 或并入 `TimerPort` |
+| `PORT-LOC-15` | `repository/DomainPorts.ets` | `port-only` | `accepted-location-exception` | C-08..C-11 / solution-architect | 拆 `contracts/RoomPorts/ScenePorts/DevicePorts.ets`；消除反向依赖 |
+| `PORT-LOC-16` | `repository/GatewayPorts.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-07 / solution-architect | 迁 `contracts/GatewayPorts.ets`；`InvitedGateway` 移 `model/**` |
+| `PORT-LOC-17` | `viewmodel/ViewModelPorts.ets` | `mixed-contract-dto` | `accepted-location-exception` | C-21..C-23 / solution-architect | 迁 `contracts/**`；收敛 `ManualDiscoveryPort`/`PermissionPort` |
+
+- 完整 17 条的 `symbols`/`reason`/`close_condition`/`evidence` 见 DES-A §27.6.2；`kind` 仅允许 `port-only`、`mixed-contract-dto`、`pure-seam`；`status` 仅允许 `accepted-location-exception`。
+- **禁止**：目录/通配符路径、把 `service/**` 或 `repository/**` 整体列入、把 `GattEndpointMap` 当端口实现、或让 `port_location_exceptions` 影响 D-12 `entries` 的匹配。
+
 - `check_production_mock_exclusion.py` allowlist 仅允许 C-17 `DEV-ONLY` 常量与测试目录；生产 import 即失败。
 - `check_i18n.py` 输出 C-14 §7.4.4 报告；CI/CQG 留痕。
 - README（T-21）必须包含：构建/运行/测试命令、环境限制（无设备/无签名）、Mock/TLS 边界、i18n 检查命令、已知限制；不得把未运行写成 PASS。
@@ -5913,6 +6151,7 @@ CQG-Txx
 | `RISK-IMPORTED-FAMILY-OWNER` | 导入家庭 owner 占位/权威成员收敛 | `RISK`（Low） | 本机加入设备的 owner 指针与 `transferAdmin` | `importFamily` 使用占位 owner；RBAC 仍按 `targetRole`；`transferAdmin` 在权威同步前不可用；不新增在线协议 | 接触式同步/后续 Change Impact |
 | `RISK-JOIN-RESUME` | 成员接受后、档案创建前进程终止/离开页面 | `RISK`（Low） | 用户已有成员/家庭行但无可用档案；join session 不持久 | `COMPLETED` 的持久事实是“成员 ACTIVE + `LocalProfile` + active family”，以持久状态判断已加入；重启后由 SessionGate 解锁；T-17/T-18 提供“完成本机档案”恢复入口；不得回退成员/家庭 | T-17/T-18 页面联调；若需持久 join 会话另走 Change Impact |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
+| `RISK-D12-ALLOWLIST` | pages DTO/UI 枚举 import 以文件/符号级 allowlist 放行（F-02/R3-01） | `RISK`（Low） | 维护者把 `accepted` 误读为目录放宽；新增例外绕过 Change Impact；`status` 不被工具强制 | §2.3/§18.1 `T20-D12-01..13` 定稿；禁止目录级；新增需 Change Impact；checker 将 used+pending 视为失败；`RoomDeletionPreview` 等实现文件内符号只按符号放行 | 迁移到 `model/**` 或 checker 符号级强制 + 复审 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
 
 > `TRUST-T18-01`（`RoomService` 缺省 actor 的 v1 local-admin trust）是已声明的组合边界，不是缺口；见 §23.7。`GAP-T18-01` 是未关闭的上游 RBAC 缺口，不得用 `TRUST-T18-01` 解释为已授权。
@@ -6157,6 +6396,8 @@ export interface DeviceStatePort {
 > **D-12 范围边界（T-18，仅记录）**：本次唯一裁定覆盖 F-06 列出的 T-18 增量（`pages/**`→`app/PageVmFactory`；`components/**`→`viewmodel/core`；`UiMapping`→`service/ac/AcModels` + `DoorUiState` 预览；components→C-10/C-11/C-15 只读 DTO `import type`）。pages 既有的 `import type` C-08/C-09/C-11/C-15 公共 DTO（如 `FamilyMemberView`、`RoomDeletionPreview`、`ProvisioningProgress`、`CloudConfigView`）未在本次重新裁定；T-20 落地时按“公共只读 DTO”纳入文件级 allowlist，或另行 Change Impact，不得把本次解释为 pages 可 import 任意 service 实现。
 >
 > **后续可选重构建议（不执行）**：若未来要把 UI 类型迁到 `model/**`，建议最小集合为 `model/AcUiModels.ets`（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`）、`model/DoorUiModels.ets`（`DoorUiState`/`DoorStage`/`DoorLockState`）、`model/ControlUiModels.ets`（`ControlPhase`/`ControlUiState`/`DeviceFilter`/`DeviceFilterKind`），并同步 C-21/C-24 imports、收缩 §18.1 allowlist；该重构需独立 Change Impact，不在 T-18 执行。
+>
+> **T-20 收口（2026-10-18；`final-system-review.md` F-02/§7.1）**：T-18 留待 T-20 处理的 pages 既有 `import type` C-08/C-09/C-11/C-15 DTO/枚举已正式纳入 §2.3 D-12 与 §18.1 `T20-D12-01..13`；`tools/contract/layering_allowlist.json` 的 13 条 `status` 由 `pending-T-20` 改为 `accepted`。其中 3 条含运行时值的 import 已在 §18.1 逐条说明（无 service 实现构造/调用、无 I/O）。该收口**不**把 pages 放宽为可 import 任意 service/repository，也**不**改变 T-18 的任何冻结签名；迁移到 `model/**` 仍为独立可选重构（P2/P3），不是 G-013/G-014 前置。
 
 **Change Impact（2026-10-18）**：
 
@@ -6204,7 +6445,7 @@ export interface DeviceStatePort {
 | T-17 | §2.1/§2.3/§13/§14/§17/§18 | `DES-B-C24/C25/C28-*` | UI 壳/页面/组合根/权限（U-01/F-09 见 §0.8） |
 | T-18 | §15/§16/§2.1/§2.3/§0.8/§0.9/§12.1.1/§17.1/§23.7 | `DES-B-C26/C27-*`；`EXT-DES-B-28..32` | 二级页面/设置/关于/Profile；按 §0.8 使用显式 props DI；T-18 增量登记见 §0.9/§23.7 |
 | T-19 | §20/§21/§22 | 全部 | 测试报告/覆盖矩阵 |
-| T-20 | §22/§24.3 | 全部 | 独立评审 |
+| T-20 | §0.10/§2.3/§18.1/§22/§23.7/§24.3 | 全部；F-01/F-02 | 独立评审 + 例外收口（T-20 收口 2026-10-18） |
 
 **T-14 裁定后续待办（2026-10-17，§0.6）**：
 
@@ -6233,6 +6474,15 @@ export interface DeviceStatePort {
 | F-01 启动键名/`useSharedStorage` | T-17 修复（已实现）；T-19 UI smoke | `OPEN`（设备证据） | Previewer/真机断言 `bootstrap.appContext` 非空、Index 进入 SessionGate/MainShell；host 测试不能替代 |
 | F-09 CryptoService/SceneService 顺序 | 实现/CQG-T17 | `ACCEPTED（记录）` | `CompositionPlan` 顺序断言覆盖两项偏差；评审确认无新增偏差 |
 | T-17 证据 | Orchestrator/CQG-T17 | `UNVERIFIED` | 按 t17-review.md §6 重跑 host/codelinter/assemble/ohosTest/i18n + 独立复审；不得以本裁定代替 F-02/F-03 等修复 |
+
+**T-20 收口后续待办（2026-10-18，§0.10/§18.1）**：
+
+| 项 | 归属 | 状态 | 关闭条件 |
+|---|---|---|---|
+| F-02 pages D-12 13 条 | solution-architect（契约）→ test-engineer（allowlist 落地） | `DONE（契约登记）`；allowlist `status` 待下一工具任务改为 `accepted` | 13 条 `entries` 与 §18.1 逐条一致；used+pending 消失；G-014 记录 |
+| F-01 端口物理位置 17 条 | solution-architect（登记）→ test-engineer/C-29（checker） | `ACCEPTED（v1，登记完成）`；迁移 `OPEN` | checker 读取 `port_location_exceptions`；未登记端口失败；独立迁移任务删除全部条目 |
+| checker status/符号强制与 fixture | test-engineer/C-29 | `OPEN` | used+pending 失败；未登记端口失败；symbols 超集失败；F-06 D-03/D-05 负例补齐 |
+| `model/**` 类型迁移 | implementation-engineer（独立 Change Impact） | `DEFERRED`（P2/P3） | 页面/VM imports 改到 `model/**`；allowlist shrink；全量回归 + 复审 |
 
 ### 24.3 契约条目索引（80 条）
 
@@ -6264,6 +6514,7 @@ export interface DeviceStatePort {
 - [x] 云路径：配置/Token/命令/影子/完成判定/PB-02（§8）。
 - [x] T-14 裁定同步（§0.6）：F-03 两层状态、F-04 固定名/inventory 路由、F-06 单 active 云作用域、F-05 `brand.*` 资源归属均已登记，未改冻结签名/G-004 语义。
 - [x] T-17 裁定同步（§0.8）：U-01 D-12/D-17 分工、UI 显式 props DI（无 `@Provide/@Consume`）、F-01 `bootstrap` 启动键、F-09 CryptoService/SceneService 顺序偏差均已登记；未改冻结签名/G-004 语义。
+- [x] T-20 收口（§0.10/§18.1）：F-02 13 条 pages D-12 例外定稿为 `accepted`；F-01 端口物理位置 17 条逐文件/符号登记；明确 0 violation ≠ D-12 收口/位置合规；未改冻结签名/G-004 语义。
 - [x] i18n：API/资源布局/fallback/键规则/迁移/CHK（§7）。
 - [x] VM：state/event/selector/异步/错误映射/节流/防乐观（§10-§12）。
 - [x] UI：页面/导航/组件 props/events/主题/动效/空态/加载/错误/可访问性（§13-§16）。
