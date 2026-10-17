@@ -1,0 +1,8 @@
+========================================================================
+YaoCore DEVELOPMENT CONTRACT SIMULATOR ONLY
+This is not OpenHarmony firmware and does not connect to IoTDA/hardware.
+Listening on https://127.0.0.1:9444
+SPKI-SHA256: 63f928c4c645b242ffb2a90a624258035e2a5ffb515756e0fb2f88113afa3243
+TLS certificate/key are PUBLIC TEST DATA ONLY; never use in production.
+Using the public test-vector secret; never use it outside local testing.
+========================================================================

@@ -1,0 +1,9 @@
+HTTP/1.0 200 OK
+Server: YaoCoreGatewayContractDEVSimulator/2.0 Python/3.12.3
+Date: Sat, 17 Oct 2026 07:15:15 GMT
+Content-Type: application/json; charset=utf-8
+Content-Length: 1057
+Cache-Control: no-store
+X-YaoCore-Simulator: DEV-ONLY
+
+{"protocolVersion":"2.0","gatewayId":"gateway_01","gatewayName":"YaoCore DEV Contract Simulator","serviceId":"SmartHomeService","generatedAt":"20261017T071515Z","security":{"alg":"HMAC-SHA256","keyId":"app-key-v1","timeWindowSeconds":120,"nonceTtlSeconds":300},"devices":[{"deviceId":"Door_01","deviceName":"智能门禁","roomName":"玄关","deviceType":"door","brand":"YaoCore-Simulator","online":true,"open":false,"updatedAt":"20261017T071515Z"},{"deviceId":"Light_01","deviceName":"客厅灯光","roomName":"客厅","deviceType":"light","brand":"YaoCore-Simulator","online":true,"power":true,"brightness":68,"updatedAt":"20261017T071515Z"},{"deviceId":"Sensor_01","deviceName":"温湿度传感器","roomName":"客厅","deviceType":"sensor","brand":"YaoCore-Simulator","online":true,"temperature":26.8,"humidity":58.0,"updatedAt":"20261017T071515Z"},{"deviceId":"AC_01","deviceName":"客厅空调","roomName":"客厅","deviceType":"ac","brand":"YaoCore-Simulator","online":true,"power":true,"targetTemp":24,"mode":"COOL","updatedAt":"20261017T071515Z"}]}

@@ -1,0 +1,134 @@
+== A. schema inventory ==
+[PASS] A.1 twelve protocol schemas present -- count=12
+[PASS] A.2 ble-enrollment-identity-request.schema.json draft 2020-12
+[PASS] A.2 ble-enrollment-identity-response.schema.json draft 2020-12
+[PASS] A.2 cloud-command.schema.json draft 2020-12
+[PASS] A.2 discover-response.schema.json draft 2020-12
+[PASS] A.2 local-control-ack.schema.json draft 2020-12
+[PASS] A.2 local-control-request.schema.json draft 2020-12
+[PASS] A.2 module-command-ack.schema.json draft 2020-12
+[PASS] A.2 module-command.schema.json draft 2020-12
+[PASS] A.2 module-heartbeat.schema.json draft 2020-12
+[PASS] A.2 module-register.schema.json draft 2020-12
+[PASS] A.2 module-state.schema.json draft 2020-12
+[PASS] A.2 state-report.schema.json draft 2020-12
+
+== B. hmac-sha256-test-vectors.json vs README control canonical ==
+[PASS] B canonical[number-value]
+[PASS] B signature[number-value]
+[PASS] B request.sign[number-value]
+[PASS] B request keys[number-value] match schema required -- keys=exact
+[PASS] B canonical[string-value-unicode]
+[PASS] B signature[string-value-unicode]
+[PASS] B request.sign[string-value-unicode]
+[PASS] B request keys[string-value-unicode] match schema required -- keys=exact
+[PASS] B canonical[boolean-value]
+[PASS] B signature[boolean-value]
+[PASS] B request.sign[boolean-value]
+[PASS] B request keys[boolean-value] match schema required -- keys=exact
+[PASS] B canonical[absent-value]
+[PASS] B signature[absent-value]
+[PASS] B request.sign[absent-value]
+[PASS] B request keys[absent-value] match schema required -- keys=exact
+
+== C. response-auth / discovery-request vectors ==
+[PASS] C bodySha256[discover-response]
+[PASS] C canonical[discover-response]
+[PASS] C signature[discover-response]
+[PASS] C discover canonical[fresh-discovery-request]
+[PASS] C discover signature[fresh-discovery-request]
+
+== D. module-hmac-test-vector.json ==
+[PASS] D derived key
+[PASS] D body sha256
+[PASS] D canonical
+[PASS] D signature
+
+== E. canonical fields vs local-control-request.schema.json ==
+[PASS] E.1 canonical lines cover schema required minus sign -- diff=exact
+[PASS] E.2 payload properties are exactly action/value
+[PASS] E.3 payload requires action
+[PASS] E.4 payload closed
+[PASS] E.5 request closed
+
+== F. C-001 field-naming evidence ==
+[PASS] F.1 discover schema requires 'online'
+[PASS] F.2 discover schema has no isOnline/powerStatus/openStatus/targetTemperature
+[PASS] F.3 discover schema uses power/open/targetTemp
+[PASS] F.4 ack schema requires 'online'
+[PASS] F.5 ack schema has no camelCase state names
+[PASS] F.6 ack schema has no 'success' and is closed
+[INFO] F simulator /discover device keys: ['brand', 'brightness', 'deviceId', 'deviceName', 'deviceType', 'humidity', 'mode', 'online', 'open', 'power', 'roomName', 'targetTemp', 'temperature', 'updatedAt']
+[PASS] F.7 simulator device keys are schema-valid -- unknown=none
+[PASS] F.8 simulator emits 'online' not 'isOnline'
+[PASS] F.9 simulator top-level keys == schema required -- extra=none
+[PASS] F.10 simulator security.keyId is app-key-v1
+[INFO] F simulator /control ACK keys: ['message', 'reported_state', 'request_id', 'result_code', 'seq', 'server_time']
+[PASS] F.11 simulator ACK keys are schema-valid -- unknown=none
+[PASS] F.12 simulator ACK has no 'success'
+[PASS] F.13 reported_state keys are schema-valid -- unknown=none
+[PASS] F.14 reported_state uses 'online'
+[INFO] F spec token "isOnline": lines [102, 114]
+[INFO] F spec token "powerStatus": lines [103, 198]
+[INFO] F spec token "openStatus": lines none
+[INFO] F spec token "targetTemperature": lines none
+[INFO] F spec token "success": lines [193]
+[INFO] F spec token "displayName": lines [45]
+[FINDING] F.15 spec discover example top-level keys vs schema -- unknown keys = ['keyId']
+[FINDING] F.15b spec discover example missing schema-required keys -- missing = ['generatedAt', 'security']
+[FINDING] F.16 spec discover example device keys vs schema -- unknown keys = ['isOnline', 'powerStatus']
+[FINDING] F.16 spec discover example device keys vs schema -- unknown keys = ['isOnline']
+[FINDING] F.17 spec ACK example keys vs schema -- unknown keys = ['success']
+[FINDING] F.18 spec ACK reported_state keys vs schema -- unknown keys = ['deviceType', 'powerStatus']
+[FINDING] F.18b spec ACK reported_state missing schema-required keys -- missing = ['online']
+
+== G. result codes ==
+[INFO] G code 0: spec=SUCCESS simulator=-
+[INFO] G code 1001: spec=INVALID_SIGNATURE simulator=INVALID_REQUEST
+[INFO] G code 1002: spec=EXPIRED_TIMESTAMP simulator=UNSUPPORTED_SECURITY
+[INFO] G code 1003: spec=MISSING_FIELD simulator=TIMESTAMP_REJECTED
+[INFO] G code 1004: spec=UNKNOWN_DEVICE simulator=BAD_SIGNATURE
+[INFO] G code 1005: spec=REPLAY simulator=REPLAY
+[INFO] G code 1006: spec=UNSUPPORTED_ACTION simulator=UNSUPPORTED_COMMAND
+[INFO] G code 1007: spec=DEVICE_OFFLINE simulator=DEVICE_OFFLINE
+[INFO] G code 1008: spec=HARDWARE_TIMEOUT simulator=-
+[FINDING] G result code 0 -- spec=SUCCESS simulator=-
+[FINDING] G result code 1001 -- spec=INVALID_SIGNATURE simulator=INVALID_REQUEST
+[FINDING] G result code 1002 -- spec=EXPIRED_TIMESTAMP simulator=UNSUPPORTED_SECURITY
+[FINDING] G result code 1003 -- spec=MISSING_FIELD simulator=TIMESTAMP_REJECTED
+[FINDING] G result code 1004 -- spec=UNKNOWN_DEVICE simulator=BAD_SIGNATURE
+[FINDING] G result code 1006 -- spec=UNSUPPORTED_ACTION simulator=UNSUPPORTED_COMMAND
+[FINDING] G result code 1008 -- spec=HARDWARE_TIMEOUT simulator=-
+
+== H. BLE identity schema vs spec ==
+[PASS] H.1 request op const
+[PASS] H.2 request closed
+[PASS] H.3 response closed
+[PASS] H.4 gatewayId length <=63
+[INFO] H spec identity example lines: [44, 45]
+[INFO] H schema serviceId const: 'YaoCoreGateway'; spec example uses 'SmartHomeService'; schema requires 'gatewayName', spec example shows 'displayName'
+
+== I. archived App parser field preferences ==
+[PASS] I.1 ACK parser falls back isOnline->online
+[PASS] I.2 ACK parser falls back powerStatus->power
+[PASS] I.3 ACK parser falls back targetTemperature->targetTemp
+[PASS] I.4 discovery validator requires security block with HMAC-SHA256/app-key-v1
+[PASS] I.5 discovery parser also accepts camelCase source keys
+
+== summary ==
+hard checks: ALL PASS
+findings about frozen inputs: 14
+  FINDING: F.15 spec discover example top-level keys vs schema
+  FINDING: F.15b spec discover example missing schema-required keys
+  FINDING: F.16 spec discover example device keys vs schema
+  FINDING: F.16 spec discover example device keys vs schema
+  FINDING: F.17 spec ACK example keys vs schema
+  FINDING: F.18 spec ACK reported_state keys vs schema
+  FINDING: F.18b spec ACK reported_state missing schema-required keys
+  FINDING: G result code 0
+  FINDING: G result code 1001
+  FINDING: G result code 1002
+  FINDING: G result code 1003
+  FINDING: G result code 1004
+  FINDING: G result code 1006
+  FINDING: G result code 1008
