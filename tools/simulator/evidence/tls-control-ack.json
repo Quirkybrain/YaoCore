@@ -1,0 +1,1 @@
+{"request_id":"req-t05-tls-0001","seq":1,"result_code":0,"message":"command executed by DEV simulator","server_time":"20261017T071520Z","reported_state":{"deviceId":"Light_01","online":true,"power":true,"brightness":42,"updatedAt":"20261017T071520Z"}}

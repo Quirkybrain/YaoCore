@@ -1,0 +1,6 @@
+========================================================================
+YaoCore DEVELOPMENT CONTRACT SIMULATOR ONLY
+This is not OpenHarmony firmware and does not connect to IoTDA/hardware.
+Listening on http://127.0.0.1:9200
+Using the public test-vector secret; never use it outside local testing.
+========================================================================

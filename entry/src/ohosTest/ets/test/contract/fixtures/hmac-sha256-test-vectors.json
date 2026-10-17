@@ -1,0 +1,92 @@
+{
+  "warning": "PUBLIC TEST DATA ONLY. Never deploy this secret to an app, gateway, or cloud service.",
+  "algorithm": "HMAC-SHA256",
+  "secretEncoding": "UTF-8",
+  "canonicalEncoding": "UTF-8",
+  "canonicalFormat": "request_id\\ncmd_id\\nseq\\ntarget\\naction\\nvalue\\ntimestamp\\nnonce\\nalg\\nkey_id",
+  "vectors": [
+    {
+      "name": "number-value",
+      "secret": "YaoCore-Contract-Secret-v2",
+      "request": {
+        "request_id": "req-20260714-0001",
+        "cmd_id": 2001,
+        "seq": 10086,
+        "target": "Light_01",
+        "payload": {
+          "action": "SET_BRIGHTNESS",
+          "value": 68
+        },
+        "timestamp": "20260714T080000Z",
+        "nonce": "9f2a7c001122",
+        "alg": "HMAC-SHA256",
+        "key_id": "app-key-v1",
+        "sign": "3555f16eeee3c30e0f79e967357f057d9a5387a8bf13aa2f8a32e80e944fbaae"
+      },
+      "canonical": "req-20260714-0001\n2001\n10086\nLight_01\nSET_BRIGHTNESS\n68\n20260714T080000Z\n9f2a7c001122\nHMAC-SHA256\napp-key-v1",
+      "expectedSign": "3555f16eeee3c30e0f79e967357f057d9a5387a8bf13aa2f8a32e80e944fbaae"
+    },
+    {
+      "name": "string-value-unicode",
+      "secret": "YaoCore-Contract-Secret-v2",
+      "request": {
+        "request_id": "req-20260714-0002",
+        "cmd_id": 2001,
+        "seq": 10087,
+        "target": "AC_01",
+        "payload": {
+          "action": "SET_MODE",
+          "value": "制冷"
+        },
+        "timestamp": "20260714T080001Z",
+        "nonce": "9f2a7c001123",
+        "alg": "HMAC-SHA256",
+        "key_id": "app-key-v1",
+        "sign": "ce9e02332550418d91c8fcf3dbd4321145892a9db278e3f7e8d72bfdd239e9b8"
+      },
+      "canonical": "req-20260714-0002\n2001\n10087\nAC_01\nSET_MODE\n\"制冷\"\n20260714T080001Z\n9f2a7c001123\nHMAC-SHA256\napp-key-v1",
+      "expectedSign": "ce9e02332550418d91c8fcf3dbd4321145892a9db278e3f7e8d72bfdd239e9b8"
+    },
+    {
+      "name": "boolean-value",
+      "secret": "YaoCore-Contract-Secret-v2",
+      "request": {
+        "request_id": "req-20260714-0003",
+        "cmd_id": 2001,
+        "seq": 10088,
+        "target": "gateway_01",
+        "payload": {
+          "action": "BOARD_LED_ON",
+          "value": true
+        },
+        "timestamp": "20260714T080002Z",
+        "nonce": "9f2a7c001124",
+        "alg": "HMAC-SHA256",
+        "key_id": "app-key-v1",
+        "sign": "be436609837789cbfd36e063ebec4bed3add05c7edb68b10c12378364d92bba0"
+      },
+      "canonical": "req-20260714-0003\n2001\n10088\ngateway_01\nBOARD_LED_ON\ntrue\n20260714T080002Z\n9f2a7c001124\nHMAC-SHA256\napp-key-v1",
+      "expectedSign": "be436609837789cbfd36e063ebec4bed3add05c7edb68b10c12378364d92bba0"
+    },
+    {
+      "name": "absent-value",
+      "secret": "YaoCore-Contract-Secret-v2",
+      "request": {
+        "request_id": "req-20260714-0004",
+        "cmd_id": 2001,
+        "seq": 10089,
+        "target": "gateway_01",
+        "payload": {
+          "action": "PING"
+        },
+        "timestamp": "20260714T080003Z",
+        "nonce": "9f2a7c001125",
+        "alg": "HMAC-SHA256",
+        "key_id": "app-key-v1",
+        "sign": "d1d9a61e8a6dbc59a2dc807347a1dab99907ed4944cbc9f442a401c438eb2169"
+      },
+      "canonical": "req-20260714-0004\n2001\n10089\ngateway_01\nPING\n\n20260714T080003Z\n9f2a7c001125\nHMAC-SHA256\napp-key-v1",
+      "expectedSign": "d1d9a61e8a6dbc59a2dc807347a1dab99907ed4944cbc9f442a401c438eb2169"
+    }
+  ]
+}

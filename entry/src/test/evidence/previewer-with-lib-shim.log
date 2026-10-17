@@ -1,0 +1,50 @@
+10-17 15:18:20.356 96357 96357 D C01406/OHOS::RS: RSCommandFactory::Register, Duplicate command & sub_command detected! type: 11 subtype: 2
+10-17 15:18:20.356 96357 96357 D C01406/OHOS::RS: RSCommandFactory::Register, Duplicate command & sub_command detected! type: 11 subtype: 2
+10-17 15:18:20.356 96357 96357 D C01406/OHOS::RS: RSCommandFactory::Register, Duplicate command & sub_command detected! type: 11 subtype: 2
+[INFO][RichPreviewer.cpp][main][101][2026-10-17T15:18:20.363]:RichPreviewer enter the main function.
+[INFO][CommandParser.cpp][IsDebugPortValid][329][2026-10-17T15:18:20.363]:CommandParser debug port:
+[INFO][CommandParser.cpp][IsAppNameValid][364][2026-10-17T15:18:20.363]:CommandParser app name: entry
+[INFO][CommandParser.cpp][IsResolutionValid][377][2026-10-17T15:18:20.363]:CommandParser resolution: 1080 2340 1080 2340
+[INFO][CommandParser.cpp][IsJsHeapValid][404][2026-10-17T15:18:20.363]:CommandParser js heap: 524288
+[INFO][CommandParser.cpp][IsJsHeapFlagValid][419][2026-10-17T15:18:20.363]:CommandParser is send JS heap: 1
+[INFO][CommandParser.cpp][IsScreenShapeValid][434][2026-10-17T15:18:20.363]:CommandParser screen shape: rect
+[INFO][CommandParser.cpp][IsDeviceValid][449][2026-10-17T15:18:20.363]:CommandParser device: phone
+[INFO][CommandParser.cpp][IsUrlValid][460][2026-10-17T15:18:20.363]:CommandParser url: ../../../.test/testability/pages/Index
+[INFO][CommandParser.cpp][IsWebSocketPortValid][669][2026-10-17T15:18:20.363]:CommandParser WebSocket listening port: 40000
+[INFO][CommandParser.cpp][IsScreenModeValid][686][2026-10-17T15:18:20.363]:CommandParser screen mode: dynamic
+[INFO][CommandParser.cpp][IsProjectModelValid][511][2026-10-17T15:18:20.363]:CommandParser projectModel: Stage
+[INFO][CommandParser.cpp][IsPagesValid][525][2026-10-17T15:18:20.363]:CommandParser pages: main_pages
+[ERROR][CommandParser.cpp][IsAbilityNameValid][896][2026-10-17T15:18:20.363]:Launch -d parameters without -abn parameters.
+[INFO][CommandParser.cpp][IsLanguageValid][700][2026-10-17T15:18:20.363]:CommandParser l: zh_CN
+[INFO][CommandParser.cpp][IsTracePipeNameValid][714][2026-10-17T15:18:20.363]:CommandParser ts: trace_7947_commandPipe
+[INFO][CommandParser.cpp][IsLocalSocketNameValid][730][2026-10-17T15:18:20.363]:CommandParser s: phone_1702972840143_1
+[INFO][CommandParser.cpp][IsScreenDensityValid][758][2026-10-17T15:18:20.363]:CommandParser sd: 480
+[INFO][RichPreviewer.cpp][InitSharedData][91][2026-10-17T15:18:20.363]:Start language is : zh_CN
+[ERROR][LocalSocket.cpp][ConnectToServer][51][2026-10-17T15:18:20.363]:connect socket failed
+[FATAL][CommandLineInterface.cpp][InitPipe][50][2026-10-17T15:18:20.363]:CommandLineInterface command pipe connect failed
+[ERROR][LocalSocket.cpp][ConnectToServer][51][2026-10-17T15:18:20.363]:connect socket failed
+[ERROR][TraceTool.cpp][InitPipe][37][2026-10-17T15:18:20.363]:TraceTool::pipe connect failed
+[INFO][TraceTool.cpp][HandleTrace][58][2026-10-17T15:18:20.363]:Trace pipe is not prepared
+[INFO][CppTimerManager.cpp][AddCppTimer][35][2026-10-17T15:18:20.364]:CppTimerManager::AddCppTimer
+[INFO][CppTimerManager.cpp][AddCppTimer][35][2026-10-17T15:18:20.364]:CppTimerManager::AddCppTimer
+[INFO][CommandLineFactory.cpp][CreateCommandLine][93][2026-10-17T15:18:20.364]:Create Command: Language
+[INFO][CommandLine.cpp][RunSet][824][2026-10-17T15:18:20.364]:Set language run finished, language is: zh_CN
+[INFO][JsAppImpl.cpp][Start][86][2026-10-17T15:18:20.364]:Start run js app
+[INFO][JsAppImpl.cpp][RunJsApp][209][2026-10-17T15:18:20.364]:RunJsApp 1
+[INFO][JsAppImpl.cpp][AssignValueForWidthAndHeight][641][2026-10-17T15:18:20.364]:AssignValueForWidthAndHeight: 1080 2340 1080 2340
+[INFO][JsAppImpl.cpp][SetJsAppArgs][173][2026-10-17T15:18:20.364]:foldStatus:unfold foldWidth:0 foldHeight:0
+[INFO][JsAppImpl.cpp][SetProjectModel][513][2026-10-17T15:18:20.364]:ProjectModel: Stage
+[INFO][JsAppImpl.cpp][SetColorMode][549][2026-10-17T15:18:20.364]:JsAppImpl::RunJsApp SetColorMode: light
+[INFO][JsAppImpl.cpp][SetOrientation][559][2026-10-17T15:18:20.364]:JsAppImpl::RunJsApp SetOrientation: portrait
+[INFO][JsAppImpl.cpp][SetAceVersionArgs][569][2026-10-17T15:18:20.364]:JsAppImpl::RunJsApp SetAceVersionArgs: ACE_2_0
+[INFO][WebSocketServer.cpp][StartWebsocketListening][135][2026-10-17T15:18:20.364]:Begin to start websocket listening!
+[INFO][JsAppImpl.cpp][SetJsAppArgs][204][2026-10-17T15:18:20.364]:start ability: 1080 2340 3.000000
+[INFO][StageContext.cpp][SetLoaderJsonPath][64][2026-10-17T15:18:20.364]:set loaderJsonPath: /home/quirkybrain/code/harmony-projects/YaoCore/entry/.test/default/intermediates/loader/default/loader.json successed.
+[INFO][StageContext.cpp][GetModulePathMapFromLoaderJson][98][2026-10-17T15:18:20.364]:hspNameOhmMap is valid
+[INFO][JsAppImpl.cpp][InitGlfwEnv][950][2026-10-17T15:18:20.364]:InitGlfwEnv started
+10-17 15:18:20.364 96357 96357 I C01403/GlfwRC: Init
+[ERROR][LocalSocket.cpp][WriteData][119][2026-10-17T15:18:20.365]:LocalSocket::WriteData ReadFile failed
+[INFO][WebSocketServer.cpp][ProtocolCallback][91][2026-10-17T15:18:20.379]:Engine Websocket protocol init
+[INFO][JsAppImpl.cpp][InitGlfwEnv][957][2026-10-17T15:18:20.444]:InitGlfwEnv finished
+[ERROR][JsAppImpl.cpp][RunDebugAbility][451][2026-10-17T15:18:20.444]:JsApp::Run ability start failed.Linux is not supported.
+[INFO][JsAppImpl.cpp][Start][89][2026-10-17T15:18:20.444]:Js app run finished
