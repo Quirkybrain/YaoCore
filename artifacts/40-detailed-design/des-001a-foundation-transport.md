@@ -3,7 +3,8 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Proposed（待 G-006）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4，冻结签名未变更）
+- **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
@@ -5225,6 +5226,8 @@ sequenceDiagram
 | `AppTheme`/`components`/`pages`/`EntryAbility`/`AppCompositionRoot` | DES-B（C-24..C-28） | 组合根只装配适配器；禁止 Mock |
 | 测试计划/执行报告/评审 | T-05/T-19/T-20 | 引用本文契约 ID |
 
+> DES-001B §23 的 23 项增量扩展（G-007 批准）统一登记于 §27.4；本表归属不变。
+
 ### 27.3 变更规则
 
 1. **禁止破坏性变更**：DES-B 不得修改本文已冻结的公开方法名/参数顺序/返回类型/错误码语义。
@@ -5239,9 +5242,78 @@ sequenceDiagram
    - 修改存储别名/表结构（需迁移）。
 4. DES-B 的接口变更必须更新本文的“共享类型边界”并在 G-007 记录；T-06..T-14 若已实现，受影响组件标 `STALE` 并重跑 CQG。
 
+> G-007（2026-10-17）批准的 DES-001B §23 扩展已登记于 §27.4；本节规则不变。
+
+### 27.4 扩展记录（Extended by DES-001B §23，G-007 批准）
+
+> **依据**：G-007（2026-10-17）批准 DES-001B §23 的 23 项增量扩展（新端口/模型/方法/错误码），条件是在 T-06 实现开始前由 solution-architect 在本文记录“extended by DES-001B §23”。本节即该记录。
+>
+> **边界**：本节只登记 DES-A 侧共享类型边界与影响说明，**不引入新裁定**，不改写 §3..§24 的任何冻结签名、错误语义、状态机或存储结构。扩展的完整签名、行为与测试要求以 DES-B §23 及对应章节为准；本节条目是索引，不是替代文本。
+
+**原则**：
+
+1. **DES-A 冻结签名不变**：公开方法名、参数顺序、返回类型、错误码类别/重试/i18n 语义以 G-006（@ `6c186f0`）为准；本节扩展只增不改。
+2. **增量边界**：仅新增文件/类型/方法/错误码；不得替换、重载或收窄既有契约；不得修改 canonical/HMAC/ACK 判定链（§18）与 §2.2 依赖方向。
+3. **双文遵守**：T-09/T-10/T-14..T-18 实现时同时遵守 DES-A（类型、错误、端口、测试 seam）与 DES-B（行为、仓储、VM、UI）；扩展符号不得绕开 `AppError`/`Result`（§3.2）、secret 生命周期（§3.5）与端口注入（§3.7）。
+4. **冲突处理**：若后续实现暴露冻结签名与本扩展不兼容，停止局部修补，按 **Change Impact** 重评；受影响组件标 `STALE`/`UNVERIFIED` 并重跑 CQG，必要时回滚到详细设计。G-007 评估时无已实现组件，故本次无 `STALE` 项。
+5. **错误码约束**：§23.4 的新增码只追加到 §24 `ErrorCatalog`，不得改变既有 code 的类别/重试/i18n 映射；`CLOUD_*` 与网关 `result_code` 数值空间及 `errors.gateway.*` 键分离。
+
+#### 27.4.1 23 项扩展清单
+
+| # | ID | 类型 | 扩展内容 | DES-B 位置 | 对 DES-A 的影响 |
+|---:|---|---|---|---|---|
+| 1 | `EXT-DES-B-01` | 新端口 | `contracts/TimerPort.ets`：`TimerPort`、`TimerHandle`（`scheduleOnce`/`scheduleRepeating`/`cancel`） | §23.1 | 新增 DI 端口，§3.7 未列；不改变 `ClockPort`/`MetricsPort` 签名；host 用 `FakeTimer`（DES-B §21.2） |
+| 2 | `EXT-DES-B-02` | 新端口 | `contracts/I18nPorts.ets`：`I18nResourceLoaderPort`、`LocaleApplierPort` | §23.1 | C-14 平台隔离；§27.2 已将 `I18nService`/资源包归属 DES-B；`errorCodeToI18nKey` 仍按 §24 |
+| 3 | `EXT-DES-B-03` | 新端口 | `contracts/CloudPorts.ets`：`CloudConfigStore`、`CloudCredentialPort` | §23.1 | `CloudConfig` 模型仍按 §5.1.7（token 只存别名）；两端口按**新增**处理（§23.1 称 §4.4 已提及，经查 §4.4 未定义）；云错误命名空间独立（§27.2） |
+| 4 | `EXT-DES-B-04` | 新端口 | `contracts/RoomPorts.ets`：`RoomLookupPort`、`DeviceAssignmentPort` | §23.1 | §27.2 已列 `DeviceAssignmentPort` 归属，本项补齐签名；`onRoomDeleted(tx,...)` 使用 C-06 事务类型；不改 §9/§11 既有方法 |
+| 5 | `EXT-DES-B-05` | 新端口 | `contracts/RoomPorts.ets`：`MemberRoomGrantPort` | §23.1 | C-09→C-08 授权清理；不改 `FamilyRepository` §11.1 冻结签名 |
+| 6 | `EXT-DES-B-06` | 新端口 | `contracts/ScenePorts.ets`：`SceneReferencePort` | §23.1 | C-10/C-07→C-11 引用清理；`Scene`/`SceneAction` 形状仍按 §5.1.7，执行器归属不变 |
+| 7 | `EXT-DES-B-07` | 新端口 | `contracts/DevicePorts.ets`：`DeviceControlPort.send(command)` | §23.1 | §3.7 已列名未给签名，本项补齐；入参/返回仍为 §5.1.4 `DeviceControlCommand`/`ControlOutcome` |
+| 8 | `EXT-DES-B-08` | 新端口 | `contracts/DevicePorts.ets`：`DeviceStatePort.applyDiscoverSnapshot/applyControlAck` | §23.1 | §3.7 已列名未给签名，本项补齐；消费 §5.1.5 `DiscoverySnapshot` 与 §5.1.4 `ControlOutcome`；不得改 `DeviceState` 字段 |
+| 9 | `EXT-DES-B-09` | 新增纯函数 | `service/i18n/I18nKeys.ets`：`I18nKeys` | §23.1 | 不进入 `contracts/**`；键族须与 I18N-DESIGN/§24 一致；不改变 `errorCodeToI18nKey` 归属 |
+| 10 | `EXT-DES-B-10` | 新模型 | `DeviceRecord`、`DeviceMergeState`、`DeviceMergeResult` | §23.2 | C-10 UI 附加视图；只增不改 `DeviceState`（§5.1.2） |
+| 11 | `EXT-DES-B-11` | 新模型 | `DiscoverApplyOptions/Result`、`ControlApplyContext/Result/Reason`、`DeviceRemoval*` | §23.2 | C-10 仲裁/删除纯值；输入使用 §5.1.5/§5.1.4 冻结类型 |
+| 12 | `EXT-DES-B-12` | 新模型 | `SceneExecutionResult/Progress/StepResult/State`、`SceneCleanupSummary` | §23.2 | C-11 执行/清理纯值；执行仍经 `DeviceControlPort`，不改 `Scene`/`SceneAction` |
+| 13 | `EXT-DES-B-13` | 新模型 | `FamilyMemberView`、`InvitationView`、`FamilyDissolutionPlan`、`JoinSessionState`、`FamilyJoinPhase` | §23.2 | C-08/C-22 视图/流程值；不改 `FamilyMember`/`InvitationRecord`/`InvitationStatus` 冻结形状（§5.1.7） |
+| 14 | `EXT-DES-B-14` | 新模型 | `CloudConfigView`、`CloudCommandReceipt`、`ShadowSnapshot`、`InventoryDeviceState`、`CloudCompletionVerdict`、`CloudControlOutcome` | §23.2 | C-15 纯值；`InventoryDeviceState` 关联 PB-02，保持非冻结；`CloudConfig` 形状仍按 §5.1.7 |
+| 15 | `EXT-DES-B-15` | 新模型 | `GatewayStatus`、`ControlUiState`、`DeviceFilter`、`FamilyCapabilities`、`DoorUiState`、`DoorLinkConfig`、`WizardStep`、`ProvisioningPermissionState` | §23.2 | UI/VM 纯值，不进入 DES-A 契约面；`ControlUiState` 消费 §18.7 的 ACK/验签结果 |
+| 16 | `EXT-DES-B-16` | 新模型 | `I18nParams`、`I18nResourceBundle`、`LocaleChangedEvent`、`I18nLoadResult` | §23.2 | C-14 纯值；资源包布局遵 I18N-DESIGN；不影响 §24 映射 |
+| 17 | `EXT-DES-B-17` | 增量方法 | `FamilyRepository`：`switchActiveFamily`、`removeRoomGrant`、`transferAdmin`、`removeFamilyLocal`、`removeMemberLocal`、`listInvitationsByFamily`、`listMemberRoomGrants`、`applyReceipt` | §23.3 | 新方法，不改 §11.1 签名；v2 表结构不变（§11.4，无迁移）；须维持 §11.3 不变量（如最后 ADMIN） |
+| 18 | `EXT-DES-B-18` | 增量方法 | `InviteService.discardJoinRequest(memberId)` | §23.3 | 新方法，不改 §13.1 签名；清理 `YCR1` 私钥别名须经 `SecretStore`（§3.5/§13.2）；失败按 §13.3 透传 `STORAGE_*`/`ASSET_*` |
+| 19 | `EXT-DES-B-19` | 无变更确认 | `GatewayRepository` 不新增方法 | §23.3 | 对 DES-A 无影响；C-23 仅调用既有 `commitBinding`/`removeLocalBinding`（§10.1） |
+| 20 | `EXT-DES-B-20` | 增量方法 | `AuthService.removeProfilesForFamily(familyId)`、`removeProfilesForMember(familyId, memberId)` | §23.3 | 新方法，不改 §12.1 既有方法；不改变会话/RBAC 语义；删除档案须使相关会话失效（§12.3） |
+| 21 | `EXT-DES-B-21` | 多家庭实现约束 | `AuthService` 每家庭一个 `LocalProfile`；不新增 `rebindProfile` | §23.3 | 不改 `LocalProfile.familyId` 冻结语义；加入家庭复用既有 `createProfile`；`RISK-MULTIFAMILY-PROFILE` 由 DES-B §22.1 登记 |
+| 22 | `EXT-DES-B-22` | 新端口 | `contracts/PermissionPort.ets`：`PermissionPort`、`PermissionKind`、`PermissionResult` | §23.1 | C-23 VM 与 C-28 `PermissionGate` 解耦；host fake；不改变 §16 BLE 权限错误码与系统权限申请归属 |
+| 23 | `EXT-DES-B-23` | 新端口 | `contracts/ControlPorts.ets`：`DeviceControlCoordinatorPort` | §23.1 | C-21 VM → LAN/云回退编排；VM 不 import service 实现，依赖方向仍按 §2.2；不改 C-17 契约 |
+
+> 计数：10 新端口 + 1 新增纯函数 + 7 新模型 + 3 增量方法 + 1 多家庭实现约束 + 1 无变更确认 = 23 项；其中 `EXT-DES-B-19` 仅确认无变更。
+
+#### 27.4.2 错误码组（DES-B §23.4，未分配 `EXT-DES-B-*` ID）
+
+G-007 同一裁定批准的 DES-B §23.4 共 **35 个新 code**，全部为新增：
+
+| 分组 | 数量 | code | DES-A 影响 |
+|---|---:|---|---|
+| 房间 | 3 | `ROOM_NOT_FOUND`、`ROOM_NAME_INVALID`、`ROOM_DELETE_NOT_CONFIRMED` | 新增 `CONFIG` 码；不改既有错误语义与 i18n 键 |
+| 设备 | 5 | `DEVICE_NOT_FOUND`、`DEVICE_DISMISSED`、`DEVICE_DISABLED`、`DEVICE_UNASSIGNED`、`DEVICE_NAME_INVALID` | 新增 `CONFIG` 码；不改 §5.1.2 `DeviceState` 与 §18.7 ACK 判定 |
+| 场景 | 8 | `SCENE_NOT_FOUND`、`SCENE_NAME_INVALID`、`SCENE_EMPTY`、`SCENE_DISABLED`、`SCENE_PREFLIGHT_FAILED`、`SCENE_STEP_FAILED`（可重试）、`SCENE_REFERENCE_INVALID`、`SCENE_CANCELLED`（可重试） | 新增 `CONFIG` 码；执行语义仍按 DES-B C-11，不改 §27.2 归属 |
+| i18n | 4 | `I18N_RESOURCE_LOAD_FAILED`（可重试）、`I18N_BUNDLE_INVALID`、`I18N_LOCALE_UNSUPPORTED`、`I18N_PLATFORM_LOCALE_FAILED`（可重试） | 新增 `CONFIG` 码；键映射仍由 §24 `ErrorCatalog` 统一 |
+| 云 | 15 | `CLOUD_NOT_CONFIGURED`、`CLOUD_ENDPOINT_INVALID`、`CLOUD_TOKEN_MISSING`、`CLOUD_TOKEN_EXPIRED`、`CLOUD_TOKEN_INVALID`、`CLOUD_RATE_LIMITED`、`CLOUD_REQUEST_FAILED`、`CLOUD_SERVICE_UNAVAILABLE`、`CLOUD_RESPONSE_INVALID`、`CLOUD_DEVICE_NOT_FOUND`、`CLOUD_SHADOW_INVALID`、`CLOUD_COMPLETION_TIMEOUT`、`CLOUD_COMPLETION_UNSUPPORTED`、`CLOUD_INVENTORY_UNSUPPORTED`、`CLOUD_SEQUENCE_UNAVAILABLE` | 新增 `CONFIG`/`AUTH`/`TRANSPORT`/`PROTOCOL` 码；不复用网关 `result_code` 数值空间；`errors.cloud.*` 与 `errors.gateway.*` 分离 |
+
+- 所有新键必须同时存在于 zh-CN/en-US rawfile（CHK-06）；`CLOUD_COMPLETION_TIMEOUT`/`CLOUD_COMPLETION_UNSUPPORTED`/`CLOUD_INVENTORY_UNSUPPORTED` 映射到 DES-B 的 `cloud.command.accepted_not_confirmed`/`cloud.completion.unsupported` 展示键。
+- 既有 code 的类别、可重试性与 i18n 语义不得因本组新增而改变（§27.3 第 1、2 条）。
+
+#### 27.4.3 消费与追溯
+
+- §28.1 的任务映射不变；T-09/T-10/T-14..T-18 在 CQG 中同时引用 DES-A 契约 ID、本节 `EXT-DES-B-*` 与 DES-B 对应章节。
+- 扩展文件落点遵守 §2.1：端口在 `contracts/**`（port-only），模型在 `model/**`，i18n 键构造在 `service/i18n/**`；`contracts/**` 不得 import 实现。
+- 后续任何新扩展重复同一路径：DES-B 侧登记 → 对应 Gate/Change Impact 裁定 → 本节更新；不得直接改写 DES-A 冻结签名。
+
 ---
 
 ## 28. 追溯与任务消费索引
+
+> DES-B §23 的增量扩展（新端口/模型/方法/错误码）由 **§27.4** 统一索引；实现任务同时引用本表与 §27.4，避免两处清单漂移。
 
 ### 28.1 组件 → 任务 → Gate
 
