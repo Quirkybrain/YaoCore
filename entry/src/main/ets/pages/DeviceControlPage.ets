@@ -373,6 +373,7 @@ export struct DeviceControlPage {
           roomName: UiMapping.roomNameById(record.state.roomId, this.devices.rooms),
           compact: false,
           motionEnabled: this.motionEnabled,
+          linkGuideOpen: this.doorGuideVisible,
           onOpen: (): void => {
             const vm = this.doorVm;
             if (vm !== undefined) {

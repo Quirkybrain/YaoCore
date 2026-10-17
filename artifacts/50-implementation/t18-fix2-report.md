@@ -19,7 +19,7 @@
 |---|---|---|---|
 | **R2-01** Settings P_BLOCKED“重新配网”缺 ADMIN 门 | Medium | **Fixed** | `pages/SettingsPage.ets` 的 `RECONFIGURE` 按钮增加 `.enabled(this.isAdmin())`，与同区 `ROTATE_SECRET` 一致；非 ADMIN 控件禁用，服务层 RBAC 仍为最终判定（`addGatewayToFamily` 残余见 §6）。测试：`T18_R2_settingsReprovisionRequiresAdmin` 断言 SECURITY 区两个网关管理动作均受 `isAdmin()` 门控，且 `isAdmin()` 以 `MemberRole.ADMIN` 为准。 |
 | **R2-02** 配网 `busy` 时取消按钮被禁用 | Medium | **Fixed** | `pages/ProvisioningPage.ets` 取消按钮移除 `!this.busy`，恢复 DES-B §16.3(1)“取消随时可用”；`cancel()` 立即清空 PoP/SSID/Wi-Fi 密码、清除错误并复位 `busy`，随后调用 `BleProvisioningViewModel.cancel()`（停扫、递增扫描代际、清 10s 定时器、销毁本会话 draft、`ble.cancel()`）。页面订阅在 `cancelled` 后不再推进步骤，晚到结果不会覆盖取消界面。测试：`T18_R2_provisioningCancelStaysAvailableWhileBusy`（源码守卫）、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`（AP 扫描挂起时取消 → `CANCELLED`、`ble.cancel` 被调用、定时器为 0）。 |
-| **R2-04** DoorCard“关联门磁”一次性 skip 后成死按钮 | Low | **Fixed** | `pages/DeviceControlPage.ets` 的显式 `onConfigureLink` 现在重置 `doorGuideDismissed = false` 并打开 `doorGuideVisible = true`。一次性规则只抑制自动弹窗；显式按钮始终有效。按钮仍仅在 `door.link.mode === 'NONE'` 时显示，已关联后不出现。测试：`T18_R2_doorExplicitLinkButtonReopensGuide`。 |
+| **R2-04** DoorCard“关联门磁”一次性 skip 后成死按钮 | Low | **Fixed** | `pages/DeviceControlPage.ets` 的显式 `onConfigureLink` 现在重置 `doorGuideDismissed = false` 并打开 `doorGuideVisible = true`。一次性规则只抑制自动弹窗；显式按钮始终有效。`components/DeviceCards.ets` 的 `DoorCard` 增加 `linkGuideOpen` prop：仅当 `door.link.mode === 'NONE'` 且引导未打开时渲染入口，避免引导已显示时出现重复/看似无效的按钮；引导关闭（skip）后入口重新出现。测试：`T18_R2_doorExplicitLinkButtonReopensGuide`。 |
 | **R2-05** 配网中途权限/蓝牙失败无“去设置”CTA | Low | **Fixed（页面层）** | 写范围不含 `viewmodel/`，因此在 `ProvisioningPage` 增加 `@State permission` 有效权限镜像：每次发布先同步 `view.permission`，当错误码为 `PROVISIONING_PERMISSION_DENIED`/`PROVISIONING_BLUETOOTH_OFF` 时更新为 `DENIED`/`BLUETOOTH_OFF`。中途失败且 `localStep >= 2` 时保留当前 Step 2/4，不强制跳回 Step0；通用错误区在 `permissionNeedsSettings() && localStep !== 0` 时渲染“去设置”CTA（Step0 仍保留原 CTA）。`openSettings()` 走既有 `PermissionPort.openSettings` seam。测试：`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`。 |
 | **R2-06** 未用 import / `width('auto')` 设备证据 | Low/Info | **Fixed（import）/ Recorded（设备）** | `pages/MainShell.ets` 删除未使用的 `AppMotionTokens` import。`PrimaryButton` 的 `.width('auto')` + `minWidth` 布局与 en-US 长标签换行仍无设备证据，记录给 T-19。 |
 | **R2-07** 网关/房间/场景服务层残余 | Info | **Recorded（不改）** | `addGatewayToFamily` 无 actor/RBAC、RoomService 缺省 actor 的 v1 local-admin trust、SceneService 无 family/room 上下文均为已声明上游残余，归属 C-22/C-09/C-15/C-12，本次不扩大范围。 |
@@ -34,7 +34,7 @@
 |---|---|---|
 | `entry/src/test/host/UiPages.test.mjs` | `T18_R2_settingsReprovisionRequiresAdmin` | R2-01：SECURITY 区 rotate/reprovision 双动作 ADMIN 矩阵 |
 | `entry/src/test/host/UiPages.test.mjs` | `T18_R2_provisioningCancelStaysAvailableWhileBusy` | R2-02：取消按钮不受 `busy` 禁用；`cancel()` 清秘密/复位 busy |
-| `entry/src/test/host/UiPages.test.mjs` | `T18_R2_doorExplicitLinkButtonReopensGuide` | R2-04：显式入口重置 dismissed 并打开引导 |
+| `entry/src/test/host/UiPages.test.mjs` | `T18_R2_doorExplicitLinkButtonReopensGuide` | R2-04：显式入口重置 dismissed 并打开引导；引导打开时隐藏重复入口 |
 | `entry/src/test/host/UiPages.test.mjs` | `T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings` | R2-05：权限错误码映射、Step2/4 保留、错误区“去设置”CTA |
 | `entry/src/test/host/ViewModelBle.test.mjs` | `T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer` | R2-02：`prepareWifi` 挂起时取消→`CANCELLED`、BLE 取消、定时器清零 |
 
@@ -48,14 +48,14 @@
 | # | 命令 | 结果 |
 |---|---|---|
 | 1 | `ohpm install` | exit 0；`install completed in 0s 39ms` |
-| 2 | `hvigorw clean assembleHap --no-daemon` | exit 0；**BUILD SUCCESSFUL in 14 s 512 ms**；0 ERROR（既有 ArkTS/SDK 警告不变） |
+| 2 | `hvigorw clean assembleHap --no-daemon` | exit 0；**BUILD SUCCESSFUL in 14 s 348 ms**；0 ERROR（既有 ArkTS/SDK 警告不变） |
 | 3 | `codelinter -c code-linter.json5 -p default .` | exit 0；**Defects 25 / Errors 0 / Warns 25 / Suggestions 0**（与修复前同量级） |
 | 4 | `entry/src/test/run-host-tests.sh` | exit 0；**tests 690 / pass 690 / fail 0 / skipped 0**（新增 5，既有 685 保留） |
 | 5 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | exit 0；**blockingFailures=0 / missingKeys=0**；warnings=139；hardcoded=82（与修复前一致） |
 
 补充静态核对：
 
-- `git diff --stat` 仅 6 个允许路径：4 个 `pages/*.ets`、2 个 `entry/src/test/host/*.test.mjs`；无 `viewmodel/`、`resources/`、`repository/`、`ohosTest/`、`module.json5`、`AppScope/` 改动。
+- `git diff --stat` 变更仅限允许路径：4 个 `pages/*.ets`、1 个 `components/*.ets`、2 个 `entry/src/test/host/*.test.mjs` 与本报告；无 `viewmodel/`、`resources/`、`repository/`、`ohosTest/`、`module.json5`、`AppScope/` 改动。
 - 未新增用户可见硬编码文案；新增注释/技术错误码字符串不进入 UI。
 - `pages/**` 未新增 `@Provide/@Consume`，未 `new` 服务/仓储/VM；DI 约定与 RBAC fail-closed 未变。
 - i18n parity 未动：未新增/删除/修改 zh-CN、en-US 资源键。
@@ -67,6 +67,7 @@
 - `entry/src/main/ets/pages/SettingsPage.ets`（R2-01）
 - `entry/src/main/ets/pages/ProvisioningPage.ets`（R2-02、R2-05）
 - `entry/src/main/ets/pages/DeviceControlPage.ets`（R2-04）
+- `entry/src/main/ets/components/DeviceCards.ets`（R2-04 引导打开时隐藏重复入口）
 - `entry/src/main/ets/pages/MainShell.ets`（R2-06 import 清理）
 - `entry/src/test/host/UiPages.test.mjs`（4 条 R2 测试）
 - `entry/src/test/host/ViewModelBle.test.mjs`（1 条 R2 测试）

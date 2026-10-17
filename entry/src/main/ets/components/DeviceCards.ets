@@ -314,6 +314,7 @@ export struct DoorCard {
   @Prop roomName: string = '';
   @Prop compact: boolean = false;
   @Prop motionEnabled: boolean = true;
+  @Prop linkGuideOpen: boolean = false;
   onOpen: () => void = (): void => {};
   onClose: () => void = (): void => {};
   onConfigureLink: () => void = (): void => {};
@@ -400,7 +401,7 @@ export struct DoorCard {
             })
         }
         .width('100%')
-        if (this.door.link.mode === 'NONE') {
+        if (this.door.link.mode === 'NONE' && !this.linkGuideOpen) {
           Button(this.i18n.t('device.door.configure_link'))
             .height(44)
             .fontSize(AppTypography.caption)

@@ -494,8 +494,10 @@ test('T18_R2_doorExplicitLinkButtonReopensGuide', async () => {
   assert.ok(!block.includes('if (!this.doorGuideDismissed)'),
     'explicit entry must not be silently ignored');
   const cards = await readUiSource('components/DeviceCards.ets');
-  assert.ok(cards.includes("if (this.door.link.mode === 'NONE')"),
-    'the entry is only rendered when no sensor is linked');
+  assert.ok(cards.includes("this.door.link.mode === 'NONE' && !this.linkGuideOpen"),
+    'the entry is only rendered when no sensor is linked and the guide is closed');
+  assert.ok(door.includes('linkGuideOpen: this.doorGuideVisible'),
+    'the page hides the duplicate entry while the guide is already open');
 });
 
 test('T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings', async () => {
