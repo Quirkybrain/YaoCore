@@ -6,7 +6,7 @@
 - **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；冻结签名未变更）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
-- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -525,8 +525,8 @@ export class Result<T> {
 | 传输 | `TLS_PROFILE_INCONSISTENT` | SECURITY | 否 | `errors.app.tls_profile_inconsistent` |
 | 传输 | `TLS_PIN_CONFIG_INVALID` | SECURITY | 否 | `errors.app.tls_pin_config_invalid` |
 | 传输 | `TLS_VERIFIER_UNAVAILABLE` | SECURITY | 否 | `errors.app.tls_verifier_unavailable` |
-| 网关 | `CONTROL_RESPONSE_AUTH_FAILED`（**DEPRECATED**，仅兼容读取） | GATEWAY | 否 | `errors.app.control_response_auth_failed` |
-| 网关 | `ACK_CORRELATION_MISMATCH`（仅 ACK body `request_id`/`seq`） | GATEWAY | 否 | `errors.app.ack_correlation_mismatch` |
+| 网关 | `CONTROL_RESPONSE_AUTH_FAILED` | GATEWAY | 否 | `errors.app.control_response_auth_failed` |
+| 网关 | `ACK_CORRELATION_MISMATCH` | GATEWAY | 否 | `errors.app.ack_correlation_mismatch` |
 | 网关 | `ACK_PROTOCOL_VIOLATION` | GATEWAY | 否 | `errors.app.ack_protocol_violation` |
 | 网关 | `ACK_STATE_MISMATCH` | GATEWAY | 否 | `errors.app.ack_state_mismatch` |
 | 网关 | `GATEWAY_ID_MISMATCH` | GATEWAY | 否 | `errors.app.gateway_id_mismatch` |
@@ -593,6 +593,11 @@ export class Result<T> {
 
 > 说明：`HTTP_<status>` 的具体 i18n 键统一为 `errors.app.http_error`，以 `{status}` 参数区分；不得为每个 HTTP 码建一个键。
 > 说明：网关 `result_code` 的 i18n 键为 `errors.gateway.<error_code>`，见 §24；不在本表重复。
+>
+> **表注（行级，T-12 裁定，2026-10-17）**：为保持本表可被 T-10 `parseDeclaredCodes` 机读（code 必须独占单元格），行级注记统一置于表后。
+> - `CONTROL_RESPONSE_AUTH_FAILED`：**DEPRECATED**，仅兼容读取，禁止新发；响应头验签/相关性的 canonical code 为 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH`（SECURITY）。
+> - `ACK_CORRELATION_MISMATCH`：仅表示 ACK body 的 `request_id`/`seq` 不等，不得用于响应头 correlation。
+>
 > **T-12 裁定同步（2026-10-17）**：响应头验签/相关性失败的唯一 canonical code 为 `RESPONSE_AUTH_FAILED` / `RESPONSE_CORRELATION_MISMATCH`（SECURITY）；`CONTROL_RESPONSE_AUTH_FAILED` 已退役，禁止新发（仅兼容读取，i18n 同键）；`ACK_CORRELATION_MISMATCH` 只表示 ACK body 的 `request_id`/`seq` 不等，不得用于响应头 correlation。完整映射与代码对齐状态见 CB §4.5。
 
 #### 3.2.4 网关结果码（仅类型分离，语义引用 CB §4.1）
@@ -5544,6 +5549,30 @@ G-007 同一裁定批准的 DES-B §23.4 共 **35 个新 code**，全部为新�
 | （未列） | C-13 InviteService | §13 | 为满足 T-03 DoD（C-12..C-13）纳入 |
 | C-02 领域模型 | C-02 | §5 | 共享面；DES-B 扩展 |
 | C-20 Mock | C-20 | §17 | 首选 ohosTest |
+
+## 附录 D：§3.2.3 机读格式修复记录（wp-048，2026-10-17）
+
+**任务**：`wp-048-des-format-fix`（solution-architect）；**触发**：CQG-T12 Post-merge integration finding——合并 `49f720c` 至 `71fd072` 后 host 回归 450/451，`T10_C14_authoritativeCatalog_everyDeclaredCodeHasBothLocaleKeys` 解析 DES-A §3.2.3 得到 94 行（期望 96）。
+
+**根因**：`entry/src/test/host/I18n.test.mjs` 的 `parseDeclaredCodes` 使用行级正则
+``/^\|\s*[^|]+\|\s*`([^`]+)`\s*\|.*?\|\s*`([^`]+)`[^|]*\|\s*$/gm``，
+其假设是 **code 独占第二个表格单元格**：code 反引号之后只允许空白，随后必须是 `|`；i18n 键必须位于行尾单元格。契约裁定 `a93cc3e` 在这两个 code 单元格内追加了注记——
+`CONTROL_RESPONSE_AUTH_FAILED（**DEPRECATED**，仅兼容读取）` 与
+``ACK_CORRELATION_MISMATCH（仅 ACK body `request_id`/`seq`）``——
+使两行不再匹配该正则，解析数由 96 降为 94。该失败与 BLE 实现无关。
+
+**修改点（仅格式，不改语义）**：
+1. §3.2.3 两个 code 单元格恢复为裸 code（`CONTROL_RESPONSE_AUTH_FAILED`、`ACK_CORRELATION_MISMATCH`），表头与列结构不变。
+2. 原行级注记移至表后 blockquote“表注（行级，T-12 裁定）”：退役/仅兼容读取、header canonical 映射、`ACK_CORRELATION_MISMATCH` 仅限 ACK body 的语义逐字保留；既有“T-12 裁定同步”段落与 CB §4.5 引用不变。
+3. 未修改任何代码、测试、locale 资源或其他 Artifact。
+
+**验证证据**：
+- 用 `parseDeclaredCodes` 同款正则直接解析 §3.2.3：**96** 行；`CONTROL_RESPONSE_AUTH_FAILED` 与 `ACK_CORRELATION_MISMATCH` 各出现 1 次且键映射不变。
+- `entry/src/test/run-host-tests.sh`：**451/451 PASS**（含 `T10_C14_authoritativeCatalog_everyDeclaredCodeHasBothLocaleKeys`）。
+- `hvigorw clean assembleHap --no-daemon`：**BUILD SUCCESSFUL**（文档变更不影响构建）。
+- `codelinter -c code-linter.json5 -p default .`：**No defects found**（exit 0）。
+
+**残余**：CQG-T12 的 451/451 证据在修复合并回 `feat/yaocore-app` 后需由 Stage Gate 补记关闭；C-20 mock 错误码对齐、DES-001B §10.2/C-23 同步仍按 CQG-T12 条件跟踪。
 
 ---
 
