@@ -1,0 +1,2 @@
+check_layering: files=209 violations=0 exceptions_used=13 pending=0 pending_used=0 port_exceptions_used=10 port_pending=0 port_pending_used=0
+check_layering: PASS

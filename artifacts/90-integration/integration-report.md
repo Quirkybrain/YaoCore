@@ -1,0 +1,361 @@
+# INTEGRATION-REPORT-001 集成验证与 IG-4/G-013 报告（T-22）
+
+- **Artifact ID**: INTEGRATION-REPORT-001
+- **Producer**: agent:integration-engineer
+- **Type**: Integration Verification Report / Regression Evidence / Stage Gate Input
+- **Status**: COMPLETE（供 G-013/G-014 消费；**不授予** Gate）
+- **Date**: 2026-10-18
+- **Task**: `wp-087-integration`（T-22；task 分支 `task/wp-087-integration`，父分支 `feat/yaocore-app`）
+- **Integration revision**: `d2896fbee100749b894ec0f965c448d15417eb86`（`feat/yaocore-app` 集成候选；任务工作树与父分支同 revision）
+- **Workflow**: STANDARD / GATED_AUTO
+- **Target Stage**: `implementation`
+- **Upstream**: T-19 `TEST-REPORT-001` @ `4f7c26b`（报告 revision）；T-20 `REV-001-FINAL-SYSTEM` @ `577dbc6`；T-20 工具收口 @ `d69ad61`；T-21 README v1.0 / 维护计划 @ `fd35fd7`；G-004 契约基线 @ `697762c`；CQG-T06..T18
+- **写范围**: `artifacts/90-integration/`；未修改产品代码、测试、工具、构建配置、`input/` 或状态文件
+- **输入完整性**: handoff 的 10 项输入 SHA-256 全部与 `state/handoffs/wp-087-integration.json` 一致（t22 实算）
+
+> **结论先行**：在集成候选 `d2896fb` 上实际执行并通过：host **697/697**、`hvigorw clean assembleHap` **BUILD SUCCESSFUL**（unsigned）、`codelinter` **0 error / 25 warning**、分层检查 **0 violation / 0 pending**（13 条 D-12 accepted；10/17 条端口位置例外被使用）、fixture **10/10**、`check_i18n --strict-ui` **0 blocking / 0 missing**、crosscheck **66/66**、仿真器契约 **20/20（HTTP+TLS）**、ohosTest HAP **仅编译**、HAP 内 Mock/ohosTest **0 命中**。与 T-19/T-20 证据对比**未发现产品回归**；所有数字差异均可由 T-20 工具收口、T-21 文档更新或 `MOCK_ONLY` 抖动解释。设备/真实 BLE/LAN/TLS/云/视觉/fps 仍为 **BLOCKED/UNAVAILABLE**，ACK p95 仍为 **MOCK_ONLY**，不得写成验收 PASS。
+>
+> **IG-4 范围：PASS（代码级）**。**G-013 建议：PASS_WITH_ACCEPTED_RISKS**。**G-014 建议：PASS_WITH_ACCEPTED_RISKS**，前提是 Orchestrator 在 Gate 记录中逐项接受本报告 §7 的残余风险并完成 §8.3 的 State/Checkpoint 动作；否则保持 `NOT READY`。
+
+---
+
+## 0. 分类与边界
+
+| 分类 | 含义 |
+|---|---|
+| `PASS` | 在当前 revision、当前主机环境实际执行且断言通过 |
+| `COMPILED_ONLY` | 只编译通过，未执行断言；**不是 PASS** |
+| `BLOCKED` | 前置条件不满足（设备/签名/运行器） |
+| `UNAVAILABLE` | 当前环境无法获得的证据 |
+| `MOCK_ONLY` | 仅在 localhost/测试替身上测得，不得外推为产品验收 |
+| `ACCEPTED_RISK` | 已登记并由 Stage Gate/Orchestrator 接受的风险 |
+
+> 本报告不把 `COMPILED_ONLY`、`BLOCKED`、`UNAVAILABLE`、`MOCK_ONLY` 写成 PASS，也不把 `check_layering` 的 0 violation 解释为“端口位置已合规”。
+
+---
+
+## 1. 环境与 revision
+
+| 项 | 实测值 |
+|---|---|
+| 仓库根 / cwd | `/home/quirkybrain/code/harmony-projects/YaoCore` |
+| 分支 / HEAD | `task/wp-087-integration` / `d2896fbee100749b894ec0f965c448d15417eb86` |
+| 父分支 / merge-base | `feat/yaocore-app` / `d2896fb`（与父分支同一 revision） |
+| OS | Linux x86_64 |
+| `ohpm` | 26.0.0.630 |
+| `hvigorw` | 6.26.8 |
+| `codelinter` | 6.0.240 |
+| Node | v24.15.0 |
+| Java | OpenJDK 21.0.12.1 |
+| Python | 3.12.3（标准库） |
+| SDK | HarmonyOS 26.0.0.105；`DEVECO_SDK_HOME=/home/quirkybrain/harmonyos/command-line-tools/sdk` |
+| 设备 | `hdc list targets` 空；无模拟器实例；`signingConfigs: []`（unsigned HAP） |
+| 代理 | 环境存在本机代理；仿真器套件以 `no_proxy=127.0.0.1,localhost` 运行（与 T-19 一致） |
+| 工作树 | 验证期间除 `artifacts/90-integration/` 外无变更；构建产物均在 ignored `entry/build/` |
+
+### 1.1 集成候选的构成
+
+| 基线 | Commit | 内容 |
+|---|---|---|
+| T-19 证据基线 | `4f7c26b` | 696 host 用例、测试报告与证据 |
+| T-20 独立评审 | `577dbc6` | 全系统评审 + 1 条 R3-01 并发用例（697） |
+| T-20 契约例外正式化 | `fec06e5` → `0d6e806` | DES-A §27.6 / DES-B §18.1 的端口与 D-12 登记 |
+| T-20 工具收口 | `d69ad61` → `59a2506` | checker 读取版本化 allowlist、fixture 10 条、i18n strict 生效、Mock 别名对齐 |
+| T-21 文档收尾 | `fd35fd7` → `942b751` | README v1.0、维护计划、风险/设备矩阵 |
+| 集成候选 | `d2896fb` | 合并证据；代码与 `13dc839` 一致 |
+
+`4f7c26b..d2896fb` 的产品代码差异只有 `entry/src/main/ets/service/mock/MockGatewayService.ets`（T-20 F-04，测试替身；**生产 HAP 排除**）；其余为测试、工具、证据与文档。该事实用于判断 T-19/T-20 证据在 `d2896fb` 的适用性。
+
+---
+
+## 2. 执行命令与结果矩阵（cwd = 仓库根）
+
+| # | 命令 | 实际结果 | 分类 | 证据 |
+|---|---|---|---|---|
+| 1 | `entry/src/test/run-host-tests.sh` | `1..697`；tests 697 / pass 697 / fail 0 / skipped 0；exit 0；≈3.0 s | **PASS** | `evidence/t22-host-node-tests.tap` |
+| 2 | `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL in 14 s 618 ms`；35 tasks；unsigned HAP | **PASS** | `evidence/t22-clean-assemble.log` |
+| 3 | `codelinter -c code-linter.json5 -p default .` | `Defects: 25; Errors: 0; Warns: 25; Suggestions: 0`；exit 0 | **PASS（0 error）** | `evidence/t22-codelinter.log` |
+| 4 | `python3 tools/contract/check_layering.py --root . --report ...` | `files=209 violations=0 exceptions_used=13 pending=0 pending_used=0 port_exceptions_used=10 port_pending=0 port_pending_used=0`；exit 0 | **PASS（含已登记例外）** | `evidence/t22-layering.log`、`t22-layering.json` |
+| 5 | `python3 tools/contract/test_check_layering.py` | `Ran 10 tests ... OK`；exit 0 | **PASS 10/10** | `evidence/t22-layering-fixture-tests.log` |
+| 6 | `python3 entry/src/test/i18n/check_i18n.py --root . --report ... --allowlist entry/src/test/i18n/allowlist.json --strict-ui` | `blockingFailures=0 warnings=55 missingKeys=0 hardcoded=16`；CHK-01..09 全 PASS；exit 0 | **PASS** | `evidence/t22-i18n-checker.log`、`t22-i18n-report.json` |
+| 7 | `python3 tools/contract/crosscheck_protocol_assets.py` | **66 PASS / 0 FAIL**；14 项冻结输入 `FINDING`；`hard checks: ALL PASS`；exit 0 | **PASS 66/66** | `evidence/t22-crosscheck.log` |
+| 8 | `no_proxy=127.0.0.1,localhost NO_PROXY=127.0.0.1,localhost python3 -m unittest tools.simulator.test_gateway_contract -v` | `Ran 20 tests ... OK`；含 HTTP 与 3 条 TLS 用例；exit 0 | **PASS 20/20（MOCK_ONLY）** | `evidence/t22-simulator-contract.log` |
+| 9 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon` | `BUILD SUCCESSFUL in 13 s 264 ms`；35 tasks；未运行断言 | **COMPILED_ONLY** | `evidence/t22-ohosTest-assemble.log` |
+| 10 | HAP 内容检查（`unzip` + `grep`） | 14 个条目；`modules.abc` 2,826,316 B、`sourceMaps.map` 1,698,148 B；`MockGatewayService`/`MockBleProvisioningClient`/`ohosTest`/`service/mock` **0 命中** | **PASS（Mock 生产排除）** | 本报告 §5.4；HAP `entry-default-unsigned.hap` ≈4.4 MB |
+| 11 | `python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5 --json ...` | p50 **0.542 ms** / p95 **0.612 ms** / max 0.692 ms；0 failures；`resultClass=MOCK_ONLY` | **MOCK_ONLY（非验收）** | `evidence/t22-ack-p95-mock.json`、`.log` |
+| 12 | 设备/真实环境验证 | 无 `hdc` target、无模拟器、无签名、无真实网关/云/硬件 | **BLOCKED / UNAVAILABLE** | 本报告 §7、维护计划 §4 |
+
+### 2.1 Host 用例与分层检查说明
+
+- 697 条 host 用例通过 Node 24 runner 加载**生产 `.ets` 源码**（`register-ets.mjs`/`ets-hooks.mjs`），注入 fake transport/clock/store；覆盖基础/协议、Crypto/Security、存储/路由、领域、i18n、云/AC、BLE、VM/UI 壳与性能 harness。它不是设备/Hypium 运行，也不替代 ArkUI 渲染证据。
+- 分层检查器覆盖 D-01/02/03/05/06/08/09/11/12/13/17；D-04/D-10、D-07/D-14、D-15、D-16 由其他检查器/评审负责（工具 JSON 中 `rules_delegated` 已声明）。`t22-layering.json` 的 `producer/task` 字段是 checker 的静态元数据（T-20），命令、报告路径与计数为本任务实测。
+- i18n 的 `55 warnings` 与 `16 hardcoded` 是**带 allowlist** 的结果，与 T-20 表格一致；README 中的 `73 warnings` 是**不带 allowlist** 的同一 checker 计数。两者 `blockingFailures=0`、`missingKeys=0` 一致。
+
+---
+
+## 3. 与 T-19 / T-20 的无回归对比
+
+| 项 | T-19 @ `4f7c26b` | T-20 @ `d69ad61` / 评审 @ `577dbc6` | T-22 @ `d2896fb` | 结论 |
+|---|---|---|---|---|
+| Host | 696/696 | 697/697（T-20 工具收口）；评审时为 696（早于收口） | **697/697** | 与 T-20 收口一致；T-19→T-20 的 +1 是 F-05 strict-ui 测试，未删除/弱化既有断言 |
+| 构建 | BUILD SUCCESSFUL | BUILD SUCCESSFUL | **BUILD SUCCESSFUL** | 一致（耗时随缓存变化） |
+| `codelinter` | 0 error / 25 warning | 0 error / 25 warning | **0 error / 25 warning** | 一致；warning 为非阻断性能建议 |
+| 分层 | 0 violation；13 pending | 0 violation；**pending 0**（accepted） | **0 violation；pending 0** | 与 T-20 一致；13 条例外已正式化 |
+| fixture | 4/4 | 10/10 | **10/10** | 与 T-20 一致（D-03/D-05/端口 fixture 已补齐） |
+| i18n | 0 blocking；121 warn/82 hardcoded（旧 checker） | 0 blocking；55 warn/16 hardcoded（allowlist） | **0 blocking；55 warn/16 hardcoded** | 与 T-20 一致；T-19 差异由 checker 语义修复解释 |
+| crosscheck | 66/66 | 66/66 | **66/66** | 一致 |
+| 仿真器契约 | 20/20（HTTP+TLS） | 20/20（HTTP+TLS） | **20/20（HTTP+TLS）** | 一致 |
+| ohosTest HAP | COMPILED_ONLY | 未单列 | **COMPILED_ONLY** | 仅编译，不是 PASS |
+| ACK p95 | 0.598 ms（MOCK_ONLY） | 0.598 ms（MOCK_ONLY） | **0.612 ms（MOCK_ONLY）** | localhost 抖动；无功能含义；均不得作为 NFR 4.3 验收 |
+| HAP Mock 排除 | 源级守卫 | 源级 + HAP 检查（评审） | **HAP 级 0 命中** | 证据增强，无回归 |
+
+**无回归结论**：所有必须一致项（构建、lint、host 通过率、crosscheck、仿真器、i18n blocking、layering 门禁）在 `d2896fb` 与最新证据（T-20 收口）一致；与 T-19 的差异均可由后续已登记任务解释。**未发现产品行为、契约或安全路径回归。**
+
+---
+
+## 4. 集成与跨组件契约验证
+
+### 4.1 契约基线与裁定一致性
+
+| 检查 | 结果 | 证据 |
+|---|---|---|
+| G-004 契约基线仍 VALID | **PASS** | `state/gates/G-004-contract-baseline.md`；ADR-001..004 Accepted；`contract-baseline.md` @ `697762c` |
+| DES-A/DES-B 冻结签名未被 T-22 改变 | **PASS** | T-12/T-18/T-20 裁定同步只登记语义/例外，不改变冻结签名（文件头 Revision 记录） |
+| 端口物理位置例外已版本化 | **PASS（登记）** | DES-A §27.6；`layering_allowlist.json` 17 条 `port_location_exceptions`；checker `port_exceptions_used=10`、`port_pending=0` |
+| D-12 UI 白名单已正式化 | **PASS（登记）** | DES-B §2.3/§18.1 `T20-D12-01..13`，13 条全部 `accepted` 且命中 |
+| 无未处置 Change Impact | **PASS（记录）** | G-004 未变；F-01/F-02/F-04/F-05/F-06 已在 T-20 工具/契约侧关闭；D-030/R4-01 为已登记风险，不是 Change Impact |
+
+### 4.2 错误语义双轨
+
+- **生产路径**：`ResponseVerifier` 对 header 的 alg/key_id/correlation/sign 失败统一为 `RESPONSE_AUTH_FAILED`，header correlation 不匹配为 `RESPONSE_CORRELATION_MISMATCH`；ACK body 的 `request_id`/`seq` 不匹配由 C-03 映射为 `ACK_CORRELATION_MISMATCH`（contract-baseline §4.5、DES-A §3.2.3）。
+- **Mock 对齐**：`CONTROL_RESPONSE_AUTH_FAILED` 在 `entry/src/main/ets` 与 `entry/src/test` 中 **0 命中**；`MockGatewayService` 已删除 try/catch 别名转换，header 验签失败原样传播 `RESPONSE_AUTH_FAILED`。
+- **双轨判定**：`result_code == 0` 仍必须同时满足响应验签、correlation、`reported_state`；`success`/HTTP 2xx 不作为成功依据。host SEC-N01..N14 与仿真器 20/20 覆盖坏签名、时间窗、nonce、重放、未知 code、缺 `reported_state` 等负例。
+- **结论**：**PASS（代码级）**；生产与测试替身错误码语义一致，无退役别名残留。
+
+### 4.3 DI、分层与 RBAC
+
+| 检查 | 结果 | 证据 |
+|---|---|---|
+| 分层规则 D-01/02/03/05/06/08/09/11/12/13/17 | **PASS：209 文件 / 0 violation** | `t22-layering.log` |
+| `@Provide` / `@Consume` | **PASS：0 生产命中**（仅注释说明） | `grep`；T-20 §6.1 |
+| 页面/组件直接构造 service/repository/VM | **PASS：0 命中**（`new` 均为本地 DTO/值对象；唯一 `NavigationService` 构造在 `Index` 的 D-12 seam） | 分层检查；T-20 §6.1 |
+| 生产组合根唯一装配 | **PASS** | `AppCompositionRoot`；`EntryAbility` 仅创建 root；host `AppShell` 用例 |
+| 显式 props / VM 工厂注入 | **PASS** | 页面/组件使用 `@Require` props 与 `PageVmFactoryPort` |
+| 服务层 RBAC（家庭/房间/场景） | **PASS（已覆盖动作）** | host RBAC 矩阵；`RoomService`/`FamilyService` 管理动作 `requireAdmin`；`SceneService` GUEST fail-closed |
+| `addGatewayToFamily` actor/RBAC | **已知缺口（D-030 / GAP-T18-01）** | `FamilyRepository.addGatewayToFamily` 无 actor；v1 接受，补偿控制 UI ADMIN 门 + BLE PoP + 内部 API 边界；**未关闭** |
+
+> `check_layering` 的 0 violation **不代表**端口位置合规：17 条例外中 10 条当前被使用，P1-P4 迁移未开始；13 条 D-12 例外已 `accepted`，但 UI 类型迁移仍未执行。两者必须由 G-014 记录。
+
+### 4.4 i18n、Mock 排除与权限最小集
+
+| 检查 | 结果 | 证据 |
+|---|---|---|
+| CHK-01..09 | **全 PASS**；0 blocking / 0 missing | `t22-i18n-checker.log` |
+| key parity | **100%**（rawfile 复数变体归一后；base/en_US 键集一致） | T-20 §6.4；checker |
+| 硬编码 UI 文案 | **0 blocking**；16 条 hardcoded 均为非 UI 技术字符串（主题颜色注释、AC 品牌 CJK 名称、Mock 错误消息） | `t22-i18n-checker.log`；T-20 §3 |
+| 历史文案 | **615 行：596 条 `PENDING_REVIEW`、10 条 ACCEPTED、6 条 DEPRECATED (heuristic)、3 条 EXCLUDED (brand data)**；重译审查 11 条 `B_REWRITE_REQUIRED`、2 条 `SAFETY_RECHECK_REQUIRED` | `legacy-migration.csv` 实算 |
+| Mock 生产排除（源级） | **PASS** | `T11_noProductionFileImportsC20MockOrOhosTest`、`T17_productionMockExclusionCoversAllMainSources` |
+| Mock 生产排除（HAP 级） | **PASS：0 命中** | `modules.abc` 与 `sourceMaps.map` 对 `MockGatewayService`/`MockBleProvisioningClient`/`ohosTest`/`service/mock` 全部 0 命中；HAP 14 条目 |
+| DEV-ONLY 拒收 | **PASS** | `LocalGatewayService.rejectDevOnly` 在验签/JSON 解析前执行；仿真器固定发送 `X-YaoCore-Simulator: DEV-ONLY` |
+| 权限声明 | **最小集：`INTERNET`（system_grant）+ `ACCESS_BLUETOOTH`（user_grant）** | `entry/src/main/module.json5`；`PermissionPolicy`/`PermissionGate`；CAMERA/LOCATION 明确不启用 |
+| 运行时权限 | **代码级 PASS；设备授予 BLOCKED** | `PermissionGate.requestPermissionsFromUser`；真实权限对话框未在设备验证 |
+
+### 4.5 v1 范围与 FR 追溯
+
+| 检查 | 结果 | 证据 |
+|---|---|---|
+| door/light/sensor/ac 完整控制 | **PASS（代码级）** | `DeviceConstants.SUPPORTED_TYPES`；`GatewayRequestPolicy`/`DeviceCommandRunner` 的 `isSupported` 前置校验 |
+| 其余设备只读降级 | **PASS（代码级）** | `READ_ONLY_TYPES`（switch/camera/curtain/fan/speaker）；`UiMapping`/`DeviceCards` 控制门；`DiscoverMapper` 归一 |
+| 无 LAN GCM 运行分支 | **PASS** | GCM 仅用于 ADR-003 邀请容器（`InviteCodec`/`OhosCryptoProvider`）；网关/云无 GCM 路径；无 MQTT |
+| 云 Token 手工管理 | **PASS** | `CloudService` 头注释与代码：manual token、无 refresh；过期/无效只提示用户更新 |
+| 无固件构建链 | **PASS** | 仓库仅 HarmonyOS App；无 ESP32/MQTT/固件构建目录或脚本 |
+| 26 项 FR 映射 | **PASS：26 行；24 covered（host/source）/ 2 partial / 0 gap** | `test-report.md` §5 实算 26 行；FR-HOME-003（真实传感器 UNAVAILABLE）、FR-SET-002（P-HMAC 无机密性/真实 TLS BLOCKED）如实 partial |
+| FR-FAM-004 v1 限制 | **PASS（已声明）** | 家庭退出/转让为 v1 本地语义；README 与测试报告均声明 |
+| NFR 4.1/4.2/4.3 | **partial（如实）** | HMAC/防重放/存储/55ms 有 host 证据；真实 TLS、设备存储、真实 p95/fps 缺失 |
+
+---
+
+## 5. IG-4 / G-013 检查清单（交付计划 §4.2）
+
+| # | 必检项 | 结果 | 证据/说明 |
+|---|---|---|---|
+| 1 | 全量构建 | **PASS** | `t22-clean-assemble.log` |
+| 2 | 全量测试（UT/CT/仿真器/回归） | **PASS** | host 697/697；crosscheck 66/66；仿真器 20/20；fixture 10/10 |
+| 3 | 独立评审 | **PASS_WITH_ACCEPTED_RISKS** | T-20 评审（`577dbc6`）；F-01/F-02/F-04/F-05/F-06 已由 `d69ad61` 关闭；F-07/F-08 Info 仍登记；无 High/Critical |
+| 4 | README / 限制说明 | **PASS** | README v1.0 @ `fd35fd7`（基于 `13dc839`）；限制/设备矩阵/风险与 T-19/T-20 一致；T-22 复跑数字与 README 状态表一致或可解释 |
+| 5 | 回归 | **PASS** | §3 无回归；所有数字差异有解释 |
+| 6 | 文档/证据一致性 | **PASS（1 条说明）** | ACK p95 由 0.598→0.612 属 MOCK_ONLY 抖动；i18n 73（无 allowlist）vs 55（有 allowlist）已解释 |
+| 7 | IG-1/IG-2/IG-3 历史 Gate 记录 | **记录缺失（治理项）** | 交付计划 §4.2 的 G-010/G-011/G-012 无独立 Gate 文件；其代码级范围由 CQG + T-19 全量 + T-20 系统评审 + 本 T-22 复跑覆盖；设备部分仍 BLOCKED。**G-014 必须显式记录该事实，或补写 Gate 后再判定** |
+
+**IG-4 判定建议：PASS（代码级集成范围）**。所有可执行的集成/契约/回归检查在 `d2896fb` 通过；未执行项均为设备/真实环境，已如实分类。
+
+**G-013 判定建议：PASS_WITH_ACCEPTED_RISKS**。理由：集成证据充分；残余项是已登记的 v1 风险与用户侧设备验证，不是本次集成失败。
+
+---
+
+## 6. 组件状态汇总（C-01..C-29，代码级）
+
+> 组件状态来自各 CQG；`STABLE` 均为**代码级**，设备/视觉证据保持 `BLOCKED`。C-20 在 T-20 的 Mock 别名修复属于测试替身对齐，host 697 与 HAP 排除已复验；C-29 无独立 CQG，按交付计划由 T-19/T-20/T-21/T-22 工具证据承载。
+
+| 组件 | 名称/范围 | 状态 | CQG / 证据 revision | 备注 |
+|---|---|---|---|---|
+| C-01 | 公共类型/常量/工具 | **STABLE（代码级）** | CQG-T06 @ `4d97e41` | — |
+| C-02 | 领域模型/枚举 | **STABLE（代码级）** | CQG-T06 @ `4d97e41` | — |
+| C-03 | 协议 DTO/映射 | **STABLE（代码级）** | CQG-T06 @ `4d97e41` | — |
+| C-04 | CryptoService | **STABLE（代码级）** | CQG-T07 @ `11a291c` | 设备向量 BLOCKED |
+| C-05 | SecurityService | **STABLE（代码级）** | CQG-T07 @ `11a291c` | — |
+| C-06 | 存储服务 | **STABLE（代码级）** | CQG-T08 @ `1f1fb4d` | 设备 Asset Store/RDB 未执行 |
+| C-07 | GatewayRepository | **STABLE（代码级）** | CQG-T08 @ `1f1fb4d` | — |
+| C-08 | FamilyRepository | **STABLE（代码级）** | CQG-T09 @ `9473ae0` | GAP-T18-01/D-030 关联 |
+| C-09 | RoomRepository | **STABLE（代码级）** | CQG-T09 @ `9473ae0` | — |
+| C-10 | DeviceRepository | **STABLE（代码级）** | CQG-T09 @ `9473ae0` | — |
+| C-11 | SceneService | **STABLE（代码级）** | CQG-T09 @ `9473ae0` | — |
+| C-12 | AuthService | **STABLE（代码级）** | CQG-T13 @ `69d5374` | — |
+| C-13 | InviteService | **STABLE（代码级）** | CQG-T13 @ `69d5374` | 设备邀请流程未验证 |
+| C-14 | I18nService/资源包 | **STABLE（代码级）** | CQG-T10 @ `1bf3183` | 596 条历史文案待 triage |
+| C-15 | CloudService | **STABLE（代码级）** | CQG-T14 @ `db33485` | 真实 IoTDA UNAVAILABLE |
+| C-16 | AC 品牌适配器 | **STABLE（代码级）** | CQG-T14 @ `db33485` | 真实 AC BLOCKED |
+| C-17 | LocalGatewayService | **STABLE（代码级）** | CQG-T11 @ `514671d` | 真实 LAN/TLS BLOCKED |
+| C-18 | GatewayDiscoveryService | **STABLE（代码级）** | CQG-T11 @ `514671d` | PB-01/UDP 未决 |
+| C-19 | BleProvisioningService | **STABLE（代码级）** | CQG-T12 @ `74255fc` | 真实 BLE BLOCKED |
+| C-20 | MockGateway/MockBle | **STABLE（代码级）** | CQG-T11 @ `514671d` + T-20 F-04 @ `d69ad61` | 测试替身；生产 HAP 0 命中 |
+| C-21 | Home/Device/Climate/Door VM | **STABLE（代码级）** | CQG-T15/16 @ `3dd0639` | 视觉/fps BLOCKED |
+| C-22 | Family/Room/Scene VM | **STABLE（代码级）** | CQG-T15/16 @ `3dd0639` | — |
+| C-23 | BleProvisioning/Settings VM | **STABLE（代码级）** | CQG-T15/16 @ `3dd0639` | — |
+| C-24 | 设计系统/复用 UI | **STABLE（代码级）** | CQG-T18 @ `967e266` | 视觉/A11y BLOCKED |
+| C-25 | Home/Rooms/DeviceControl 页面 | **STABLE（代码级）** | CQG-T18 @ `967e266` | 视觉 BLOCKED |
+| C-26 | Family/Room/Scene 页面 | **STABLE（代码级）** | CQG-T18 @ `967e266` | 视觉 BLOCKED |
+| C-27 | Provisioning/Settings/About/Profile 页面 | **STABLE（代码级）** | CQG-T18 @ `967e266` | 视觉/设备 BLOCKED |
+| C-28 | 应用壳/EntryAbility/权限/组合根 | **STABLE（代码级）** | CQG-T17 @ `6b10975` | 启动设备 smoke BLOCKED |
+| C-29 | 构建/仿真/README 工具 | **STABLE（代码级，工具证据）** | T-19 @ `4f7c26b`；T-20 @ `d69ad61`；T-21 @ `fd35fd7`；T-22 @ `d2896fb` | **无独立 CQG**（计划归 T-19）；T-22 复跑全部工具 |
+
+**统计**：29/29 有状态；28 个有 CQG（C-01..C-28），C-29 由 T-19/T-20/T-21/T-22 工具证据承载。所有进入集成的组件为 **STABLE（代码级）**；未完成/未验证项均有明确范围与风险记录（设备、视觉、真实网络、端口/D-12 迁移、i18n 历史文案）。
+
+---
+
+## 7. 残余风险清单与接受建议
+
+| ID | 风险 | 级别/分类 | 现状与证据 | 建议 |
+|---|---|---|---|---|
+| **D-030 / GAP-T18-01** | `FamilyRepository.addGatewayToFamily` 无 actor/RBAC | Medium / 已接受 | 服务层授权缺口**未关闭**；UI ADMIN 门 + BLE PoP 前置 + 内部 API 边界；CQG-T18 §1、T-20 §6.2/F-08、维护计划 §5.1 | G-014 明确“服务层 RBAC 未闭合”；后续 C-22/C-09/C-15 变更时复审 |
+| **R4-01** | `addGatewayToFamily` 已发起后的取消不可 durable 回滚 | Info / 已接受 | VM 只抑制 `BOUND`；durable 写可能完成；README/维护计划已声明；无 durable 回滚测试 | 接受为 v1 边界；后续配网 VM 变更时补边界用例 |
+| **端口位置迁移** | 17 条端口例外（10 条当前使用），`contracts/**` 未建立 | Medium / 治理 | DES-A §27.6；`port_exceptions_used=10`、`port_pending=0`；P1-P4 未开始 | 记录“0 violation ≠ 端口位置合规”；下一维护窗口执行 P1-P3，完成后删除例外并重跑全量 |
+| **R3-01 / D-12** | 13 条 pages DTO/枚举 import | Low / 已登记 | 已 `accepted`（10 type-only + 3 值 import）；迁移未完成；检查器命中 13 | 记录为已登记例外；P2 迁移后改为 `model/**` 并删除条目 |
+| **i18n 596** | 615 条 legacy 映射中 596 条 `PENDING_REVIEW` | Low / 已登记 | 当前 UI 0 blocking；16 条 hardcoded 均为非 UI 技术字符串；CSV 实算 | 维护轮次逐条 triage；不得把 596 写成已签署 |
+| **设备/真实环境 BLOCKED** | BLE/LAN/TLS/云/视觉/A11y/fps/硬件 | Medium / 用户侧 | `hdc` 空、无模拟器、无签名；BLK-01..08；维护计划 §4 矩阵 | 按 §8.4 由用户执行；结果回填；不得用 host/mock 外推 |
+| **ACK p95 MOCK_ONLY** | localhost p95 0.612 ms | Info / 非验收 | 本次 N=100/warmup=5；T-19/T-20 0.598、T-21 0.589；`resultClass=MOCK_ONLY` | 不用于 NFR 4.3；真实 LAN p95 由 BLK-07 执行 |
+| **NFR 4.1/4.2/4.3 partial** | 传输机密性、设备存储、真实性能 | Medium / 已登记 | P-HMAC 无机密性；真实 TLS/Asset Store/p95/fps 缺失 | G-014 记录 partial；README 已如实告知 |
+| **测试源码 lint / 覆盖率** | `src/test/**`、`src/ohosTest/**` 未 lint；无覆盖率 | Low / 已登记 | `code-linter.json5` 忽略；测试仅 Node 解析/编译门禁 | 维护计划 M-08；不阻断 v1 |
+| **IG-1/2/3 Gate 记录缺失** | G-010/G-011/G-012 无独立 Gate 文件 | Medium / 治理 | §5 #7；CQG + T-19 + T-20 + T-22 覆盖代码级范围；设备部分 BLOCKED | G-014 记录“以 IG-4 全量证据替代历史 IG 记录”或补写后再判定 |
+| **State/Checkpoint 过期** | `state/checkpoint.md` 仍为 CP-009（M3）；`project-state.md` 未更新到 T-22 | Medium / 流程 | T-20 §8/§F-09；T-22 写范围不允许改 state | Orchestrator 在 G-014 前写新 Checkpoint、更新 project-state |
+| **C-29 无独立 CQG** | 工具/文档组件 | Low / 治理 | T-19/T-20/T-21/T-22 证据；本报告 §2 全量复跑 | G-014 明确 C-29 的状态依据；如需可补一个工具 CQG |
+| **UI 视觉/A11y 未验收** | 仅源码级 + host VM | Medium / 用户侧 | 无设备/模拟器；T-20 §8；维护计划 §4.2 | 用户按 §8.4 抽查；不宣称视觉 PASS |
+| **许可证 TODO** | 项目级许可证未声明 | Low / 项目所有者 | README 明确 TODO | 首次公开发布前处理；不假设可再分发 |
+
+---
+
+## 8. G-014 Stage Gate 建议
+
+### 8.1 逐项判定（交付计划 §4.4）
+
+| # | 判定清单项 | 结果 | 依据/条件 |
+|---|---|---|---|
+| 1 | G-004 契约基线仍 VALID；无未处置 Change Impact；D-009..D-016 未被覆盖 | **PASS** | G-004 PASS；ADR-001..004 Accepted；T-12/T-18/T-20 裁定只登记语义/例外；D-030 已书面接受 |
+| 2 | 29 组件均有状态；进入集成的组件 STABLE；未完成项有范围/风险接受 | **PASS（代码级）** | §6；设备/视觉/迁移项明确排除并登记；C-29 无独立 CQG 已记录 |
+| 3 | T-01/T-03/T-04/T-05/T-19/T-20/T-21/T-22 均 VALID | **条件性 PASS** | 各工件证据完整；T-22 本报告待 Orchestrator 的 Artifact Validation；T-01/T-03/T-04/T-05 已有 G-009/G-006/G-007/G-008 |
+| 4 | 构建/静态/UT/CT/IT 通过；无 P0/P1；失败/未运行如实列出 | **PASS（代码级）** | §2；无产品失败；设备/真实环境 BLOCKED/UNAVAILABLE 如实列出；IT 仅限 host/仿真器，真实 IT BLOCKED |
+| 5 | i18n CHK-01..09 通过；无硬编码 UI；parity 100% | **PASS** | 0 blocking/0 missing；16 条非 UI 告警；596 条历史文案为已登记残余；parity 100% |
+| 6 | SC-01..SC-16 独立评审通过；无秘密/证书/HAP/构建入库；Mock 排除；P-TLS-PIN 如实标注；SC-07 检查 | **PASS（记录例外）** | T-20 §5；本报告 §4.4；仅 T-05 授权 PUBLIC TEST DATA 证书；HAP/build ignored；源级 + HAP 级 Mock 0 命中；P-HMAC 无机密性已声明 |
+| 7 | v1 范围：door/light/sensor/ac 完整；其余只读；无 GCM 运行分支；云 Token 手工；无固件构建链 | **PASS（代码级）** | §4.5；设备行为仍 BLOCKED |
+| 8 | FR 追溯：26 项有 component→task→test；FR-FAM-004 v1 限制已声明 | **PASS（含 2 partial）** | §4.5；24 covered / 2 partial / 0 gap |
+| 9 | 实机/真实网络未完成项列为用户自行执行，不作为 Agent 阻塞 | **PASS** | §8.4；CP-03/D-018；未把 BLOCKED 写成 PASS |
+| 10 | Target Stage=implementation 已达到；写 Checkpoint；`PAUSED_AT_STAGE`；不自动进入 testing/release | **待 Orchestrator** | §8.3；T-22 写范围不含 `state/`；当前 CP-009 过期 |
+
+### 8.2 Gate 建议
+
+- **G-013（IG-4 全量）：PASS_WITH_ACCEPTED_RISKS**。集成构建/测试/契约/回归在 `d2896fb` 通过；无产品回归；残余为已登记风险与设备侧验证。
+- **G-014（Stage Gate, implementation）：PASS_WITH_ACCEPTED_RISKS（条件式）**。建议理由：
+  1. 代码级交付与 29 组件状态完整，集成证据可复现；
+  2. 无 P0/P1；所有 BLOCKED/UNAVAILABLE/MOCK_ONLY 已如实分类；
+  3. 残余风险有 owner、补偿控制与复审触发条件；
+  4. 设备/真实网络按 CP-03/D-018 由用户执行，不作为 Agent 阻塞；
+  5. README/维护计划已如实告知限制。
+- **前置条件（未满足则不得判 PASS）**：
+  1. Orchestrator 对 T-22 本报告与上游工件执行 Artifact Validation；
+  2. 在 G-014 记录 D-030/GAP-T18-01、R4-01、端口/D-12 迁移、i18n 596、设备 BLOCKED、NFR partial、ACK p95 MOCK_ONLY、测试 lint/覆盖率；
+  3. 明确记录 IG-1/IG-2/IG-3 无独立 Gate 文件，且以 IG-4 全量证据作为代码级覆盖；若要求正式 IG 记录，则先补 Gate；
+  4. 写新 Checkpoint 并更新 `state/project-state.md`，标记 `PAUSED_AT_STAGE`，不自动进入 testing/release；
+  5. 不把本报告或 T-20 评审等同于用户验收/设备验收。
+
+### 8.3 Orchestrator 收尾动作（T-22 写范围外）
+
+```text
+1. Artifact Validation: T-22 integration-report.md + T-19/T-20/T-21 状态
+2. 写 state/gates/G-013（IG-4）与 G-014（Stage Gate）
+3. 更新 state/checkpoint.md（CP-011 或下一编号）与 state/project-state.md
+4. 记录 §7 风险接受与设备矩阵（引用 maintenance-plan §4/§5）
+5. 标记 PAUSED_AT_STAGE；不启动 testing/release
+```
+
+### 8.4 用户侧设备矩阵指引
+
+按 `artifacts/80-maintenance/maintenance-plan.md` §4.1/§4.2 执行，至少覆盖：
+
+- **BLK-01/02**：受支持运行器或签名 HAP + `hdc` target + 模拟器/真机；运行 `onDeviceTest`；4 Tab/NavDestination 返回。
+- **BLK-03**：真实 ESP32-S3 BLE 配网（Security1、身份 v2.0/v2.1、Wi-Fi 扫描/下发、取消清理、PoP 错误）。
+- **BLK-04**：真实 LAN discover/control/ACK；验签、correlation、`reported_state`；pin mismatch/握手失败必须 P-BLOCKED 且无明文回退。
+- **BLK-05**：真实华为云 IoTDA（endpoint/projectId/deviceId/IAM Token；签名命令/影子/完成判定/Token 过期；不期望自动刷新）。
+- **BLK-06**：视觉/无障碍/动效（4 Tab、暗黑、428×872、长英文、75% 文本膨胀、对比度、读屏、动效降级）。
+- **BLK-07**：真实 LAN ACK p95 ≤500ms、55ms 节流、60/120fps；记录设备型号/网络/样本数。
+- **BLK-08**：门锁/门磁/AC/SHT30/PIR 实物状态与来源。
+- **§4.2 抽查**：非 ADMIN 网关入口、配网取消、门磁引导、权限 CTA、按钮禁用可见性、长英文/文本膨胀。
+
+记录设备型号、OS/API、固件版本、网络、App revision、签名方式；日志必须脱敏；失败保留首跑证据；结果回填测试报告/维护计划，不反向修改代码级 Gate 结论。
+
+---
+
+## 9. 限制与声明
+
+1. 本报告只覆盖 `d2896fb` 与 §1 环境；不覆盖设备、真实网络、视觉/A11y、真实性能或用户验收。
+2. host 测试在 Node 24 下加载生产 `.ets` 源码并注入 fake；不是 ArkTS/Hypium 设备运行，也不证明 ArkUI 渲染。
+3. 仿真器 20/20 只证明 localhost 契约夹具与 TLS 夹具；不证明真实网关固件、证书链或 LAN 时延。
+4. ACK p95 为 `MOCK_ONLY`，不得作为 NFR 4.3 验收；55ms 节流为 fake clock/host 逻辑证据。
+5. `check_layering` 0 violation 是“在已登记例外下通过”，不是端口位置合规；D-12 13 条为 `accepted` 例外，不是迁移完成。
+6. 本报告不授予 G-013/G-014、CQG、IG-1/2/3、用户验收或 release 完成；Gate 判定权在 Orchestrator。
+7. 本报告未修改产品代码、测试、工具、构建配置、`input/` 或状态文件；唯一写入为 `artifacts/90-integration/`。
+
+---
+
+## 10. 证据索引与追溯
+
+### 10.1 本任务证据（`artifacts/90-integration/evidence/`）
+
+| 文件 | 内容 |
+|---|---|
+| `t22-host-node-tests.tap` | 697 条 host TAP |
+| `t22-clean-assemble.log` | clean HAP 构建 |
+| `t22-codelinter.log` | 静态检查 |
+| `t22-layering.log` / `t22-layering.json` | 分层检查与例外明细 |
+| `t22-layering-fixture-tests.log` | 10/10 fixture 自测 |
+| `t22-i18n-checker.log` / `t22-i18n-report.json` | CHK-01..09 与计数 |
+| `t22-crosscheck.log` | 66/66 协议资产交叉校验 |
+| `t22-simulator-contract.log` | 20/20 HTTP+TLS 契约套件 |
+| `t22-ohosTest-assemble.log` | ohosTest HAP 编译（COMPILED_ONLY） |
+| `t22-ack-p95-mock.json` / `.log` | ACK p95 MOCK_ONLY |
+
+> 证据日志为原始 stdout 的 **ANSI 转义与行尾空白规范化**版本（通过 `git diff --cached --check`）；断言内容、计数与顺序未改写。
+
+### 10.2 上游追溯
+
+- 需求：`input/requirements/YaoCore_HarmonyOS_App_Requirements.md` §3（26 FR）/§4（NFR 4.1..4.3）。
+- 契约：`artifacts/20-architecture/contract-baseline.md`（§4.3/§4.5）；ADR-001..004；DES-A §27.6；DES-B §2.3/§18.1。
+- 计划：`artifacts/30-plan/delivery-plan.md` §3.4 T-22、§4.2 G-013、§4.4 Stage Gate；`component-graph.md` C-01..C-29。
+- 组件 Gate：`state/gates/CQG-T06..T18.md`（C-01..C-28）；C-29 工具证据见 T-19/T-20/T-21。
+- 测试：`artifacts/60-testing/test-report.md`、`test-plan.md`、`tooling-cleanup-report.md`；`entry/src/test/**`。
+- 评审：`artifacts/70-review/final-system-review.md`（F-01..F-09）。
+- 文档/风险：`README.md`（README-001 v1.0）；`artifacts/80-maintenance/maintenance-plan.md`（§3/§4/§5）。
+- 输入完整性：`state/handoffs/wp-087-integration.json`（10 项 SHA-256 实算一致）。
+
+---
+
+*INTEGRATION-REPORT-001 结束。所有 PASS 均对应当前集成 revision `d2896fb` 与本报告 §1 环境实际执行；设备/真实环境、`COMPILED_ONLY`、`MOCK_ONLY` 均未写成 PASS。*
