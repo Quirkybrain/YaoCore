@@ -3,10 +3,10 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；**T-18 裁定同步（2026-10-18）见 §0.7/§27.5**；冻结签名未变更）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；**T-18 裁定同步（2026-10-18）见 §0.7/§27.5**；**T-20 收口（2026-10-18）见 §0.8/§2.1/§3.7/§27.6**（F-01 端口物理位置例外登记；不改变冻结签名与 G-004 语义）；冻结签名未变更）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
-- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-19 `scanWifiAccessPoints`/`BleWifiScanRequest`（`EXT-DES-B-29`）与 C-09/C-11/C-23/C-28 增量边界；见 §0.7/§27.5；不改变冻结签名与 G-004 语义。
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-19 `scanWifiAccessPoints`/`BleWifiScanRequest`（`EXT-DES-B-29`）与 C-09/C-11/C-23/C-28 增量边界；见 §0.7/§27.5；不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/§7.2 建立端口物理位置例外登记（§27.6；16 个端口声明文件 + 1 个纯映射 seam），并把 17 条机器可读条目规范纳入 `tools/contract/layering_allowlist.json` 的 `port_location_exceptions`；明确 `check_layering` 0 violation ≠ 端口位置合规；只登记现状、关闭条件与迁移建议，不迁移代码、不改变冻结签名/G-004 语义。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -135,6 +135,21 @@
 
 - **不改变**：DES-A 冻结方法名/参数顺序/返回类型/错误码语义；`BleProvisioningRequest`/`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 的 canonical/HMAC/ACK/安全语义。
 - **证据**：T-18 `a9d0bb5` 复审（`t18-review-b.md`）与 `74e9157` R2 修复；host 690/690、clean assembleHap、codelinter 0 error、i18n blocking=0 由实现报告记录；本节不做设备/BLE PASS 声明。
+
+### 0.8 T-20 收口（2026-10-18）
+
+> **性质**：F-01 受控接受登记与工具契约收口，不是新的架构裁定。**依据**：`artifacts/70-review/final-system-review.md` F-01/§7.2、`artifacts/60-testing/test-report.md` §3.2/§8.2-4，以及 T-06/T-07/T-08/T-09/T-11/T-14 实现报告中的既有位置偏差记录。**边界**：不迁移代码、不创建 `contracts/**`、不改变任何冻结端口签名/错误语义/G-004 语义；与实现现状冲突处只记录，不静默消除。
+
+| 项 | 结论 | 落点 |
+|---|---|---|
+| **端口物理位置** | `entry/src/main/ets/contracts/**` 在 v1 仍不存在；DES-A §2.1/§3.7 名义端口实际分布在 `common/types/**`、`service/**`、`repository/**`、`viewmodel/**`。采用 **v1 受控接受 + 逐文件/符号登记**，迁移为独立重构任务。 | §2.1 注记；§3.7 注记；§27.6 |
+| **检查器语义** | `check_layering.py` 通过 `_is_storage_port_path`（:550-561）与 `_is_viewmodel_service_port`（:564-578）**硬编码**放行端口路径；`layering_allowlist.json` 无端口条目。因此 **0 violation 只证明“当前路径被硬编码视为端口”，不证明端口位置符合 DES-A 路径契约**。 | §27.6；DES-B §18.1 |
+| **机器可读登记** | 新增 `port_location_exceptions`：16 条端口声明文件（`kind: port-only` 或 `mixed-contract-dto`）+ 1 条纯映射 seam（`GattEndpointMap`，`kind: pure-seam`），共 **17 条**。状态统一 `accepted-location-exception`；每条含 owner、关闭条件、evidence。 | §27.6.2 |
+| **后续迁移** | 建议独立任务（不占用 T-21/T-22；ID 由 Orchestrator 分配）：建立 `contracts/**`、按文件迁移/拆分、更新 imports、全量回归、删除例外。不得以“复制一套端口”或“目录级放宽”替代迁移。 | §27.6.3 |
+
+- **上游基线**：G-004 `contract-baseline.md` @ `697762c` 仍 VALID；F-01 只登记端口物理位置，不改变 CB 的端口/错误/安全语义。若后续迁移触发 Change Impact，按 CB/ADR 重新验证。
+- **不改变**：DES-A 冻结方法名/参数顺序/返回类型/错误码语义；`BleProvisioningRequest`/`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 canonical/HMAC/ACK/安全语义。
+- **证据边界**：本节只登记静态位置与工具放行关系；不新增设备/BLE/TLS/云/性能 PASS 声明，也不替代 Stage Gate 对 F-01 的记录。
 
 ---
 
@@ -359,6 +374,8 @@ entry/src/main/ets/
 ├── components/                              # C-24；DES-001B
 └── entryability/                            # C-28；DES-001B
 ```
+
+> **T-20 收口（2026-10-18）— 端口物理位置例外**：上图 `contracts/**` 是**目标布局**，不是 v1 现状。仓库中 `entry/src/main/ets/contracts/**` 不存在；§3.7 的端口声明实际位于 `common/types/Ports.ets`、`service/{crypto,storage,ble,gateway,cloud,i18n,scene}/**`、`repository/{DomainPorts,GatewayPorts}.ets`、`viewmodel/ViewModelPorts.ets`。逐文件/符号登记、owner、关闭条件与迁移建议见 **§27.6**。`check_layering` 对这些路径使用硬编码放行，**0 violation 不等于端口位置合规**；Stage Gate 不得把检查器 PASS 解释为 DES-A §2.1 路径契约已满足。
 
 **测试目录**（D-018 的落位）：
 
@@ -814,6 +831,8 @@ export interface CancellationToken {
 | `DiscoveryTransport` | `scan(...)` | mDNS/（UDP 待 PB-01） | `FakeDiscoveryTransport` |
 | `SecretVerifier` | `verify(gatewayId, secret)` | C-17 签名 discover | 内存断言 |
 | `InvitationApplicationPort` | `applyInvitedGateway(entry)` | C-07 | 内存 |
+
+> **T-20 收口（2026-10-18）**：本表是**逻辑端口清单**，不是物理位置证明。表中端口在 v1 实际分布在 `common/types/**`、`service/**`、`repository/**`、`viewmodel/**`；唯一权威的物理位置例外登记见 §27.6（17 条：16 个端口/契约文件 + 1 个纯映射 seam）。在独立迁移任务完成前，不得新增未登记的端口路径，也不得把 `contracts/**` 迁移未完成写成“端口位置合规”。
 
 ```ts
 export interface ClockPort { nowMs(): number; }
@@ -5286,6 +5305,7 @@ sequenceDiagram
 | `RISK-BLE-MTU` | 实际 MTU <247 | 配网失败 | 明确失败，不截断；提示 | T-12 设备测试 |
 | `RISK-PIN-BASE64` | `publicKeyHash` 编码误用 | TLS 永远失败 | §19.1 转换规则；PB-03 验证 | T-11 spike |
 | `RISK-REQUEST-ID-EPOCH` | CB 示例 10 位秒 vs 文字 epochMillis | correlation/日志不一致 | 本文按 13 位 ms；联调确认；必要时 Change Impact | T-06/T-11 仿真器 |
+| `RISK-PORT-LOCATION` | 端口物理位置偏离 `contracts/**`，且检查器以硬编码路径放行（F-01） | 0 violation 被误读为端口位置合规；新增端口可绕过 Change Impact；迁移责任悬空 | v1 受控接受并逐文件/符号登记（§27.6）；检查器下一任务改为读取 `port_location_exceptions`；Stage Gate 明确例外；独立迁移任务关闭 | 迁移完成 + 所有 imports 回归 + 例外删除 + 复审 |
 
 ### 26.3 需固件协同（引用 CB §11）
 
@@ -5496,6 +5516,281 @@ export interface IBleProvisioningClient {
 4. T-20 `check_layering.py` 必须按 DES-B §2.3/§18.1 的 T-18 D-12 例外实现；T-19 设备/BLE 仍 `BLOCKED`。
 5. 下游文档若仍引用旧 `IBleProvisioningClient` 四方法接口或旧 C-23 `submit` 四参数签名，标 `UNVERIFIED` 并按本节/DES-B §23.7 更新；不得把旧文本当实现依据。
 
+### 27.6 端口物理位置例外登记（T-20 收口，2026-10-18；F-01）
+
+> **性质**：版本化的**受控接受登记**，不是新的架构裁定，不改变 §3.7/各章冻结端口签名、错误语义或 G-004 语义。**依据**：`artifacts/70-review/final-system-review.md` F-01/§7.2、`artifacts/60-testing/test-report.md` §3.2/§8.2-4；T-06 R-13、T-07 R-08、T-08、T-09、T-11 D-1、T-14 的既有位置偏差记录；各文件头注释的 `LOCATION EXCEPTION`。**边界**：本任务只登记与定义关闭条件，不迁移代码、不创建 `contracts/**`、不修改 `tools/contract/**`。
+
+#### 27.6.1 登记口径
+
+| 字段 | 含义 |
+|---|---|
+| `id` | 稳定 ID `PORT-LOC-01..17`；删除例外后不得复用。 |
+| `path` | 仓库根相对路径；必须精确匹配，禁止目录/通配符。 |
+| `symbols` | 该文件内**允许被跨层 import 的符号上限**；checker 必须按 `symbols ⊆ entry.symbols` 判断，不能只看路径。 |
+| `kind` | `port-only`（纯接口/契约类型）、`mixed-contract-dto`（端口与 DTO/枚举同文件）、`pure-seam`（非端口，但当前被 checker 当端口放行的纯映射 seam）。 |
+| `status` | 统一 `accepted-location-exception`；不允许 `pending-*` 进入 Gate。 |
+| `owner` | 架构登记 owner + 迁移 owner（角色/组件）。 |
+| `close_condition` | 迁移到 `contracts/**`/`model/**` 或拆分后删除本条目；不得以“永久接受”替代关闭。 |
+| `evidence` | 评审/实现报告/文件头注释/checker 报告路径。 |
+
+> **关键语义**：当前 `check_layering.py` 的 `_is_storage_port_path`（:550-561）与 `_is_viewmodel_service_port`（:564-578）是**代码内硬编码白名单**，不是 `layering_allowlist.json` 条目。因此 **`check_layering` 0 violation 只表示“这些路径被硬编码视为端口”，不表示端口位置合规**。下一工具任务必须改为读取 `port_location_exceptions`；在新检查器落地前，本表是架构侧唯一权威登记。
+>
+> **作用域**：`port_location_exceptions` 只替代 D-09（`repository/**` → `service/**`）与 D-11（`viewmodel/**` → `service/{gateway,ble,crypto,storage}`）的端口路径判断；`pages/**`/`components/**` 的 D-12 import 仍由 `entries` 独立控制。两者同时适用时取**更严格者**；端口例外不得被用来放宽 D-12，D-12 例外也不得被用来放宽 D-09/D-11。
+
+#### 27.6.2 逐文件/符号清单（17 条）
+
+| ID | 文件 | 允许跨层 import 的符号上限 | kind | 当前放行点 | 原因 | owner | 关闭条件 |
+|---|---|---|---|---|---|---|---|
+| `PORT-LOC-01` | `entry/src/main/ets/common/types/Ports.ets` | `ClockPort`、`RandomPort`、`IdPort`、`LoggerPort`、`MetricsPort`、`CancellationToken`、`HmacSignerPort` | `port-only` | 无（`common/**` 本身被 D-01 允许；但仍偏离 §2.1 `contracts/**`） | T-06 写范围不含 `contracts/`；纯接口、无平台 import | C-01 / solution-architect | 迁移到 `contracts/Ports.ets`，更新 imports，删除条目 |
+| `PORT-LOC-02` | `entry/src/main/ets/service/crypto/CryptoPort.ets` | `CryptoPort`、`X25519KeyHandle`、`X25519KeyPair`、`AesCtrState`、`AesCtrStream`、`GcmCiphertext` | `mixed-contract-dto` | D-11 `_is_viewmodel_service_port` | T-07 写范围不含 `contracts/`；文件头已记录；禁止复制第二套端口 | C-04 / solution-architect | 端口与值类型拆分/迁移；`viewmodel` 仅 import 端口与必要 DTO |
+| `PORT-LOC-03` | `entry/src/main/ets/service/storage/RdbStore.ets` | `RdbValue`、`RdbRow`、`RdbTransaction`、`RdbStore` | `port-only` | D-09 `_is_storage_port_path` | T-08 写范围不含 `contracts/`；repository 需要事务类型 | C-06 / solution-architect | 迁移到 `contracts/RdbStore.ets` + `model/**`（值类型），更新 repository imports |
+| `PORT-LOC-04` | `entry/src/main/ets/service/storage/PreferencesStore.ets` | `PreferencesStore` | `port-only` | D-09 + D-11 | T-08 写范围不含 `contracts/` | C-06 / solution-architect | 迁移到 `contracts/PreferencesStore.ets` |
+| `PORT-LOC-05` | `entry/src/main/ets/service/storage/SecretStore.ets` | `SecretStore`、`SecretAlias` | `mixed-contract-dto` | D-09 + D-11 | T-08 写范围不含 `contracts/`；`GatewayRepository` 需要 `SecretAlias` 值 | C-06 / solution-architect | 迁移端口；`SecretAlias` 移到 `model/**` 或 `common/**` |
+| `PORT-LOC-06` | `entry/src/main/ets/service/storage/SecretDraftPort.ets` | `SecretDraftPort` | `port-only` | D-09 + D-11 | T-08 写范围不含 `contracts/` | C-06 / solution-architect | 迁移到 `contracts/SecretDraftPort.ets` |
+| `PORT-LOC-07` | `entry/src/main/ets/service/storage/MigrationPort.ets` | `MigrationSink`、`MigrationRegistryPort` | `port-only` | D-09 `_is_storage_port_path` | T-08 写范围不含 `contracts/` | C-06 / solution-architect | 迁移到 `contracts/MigrationPort.ets` |
+| `PORT-LOC-08` | `entry/src/main/ets/service/ble/BleProvisioningPorts.ets` | `IBleProvisioningClient`、`BleTransport`、`BlePermissionGate`、`BleConnection`、`BleScanListener`、`BleProvisioningProgressListener`、`BleProvisioningRequest`、`BleWifiScanRequest`、`ProvisioningState`、`BleProvisioningStage`、`BleProvisioningDevice`、`BleScanDevice`、`BleScanFilter`、`WifiAp`、`ProvisioningProgress`、`BleServiceRef`、`BleCharacteristicRef`、`BleDescriptorRef` | `mixed-contract-dto` | D-11 `_is_viewmodel_service_port`；D-12 pages 值/类型 import（见 DES-B §18.1） | T-12 写范围不含 `contracts/`/`model/`；页面与 VM 需要 DTO/枚举 | C-19 / solution-architect | 拆分：端口 → `contracts/BleProvisioningPorts.ets`；DTO/枚举 → `model/ProvisioningModels.ets`；shrink 例外 |
+| `PORT-LOC-09` | `entry/src/main/ets/service/ble/GattEndpointMap.ets` | `GattEndpointMap` | `pure-seam` | D-11 `_is_viewmodel_service_port` | **不是端口**：纯 GATT 端点常量/映射；`BleProvisioningViewModel` 值 import 其静态常量；checker 以端口路径放行 | C-19 / solution-architect | 迁移到 `common/ble/GattEndpointMap.ets` 或 `model/**`；或把 VM 所需常量下沉到 VM 本地；删除例外 |
+| `PORT-LOC-10` | `entry/src/main/ets/service/gateway/GatewayTransportPorts.ets` | `HttpTransport`、`TlsPinVerifier`、`IGatewayClient`、`HttpRequest`、`TlsVerification`、`HttpResponse`、`TlsPolicy`、`GatewayTarget`、`ProbeResult` | `mixed-contract-dto` | D-11 `_is_viewmodel_service_port` | T-11 写范围不含 `contracts/`；VM 需要 `GatewayTarget`/`IGatewayClient` | C-17 / solution-architect | 端口 → `contracts/GatewayTransportPorts.ets`；DTO → `model/**`；`viewmodel` 仅 import 端口/DTO |
+| `PORT-LOC-11` | `entry/src/main/ets/service/gateway/DiscoveryModels.ets` | `DiscoveryTransport`、`DiscoverySource`、`DiscoveryTransportKind`、`DiscoveryCandidate`、`DiscoveryOptions`、`DiscoveryReport`、`DiscoveryBeacon` | `mixed-contract-dto` | D-11 `_is_viewmodel_service_port` | DES-A §5.1.5/§2.1 名义位置为 `model/DiscoveryModels.ets` + `contracts/DiscoveryTransport.ets`；T-11 写范围限制 | C-18 / solution-architect | 拆分到 `model/DiscoveryModels.ets` + `contracts/DiscoveryTransport.ets`；更新 C-10/C-18/C-23 imports |
+| `PORT-LOC-12` | `entry/src/main/ets/service/cloud/CloudPorts.ets` | `CloudConfigStore`、`CloudCredentialPort`、`TimerPort`、`CloudActiveScopePort` | `port-only` | 无直接 D-11/D-09 硬编码（`service/cloud` 不在受限目录），但仍偏离 DES-B §2.1 `contracts/CloudPorts.ets` | T-14 写范围不含 `contracts/`；文件头已记录 | C-15 / solution-architect | 迁移到 `contracts/CloudPorts.ets`；`TimerPort` 按 §2.1 拆到 `contracts/TimerPort.ets` |
+| `PORT-LOC-13` | `entry/src/main/ets/service/i18n/I18nPorts.ets` | `I18nResourceLoaderPort`、`LocaleApplierPort` | `port-only` | 无直接硬编码（`pages` i18n 白名单只覆盖 `I18nService/I18nModels/I18nKeys`） | DES-B §2.1 名义位置 `contracts/I18nPorts.ets`；T-10 写范围限制 | C-14 / solution-architect | 迁移到 `contracts/I18nPorts.ets`；保持 host fake 注入 |
+| `PORT-LOC-14` | `entry/src/main/ets/service/scene/SceneTimerPort.ets` | `SceneTimerPort` | `port-only` | 无直接硬编码（`service/scene` 不在 D-11 受限目录） | C-11 纯延迟 seam；生产适配器在组合根；名义位置 `contracts/**` | C-11 / solution-architect | 迁移到 `contracts/SceneTimerPort.ets` 或与 `TimerPort` 合并；更新 C-11 imports |
+| `PORT-LOC-15` | `entry/src/main/ets/repository/DomainPorts.ets` | `RoomLookupPort`、`DeviceAssignmentPort`、`RoomDeviceNamePort`、`MemberRoomGrantPort`、`SceneReferencePort`、`DeviceControlPort`、`DeviceStatePort`、`DeviceRecordQueryPort` | `port-only` | 无（repository 可 import repository；文件内 import `service/storage/RdbStore` 由 D-09 硬编码放行） | T-09 写范围限定 `repository/**`/`service/**`；文件头已记录；当前造成 `service/** → repository/**` 的反向可见性 | C-08..C-11 / solution-architect | 按 DES-B §23.1 拆分到 `contracts/RoomPorts.ets`、`ScenePorts.ets`、`DevicePorts.ets`；消除 `service → repository` 反向依赖 |
+| `PORT-LOC-16` | `entry/src/main/ets/repository/GatewayPorts.ets` | `GatewayRoutePort`、`GatewayCredentialPort`、`GatewayAddressPort`、`GatewaySequencePort`、`SecretVerifier`、`InvitationApplicationPort`、`InvitedGateway` | `mixed-contract-dto` | 无直接硬编码（repository 层内） | T-08 写范围限定 `repository/**`；文件头已记录 | C-07 / solution-architect | 端口 → `contracts/GatewayPorts.ets`；`InvitedGateway` → `model/**`；更新 C-07/C-17/C-18/C-23 imports |
+| `PORT-LOC-17` | `entry/src/main/ets/viewmodel/ViewModelPorts.ets` | `DeviceControlCoordinatorPort`、`PermissionKind`、`PermissionPort`、`ManualDiscoveryPort` | `mixed-contract-dto` | 无直接硬编码（viewmodel 自身层） | T-15/T-16 写范围限定 `viewmodel/**`；DES-B §2.1 名义位置 `contracts/{ControlPorts,PermissionPort}.ets` | C-21..C-23 / solution-architect | 端口 → `contracts/`；`ManualDiscoveryPort` 与 C-18 端口收敛；`PermissionPort` 同名冲突另按 §23.7 记录处理 |
+
+**同文件非端口符号说明**：
+
+- `PORT-LOC-08` 的 DTO/枚举（`BleProvisioningDevice`、`WifiAp`、`ProvisioningProgress`、`ProvisioningState` 等）**不是端口**；它们被 pages/VM 使用只构成 DES-B §18.1 的 D-12 文件/符号级例外，不构成“pages 可 import service 实现”。迁移时应拆到 `model/**`，不得把整个文件继续当端口。
+- `PORT-LOC-10` 的 `GatewayTarget`/`ProbeResult` 等是 DTO；`IGatewayClient` 是端口。checker 的符号上限必须按上表，不允许新增未列符号。
+- `PORT-LOC-11` 的 `DiscoveryModels` 在 DES-A §5.1.5 已有模型形状；本表只登记物理位置，不改变模型字段。
+- `PORT-LOC-05` 的 `SecretAlias` 是纯值 helper；迁移到 `model/**`/`common/**` 后 `repository` 不再需要 import `service/storage`。
+- `PORT-LOC-15` 的 `DeviceRecord` 等 C-10/C-11 视图模型在 `repository/DomainModels.ets`，**不在本表**；它们是 DES-B §18.1 D-12 的 DTO 例外，不是端口。
+
+**明确不登记为端口的文件（防止错误放宽）**：
+
+| 文件 | 实际性质 | 处理 |
+|---|---|---|
+| `service/cloud/SystemTimerPort.ets` | `TimerPort` 的生产实现（`setTimeout`，无 `@ohos.*`） | 不是端口；由组合根装配；随 `TimerPort` 迁移后改为 `adapters/**` 或保留 service/cloud 实现，单独评审 |
+| `app/AppPlatformPorts.ets` | 生产平台适配器（Clock/UUID/Logger/Metrics/VM/Scene timer） | 不是端口；D-17 允许 `app/**` 装配；不进入本表 |
+| `service/gateway/adapters/**`、`service/cloud/adapters/**`、`service/ble/adapters/**`、`service/gateway/discovery/MdnsDiscoveryTransport.ets` | 平台适配器 | 不是端口；D-06 只允许组合根/entryability 装配 |
+| `service/ac/AcModels.ets`、`service/family/FamilyModels.ets`、`service/cloud/CloudModels.ets`、`repository/DomainModels.ets` | 纯模型/视图模型（位置偏差） | 不是端口；由 DES-B §18.1 D-12 / 后续模型迁移处理 |
+| `service/crypto/CryptoProvider.ets`、`service/crypto/CryptoRandomSource.ets` | 实现/平台适配 helper | 不是端口；不得加入本表 |
+
+**机器可读条目（`layering_allowlist.json` 的 `port_location_exceptions`，与上表逐条一致）**：
+
+```json
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST",
+  "producer": "agent:solution-architect",
+  "task": "T-20 / wp-084-contract-cleanup",
+  "policy": "Port location exceptions are file/symbol-level and closed by migration to contracts/**. Never widen a whole directory; checker must match symbols subset and fail closed.",
+  "port_location_exceptions": [
+    {
+      "id": "PORT-LOC-01",
+      "path": "entry/src/main/ets/common/types/Ports.ets",
+      "symbols": ["ClockPort", "RandomPort", "IdPort", "LoggerPort", "MetricsPort", "CancellationToken", "HmacSignerPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-01 / solution-architect",
+      "reason": "T-06 write scope excluded contracts/; pure interfaces with no platform import.",
+      "close_condition": "Move to contracts/Ports.ets, update imports, delete this entry after full regression.",
+      "evidence": "artifacts/70-review/final-system-review.md F-01/§7.2; artifacts/60-testing/test-report.md §3.2/§8.2-4; T-06 R-13; file header LOCATION EXCEPTION"
+    },
+    {
+      "id": "PORT-LOC-02",
+      "path": "entry/src/main/ets/service/crypto/CryptoPort.ets",
+      "symbols": ["CryptoPort", "X25519KeyHandle", "X25519KeyPair", "AesCtrState", "AesCtrStream", "GcmCiphertext"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-04 / solution-architect",
+      "reason": "T-07 write scope excluded contracts/; file header forbids a second port copy.",
+      "close_condition": "Move port to contracts/CryptoPort.ets and value types to model/**, update imports, delete this entry.",
+      "evidence": "artifacts/70-review/t07-review.md R-08; file header LOCATION EXCEPTION; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-03",
+      "path": "entry/src/main/ets/service/storage/RdbStore.ets",
+      "symbols": ["RdbValue", "RdbRow", "RdbTransaction", "RdbStore"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-06 / solution-architect",
+      "reason": "T-08 write scope excluded contracts/; repository layer needs transaction types.",
+      "close_condition": "Move to contracts/RdbStore.ets plus model/** value types, update repository imports, delete this entry.",
+      "evidence": "artifacts/60-testing/test-report.md §3.2; T-08 review; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-04",
+      "path": "entry/src/main/ets/service/storage/PreferencesStore.ets",
+      "symbols": ["PreferencesStore"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-06 / solution-architect",
+      "reason": "T-08 write scope excluded contracts/; pure interface with no platform import.",
+      "close_condition": "Move to contracts/PreferencesStore.ets, update imports, delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; artifacts/60-testing/test-report.md §3.2"
+    },
+    {
+      "id": "PORT-LOC-05",
+      "path": "entry/src/main/ets/service/storage/SecretStore.ets",
+      "symbols": ["SecretStore", "SecretAlias"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-06 / solution-architect",
+      "reason": "T-08 write scope excluded contracts/; GatewayRepository needs the SecretAlias value helper.",
+      "close_condition": "Move port to contracts/SecretStore.ets and SecretAlias to model/** or common/**, update imports, delete this entry.",
+      "evidence": "artifacts/60-testing/test-report.md §3.2; repository/GatewayRepository.ets imports; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-06",
+      "path": "entry/src/main/ets/service/storage/SecretDraftPort.ets",
+      "symbols": ["SecretDraftPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-06 / solution-architect",
+      "reason": "T-08 write scope excluded contracts/; pure interface.",
+      "close_condition": "Move to contracts/SecretDraftPort.ets, update imports, delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; artifacts/60-testing/test-report.md §3.2"
+    },
+    {
+      "id": "PORT-LOC-07",
+      "path": "entry/src/main/ets/service/storage/MigrationPort.ets",
+      "symbols": ["MigrationSink", "MigrationRegistryPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-06 / solution-architect",
+      "reason": "T-08 write scope excluded contracts/; pure migration interfaces.",
+      "close_condition": "Move to contracts/MigrationPort.ets, update imports, delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; artifacts/60-testing/test-report.md §3.2"
+    },
+    {
+      "id": "PORT-LOC-08",
+      "path": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+      "symbols": ["IBleProvisioningClient", "BleTransport", "BlePermissionGate", "BleConnection", "BleScanListener", "BleProvisioningProgressListener", "BleProvisioningRequest", "BleWifiScanRequest", "ProvisioningState", "BleProvisioningStage", "BleProvisioningDevice", "BleScanDevice", "BleScanFilter", "WifiAp", "ProvisioningProgress", "BleServiceRef", "BleCharacteristicRef", "BleDescriptorRef"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-19 / solution-architect",
+      "reason": "T-12 write scope excluded contracts/ and model/; pages and VM need provisioning DTOs/enums co-located with the port.",
+      "close_condition": "Split ports to contracts/BleProvisioningPorts.ets and DTO/enums to model/ProvisioningModels.ets; update imports; shrink this entry to zero.",
+      "evidence": "file header LOCATION EXCEPTION; DES-B §18.1 T20-D12-07..09; final-system-review.md F-01/§7.2/F-02"
+    },
+    {
+      "id": "PORT-LOC-09",
+      "path": "entry/src/main/ets/service/ble/GattEndpointMap.ets",
+      "symbols": ["GattEndpointMap"],
+      "kind": "pure-seam",
+      "status": "accepted-location-exception",
+      "owner": "C-19 / solution-architect",
+      "reason": "NOT a port: pure GATT endpoint constants/mapping; BleProvisioningViewModel value-imports static constants and the checker treats the path as a port.",
+      "close_condition": "Move to common/ble/GattEndpointMap.ets or model/**, or sink VM constants into the VM; delete this entry.",
+      "evidence": "file content/header; viewmodel/BleProvisioningViewModel.ets import; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-10",
+      "path": "entry/src/main/ets/service/gateway/GatewayTransportPorts.ets",
+      "symbols": ["HttpTransport", "TlsPinVerifier", "IGatewayClient", "HttpRequest", "TlsVerification", "HttpResponse", "TlsPolicy", "GatewayTarget", "ProbeResult"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-17 / solution-architect",
+      "reason": "T-11 write scope excluded contracts/; VM needs GatewayTarget and IGatewayClient.",
+      "close_condition": "Move ports to contracts/GatewayTransportPorts.ets and DTOs to model/**; update imports; delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; viewmodel/HomeViewModel.ets imports; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-11",
+      "path": "entry/src/main/ets/service/gateway/DiscoveryModels.ets",
+      "symbols": ["DiscoveryTransport", "DiscoverySource", "DiscoveryTransportKind", "DiscoveryCandidate", "DiscoveryOptions", "DiscoveryReport", "DiscoveryBeacon"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-18 / solution-architect",
+      "reason": "DES-A §5.1.5/§2.1 place the model in model/DiscoveryModels.ets and the port in contracts/; T-11 write scope limited the physical location.",
+      "close_condition": "Split to model/DiscoveryModels.ets and contracts/DiscoveryTransport.ets; update C-10/C-18/C-23 imports; delete this entry.",
+      "evidence": "DES-A §2.1/§5.1.5; file header; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-12",
+      "path": "entry/src/main/ets/service/cloud/CloudPorts.ets",
+      "symbols": ["CloudConfigStore", "CloudCredentialPort", "TimerPort", "CloudActiveScopePort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-15 / solution-architect",
+      "reason": "T-14 write scope excluded contracts/; file header records the location exception.",
+      "close_condition": "Move to contracts/CloudPorts.ets and split TimerPort to contracts/TimerPort.ets; update imports; delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; DES-B §2.1/§23.1; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-13",
+      "path": "entry/src/main/ets/service/i18n/I18nPorts.ets",
+      "symbols": ["I18nResourceLoaderPort", "LocaleApplierPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-14 / solution-architect",
+      "reason": "DES-B §2.1 nominally places these in contracts/I18nPorts.ets; T-10 write scope limited the physical location.",
+      "close_condition": "Move to contracts/I18nPorts.ets; keep host fakes injectable; update imports; delete this entry.",
+      "evidence": "DES-B §2.1/§23.1; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-14",
+      "path": "entry/src/main/ets/service/scene/SceneTimerPort.ets",
+      "symbols": ["SceneTimerPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-11 / solution-architect",
+      "reason": "Pure delay seam; production adapter belongs to the composition root; nominal location is contracts/**.",
+      "close_condition": "Move to contracts/SceneTimerPort.ets or merge with TimerPort; update C-11 imports; delete this entry.",
+      "evidence": "file header; app/AppCompositionRoot.ets assembly; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-15",
+      "path": "entry/src/main/ets/repository/DomainPorts.ets",
+      "symbols": ["RoomLookupPort", "DeviceAssignmentPort", "RoomDeviceNamePort", "MemberRoomGrantPort", "SceneReferencePort", "DeviceControlPort", "DeviceStatePort", "DeviceRecordQueryPort"],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "C-08..C-11 / solution-architect",
+      "reason": "T-09 write scope limited to repository/** and service/**; file header records the location exception; current placement also creates service -> repository visibility.",
+      "close_condition": "Split per DES-B §23.1 into contracts/RoomPorts.ets, ScenePorts.ets, DevicePorts.ets; eliminate service -> repository reverse imports; delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; DES-B §23.1; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-16",
+      "path": "entry/src/main/ets/repository/GatewayPorts.ets",
+      "symbols": ["GatewayRoutePort", "GatewayCredentialPort", "GatewayAddressPort", "GatewaySequencePort", "SecretVerifier", "InvitationApplicationPort", "InvitedGateway"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-07 / solution-architect",
+      "reason": "T-08 write scope limited to repository/**; file header records the location exception.",
+      "close_condition": "Move ports to contracts/GatewayPorts.ets and InvitedGateway to model/**; update C-07/C-17/C-18/C-23 imports; delete this entry.",
+      "evidence": "file header LOCATION EXCEPTION; DES-A §3.7/§10; final-system-review.md F-01/§7.2"
+    },
+    {
+      "id": "PORT-LOC-17",
+      "path": "entry/src/main/ets/viewmodel/ViewModelPorts.ets",
+      "symbols": ["DeviceControlCoordinatorPort", "PermissionKind", "PermissionPort", "ManualDiscoveryPort"],
+      "kind": "mixed-contract-dto",
+      "status": "accepted-location-exception",
+      "owner": "C-21..C-23 / solution-architect",
+      "reason": "T-15/T-16 write scope limited to viewmodel/**; DES-B §2.1 nominally places them in contracts/{ControlPorts,PermissionPort}.ets.",
+      "close_condition": "Move ports to contracts/; converge ManualDiscoveryPort with C-18; resolve the same-name PermissionPort conflict separately; delete this entry.",
+      "evidence": "file header; DES-B §2.1/§12.1.1/§23.7; final-system-review.md F-01/§7.2"
+    }
+  ]
+}
+```
+
+> **落地说明**：上式展示合并后的文件头（`version`/`artifact`/`producer`/`task`/`policy`）与**新增顶层键** `port_location_exceptions`；落地时保留现有 13 条 D-12 `entries`（按 DES-B §18.1 定稿为 `accepted`），并把 `producer`/`task` 更新为本任务或下一工具任务。当前 checker 只读取 `entries`，会忽略本键；**下一任务**必须增加 `load_port_location_exceptions()` 并用它替换 `_is_storage_port_path`/`_is_viewmodel_service_port`。在替换完成前，本 JSON 是架构登记，不是门禁证据。
+
+#### 27.6.3 后续迁移建议（独立任务，不阻塞 T-21/T-22）
+
+1. **P1（先做，影响 checker 语义）**：把纯端口文件迁移到 `contracts/**`：`common/types/Ports.ets`、`service/storage/{RdbStore,PreferencesStore,SecretStore,SecretDraftPort,MigrationPort}.ets`、`service/cloud/CloudPorts.ets`、`service/i18n/I18nPorts.ets`、`service/scene/SceneTimerPort.ets`、`service/crypto/CryptoPort.ets`、`repository/{DomainPorts,GatewayPorts}.ets`、`viewmodel/ViewModelPorts.ets`。保持方法名/参数/返回/错误语义不变，只改物理位置与 imports。
+2. **P2（拆分混合文件）**：`BleProvisioningPorts.ets`、`GatewayTransportPorts.ets`、`DiscoveryModels.ets` 拆为 `contracts/**`（端口）与 `model/**`（DTO/枚举）；页面/VM 改为 import `model/**`，从根上消除 D-12 值 import 例外。
+3. **P3（纯映射 seam）**：`GattEndpointMap.ets` 迁到 `common/**`/`model/**`，或把 VM 所需常量下沉到 VM 本地；不要继续把实现映射文件当端口。
+4. **P4（checker 切换）**：删除 `_is_storage_port_path`/`_is_viewmodel_service_port` 硬编码，改为读取 `port_location_exceptions`；新增未登记端口路径必须失败；每条例外按 `symbols` 子集匹配；增加 fixture（合法树 + 未登记端口 + 超出符号 + `pending-*` 状态）——与 F-06 一并处理。
+5. **验收**：全量 host/构建/codelinter/i18n/crosscheck + `check_layering` 报告 `exceptions_used` 逐条为 0；删除本表条目并更新 DES-A §2.1/§3.7；Stage Gate 记录“端口位置合规”。
+6. **D-03 空集警告**：在 `contracts/**` 创建前，D-03 没有输入文件，其“0 violation”是**空集**而非合规证据；迁移 P1 落地后 D-03 才真正生效，必须补负例 fixture（见 F-06），不得用当前 0 违规宣称 `contracts/**` 导入边界已满足。
+
+> **不改变**：端口签名、`contracts/**` 目标布局本身、G-004 语义、§2.2 依赖方向规则。**冲突记录**：`service/**` 反向 import `repository/{DomainPorts,GatewayPorts}` 是当前物理位置的副作用；迁移到 `contracts/**` 后应消失。本任务不修改代码，故不将其标为代码缺陷，只登记为迁移关闭条件。
+
 ---
 
 ## 28. 追溯与任务消费索引
@@ -5588,6 +5883,7 @@ export interface IBleProvisioningClient {
 - [ ] 关键时序图覆盖 discover/control/BLE（§25）。
 - [ ] 未决/风险/固件协同清单完整（§26）。
 - [ ] 与 DES-001B 的共享类型边界显式（§27）。
+- [x] T-20 收口（§0.8/§27.6）：端口物理位置例外 17 条逐文件/符号登记；明确 0 violation ≠ 位置合规；未改冻结签名/G-004 语义。
 - [ ] 无新增架构裁定；所有语义引用 G-004 路径+章节。
 - [ ] 未修改 `input/`、代码、契约基线；只写本文。
 
