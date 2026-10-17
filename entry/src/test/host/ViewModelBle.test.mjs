@@ -103,6 +103,36 @@ class HangingWifiBle extends FakeBle {
   }
 }
 
+/**
+ * R3-02: simulates a BLE implementation whose cancel() does not reject the
+ * pending provision/AP scan. Its late success must still be dropped by the VM
+ * cancellation generation.
+ */
+class DeferredBle extends FakeBle {
+  async provision(request, listener) {
+    this.provisionCalls++;
+    this.request = request;
+    this.listener = listener;
+    return new Promise((resolve) => {
+      this.pendingResolve = resolve;
+    });
+  }
+
+  async cancel() { this.cancelCalls++; }
+}
+
+class DeferredWifiBle extends FakeBle {
+  async scanWifiAccessPoints(request, listener) {
+    this.wifiRequest = request;
+    this.wifiListener = listener;
+    return new Promise((resolve) => {
+      this.pendingWifiResolve = resolve;
+    });
+  }
+
+  async cancel() { this.cancelCalls++; }
+}
+
 class FakePermissions {
   constructor(options = {}) {
     this.failure = options.failure;
@@ -184,15 +214,32 @@ class FakeFamilyGateways {
   }
 }
 
+/** R3-02: holds commitBinding open so cancel can race the commit await. */
+class DeferredBindings {
+  constructor() {
+    this.calls = [];
+    this.pendingResolve = undefined;
+  }
+  async commitBinding(result, draftId, familyId) {
+    this.calls.push({ result, draftId, familyId });
+    return new Promise((resolve) => {
+      this.pendingResolve = resolve;
+    });
+  }
+}
+
 function setup(options = {}) {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);
-  const ble = options.hangingWifi ? new HangingWifiBle(options) :
+  const ble = options.deferredWifi ? new DeferredWifiBle(options) :
+    options.deferred ? new DeferredBle(options) :
+    options.hangingWifi ? new HangingWifiBle(options) :
     options.hanging ? new HangingBle(options) : new FakeBle(options);
   const drafts = new FakeDrafts();
   const crypto = new FakeCrypto();
   const permissions = new FakePermissions(options.permission);
-  const bindings = new FakeBindings(options.binding);
+  const bindings = options.deferredBinding ? new DeferredBindings() :
+    new FakeBindings(options.binding);
   const families = new FakeFamilyGateways(options.family);
   const vm = new BleProvisioningViewModel(ble, bindings, families, drafts, crypto, permissions,
     new FakeI18n(), clock, timer, new FakeLogger());
@@ -326,6 +373,114 @@ test('T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer', async () => {
   assert.equal(state.provisioning, 'CANCELLED');
   assert.equal(state.canCancel, false);
   assert.equal(h.timer.pending(), 0);
+});
+
+test('T18_R3_cancelDuringPrepareWifiDropsLateAccessPoints', async () => {
+  const h = setup({ deferredWifi: true });
+  await readyDevice(h);
+  const preparing = h.vm.prepareWifi('12345678');
+  await waitMicrotasks();
+  assert.equal(h.vm.getState().provisioning, 'CONNECTING');
+
+  await h.vm.cancel();
+  const cancelled = h.vm.getState();
+  assert.equal(cancelled.provisioning, 'CANCELLED');
+  const revisionAtCancel = cancelled.revision;
+
+  // The pending handshake still emits events and resolves with a real AP list.
+  // None of that may republish over the cancelled snapshot.
+  h.ble.wifiListener.onAccessPoints([
+    { ssid: 'LateWifi', bssid: 'bb', channel: 6, rssi: -50, auth: 3 }
+  ]);
+  h.ble.wifiListener.onStateChanged({ state: 'AP_SCANNING' });
+  h.ble.pendingWifiResolve([
+    { ssid: 'LateWifi', bssid: 'bb', channel: 6, rssi: -50, auth: 3 }
+  ]);
+  await preparing;
+
+  const state = h.vm.getState();
+  assert.equal(state.provisioning, 'CANCELLED');
+  assert.equal(state.step, 2);
+  assert.equal(state.accessPoints.length, 0);
+  assert.equal(state.revision, revisionAtCancel,
+    'R3-02: a late AP list must not publish after cancel');
+  assert.equal(h.timer.pending(), 0);
+});
+
+test('T18_R3_cancelDuringSubmitDropsLateBindingSuccess', async () => {
+  const h = setup({ deferred: true });
+  await readyDevice(h);
+  const published = [];
+  h.vm.subscribe((state) => published.push(state.provisioning));
+  const submitting = h.vm.submit('12345678', 'HomeWifi', 'wifi-password');
+  await waitMicrotasks();
+  assert.equal(h.ble.provisionCalls, 1);
+
+  await h.vm.cancel();
+  const revisionAtCancel = h.vm.getState().revision;
+
+  // A provision that ignores the cancel and reports success late must not
+  // reach commitBinding/addGatewayToFamily or re-enter BOUND.
+  h.ble.listener.onStateChanged({ state: 'BOUND' });
+  h.ble.listener.onCompleted(RESULT);
+  h.ble.pendingResolve(RESULT);
+  await submitting;
+
+  const state = h.vm.getState();
+  assert.equal(state.provisioning, 'CANCELLED');
+  assert.equal(state.step, 2);
+  assert.equal(state.result, undefined);
+  assert.equal(state.revision, revisionAtCancel,
+    'R3-02: late progress/completion must not publish after cancel');
+  assert.equal(h.bindings.calls.length, 0,
+    'R3-02: cancelled submit must not call commitBinding');
+  assert.equal(h.families.calls.length, 0,
+    'R3-02: cancelled submit must not call addGatewayToFamily');
+  assert.equal(published.indexOf('BOUND'), -1);
+  assert.equal(h.drafts.destroyed.indexOf('draft-result') >= 0, true,
+    'the late re-issued result draft must be zeroized');
+});
+
+test('T18_R3_cancelDuringCommitBindingSkipsFamilyAddAndBound', async () => {
+  const h = setup({ deferredBinding: true });
+  await readyDevice(h);
+  const submitting = h.vm.submit('12345678', 'HomeWifi', 'wifi-password');
+  await waitMicrotasks();
+  assert.equal(h.bindings.calls.length, 1);
+  assert.equal(h.bindings.calls[0].draftId, 'draft-result');
+
+  await h.vm.cancel();
+  const revisionAtCancel = h.vm.getState().revision;
+  h.bindings.pendingResolve({ gatewayId: GATEWAY_ID });
+  await submitting;
+
+  const state = h.vm.getState();
+  assert.equal(state.provisioning, 'CANCELLED');
+  assert.equal(state.result, undefined);
+  assert.equal(state.revision, revisionAtCancel);
+  assert.equal(h.families.calls.length, 0,
+    'cancel while commitBinding is in flight skips addGatewayToFamily');
+});
+
+test('T18_R3_repeatedCancelIsIdempotentAndDropsLateSuccess', async () => {
+  const h = setup({ deferred: true });
+  await readyDevice(h);
+  const submitting = h.vm.submit('12345678', 'HomeWifi', 'wifi-password');
+  await waitMicrotasks();
+
+  await Promise.all([h.vm.cancel(), h.vm.cancel()]);
+  const cancelled = h.vm.getState();
+  assert.equal(cancelled.provisioning, 'CANCELLED');
+  assert.equal(cancelled.canCancel, false);
+  assert.equal(cancelled.result, undefined);
+
+  h.ble.pendingResolve(RESULT);
+  await submitting;
+  const state = h.vm.getState();
+  assert.equal(state.provisioning, 'CANCELLED');
+  assert.equal(state.result, undefined);
+  assert.equal(h.bindings.calls.length, 0);
+  assert.equal(h.families.calls.length, 0);
 });
 
 test('T16_Ble_backFromScanStopsScanAndDropsTheTenSecondTimer', async () => {
