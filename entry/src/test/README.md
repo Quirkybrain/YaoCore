@@ -1,7 +1,7 @@
 # Host 单元测试（无设备）
 
-- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06/T-07/T-08/T-09/T-10 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b、wp-033-fix-t10）
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`；T-08 `wp-020-storage` + 修复 `wp-022-fix-t08`；T-09 `wp-024-domain` + 修复 `wp-026-fix-t09` + 复审修复 `wp-028-fix-t09b`；T-10 `wp-031-i18n` + 评审修复 `wp-033-fix-t10`
+- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06/T-07/T-08/T-09/T-10/T-11 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b、wp-033-fix-t10、wp-035-transport）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`；T-08 `wp-020-storage` + 修复 `wp-022-fix-t08`；T-09 `wp-024-domain` + 修复 `wp-026-fix-t09` + 复审修复 `wp-028-fix-t09b`；T-10 `wp-031-i18n` + 评审修复 `wp-033-fix-t10`；T-11 `wp-035-transport`
 - **状态**: **可运行（Node host runner）**；`hvigorw test` 的 Hypium 入口可编译，但本环境无法执行（见 §3）。
 
 ## 1. 目录与约定
@@ -32,6 +32,11 @@ entry/src/test/
 │   ├── Storage.test.mjs          # T-08 C-06 存储/迁移/draft/事务运行器（15 用例）
 │   ├── GatewayRepository.test.mjs # T-08 C-07 路由/绑定/补偿/profile/sequence（29 用例）
 │   ├── I18n.test.mjs             # T-10 C-14 locale/fallback/插值/复数/键映射/权威 catalog/CHK（28 用例）
+│   ├── GatewayLocal.test.mjs     # T-11 C-17 discover/control/ACK/重试/TLS tri-state/DEV-ONLY（21 用例）
+│   ├── GatewayDiscovery.test.mjs # T-11 C-18 LAST_KNOWN/mDNS/手动 IP/UDP seam/退避（19 用例）
+│   ├── GatewayMock.test.mjs      # T-11 C-20 Mock 行为矩阵/TLS 四模式/MockBLE（17 用例）
+│   ├── TransportBoundary.test.mjs # T-11 SC-11/D-04 生产边界静态检查（3 用例）
+│   ├── TransportFakes.ets        # T-11 clock/random/route/credential/transport fakes
 │   ├── TestCryptoProvider.ets    # 测试专用纯 TS provider（仅 SHA/HMAC/HKDF/PBKDF2）
 │   ├── protocol-oracle.ets       # 纯 TS canonical oracle（无 @ohos）
 │   ├── ets-hooks.mjs             # Node loader：.ets -> TS strip -> ESM
@@ -82,7 +87,7 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前 revision：**275/275 PASS**（`evidence/t10-fix-host-node-tests.tap`，T-10 评审修复后）。覆盖：
+当前 revision：**335/335 PASS**（`evidence/t11-host-node-tests.tap`，T-11）。覆盖：
 
 - 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
@@ -101,13 +106,27 @@ node --no-warnings \
 - T-09 C-11（15）：场景 CRUD/值校验、串行成功/事件、预检 0 命令、首步/次步失败、局部失败不回滚、MISMATCH/UNVERIFIED（MISMATCH 回写 SSOT，R-03）、delayMs、取消、same-scene 单飞（R-02）、step/total timeout（R-05）、迟到 outcome 丢弃、监听器抛错隔离、房间删除后预检失败、禁用/空场景；
 - T-09 O-1（5）：gate 串行、合法排队在超时内成功（D-023/R2-02）、同步重入 fail-fast、异步重入有界失败、fake RDB 嵌套事务 fail-fast（R-04）；
 - T-10 C-14（28）：auto locale 解析（zh/en/其他/读取失败）、fallback 链与 missing 诊断、插值/缺参数/单次替换、英文 `_one/_other`/中文基键/缺变体回退、setLocaleMode 持久化+通知、apply 失败 `platformApplied=false`、加载失败回滚、Preferences 失败、reload 重解析、监听器隔离/退订、dispose、`has`/`tKey`、bundle codec 负例、I18nKeys/ErrorI18nMapper、权威 catalog 派生（DES-A §3.2.3 + DES-B §23.4）、5 个动态 code 双 locale 渲染、生产资源 parity、CHK good/bad 夹具与 exit 2、current-only/base-only/both 缺失降级；
+- T-11 C-17（21）：discover/control 全链、P-HMAC/P-TLS-PIN/P-BLOCKED、pin 缺失/不匹配禁回退、明文禁用、DEV-ONLY 先于验签、精确重传（同 body/nonce/seq）、300/900 重试、签名/correlation/缺 reported_state/目标不一致负例、`send` 路由装配、ControlPolicy 矩阵；
+- T-11 C-18（19）：LAST_KNOWN 成功/失败隔离/identity/profile 不符、去重排序、mDNS hint/无 hint/扫描失败、手动 IP 绑定/非法/限频/失败预算、UDP PB-01 warning 与 locator-only、超时/取消、ProbeBackoff 500/1000/2000/4000/8000；
+- T-11 C-20（17）：normal/offline/ack-lost/replay/timeout/dev-only、TLS pin-match/pin-mismatch/handshake-fail、resultCode/omitReportedState/badSignature/badCorrelation、failAtAttempt、MockBLE 正常/v2.1/离线/超时/取消；
+- T-11 边界（3）：生产树无 Mock/ohosTest import、Mock TEST ONLY 标记、纯逻辑 gateway 无 `@ohos`/`@kit`；
 - host runner 基线断言。
 
-计数口径：按 `test('T10_C14_...')` 前缀统计 28 条（T-10 初版 24 条 + 评审修复 4 条）；T-09 五个域分类 81 条，其余 166 为 T-05..T-08 基线，当前总数 **275**。
+计数口径：T-11 新增 60 条（21+19+17+3）；T-10 基线 275；当前总数 **335**。
 
 T-08 修复前基线为 **161/161 PASS**（`evidence/t08-host-node-tests.tap`）；T-06 修复时基线为 **88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`）；T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）。这些旧数字仅代表当时范围，不代表当前 revision。
 
-T-10 评审修复证据（wp-033-fix-t10，当前 revision）：
+T-11 传输发现/Mock 证据（wp-035-transport，当前 revision）：
+
+| 文件 | 内容 |
+|---|---|
+| `evidence/t11-host-node-tests.tap` | 当前 335/335 TAP |
+| `evidence/t11-ohpm-install.log` | `ohpm install` |
+| `evidence/t11-clean-assemble.log` | `hvigorw clean assembleHap --no-daemon` |
+| `evidence/t11-codelinter.log` | `codelinter -c code-linter.json5 -p default .`（产品源码） |
+| `evidence/t11-ohosTest-assemble.log` | 附加：ohosTest HAP 编译（不等于设备执行） |
+
+T-10 评审修复证据（wp-033-fix-t10，历史 revision）：
 
 | 文件 | 内容 |
 |---|---|
@@ -193,7 +212,7 @@ Node host runner 是本环境唯一已实证的可执行 host 路径，覆盖纯
 
 | 层 | 路径 | 运行条件 | 当前 |
 |---|---|---|---|
-| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 275/275**（T-10 评审修复后） |
+| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 335/335**（T-11） |
 | Hypium host | `entry/src/test/List.test.ets` | `hvigorw test` + Linux Previewer | **BLOCKED**（见 §3） |
 | 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README；storage 套件已注册但未执行） |
 

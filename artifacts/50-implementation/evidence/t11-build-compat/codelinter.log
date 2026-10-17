@@ -1,0 +1,5 @@
+# command: codelinter -c code-linter.json5 -p default .
+[32mThe configuration file /home/quirkybrain/code/harmony-projects/YaoCore/code-linter.json5 is in use.[0m
+[32mCurrently active product:default[0m
+[32mNo defects found in your code.[0m
+# exit=0

@@ -18,6 +18,8 @@ entry/src/ohosTest/
     │   └── SecurityDevice.test.ets      # T-07 C-04/C-05 设备向量（BLOCKED_ON_DEVICE_RUNNER）
     ├── storage/
     │   └── StorageDevice.test.ets       # T-08 C-06/C-07 适配器/事务/Asset 骨架（BLOCKED）
+    ├── gateway/
+    │   └── GatewayTransportDevice.test.ets  # T-11 C-17 HTTP/TLS pin path B 骨架（BLOCKED）
     ├── i18n/
     │   └── I18nDevice.test.ets          # T-10 C-14 rawfile/applier/Preferences 骨架（BLOCKED）
     └── contract/

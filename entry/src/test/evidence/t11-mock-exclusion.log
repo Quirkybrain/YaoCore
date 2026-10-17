@@ -1,0 +1,5 @@
+T-11 production HAP mock exclusion probe
+hap: entry/build/default/outputs/default/entry-default-unsigned.hap
+sourceMaps contains mock: 0
+modules.abc strings MockGatewayService count: 0
+host boundary test: TransportBoundary.test.mjs 3/3 PASS
