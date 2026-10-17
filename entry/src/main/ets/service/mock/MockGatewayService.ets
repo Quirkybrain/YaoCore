@@ -12,7 +12,7 @@
  * ControlAckMapper so that a mock pass cannot hide a real ACK-chain regression.
  * Secrets are PUBLIC TEST DATA ONLY; no payload is logged.
  */
-import { AppError, AppErrors } from '../../common/types/AppError';
+import { AppErrors } from '../../common/types/AppError';
 import { ProtocolConstants, ProtocolHeaders } from '../../common/constants/ProtocolConstants';
 import { DeviceAction, DeviceConstants, DeviceType } from '../../common/constants/DeviceConstants';
 import { HttpHeaders } from '../../common/types/HttpHeaders';
@@ -293,21 +293,13 @@ export class MockGatewayService implements IGatewayClient, DeviceControlPort {
     const headers = await this.signedHeaders(requestId, seq, body);
     const expectation = new AckExpectation(requestId, seq, command.target, command.action,
       command.value, alreadyApplied);
-    try {
-      await this.verifier.verify(headers, body,
-        ExpectedResponse.forControl(requestId, seq), this.secret);
-      return ControlAckMapper.map(body, expectation, new DeviationCounter());
-    } catch (error) {
-      if (error instanceof AppError) {
-        if (error.code === 'RESPONSE_AUTH_FAILED') {
-          throw AppErrors.of('CONTROL_RESPONSE_AUTH_FAILED', []);
-        }
-        if (error.code === 'RESPONSE_CORRELATION_MISMATCH') {
-          throw AppErrors.of('ACK_CORRELATION_MISMATCH', []);
-        }
-      }
-      throw error;
-    }
+    // Propagate the C-05 verifier codes unchanged: header auth failure is
+    // RESPONSE_AUTH_FAILED and header correlation failure is
+    // RESPONSE_CORRELATION_MISMATCH (contract-baseline §4.5). ACK body
+    // correlation keeps ACK_CORRELATION_MISMATCH from C-03's mapper.
+    await this.verifier.verify(headers, body,
+      ExpectedResponse.forControl(requestId, seq), this.secret);
+    return ControlAckMapper.map(body, expectation, new DeviationCounter());
   }
 
   private async signedHeaders(requestId: string, seq: number,

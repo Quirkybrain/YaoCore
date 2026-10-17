@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:test-engineer",
+  "task": "T-20 / wp-085-tooling fixture",
+  "policy": "Fixture only: a used pending D-12 entry must fail the gate.",
+  "entries": [
+    {
+      "id": "T20-D12-99",
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/Page.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "DeviceRecord"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "fixture",
+      "evidence": "fixture"
+    }
+  ],
+  "port_location_exceptions": []
+}

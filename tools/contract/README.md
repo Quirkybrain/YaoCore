@@ -71,3 +71,22 @@ exit code: 0
 - 未引入 JSON Schema 校验器；schema 检查是结构性断言（与 wp-002 一致）。
 - 不校验真实网关、真实 TLS/云、BLE 射频。
 - `input/` 只读；本工具不修改冻结输入。
+
+## 6. 分层检查器（`check_layering.py`，C-29 / T-20）
+
+```bash
+python3 tools/contract/check_layering.py --root .
+python3 tools/contract/check_layering.py --root . --report reports/contract/layering.json
+python3 tools/contract/test_check_layering.py
+```
+
+- `entries`：D-12 文件/符号级例外。`status` 强制：已使用但状态不是 `accepted` 的条目视为违规（exit 1）；
+  `pending-*` 未被使用时保留可见告警与计数。
+- `port_location_exceptions`：DES-A §27.6.2 / DES-B §18.1 的端口物理位置登记（17 条）。按精确 `path` +
+  `symbols ⊆` 匹配；未登记路径、符号越界、非 `accepted-location-exception` 状态均使 D-09/D-11 失败。
+  端口例外**不**放宽 D-12；两个 allowlist 独立适用，取更严格者。
+- 硬编码 `_is_storage_port_path` / `_is_viewmodel_service_port` 已删除；注册的端口文件若新增
+  `@ohos.*`、adapter 或未登记 repository 依赖，`PORT-LOC` 规则失败。
+- 输出计数：`exceptions_used`、`pending`、`pending_used`、`port_exceptions_used`、`port_pending`、
+  `port_pending_used`。`violations=0` 不等于端口位置合规，G-014 必须记录“例外已登记、迁移未完成”。
+- 当前 `--strict-ui` i18n 检查器位于 `entry/src/test/i18n/check_i18n.py`（路径偏差 T10-EX-01，未迁移）。

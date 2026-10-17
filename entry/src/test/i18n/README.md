@@ -65,15 +65,19 @@ python3 entry/src/test/i18n/check_i18n.py \
 
 - 退出码：`0` 全部阻断项通过；`1` 存在阻断失败；`2` 输入/工具错误。
 - CHK-01 rawfile 键集（含复数展开）；CHK-02 string.json 键集；CHK-03 插值参数；CHK-04 两个存储的空值/占位/括号；
-  CHK-05 未使用键（告警）；CHK-06 未定义键；CHK-07 硬编码（UI 阻断、非 UI 告警 + allowlist；短英文 UI 占位为
-  T-17/T-18 迁移期告警）；CHK-08 多语言代码分叉；CHK-09 locale 目录结构。
+  CHK-05 未使用键（告警）；CHK-06 未定义键；CHK-07 硬编码（UI 阻断、非 UI 告警 + allowlist；短英文 UI 占位默认
+  **advisory warning**，`--strict-ui` 时提升为 **blocking**）；CHK-08 多语言代码分叉；CHK-09 locale 目录结构。
+- `--strict-ui` 不是 no-op（T-20 F-05）：它只提升短英文 UI 文案的严重级别，不改变 CJK/英文句子规则；
+  SCREAMING_SNAKE/CamelCase 等技术常量不作为 UI 文案。报告字段 `strictUi` 记录本次是否启用。
 - `allowlist.json` 支持三类条目：`entries`（文件+正行号，用于 CHK-07）、`keyEntries`（精确键）、
   `keyPrefixes`（为 T-17/T-18 预留的 UI/动态键前缀）。每项必须有非空前缀/键/文件名与理由，否则检查器以
   exit 2 拒绝。
 - 正负夹具：`entry/src/test/i18n/fixtures/good|bad/`；host 测试断言 good=0、bad=1 且 CHK-01/02/03/04/06/07/08/09 阻断；
-  bad 夹具同时验证 `string.json` 的 `TODO` 与未闭合括号会被 CHK-04 命中。
-- 当前生产树：0 阻断；CHK-07 对 `pages/Index.ets` 的 `Hello World`/`Welcome` 报 2 条短英文占位告警（T-17/T-18
-  迁移后应改为阻断）。CHK-05 的 0 告警依赖 keyPrefixes 与动态前缀，不等于“无未使用键”。
+  bad 夹具同时验证 `string.json` 的 `TODO` 与未闭合括号会被 CHK-04 命中。`fixtures/short-ui/` 专门验证
+  `--strict-ui` 将短英文 UI 从 warning 提升为 blocking（默认 exit 0，strict exit 1）。
+- 当前生产树：0 阻断；CHK-07 不再对状态常量（如 `'LOADING'`/`'RECONFIGURE'`）误报，当前短英文 UI 告警为 0；
+  `--strict-ui` 用于门禁时仍会阻断未来真实短文案回归。CHK-05 的 0 告警依赖 keyPrefixes 与动态前缀，
+  不等于“无未使用键”。
 
 > **路径偏差（正式例外 T10-EX-01）**：DES-B §7.4.4 / delivery-plan 指定 `tools/i18n/check_i18n.py`、
 > `tools/i18n/allowlist.json`、`tools/i18n/legacy_migration.csv`、`reports/i18n/*`；`wp-031-i18n` handoff 的

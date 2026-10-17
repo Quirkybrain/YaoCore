@@ -16,6 +16,10 @@ Exit codes:
   1  at least one blocking check failed
   2  tool/input error (missing file, malformed JSON)
 
+--strict-ui promotes hardcoded short English UI text from an advisory warning
+to a blocking finding. Without it, CHK-07 still blocks CJK text and English
+sentences in pages/components, but short labels remain visible warnings.
+
 The checker is a development/CI tool. It is not part of the ArkTS build graph.
 """
 
@@ -242,8 +246,10 @@ def main(argv=None) -> int:
     parser.add_argument("--report", default="")
     parser.add_argument("--allowlist", default="")
     parser.add_argument("--strict-ui", action="store_true",
-                        help="treat hardcoded UI text as blocking (default behaviour; kept for the documented command)")
+                        help="promote hardcoded short English UI text to blocking; "
+                             "without it those findings stay advisory warnings")
     args = parser.parse_args(argv)
+    strict_ui = bool(args.strict_ui)
 
     root = Path(args.root).resolve()
     report_path = Path(args.report).resolve() if args.report else None
@@ -473,9 +479,13 @@ def main(argv=None) -> int:
                 sentence = len(words) >= 3 and bool(re.search(r"\s", literal))
                 # Short UI placeholders such as "Welcome" or "Hello World" must
                 # not evade the >=3-word sentence heuristic. CamelCase tokens
-                # (component ids, resource names) are excluded.
+                # (component ids, resource names) and SCREAMING_SNAKE state
+                # constants such as 'LOADING'/'RECONFIGURE' are technical values,
+                # not user-visible prose.
                 short_ui = (is_ui and not cjk and not sentence
                             and SHORT_UI_EN_RE.match(literal.strip()) is not None
+                            and re.search(r"[a-z]", literal) is not None
+                            and not literal.strip().isupper()
                             and re.match(r"^[A-Z][a-z]+[A-Z]", literal) is None)
                 if not cjk and not sentence and not short_ui:
                     continue
@@ -495,12 +505,13 @@ def main(argv=None) -> int:
                 if allowlist_lookup(allowlist, rel, line):
                     continue
                 if short_ui:
-                    # Advisory until T-17/T-18 replace the scaffold UTF-8 text;
-                    # promote to blocking after the UI migration.
+                    # Advisory by default; --strict-ui is a real gate switch and
+                    # promotes short UI text to blocking (T-20 F-05).
                     findings.append(finding(
                         file=rel, line=line,
-                        message="hardcoded short English UI text (T-17/T-18 migration)",
-                        severity="warning"))
+                        message="hardcoded short English UI text"
+                                + ("" if strict_ui else " (advisory; rerun with --strict-ui)"),
+                        severity="blocking" if strict_ui else "warning"))
                     continue
                 severity = "blocking" if is_ui else "warning"
                 findings.append(finding(file=rel, line=line,
@@ -550,6 +561,7 @@ def main(argv=None) -> int:
                 "schemaVersion": 1,
                 "generatedAt": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "root": str(root),
+                "strictUi": strict_ui,
                 "toolError": str(error),
                 "checks": [],
                 "summary": {"blockingFailures": 1, "warnings": 0, "missingKeys": 0, "hardcoded": 0},
@@ -569,6 +581,7 @@ def main(argv=None) -> int:
         "schemaVersion": 1,
         "generatedAt": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "root": str(root),
+        "strictUi": strict_ui,
         "locales": RAW_LOCALES,
         "checks": checks,
         "summary": {

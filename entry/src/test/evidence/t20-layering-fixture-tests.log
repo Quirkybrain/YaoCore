@@ -1,0 +1,15 @@
+test_illegal_fixture_fails_with_every_rule_class (__main__.CheckLayeringFixtureTests.test_illegal_fixture_fails_with_every_rule_class) ... ok
+test_legal_fixture_passes (__main__.CheckLayeringFixtureTests.test_legal_fixture_passes) ... ok
+test_missing_main_root_is_exit_two (__main__.CheckLayeringFixtureTests.test_missing_main_root_is_exit_two) ... ok
+test_pending_d12_status_fails_and_is_counted (__main__.CheckLayeringFixtureTests.test_pending_d12_status_fails_and_is_counted) ... ok
+test_pending_port_status_fails_and_is_counted (__main__.CheckLayeringFixtureTests.test_pending_port_status_fails_and_is_counted) ... ok
+test_port_exception_legal_tree_passes_including_pure_seam (__main__.CheckLayeringFixtureTests.test_port_exception_legal_tree_passes_including_pure_seam) ... ok
+test_port_symbol_overflow_fails (__main__.CheckLayeringFixtureTests.test_port_symbol_overflow_fails) ... ok
+test_repository_tree_passes_with_versioned_exceptions (__main__.CheckLayeringFixtureTests.test_repository_tree_passes_with_versioned_exceptions) ... ok
+test_unregistered_port_paths_fail_d09_d11_and_d12_stays_strict (__main__.CheckLayeringFixtureTests.test_unregistered_port_paths_fail_d09_d11_and_d12_stays_strict) ... ok
+test_wildcard_port_path_is_rejected_as_input_error (__main__.CheckLayeringFixtureTests.test_wildcard_port_path_is_rejected_as_input_error) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.523s
+
+OK
