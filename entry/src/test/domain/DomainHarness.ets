@@ -5,13 +5,14 @@
  * Wires the DES-B v4 schema into the in-memory RDB fake with a shared O-1
  * DomainOperationGate. PUBLIC TEST DATA ONLY; no platform adapter is touched.
  */
-import { FixedClock, InMemoryPreferencesStore, InMemoryRdbStore, SequenceIds } from '../storage/FakeStores';
+import { FixedClock, InMemoryPreferencesStore, InMemoryRdbStore, InMemorySecretStore, SequenceIds, SyncRandom } from '../storage/FakeStores';
 import { MigrationRegistry } from '../../main/ets/service/storage/MigrationRegistry';
 import { DomainOperationGate } from '../../main/ets/repository/DomainOperationGate';
 import { FamilyRepository } from '../../main/ets/repository/FamilyRepository';
 import { RoomRepository } from '../../main/ets/repository/RoomRepository';
 import { DeviceRepository } from '../../main/ets/repository/DeviceRepository';
 import { SceneRepository } from '../../main/ets/repository/SceneRepository';
+import { AuthService } from '../../main/ets/service/auth/AuthService';
 import { FakeDeviceControlPort, FakeFamilyAuth, FakeInviteService, FakeLogger, FakeMetrics, FakeRoutePort, ManualSceneTimer } from './DomainFakes';
 
 const V1_PROBE: ReadonlyArray<string> = [
@@ -28,16 +29,11 @@ const V1_PROBE: ReadonlyArray<string> = [
     'PRIMARY KEY (gateway_id, device_id))'
 ];
 
-const V3_PROBE: ReadonlyArray<string> = [
-  'CREATE TABLE IF NOT EXISTS auth_profile (' +
-    'profile_id TEXT PRIMARY KEY NOT NULL, family_id TEXT NOT NULL, member_id TEXT NOT NULL, ' +
-    'display_name TEXT NOT NULL, hash_alias TEXT NOT NULL, salt_hex TEXT NOT NULL, ' +
-    'iterations INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)'
-];
-
 export class DomainHarness {
   readonly clock: FixedClock;
+  readonly random: SyncRandom;
   readonly preferences: InMemoryPreferencesStore;
+  readonly secrets: InMemorySecretStore;
   readonly rdb: InMemoryRdbStore;
   readonly ids: SequenceIds;
   readonly gate: DomainOperationGate;
@@ -57,7 +53,9 @@ export class DomainHarness {
 
   constructor(nowMs: number = Date.UTC(2026, 9, 17, 8, 0, 0)) {
     this.clock = new FixedClock(nowMs);
+    this.random = new SyncRandom();
     this.preferences = new InMemoryPreferencesStore();
+    this.secrets = new InMemorySecretStore();
     this.rdb = new InMemoryRdbStore();
     this.ids = new SequenceIds();
     this.gate = new DomainOperationGate();
@@ -71,7 +69,7 @@ export class DomainHarness {
     this.auth = new FakeFamilyAuth();
     this.registry.register(1, V1_PROBE);
     FamilyRepository.registerMigrations(this.registry);
-    this.registry.register(3, V3_PROBE);
+    AuthService.registerMigrations(this.registry);
     // All three v4 components expose the DES-B static registration; the
     // shared v4 registration is idempotent (wp-026 R-06).
     RoomRepository.registerMigrations(this.registry);

@@ -397,25 +397,40 @@ export class FamilyService {
     // row (wp-026 R-01). A failed import must leave no ACTIVE member behind.
     FamilyService.requireUsableInvitation(record, this.clock.nowMs());
     const verification = await this.invites.verifyReceipt(receiptText, inviteId);
-    if (!verification.valid || verification.memberId === undefined ||
-      (verification.inviteId !== undefined && verification.inviteId !== inviteId)) {
-      throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+    try {
+      if (!verification.valid || verification.memberId === undefined ||
+        (verification.inviteId !== undefined && verification.inviteId !== inviteId)) {
+        throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+      }
+      const memberId = verification.memberId;
+      const family = await this.requireFamily(record.familyId);
+      const expiresAt = record.targetRole === MemberRole.GUEST ? record.expireAt : undefined;
+      const member = new FamilyMember(memberId, record.familyId, memberId, memberId,
+        record.targetRole, MemberStatus.ACTIVE, DateTimeUtil.nowUtcCompact(this.clock),
+        record.allowedRoomIds, expiresAt, undefined,
+        record.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' : 'INVITE_CODE_KEK');
+      const acceptedAt = verification.acceptedAt === undefined ?
+        DateTimeUtil.nowUtcCompact(this.clock) : verification.acceptedAt;
+      // Single repository transaction: receipt validation, usedCount++, optional
+      // member activation. applyReceiptInTransaction re-checks under the tx.
+      await this.families.applyReceiptAndEnsureMember(inviteId, member,
+        new InvitationPatch(acceptedAt, memberId, receiptText));
+      return new AcceptedInvitation(record.familyId, record.familyName, memberId,
+        record.targetRole, record.allowedRoomIds, family.gatewayIds, receiptText);
+    } catch (error) {
+      // F-05: verifyReceipt already wrote the Asset-ledger entry, but the C-08
+      // RDB transaction is a separate store. Any failure after successful
+      // verification must release the reservation so the same legitimate
+      // receipt can be retried.
+      try {
+        await this.invites.releaseReceipt(receiptText, inviteId);
+      } catch (releaseError) {
+        const reason = releaseError instanceof AppError ? releaseError.code : 'UNKNOWN';
+        this.logger.warn('FamilyService', 'invite_receipt_ledger_release_failed',
+          [new NameValue('inviteId', inviteId), new NameValue('reason', reason)]);
+      }
+      throw error as Error;
     }
-    const memberId = verification.memberId;
-    const family = await this.requireFamily(record.familyId);
-    const expiresAt = record.targetRole === MemberRole.GUEST ? record.expireAt : undefined;
-    const member = new FamilyMember(memberId, record.familyId, memberId, memberId,
-      record.targetRole, MemberStatus.ACTIVE, DateTimeUtil.nowUtcCompact(this.clock),
-      record.allowedRoomIds, expiresAt, undefined,
-      record.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' : 'INVITE_CODE_KEK');
-    const acceptedAt = verification.acceptedAt === undefined ?
-      DateTimeUtil.nowUtcCompact(this.clock) : verification.acceptedAt;
-    // Single repository transaction: receipt validation, usedCount++, optional
-    // member activation. applyReceiptInTransaction re-checks under the tx.
-    await this.families.applyReceiptAndEnsureMember(inviteId, member,
-      new InvitationPatch(acceptedAt, memberId, receiptText));
-    return new AcceptedInvitation(record.familyId, record.familyName, memberId,
-      record.targetRole, record.allowedRoomIds, family.gatewayIds, receiptText);
   }
 
   async expireInvitations(familyId: string, nowMs: number,

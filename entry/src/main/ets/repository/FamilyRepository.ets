@@ -111,6 +111,9 @@ const V2_STATEMENTS: ReadonlyArray<string> = [
 ];
 
 export class FamilyRepository implements MemberRoomGrantPort {
+  /** DES-B `EXT-DES-B-25`: imported-family owner placeholder, not a member. */
+  static readonly IMPORTED_FAMILY_OWNER_PLACEHOLDER: string =
+    '00000000-0000-0000-0000-000000000000';
   private readonly rdb: RdbStore;
   private readonly preferences: PreferencesStore;
   private readonly clock: ClockPort;
@@ -227,6 +230,39 @@ export class FamilyRepository implements MemberRoomGrantPort {
         await FamilyRepository.insertMember(tx, member);
       });
       return family;
+    });
+  }
+
+  /**
+   * DES-B `EXT-DES-B-25` (F-02/T-13 ruling): create or ensure the local family
+   * row from an authenticated invitation. Uses the invitation's fixed
+   * familyId (never a newly generated UUID), is idempotent, and creates no
+   * FamilyMember/LocalProfile/ADMIN. The owner pointer is a local placeholder.
+   */
+  async importFamily(familyId: string, familyName: string): Promise<Family> {
+    this.ensureInitialized();
+    const checkedFamily = FamilyRepository.requireIdentifier(familyId, 'familyId');
+    const name = FamilyRepository.importedFamilyName(familyName);
+    return this.gate.run(async (): Promise<Family> => {
+      const existing = await this.readFamily(this.rdb, checkedFamily);
+      if (existing !== undefined) {
+        return existing;
+      }
+      const now = DateTimeUtil.nowUtcCompact(this.clock);
+      const created = new Family(checkedFamily, name,
+        FamilyRepository.IMPORTED_FAMILY_OWNER_PLACEHOLDER, now, now, []);
+      await this.rdb.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
+        const again = await this.readFamily(tx, checkedFamily);
+        if (again !== undefined) {
+          return;
+        }
+        await tx.execute('INSERT INTO family (' + FAMILY_COLUMNS + ') ' +
+          'VALUES (?, ?, ?, ?, ?, ?)',
+        [created.familyId, created.familyName, created.ownerMemberId,
+          SqlJson.stringArray(created.gatewayIds), created.createdAt, created.updatedAt]);
+      });
+      const stored = await this.readFamily(this.rdb, checkedFamily);
+      return stored === undefined ? created : stored;
     });
   }
 
@@ -1054,6 +1090,15 @@ export class FamilyRepository implements MemberRoomGrantPort {
   private static familyName(value: string): string {
     const trimmed = value.trim();
     if (trimmed.length < 1 || trimmed.length > 31) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'familyName');
+    }
+    return trimmed;
+  }
+
+  /** Invitation headers allow up to 63 characters; Family allows 63. */
+  private static importedFamilyName(value: string): string {
+    const trimmed = value.trim();
+    if (trimmed.length < 1 || trimmed.length > 63) {
       throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'familyName');
     }
     return trimmed;

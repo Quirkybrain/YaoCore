@@ -8,6 +8,7 @@
  * PASS: each suite remains BLOCKED_ON_DEVICE_RUNNER in this environment.
  */
 import baselineTest from './Baseline.test';
+import authInviteDeviceTest from './family/AuthInviteDevice.test';
 import bleProvisioningDeviceTest from './ble/BleProvisioningDevice.test';
 import foundationDeviceTest from './foundation/FoundationDevice.test';
 import gatewayTransportDeviceTest from './gateway/GatewayTransportDevice.test';
@@ -23,4 +24,5 @@ export default function testsuite() {
   i18nDeviceTest();
   gatewayTransportDeviceTest();
   bleProvisioningDeviceTest();
+  authInviteDeviceTest();
 }
