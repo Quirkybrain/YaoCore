@@ -221,6 +221,83 @@ test('T15_Device_cancelRacingEndCommitNeverPublishesCommitted', async () => {
   assert.equal(control.confirmedValue, undefined);
 });
 
+test('T15_Device_crossDeviceContinuousSessionsAreIndependent', async () => {
+  const clock = new FakeClock();
+  const timer = new FakeTimer(clock);
+  const lightA = record({ deviceId: 'dev-a', brightness: 10 });
+  const lightB = record({ deviceId: 'dev-b', brightness: 20 });
+  const devices = new FakeDeviceQuery([lightA, lightB]);
+  const control = new FakeControlCoordinator();
+  const vm = new DeviceViewModel(devices, new FakeRoomQuery([]), control, new FakeI18n(), clock,
+    timer, new FakeLogger());
+  await vm.initialize('family-1');
+  const keyA = lightA.state.key;
+  const keyB = lightB.state.key;
+
+  vm.beginContinuous(keyA, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.beginContinuous(keyB, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  // R2-02: starting B must not cancel/invalidate A's session.
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+
+  control.push(executionOf(record({ deviceId: 'dev-a', brightness: 60 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 60 }));
+  vm.updateContinuous(keyA, 60);
+  timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(control.calls.length, 1);
+  assert.equal(control.calls[0].command.target, 'dev-a');
+  assert.equal(control.calls[0].command.value, 60);
+  await vm.endContinuous(keyA, 60);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyA).confirmedValue, 60);
+  // B's session is still active after A commits.
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+
+  control.push(executionOf(record({ deviceId: 'dev-b', brightness: 75 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 75 }));
+  vm.updateContinuous(keyB, 75);
+  timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(control.calls.length, 2);
+  assert.equal(control.calls[1].command.target, 'dev-b');
+  assert.equal(control.calls[1].command.value, 75);
+  await vm.endContinuous(keyB, 75);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyB).confirmedValue, 75);
+});
+
+test('T15_Device_cancelOnOneDeviceKeepsAnotherSessionAlive', async () => {
+  const clock = new FakeClock();
+  const timer = new FakeTimer(clock);
+  const lightA = record({ deviceId: 'dev-a', brightness: 10 });
+  const lightB = record({ deviceId: 'dev-b', brightness: 20 });
+  const devices = new FakeDeviceQuery([lightA, lightB]);
+  const control = new FakeControlCoordinator();
+  const vm = new DeviceViewModel(devices, new FakeRoomQuery([]), control, new FakeI18n(), clock,
+    timer, new FakeLogger());
+  await vm.initialize('family-1');
+  const keyA = lightA.state.key;
+  const keyB = lightB.state.key;
+
+  vm.beginContinuous(keyA, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.beginContinuous(keyB, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.cancelContinuous(keyB);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.IDLE);
+
+  control.push(executionOf(record({ deviceId: 'dev-a', brightness: 40 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 40 }));
+  vm.updateContinuous(keyA, 40);
+  timer.advance(55);
+  await waitMicrotasks();
+  await vm.endContinuous(keyA, 40);
+  assert.equal(control.calls.length, 1);
+  assert.equal(control.calls[0].command.target, 'dev-a');
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyA).confirmedValue, 40);
+});
+
 test('T15_Device_roomFilterAndUnassignedPool', async () => {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);

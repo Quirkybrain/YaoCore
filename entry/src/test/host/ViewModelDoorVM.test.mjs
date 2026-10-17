@@ -14,8 +14,9 @@ import {
   DoorStage
 } from '../../main/ets/viewmodel/core/DoorConfirmationTracker.ets';
 import { DeviceChangeEvent, DeviceChangeEventType } from '../../main/ets/repository/DomainModels.ets';
-import { DeviceAction } from '../../main/ets/common/constants/DeviceConstants.ets';
+import { DeviceAction, DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets';
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
+import { ControlPolicy } from '../../main/ets/service/gateway/GatewayRequestPolicy.ets';
 import {
   FakeClock,
   FakeControlCoordinator,
@@ -64,6 +65,34 @@ test('T15_DoorView_lockWithGatewayMergedReachesSecuredAndCommitted', async () =>
   assert.equal(state.door.lockState, DoorLockState.SECURED);
   assert.equal(state.control.phase, 'COMMITTED');
   assert.equal(h.control.calls[0].command.action, DeviceAction.CLOSE);
+  // R2-01: the CLOSE command must carry the boolean expected by C-17.
+  assert.equal(h.control.calls[0].command.value, false);
+});
+
+test('T15_DoorView_lockCommandPassesRealControlPolicy', async () => {
+  const h = setup();
+  h.control.push(executionOf(record({ deviceId: 'door-1', deviceType: 'door',
+    openStatus: false }), DeviceAction.CLOSE, { value: false }));
+  await h.vm.load(h.key);
+  await h.vm.configureLink(new DoorLinkConfig(DoorLinkMode.GATEWAY_MERGED));
+  // R2-01: enforce the real C-17 policy on the command actually emitted by the
+  // VM, exactly as DeviceCommandRunner/LocalGatewayService do in production.
+  const delegate = h.control.execute.bind(h.control);
+  h.control.execute = async (command, familyId) => {
+    ControlPolicy.validate(DeviceType.DOOR, true, command.action, command.value);
+    return delegate(command, familyId);
+  };
+  await h.vm.lock();
+  assert.equal(h.control.calls.length, 1);
+  assert.equal(h.control.calls[0].command.action, DeviceAction.CLOSE);
+  assert.equal(h.control.calls[0].command.value, false);
+  assert.doesNotThrow(() => ControlPolicy.validate(DeviceType.DOOR, true,
+    DeviceAction.CLOSE, false));
+  assert.throws(() => ControlPolicy.validate(DeviceType.DOOR, true,
+    DeviceAction.CLOSE, true),
+  (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  assert.equal(h.vm.getState().door.stage, DoorStage.SECURED);
+  assert.equal(h.vm.getState().control.phase, 'COMMITTED');
 });
 
 test('T15_DoorView_contactSensorWaitsThenSecuresOnClosedOnlineContact', async () => {

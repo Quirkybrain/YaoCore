@@ -75,6 +75,31 @@ export class DeviceViewState {
   }
 }
 
+/**
+ * R2-02: one continuous-control session per device key. The token identifies
+ * this begin generation, so late results from an older session are ignored
+ * without invalidating sessions of other devices.
+ */
+class ContinuousSession {
+  readonly action: DeviceAction;
+  readonly min: number;
+  readonly max: number;
+  readonly token: number;
+  readonly gate: ThrottleGate;
+  lastOk: boolean = true;
+  lastExecution?: ControlExecution = undefined;
+  lastError?: ViewModelError = undefined;
+
+  constructor(action: DeviceAction, min: number, max: number,
+    token: number, gate: ThrottleGate) {
+    this.action = action;
+    this.min = min;
+    this.max = max;
+    this.token = token;
+    this.gate = gate;
+  }
+}
+
 export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
   private readonly devices: DeviceRepository;
   private readonly rooms: RoomService;
@@ -94,16 +119,16 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
   private revision: number = 0;
   private disposed: boolean = false;
 
-  private gate?: ThrottleGate = undefined;
-  private gateKey?: DeviceKey = undefined;
-  /** F-01: one generation per beginContinuous session; late results are dropped. */
-  private gateToken: number = 0;
-  private gateAction: DeviceAction = DeviceAction.PING;
-  private gateMin: number = 0;
-  private gateMax: number = 100;
-  private gateLastOk: boolean = true;
-  private gateLastExecution?: ControlExecution = undefined;
-  private gateLastError?: ViewModelError = undefined;
+  /**
+   * R2-02 / DES-B §10.3.2: different devices throttle independently. Each
+   * continuous-control session owns its gate, action range, and generation;
+   * beginning or cancelling one device never touches another device's session.
+   */
+  private sessions: Map<string, ContinuousSession> = new Map<string, ContinuousSession>();
+  /** F-01: globally unique session generation; late results are dropped. */
+  private gateGeneration: number = 0;
+  /** Last continuous action per key, used only by the defensive end fallback. */
+  private continuousActions: Map<string, DeviceAction> = new Map<string, DeviceAction>();
 
   constructor(devices: DeviceRepository, rooms: RoomService,
     control: DeviceControlCoordinatorPort, i18n: I18nService, clock: ClockPort,
@@ -198,40 +223,35 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
       return;
     }
     this.cancelContinuous(key);
-    this.gateKey = key;
-    this.gateAction = action;
-    this.gateMin = min;
-    this.gateMax = max;
-    this.gateLastOk = true;
-    this.gateLastExecution = undefined;
-    this.gateLastError = undefined;
-    // Arm the per-key settle token (the control-timeout generation) and capture
-    // the F-01 gate generation that owns this session's in-flight dispatches.
+    const id = key.globalId();
+    this.continuousActions.set(id, action);
+    // Arm the per-key settle token (the control-timeout generation).
     this.nextToken(key);
-    const token = this.gateToken;
-    const current = this.controls.get(key.globalId());
+    const current = this.controls.get(id);
     const start = current !== undefined && current.confirmedValue !== undefined ?
       DeviceViewModel.numeric(current.confirmedValue) : min;
+    const token = ++this.gateGeneration;
+    const gate = new ThrottleGate(this.timer, this.clock, THROTTLE_MS,
+      (value: number): Promise<void> => this.dispatchContinuous(key, token, value));
+    this.sessions.set(id, new ContinuousSession(action, min, max, token, gate));
     this.setControl(new ControlUiState(key, action, ControlPhase.PENDING, this.revision + 1,
       current === undefined ? undefined : current.confirmedValue, start, this.clock.nowMs(),
       current === undefined ? undefined : current.lastOutcome,
       current === undefined ? undefined : current.lastExecution,
       current === undefined ? undefined : current.lastError));
-    this.gate = new ThrottleGate(this.timer, this.clock, THROTTLE_MS,
-      (value: number): Promise<void> => this.dispatchContinuous(value, token));
     this.publishControls();
   }
 
   updateContinuous(key: DeviceKey, value: number): void {
-    if (this.gate === undefined || this.gateKey === undefined ||
-      !ViewModelSupport.isSameKey(this.gateKey, key)) {
+    const session = this.sessions.get(key.globalId());
+    if (session === undefined) {
       return;
     }
-    const clamped = DeviceViewModel.clamp(value, this.gateMin, this.gateMax);
-    this.gate.onInput(clamped);
+    const clamped = DeviceViewModel.clamp(value, session.min, session.max);
+    session.gate.onInput(clamped);
     const current = this.controls.get(key.globalId());
     if (current !== undefined) {
-      this.setControl(new ControlUiState(key, this.gateAction, ControlPhase.PENDING,
+      this.setControl(new ControlUiState(key, session.action, ControlPhase.PENDING,
         this.revision + 1, current.confirmedValue, clamped, current.pendingSinceMs,
         current.lastOutcome, current.lastExecution, current.lastError));
       this.publishControls();
@@ -239,29 +259,27 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
   }
 
   async endContinuous(key: DeviceKey, value: number): Promise<void> {
-    if (this.gate === undefined || this.gateKey === undefined ||
-      !ViewModelSupport.isSameKey(this.gateKey, key)) {
-      const action = this.gateAction === DeviceAction.PING ?
-        DeviceAction.SET_TARGET_TEMPERATURE : this.gateAction;
+    const id = key.globalId();
+    const session = this.sessions.get(id);
+    if (session === undefined) {
+      const remembered = this.continuousActions.get(id);
+      const action = remembered === undefined ? DeviceAction.SET_TARGET_TEMPERATURE : remembered;
       await this.runSingle(key, action, value);
       return;
     }
-    const gate = this.gate;
-    const sessionToken = this.gateToken;
-    const action = this.gateAction;
-    const clamped = DeviceViewModel.clamp(value, this.gateMin, this.gateMax);
+    const gate = session.gate;
+    const action = session.action;
+    const clamped = DeviceViewModel.clamp(value, session.min, session.max);
     await gate.onCommit(clamped);
     // F-01: a concurrent cancel/dispose/new session invalidates this commit.
-    // Only the session that still owns the gate may publish COMMITTED/REVERT.
-    if (this.disposed || this.gate !== gate || this.gateToken !== sessionToken) {
+    // Only the session that still owns the key may publish COMMITTED/REVERT.
+    if (this.disposed || this.sessions.get(id) !== session) {
       return;
     }
-    const failed = !this.gateLastOk;
-    const execution = this.gateLastExecution;
-    const error = this.gateLastError;
-    this.gate = undefined;
-    this.gateKey = undefined;
-    this.gateToken++;
+    const failed = !session.lastOk;
+    const execution = session.lastExecution;
+    const error = session.lastError;
+    this.sessions.delete(id);
     if (failed) {
       this.applyRevert(key, action, error === undefined ?
         ViewModelSupport.viewError(AppErrors.of('GATEWAY_TIMEOUT', []), this.clock) : error);
@@ -278,14 +296,13 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
   }
 
   cancelContinuous(key: DeviceKey): void {
-    if (this.gate !== undefined) {
-      this.gate.dispose();
+    const id = key.globalId();
+    const session = this.sessions.get(id);
+    if (session !== undefined) {
+      session.gate.dispose();
+      this.sessions.delete(id);
     }
-    this.gate = undefined;
-    this.gateKey = undefined;
-    // F-01: invalidate every in-flight dispatch of the cancelled session.
-    this.gateToken++;
-    const current = this.controls.get(key.globalId());
+    const current = this.controls.get(id);
     if (current === undefined) {
       return;
     }
@@ -317,11 +334,10 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
 
   dispose(): void {
     this.disposed = true;
-    this.gateToken++;
-    if (this.gate !== undefined) {
-      this.gate.dispose();
-      this.gate = undefined;
-    }
+    this.sessions.forEach((session: ContinuousSession): void => {
+      session.gate.dispose();
+    });
+    this.sessions.clear();
     this.revertTimers.forEach((timerId: number): void => {
       this.timer.clearTimer(timerId);
     });
@@ -380,38 +396,37 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
     this.applyRevert(key, action, this.errorOf(execution));
   }
 
-  private async dispatchContinuous(value: number, token: number): Promise<void> {
-    if (!this.isGateCurrent(token)) {
+  private async dispatchContinuous(key: DeviceKey, token: number, value: number): Promise<void> {
+    const session = this.currentSession(key, token);
+    if (session === undefined) {
       return;
     }
-    const gate = this.gate as ThrottleGate;
-    const key = this.gateKey as DeviceKey;
-    const action = this.gateAction;
     const record = this.recordFor(key);
     if (record === undefined) {
-      if (this.isGateCurrent(token)) {
-        this.gateLastOk = false;
-        this.gateLastError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
+      if (this.currentSession(key, token) !== undefined) {
+        session.lastOk = false;
+        session.lastError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
           this.clock);
       }
       return;
     }
     try {
-      const command = new DeviceControlCommand(key.gatewayId, key.deviceId, action,
+      const command = new DeviceControlCommand(key.gatewayId, key.deviceId, session.action,
         this.clock.nowMs(), value);
       const execution = await this.control.execute(command, record.state.familyId);
-      // F-01: cancel/dispose/new begin increments the generation. A late
-      // result must not resurrect PENDING or mutate the new session.
-      if (this.disposed || this.gate !== gate || this.gateToken !== token) {
+      // F-01: cancel/dispose/new begin removes or replaces this key's session.
+      // A late result must not resurrect PENDING or mutate a newer session,
+      // while sessions of other devices remain independent (R2-02).
+      if (this.disposed || this.sessions.get(key.globalId()) !== session) {
         return;
       }
-      this.gateLastExecution = execution;
-      this.gateLastOk = DeviceControlCoordinator.succeeded(execution);
-      this.gateLastError = this.gateLastOk ? undefined : this.errorOf(execution);
-      if (this.gateLastOk) {
+      session.lastExecution = execution;
+      session.lastOk = DeviceControlCoordinator.succeeded(execution);
+      session.lastError = session.lastOk ? undefined : this.errorOf(execution);
+      if (session.lastOk) {
         const current = this.controls.get(key.globalId());
         if (current !== undefined) {
-          this.setControl(new ControlUiState(key, action, ControlPhase.PENDING,
+          this.setControl(new ControlUiState(key, session.action, ControlPhase.PENDING,
             this.revision + 1, current.confirmedValue, value, current.pendingSinceMs,
             execution.lan === undefined ? undefined : execution.lan.outcome, execution,
             undefined));
@@ -419,17 +434,17 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
         }
       }
     } catch (error) {
-      if (this.disposed || this.gate !== gate || this.gateToken !== token) {
+      if (this.disposed || this.sessions.get(key.globalId()) !== session) {
         return;
       }
-      this.gateLastOk = false;
-      this.gateLastError = ViewModelSupport.viewError(error as Object, this.clock);
+      session.lastOk = false;
+      session.lastError = ViewModelSupport.viewError(error as Object, this.clock);
     }
   }
 
-  private isGateCurrent(token: number): boolean {
-    return !this.disposed && this.gate !== undefined && this.gateKey !== undefined &&
-      this.gateToken === token;
+  private currentSession(key: DeviceKey, token: number): ContinuousSession | undefined {
+    const session = this.sessions.get(key.globalId());
+    return session !== undefined && session.token === token ? session : undefined;
   }
 
   private applyRevert(key: DeviceKey, action: DeviceAction, error: ViewModelError): void {

@@ -128,7 +128,9 @@ export class DoorViewModel implements ViewModelBase<DoorViewState> {
   }
 
   async lock(): Promise<void> {
-    await this.applyLock(DeviceAction.CLOSE, true);
+    // R2-01 / DES-B §10.1.7: CLOSE carries boolean `false`; C-17
+    // ControlPolicy rejects CLOSE=true with PROTOCOL_VALUE_OUT_OF_RANGE.
+    await this.applyLock(DeviceAction.CLOSE, false);
   }
 
   async unlock(): Promise<void> {
