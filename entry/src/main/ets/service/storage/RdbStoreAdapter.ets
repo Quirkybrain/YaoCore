@@ -6,18 +6,37 @@
  * The ONLY storage file importing @ohos.data.relationalStore (through
  * ArkData). Transactions are serialized per store; the same connection object
  * is handed to the callback so platform PRAGMA user_version updates join the
- * transaction. Failures map to STORAGE_RDB_ERROR with only a numeric platform
- * code retained.
+ * transaction. The begin/commit/rollback state machine lives in the
+ * platform-neutral RdbTransactionRunner, so host tests can prove that a failed
+ * beginTransaction() resets state and maps to STORAGE_RDB_ERROR (wp-022 R-02).
+ * Failures map to STORAGE_RDB_ERROR with only a numeric platform code retained.
  */
 import { relationalStore } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
-import { AppError, AppErrors } from '../../common/types/AppError';
-import { NameValue } from '../../common/types/NameValue';
+import { AppErrors } from '../../common/types/AppError';
 import { StorageConstants } from '../../common/constants/StorageConstants';
 import type { RdbRow, RdbStore, RdbTransaction, RdbValue } from './RdbStore';
+import type { RdbTransactionDriver } from './RdbTransactionRunner';
+import { RdbTransactionRunner, mapRdbError } from './RdbTransactionRunner';
 
-interface PlatformErrorLike {
-  code?: number;
+class PlatformTransactionDriver implements RdbTransactionDriver {
+  private readonly store: relationalStore.RdbStore;
+
+  constructor(store: relationalStore.RdbStore) {
+    this.store = store;
+  }
+
+  begin(): void {
+    this.store.beginTransaction();
+  }
+
+  commit(): void {
+    this.store.commit();
+  }
+
+  rollBack(): void {
+    this.store.rollBack();
+  }
 }
 
 export class RdbStoreAdapter implements RdbStore {
@@ -25,8 +44,7 @@ export class RdbStoreAdapter implements RdbStore {
   private readonly name: string;
   private store: relationalStore.RdbStore | undefined = undefined;
   private opening: Promise<relationalStore.RdbStore> | undefined = undefined;
-  private transactionChain: Promise<void> = Promise.resolve();
-  private inTransaction: boolean = false;
+  private readonly transactions: RdbTransactionRunner = new RdbTransactionRunner();
 
   constructor(context: common.Context, name: string = StorageConstants.RDB_NAME) {
     this.context = context;
@@ -38,7 +56,7 @@ export class RdbStoreAdapter implements RdbStore {
       const store = await this.open();
       await store.executeSql(sql, RdbStoreAdapter.bindArgs(args));
     } catch (error) {
-      throw RdbStoreAdapter.mapError(error as Error);
+      throw mapRdbError(error as Error);
     }
   }
 
@@ -57,18 +75,13 @@ export class RdbStoreAdapter implements RdbStore {
       }
       return rows;
     } catch (error) {
-      throw RdbStoreAdapter.mapError(error as Error);
+      throw mapRdbError(error as Error);
     }
   }
 
   async transaction<T>(fn: (tx: RdbTransaction) => Promise<T>): Promise<T> {
-    const run: Promise<T> = this.transactionChain.then((): Promise<T> => {
-      return this.runTransaction(fn);
-    });
-    this.transactionChain = run.then((): void => {
-    }, (): void => {
-    });
-    return run;
+    return this.transactions.transaction(
+      (): Promise<RdbTransactionDriver> => this.openDriver(), this, fn);
   }
 
   async getVersion(): Promise<number> {
@@ -76,7 +89,7 @@ export class RdbStoreAdapter implements RdbStore {
       const store = await this.open();
       return store.version;
     } catch (error) {
-      throw RdbStoreAdapter.mapError(error as Error);
+      throw mapRdbError(error as Error);
     }
   }
 
@@ -88,7 +101,7 @@ export class RdbStoreAdapter implements RdbStore {
       const store = await this.open();
       store.version = version;
     } catch (error) {
-      throw RdbStoreAdapter.mapError(error as Error);
+      throw mapRdbError(error as Error);
     }
   }
 
@@ -97,34 +110,16 @@ export class RdbStoreAdapter implements RdbStore {
       try {
         await this.store.close();
       } catch (error) {
-        throw RdbStoreAdapter.mapError(error as Error);
+        throw mapRdbError(error as Error);
       }
     }
     this.store = undefined;
     this.opening = undefined;
   }
 
-  private async runTransaction<T>(fn: (tx: RdbTransaction) => Promise<T>): Promise<T> {
-    if (this.inTransaction) {
-      throw AppErrors.of('STORAGE_RDB_ERROR', []);
-    }
+  private async openDriver(): Promise<RdbTransactionDriver> {
     const store = await this.open();
-    this.inTransaction = true;
-    store.beginTransaction();
-    try {
-      const result = await fn(this);
-      store.commit();
-      return result;
-    } catch (error) {
-      try {
-        store.rollBack();
-      } catch (rollbackError) {
-        // Keep the original failure; the platform rollback is best effort.
-      }
-      throw RdbStoreAdapter.mapError(error as Error);
-    } finally {
-      this.inTransaction = false;
-    }
+    return new PlatformTransactionDriver(store);
   }
 
   private open(): Promise<relationalStore.RdbStore> {
@@ -143,7 +138,7 @@ export class RdbStoreAdapter implements RdbStore {
         })
         .catch((error: Error): never => {
           this.opening = undefined;
-          throw RdbStoreAdapter.mapError(error);
+          throw mapRdbError(error);
         });
     }
     return this.opening;
@@ -188,17 +183,5 @@ export class RdbStoreAdapter implements RdbStore {
       return resultSet.getBlob(index);
     }
     return resultSet.getString(index);
-  }
-
-  private static mapError(error: Error): AppError {
-    if (error instanceof AppError) {
-      return error;
-    }
-    const candidate = error as PlatformErrorLike;
-    if (typeof candidate.code === 'number') {
-      return AppErrors.of('STORAGE_RDB_ERROR',
-        [new NameValue('platformCode', String(candidate.code))]);
-    }
-    return AppErrors.of('STORAGE_RDB_ERROR', []);
   }
 }

@@ -8,9 +8,13 @@
  * ArkTS compile graph by the host suite); it must never be reported as PASS
  * from the Node host runner.
  *
- * The suite exercises real Preferences/RDB/Asset Store persistence once a
- * device runner exists, including restart persistence and lock-screen access
- * semantics (ASSET_ACCESS_DENIED).
+ * The suite is registered in `entry/src/ohosTest/ets/test/List.test.ets`
+ * (wp-022 R-03) but remains BLOCKED_ON_DEVICE_RUNNER. It exercises real
+ * Preferences/RDB/Asset Store persistence once a device runner exists,
+ * including restart persistence, transaction-internal version rollback, and
+ * lock-screen access semantics (ASSET_ACCESS_DENIED). The lock-screen case
+ * requires the runner to establish a locked-device precondition; it is not
+ * claimed as executed in this environment.
  *
  * PUBLIC TEST DATA ONLY.
  */
@@ -21,11 +25,13 @@ import { RdbStoreAdapter } from '../../../../main/ets/service/storage/RdbStoreAd
 import { AssetStoreSecretStore } from '../../../../main/ets/service/storage/AssetStoreSecretStore';
 import { SecretAlias } from '../../../../main/ets/service/storage/SecretStore';
 import { RdbTransaction } from '../../../../main/ets/service/storage/RdbStore';
+import { AppError } from '../../../../main/ets/common/types/AppError';
 import { SecureBytes } from '../../../../main/ets/common/types/SecureBytes';
 
 const PREF_NAME: string = 'yaocore_t08_device_prefs';
 const RDB_NAME: string = 'yaocore_t08_device.db';
 const SECRET_ALIAS: string = 'yaocore.t08.device.secret';
+const LOCK_ALIAS: string = 'yaocore.t08.device.lockprobe';
 const SECRET_HEX: string = '00112233445566778899aabbccddeeff';
 
 export default function storageDeviceTest() {
@@ -72,6 +78,32 @@ export default function storageDeviceTest() {
       await store.close();
     });
 
+    it('C06_RdbAdapter_setVersionInsideTransactionRollsBack', 0, async () => {
+      const context = abilityDelegatorRegistry.getAbilityDelegator().getAppContext();
+      const store = new RdbStoreAdapter(context, RDB_NAME);
+      await store.execute('CREATE TABLE IF NOT EXISTS t08_version_probe (' +
+        'id TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)');
+      const before = await store.getVersion();
+      let failed = false;
+      try {
+        await store.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
+          await tx.execute('INSERT OR REPLACE INTO t08_version_probe (id, value) VALUES (?, ?)',
+            ['v', 'pending']);
+          // R-T08-03 / R-03: prove store.version joins the transaction and is
+          // rolled back with the table write when the callback fails.
+          await store.setVersion(before + 1);
+          throw new Error('version rollback probe');
+        });
+      } catch (error) {
+        failed = true;
+      }
+      expect(failed).assertTrue();
+      expect(await store.getVersion()).assertEqual(before);
+      const rows = await store.query('SELECT id FROM t08_version_probe WHERE id = ?', ['v']);
+      expect(rows.length).assertEqual(0);
+      await store.close();
+    });
+
     it('C06_AssetStoreSecretStore_addQueryRemoveAndList', 0, async () => {
       const store = new AssetStoreSecretStore();
       await store.initialize();
@@ -97,6 +129,31 @@ export default function storageDeviceTest() {
       }
       expect(missing).assertTrue();
       expect(SecretAlias.PATTERN.test(SECRET_ALIAS)).assertTrue();
+    });
+
+    it('C06_AssetStore_lockScreenPreconditionMapsDenialToAccessDenied', 0, async () => {
+      // Device skeleton for R-T08-04 / R-03. The runner must establish a
+      // locked-device precondition before this case; when unlocked, access is
+      // expected to succeed and only the success branch is exercised. Any
+      // failure must be ASSET_ACCESS_DENIED (never a generic error or a
+      // plaintext fallback).
+      const store = new AssetStoreSecretStore();
+      let failureCode = '';
+      try {
+        await store.initialize();
+        const secret = SecureBytes.fromHex(SECRET_HEX);
+        await store.put(LOCK_ALIAS, secret);
+        secret.destroy();
+        await store.withSecret(LOCK_ALIAS, async (): Promise<number> => 1);
+      } catch (error) {
+        failureCode = (error as AppError).code;
+      }
+      try {
+        await store.remove(LOCK_ALIAS);
+      } catch (error) {
+        // Cleanup is best effort: a locked device may deny it as well.
+      }
+      expect(failureCode === '' || failureCode === 'ASSET_ACCESS_DENIED').assertTrue();
     });
   });
 }

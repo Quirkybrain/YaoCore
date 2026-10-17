@@ -49,6 +49,11 @@ const SELECT_ROUTES: string = 'SELECT ' + ROUTE_COLUMNS + ' FROM gw_route';
 const INSERT_ROUTE: string = 'INSERT OR REPLACE INTO gw_route (' + ROUTE_COLUMNS + ') ' +
   'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
+// SC-04 / ADR-002 §8.2 / DES-A §22.2: the per-gateway command secret is at
+// least 16 bytes. The upper bound matches rotateSecret (16..4096).
+const MIN_COMMAND_SECRET_BYTES: number = 16;
+const MAX_COMMAND_SECRET_BYTES: number = 4096;
+
 class RouteCells {
   readonly gatewayId: string;
   readonly familyId: string;
@@ -185,12 +190,7 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
       }
       await this.probeSecret(existing.credentialAlias);
       const route = await this.writeRoute(this.buildRoute(result, familyId, existing));
-      await this.markSeen(gatewayId, this.clock.nowMs());
-      const stored = await this.readRoute(gatewayId);
-      if (stored === undefined) {
-        throw AppErrors.of('STORAGE_RDB_ERROR', []);
-      }
-      return stored;
+      return await this.completeCommit(gatewayId, route);
     }
 
     let draft: SecureBytes;
@@ -202,6 +202,14 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
         throw AppErrors.of('PROVISIONING_SECRET_DRAFT_EXPIRED', []);
       }
       GatewayRepository.rethrow(error as Error);
+    }
+
+    // SC-04 Must / ADR-002 §8.2 / DES-A §22.2: never persist a command secret
+    // shorter than 16 bytes (or absurdly large) even if a draft was issued.
+    // The draft is single-use, so destroy it before rejecting.
+    if (draft.length < MIN_COMMAND_SECRET_BYTES || draft.length > MAX_COMMAND_SECRET_BYTES) {
+      draft.destroy();
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'secret')]);
     }
 
     const route = this.buildRoute(result, familyId, existing);
@@ -221,12 +229,7 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
         throw AppErrors.of('STORAGE_RDB_ERROR', []);
       }
       this.secretDrafts.destroy(draftId);
-      await this.markSeen(gatewayId, this.clock.nowMs());
-      const stored = await this.readRoute(gatewayId);
-      if (stored === undefined) {
-        throw AppErrors.of('STORAGE_RDB_ERROR', []);
-      }
-      return stored;
+      return await this.completeCommit(gatewayId, route);
     } finally {
       draft.destroy();
       if (oldSecret !== undefined) {
@@ -311,6 +314,19 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
 
   // ---- Profile and pin rotation ------------------------------------------
 
+  /**
+   * Persists the channel profile (DES-A §10.4). P-BLOCKED is runtime-only and
+   * is rejected here.
+   *
+   * P-TLS-PIN -> P-HMAC is legal only for an explicit user rebind where the
+   * gateway no longer advertises TLS (DES-A §10.4; ADR-002 §6.2-4). A runtime
+   * TLS verification failure must NEVER call this method: C-17 keeps the
+   * persisted profile P-TLS-PIN and selects runtime P-BLOCKED, sending no
+   * control traffic (SC-09; no cleartext fallback, ADR-002 §6.2-3). This
+   * repository cannot distinguish a user rebind from a failure callback, so
+   * enforcement is owned by the C-17 call site; no downgrade guard parameter
+   * is added here to keep the frozen §10.1 signature.
+   */
   async setPersistentProfile(gatewayId: string, profile: TransportProfile): Promise<void> {
     this.ensureInitialized();
     const checked = GatewayRepository.requireGatewayId(gatewayId);
@@ -385,7 +401,8 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
     verifier: SecretVerifier): Promise<void> {
     this.ensureInitialized();
     const checked = GatewayRepository.requireGatewayId(gatewayId);
-    if (newSecret.length < 16 || newSecret.length > 4096) {
+    if (newSecret.length < MIN_COMMAND_SECRET_BYTES ||
+      newSecret.length > MAX_COMMAND_SECRET_BYTES) {
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'secret')]);
     }
     const route = await this.readRoute(checked);
@@ -557,6 +574,27 @@ export class GatewayRepository implements GatewayRoutePort, GatewayCredentialPor
     init.createdAt = existing === undefined ? now : existing.createdAt;
     init.updatedAt = now;
     return GatewayRoute.create(init);
+  }
+
+  /**
+   * Post-commit completion for commitBinding (DES-A §10.3 step 9). When this
+   * runs, the route and secret are already durable; reporting a binding failure
+   * from here would be false. `markSeen` is therefore best effort: if it fails,
+   * `last_seen_at` simply lags until the next successful markSeen. If the
+   * read-back fails, return the committed snapshot instead of throwing.
+   */
+  private async completeCommit(gatewayId: string, route: GatewayRoute): Promise<GatewayRoute> {
+    try {
+      await this.markSeen(gatewayId, this.clock.nowMs());
+    } catch (error) {
+      // Intentionally swallowed: the binding is already committed (R-05).
+    }
+    try {
+      const stored = await this.readRoute(gatewayId);
+      return stored === undefined ? route : stored;
+    } catch (error) {
+      return route;
+    }
   }
 
   private async writeRoute(route: GatewayRoute): Promise<GatewayRoute> {

@@ -15,6 +15,7 @@
   - `artifacts/60-testing/test-plan.md` §4/§5/§10；D-019 host/device 分层
 - **Downstream**: T-09（FamilyRepository 复用 `MigrationSink`/RDB）、T-11（`GatewayRepository`/`tlsMaterial`）、T-12（`SecretDraftStore`）、T-13、CQG-T08、T-20、Stage Gate
 - **组件状态**: C-06 `UNVERIFIED`、C-07 `UNVERIFIED`（本报告不授予 `STABLE`）
+- **评审修复**: `wp-022-fix-t08`（R-01..R-07）见 `artifacts/50-implementation/t08-fix-report.md`；本文件的文件计数、测试数与设备覆盖措辞已按评审同步更正
 
 ---
 
@@ -22,10 +23,10 @@
 
 | 项 | 结果 | 证据 |
 |---|---|---|
-| C-06 存储服务（Preferences/RDB/Asset 端口 + 适配器 + v1 迁移 + draft store） | **实现完成** | `service/storage/` 12 文件 |
+| C-06 存储服务（Preferences/RDB/Asset 端口 + 适配器 + v1 迁移 + draft store） | **实现完成** | `service/storage/` 11 文件（初版；wp-022 新增 `RdbTransactionRunner.ets` 后 12） |
 | C-07 GatewayRepository（route CRUD/profile/pin/commitBinding/rotate/sequence） | **实现完成** | `repository/` 2 文件 |
 | 平台适配器（Preferences/RDB/AssetStore） | **COMPILED_ONLY** | 单文件隔离；无设备运行 |
-| Node host 测试 | **PASS 161/161**（新增 39：C-06 14 + C-07 25） | `entry/src/test/evidence/t08-host-node-tests.tap` |
+| Node host 测试 | **PASS 161/161**（初版新增 39：C-06 14 + C-07 25）；wp-022 修复后 **166/166**（C-06 15 + C-07 29，见 `t08-fix-report.md`） | `entry/src/test/evidence/t08-host-node-tests.tap` / `t08-fix-host-node-tests.tap` |
 | `ohpm install` | **PASS**（exit 0） | `evidence/t08-ohpm-install.log` |
 | `hvigorw clean assembleHap --no-daemon` | **PASS**（BUILD SUCCESSFUL，35 tasks） | `evidence/t08-clean-assemble.log` |
 | `codelinter -c code-linter.json5 -p default .` | **PASS**（No defects found） | `evidence/t08-codelinter.log` |
@@ -39,7 +40,10 @@
 
 ## 1. 实现范围与文件清单
 
-### 1.1 C-06（`entry/src/main/ets/service/storage/`，12 文件）
+### 1.1 C-06（`entry/src/main/ets/service/storage/`，初版 11 文件）
+
+> 评审更正（R-06）：本报告初版两处误写 12 文件；`66b6e1d` 实际为 11 文件。wp-022
+> 修复新增平台无关的 `RdbTransactionRunner.ets`（R-02），修复 revision 为 12 文件。
 
 ```text
 PreferencesStore.ets       # PreferencesStore 端口
@@ -75,7 +79,7 @@ GatewayRepository.ets  # 实现全部端口
 要点：
 
 - **route CRUD**：`listRoutes`/`listRoutesByFamily`/`getRoute`/`isBound`；`GatewayRoute.create` 继续承担 profile/pin/port/timestamp/alias 不变量，不重复实现。
-- **commitBinding**：校验参数与 `draftId === result.credentialDraftId`；家庭归属变更 → `CONFIGURATION_ERROR`（禁止静默迁移）；v2.0/无 TLS → `P-HMAC`，v2.1+TLS → `P-TLS-PIN`；secret → route 顺序写入；route 失败时恢复旧 secret，旧值恢复也失败则删除 alias（**fail-closed**，避免 route 指向未验证 secret）；draft 一次性消费（重放 → `PROVISIONING_SECRET_DRAFT_EXPIRED`）；成功后 `markSeen`。
+- **commitBinding**：校验参数与 `draftId === result.credentialDraftId`；家庭归属变更 → `CONFIGURATION_ERROR`（禁止静默迁移）；draft 命令密钥强制 16..4096B（SC-04，wp-022 R-01）；v2.0/无 TLS → `P-HMAC`，v2.1+TLS → `P-TLS-PIN`；secret → route 顺序写入；route 失败时恢复旧 secret，旧值恢复也失败则删除 alias（**fail-closed**，避免 route 指向未验证 secret）；draft 一次性消费（重放 → `PROVISIONING_SECRET_DRAFT_EXPIRED`）；成功后 `markSeen` 为 post-commit best effort（wp-022 R-05）。
 - **applyInvitedGateway**：同一补偿语义；同 `gatewayId` 重复应用幂等，保留 `createdAt`；家庭变更拒绝。
 - **setPersistentProfile**：只允许 `P-HMAC`/`P-TLS-PIN`；`P-BLOCKED` → `GATEWAY_PROFILE_BLOCKED` 且不落盘；`P-HMAC` 清空 pins/tls。
 - **pinVerified**：格式/成员校验失败 `TLS_PIN_CONFIG_INVALID`；多 pin 首次匹配成功后收缩为单 pin（ADR-002 §4.4）；单 pin 匹配 no-op；非 TLS route → `TLS_PROFILE_INCONSISTENT`。
@@ -183,7 +187,11 @@ GatewayRepository.ets  # 实现全部端口
 - RDB 建表、插入/查询、事务回滚、user_version；
 - Asset Store `put/withSecret/list/remove`。
 
-该文件经 `entry/src/test/storage/StorageHost.test.ets` 的 `import` 拉入 `hvigorw test` 的 ArkTS 编译图（`UnitTestArkTS` 成功），但**未在设备上执行**。`onDeviceTest` 在无设备/无签名环境为 `UNAVAILABLE`，不得写成 PASS。
+初版该套件**未注册**进 `entry/src/ohosTest/ets/test/List.test.ets`；wp-022（R-03）已注册，并补充了
+“事务内 `setVersion` + 后续语句失败 → 版本和表回滚”与“锁屏前置条件下 `ASSET_ACCESS_DENIED`”
+设备骨架断言。锁屏分支需要 runner 先建立锁屏前置条件，当前环境无法执行，**不是 PASS**。
+
+该文件经 `entry/src/test/storage/StorageHost.test.ets` 的 `import` 拉入 `hvigorw test` 的 ArkTS 编译图（`UnitTestArkTS` 成功），但**未在设备上执行**。`onDeviceTest` 在无设备/无签名环境为 `UNAVAILABLE`，不得写成 PASS；真实 RDB/Asset 行为仍为 `COMPILED_ONLY`/`BLOCKED`。
 
 ---
 
@@ -197,6 +205,8 @@ CQG-T08
   log: entry/src/test/evidence/t08-codelinter.log (No defects found)
 - host tests: entry/src/test/run-host-tests.sh -> PASS (161/161; new 39)
   log: entry/src/test/evidence/t08-host-node-tests.tap
+- host tests (wp-022 fix): entry/src/test/run-host-tests.sh -> PASS (166/166; new 44)
+  log: entry/src/test/evidence/t08-fix-host-node-tests.tap
 - test HAP compile: hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon -> PASS
   log: entry/src/test/evidence/t08-ohosTest-assemble.log
 - Hypium host compile: hvigorw test --no-daemon -> COMPILED_ONLY (UnitTestArkTS OK; Previewer BLOCKED, exit 124)
@@ -214,7 +224,8 @@ CQG-T08
 | `ohpm install` | 0 | `entry/src/test/evidence/t08-ohpm-install.log` |
 | `hvigorw clean assembleHap --no-daemon` | 0 | `entry/src/test/evidence/t08-clean-assemble.log` |
 | `codelinter -c code-linter.json5 -p default .` | 0 | `entry/src/test/evidence/t08-codelinter.log` |
-| `entry/src/test/run-host-tests.sh` | 0 | `entry/src/test/evidence/t08-host-node-tests.tap` |
+| `entry/src/test/run-host-tests.sh` | 0 | `entry/src/test/evidence/t08-host-node-tests.tap`（初版 161/161） |
+| `entry/src/test/run-host-tests.sh`（wp-022 修复） | 0 | `entry/src/test/evidence/t08-fix-host-node-tests.tap`（166/166） |
 | `hvigorw test --no-daemon`（附加） | 124（Previewer） | `entry/src/test/evidence/t08-hvigor-test-compile.log` |
 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon`（附加） | 0 | `entry/src/test/evidence/t08-ohosTest-assemble.log` |
 
@@ -231,15 +242,17 @@ CQG-T08
 5. **`StorageService.close()`**：端口无 `close`，服务只清逻辑状态；平台句柄由组合根调用适配器的 `close()`。这是契约签名限制，不是漏实现。
 6. **`removeLocalBinding` 删除顺序**：先删 secret、再事务删 route/sequence。若 RDB 删除失败，route 仍存在但 secret 已无（控制 fail-closed）；再次调用可完成，因为 secret 删除容忍 `ASSET_NOT_FOUND`。跨 Asset/RDB 无法共用事务，属 DES-A §10.3 已承认的补偿边界。
 7. **`nextSequence` 上限**：仓库无法观察 C-17 的“在途命令”，到达 `MAX_SEQ` 时保守返回 `CONFIGURATION_ERROR`；显式空闲重置由 `resetSequenceIfIdle` 提供，是否调用由 C-17 决定。
+8. **`commitBinding` post-commit 语义（wp-022 R-05）**：route + secret 成功落盘后，`markSeen`/回读失败不再把绑定报告为失败；`last_seen_at` 为 best effort，回读失败时返回已提交的 route 快照。评审修复报告补充半成功用例。
+9. **`setPersistentProfile` 降级边界（wp-022 R-07）**：P-TLS-PIN → P-HMAC 仅允许显式重配网（网关不再宣告 TLS）；TLS 运行期校验失败必须由 C-17 走 P-BLOCKED，**不得调用**该方法。仓库层未增加降级守卫参数，以保持 §10.1 冻结签名；约束记录在方法注释与修复报告中。
 
 ### 5.2 设备侧未验证 / 风险
 
 | ID | 内容 | 影响 | 处置 |
 |---|---|---|---|
-| R-T08-01 | Asset Store `ALIAS` 在本 SDK 的 `asset.Value` 类型中按 BYTES 处理，适配器使用 UTF-8 `Uint8Array` 写入/读回 | 若平台实际要求 string alias，设备运行会失败 | `StorageDevice.test.ets` 已覆盖 put/query/list；设备环境必须复核；不得回退明文 |
-| R-T08-02 | `AssetStoreSecretStore.list()` 使用 `RETURN_TYPE=ATTRIBUTES` + 分页查询全部资产 | 平台是否允许无 alias 的全量 query 未在设备验证 | 设备用例覆盖；若不允许，改为按已知别名集合查询（仍不读取 secret） |
-| R-T08-03 | RDB `store.version` 属性与 `beginTransaction/commit/rollBack` 的真实行为 | 迁移版本/回滚语义可能偏差 | 设备用例覆盖事务回滚与版本；host 已覆盖逻辑 |
-| R-T08-04 | 锁屏/首次解锁 Asset 访问语义 | `DEVICE_FIRST_UNLOCKED` 失败应 `ASSET_ACCESS_DENIED` | 设备用例/安全评审 |
+| R-T08-01 | Asset Store `ALIAS` 在本 SDK 的 `asset.Value` 类型中按 BYTES 处理，适配器使用 UTF-8 `Uint8Array` 写入/读回 | 若平台实际要求 string alias，设备运行会失败 | `StorageDevice.test.ets` 骨架包含 put/query/list，**未执行**；设备环境必须复核；不得回退明文 |
+| R-T08-02 | `AssetStoreSecretStore.list()` 使用 `RETURN_TYPE=ATTRIBUTES` + 分页查询全部资产 | 平台是否允许无 alias 的全量 query 未在设备验证 | `StorageDevice.test.ets` 骨架包含 list，**未执行**；若不允许，改为按已知别名集合查询（仍不读取 secret） |
+| R-T08-03 | RDB `store.version` 属性与 `beginTransaction/commit/rollBack` 的真实行为 | 迁移版本/回滚语义可能偏差 | 设备骨架已加“事务内 setVersion 失败回滚”（wp-022 R-03），**未在设备执行**；host 已覆盖事务运行器逻辑 |
+| R-T08-04 | 锁屏/首次解锁 Asset 访问语义 | `DEVICE_FIRST_UNLOCKED` 失败应 `ASSET_ACCESS_DENIED` | 设备骨架已加锁屏 `ASSET_ACCESS_DENIED` 断言（需锁屏前置条件），**未在设备执行**；安全评审/设备复核仍待 |
 | R-T08-05 | 补偿写回旧 secret 失败时删除 alias | 网关暂时不可控（fail-closed） | 已由 `C07_commitBinding_rollbackRestoreFailureDeletesUnverifiedSecret` 断言 |
 | R-T08-06 | Preferences 适配器不主动识别/拒绝 secret | 误用可能违反 SC-09 | 端口注释 + 仓储不写 Preferences；评审检查调用点 |
 
@@ -264,7 +277,7 @@ CQG-T08
 | ADR-002 §8.3/§8.4 存储边界/轮换 | `StorageConstants` alias + `rotateSecret` 用例 |
 | PR-06 绑定 identity 一致 | `commitBinding` 使用 `BleProvisioningResult.identity.gatewayId`；C-19/C-23 负责验签一致性 |
 | FC-03 key_id 不滚动 | `keyId = app-key-v1` |
-| D-019 host/device | Node 161 用例 + 设备 skeleton（BLOCKED） |
+| D-019 host/device | Node 161 用例（wp-022 后 166）+ 设备 skeleton（已注册，BLOCKED） |
 
 ---
 

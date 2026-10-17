@@ -1,7 +1,7 @@
 # ohosTest（设备/模拟器测试）引导
 
-- **Producer**: agent:test-engineer
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）
+- **Producer**: agent:test-engineer；agent:implementation-engineer（T-06/T-07/T-08 设备骨架）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-08 修复 `wp-022-fix-t08`
 - **当前状态**: **BLOCKED / 未运行**。本环境无真机、无模拟器实例、无签名配置；以下命令保留为设备可用时的执行入口，**不得**把“测试 HAP 编译成功”写成“设备测试通过”。
 
 ## 1. 目录
@@ -10,12 +10,14 @@
 entry/src/ohosTest/
 ├── module.json5                         # entry_test feature 模块
 └── ets/test/
-    ├── List.test.ets                    # Hypium suite 入口（注册 baseline/foundation/security）
+    ├── List.test.ets                    # Hypium suite 入口（注册 baseline/foundation/security/storage）
     ├── Baseline.test.ets                # T-01 框架冒烟（仅编译过，未执行）
     ├── foundation/
     │   └── FoundationDevice.test.ets    # T-06 C-01..C-03 设备骨架（BLOCKED_ON_DEVICE_RUNNER）
     ├── security/
     │   └── SecurityDevice.test.ets      # T-07 C-04/C-05 设备向量（BLOCKED_ON_DEVICE_RUNNER）
+    ├── storage/
+    │   └── StorageDevice.test.ets       # T-08 C-06/C-07 适配器/事务/Asset 骨架（BLOCKED）
     └── contract/
         └── fixtures/                    # 协议 golden（PUBLIC TEST DATA ONLY）
             ├── hmac-sha256-test-vectors.json
@@ -65,6 +67,7 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default onDeviceTest -
 
 ## 5. 限制
 
-- 本目录的设备套件已全部注册进 `List.test.ets`（T-06 foundation、T-07 security）；注册只表示设备可用时会执行，当前仍为 `BLOCKED_ON_DEVICE_RUNNER`，不得写成 PASS。
+- 本目录的设备套件已全部注册进 `List.test.ets`（T-06 foundation、T-07 security、T-08 storage）；注册只表示设备可用时会执行，当前仍为 `BLOCKED_ON_DEVICE_RUNNER`，不得写成 PASS。
+- T-08 storage 骨架包含 Preferences/RDB/Asset 读写、事务回滚、事务内 `setVersion` 回滚与锁屏 `ASSET_ACCESS_DENIED` 断言；锁屏分支需要 runner 先建立锁屏前置条件，未在无设备环境执行。
 - 设备测试不覆盖真实硬件/射频/真实网关；这些由用户自行执行（CP-03）。
 - `code-linter.json5` 当前忽略 `src/ohosTest/**`；测试源码检查策略见 TEST-001。

@@ -1,7 +1,7 @@
 # Host 单元测试（无设备）
 
-- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer (T-06/T-07 and wp-018-fix-t07)
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`
+- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06/T-07/T-08 及修复 wp-018-fix-t07、wp-022-fix-t08）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`；T-08 `wp-020-storage` + 修复 `wp-022-fix-t08`
 - **状态**: **可运行（Node host runner）**；`hvigorw test` 的 Hypium 入口可编译，但本环境无法执行（见 §3）。
 
 ## 1. 目录与约定
@@ -24,6 +24,8 @@ entry/src/test/
 │   ├── PerfHarness.test.mjs      # NFR 4.3 测量 harness
 │   ├── Crypto.test.mjs           # T-07 C-04 host 测试（含 R-01 分类器/R-07 前缀副本）
 │   ├── Security.test.mjs         # T-07 C-05 向量与负例
+│   ├── Storage.test.mjs          # T-08 C-06 存储/迁移/draft/事务运行器（15 用例）
+│   ├── GatewayRepository.test.mjs # T-08 C-07 路由/绑定/补偿/profile/sequence（29 用例）
 │   ├── TestCryptoProvider.ets    # 测试专用纯 TS provider（仅 SHA/HMAC/HKDF/PBKDF2）
 │   ├── protocol-oracle.ets       # 纯 TS canonical oracle（无 @ohos）
 │   ├── ets-hooks.mjs             # Node loader：.ets -> TS strip -> ESM
@@ -32,6 +34,9 @@ entry/src/test/
 ├── protocol/                     # Hypium host 冒烟（仅编译）
 ├── security/
 │   └── SecurityHost.test.ets     # T-07 C-04/C-05 Hypium 冒烟（仅编译）
+├── storage/
+│   ├── FakeStores.ets            # T-08 C-06/C-07 内存 fake（不默认成功）
+│   └── StorageHost.test.ets      # T-08 Hypium 编译/冒烟（仅编译）
 └── evidence/                     # 运行日志（当前 revision 证据）
 ```
 
@@ -41,6 +46,7 @@ entry/src/test/
 2. 纯逻辑产品模块应能在 host 加载；Node loader 支持 `.ets`/`.ts`（TypeScript 语法），但 UI/平台文件不可加载。
 3. Hypium `List.test.ets` 只做 suite 聚合；每个 `*Suite` 导出同名函数（DES-A §23.1）。
 4. 新增测试时同时保留 Requirement/Contract/component ID 注释（traceability）。
+5. `code-linter.json5` 忽略 `src/test/**` 与 `src/ohosTest/**`；`codelinter` 的 PASS 只覆盖产品源码，不覆盖测试源码。
 
 ## 2. 可运行命令（推荐）
 
@@ -58,7 +64,7 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前 revision：**122/122 PASS**（`evidence/t07-fix-host-node-tests.tap`，wp-018-fix-t07 后）。覆盖：
+当前 revision：**166/166 PASS**（`evidence/t08-fix-host-node-tests.tap`，wp-022-fix-t08 后）。覆盖：
 
 - 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
@@ -69,9 +75,22 @@ node --no-warnings \
 - T-07 C-04：SHA/HMAC/HKDF/PBKDF2 对照 Node/RFC 向量、X25519 DER↔raw 对照 Node JWK、常数时间行为、CTR 状态机、GCM 标签/长度负例、随机长度/不可用；
 - T-07 C-04 R-01/R-07 修复：分层错误分类器（CREATE/KEY_CONVERSION/OPERATION/GCM tag）、X25519 前缀防御性副本；
 - T-07 C-05：V-01 4/4、发现/响应向量、correlation/nonce/TTL/±120s 负例与 ACK 链组合；
+- T-08 C-06（15）：draft 复制/一次性/TTL/clearAll/非法 TTL、迁移 0→2/重复/缺口/失败回滚/拒绝降版本、v1 初始化/幂等/close、secret 副本清零与 alias 语法、`RdbTransactionRunner` begin 失败映射与状态复位；
+- T-08 C-07（29）：HMAC/TLS 绑定、短/超长 draft secret 拒绝（R-01）、draft 重放/不匹配/家庭迁移负例、route/secret 补偿与 fail-closed、secret 写失败、复用路径、markSeen/回读 post-commit 语义（R-05）、邀请幂等、P-BLOCKED 拒绝、TLS→HMAC、多 pin 收缩/未知 pin、轮换成功/失败/异常、initialize 清理 pending、本机解绑、sequence 读/增/重置/上限/40 并发、路由列表/家庭索引/地址更新、未绑定错误、秘密泄漏审计；
 - host runner 基线断言。
 
-T-06 修复时基线为 **88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`）；T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）。这些旧数字仅代表当时范围，不代表当前 revision。
+T-08 修复前基线为 **161/161 PASS**（`evidence/t08-host-node-tests.tap`）；T-06 修复时基线为 **88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`）；T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）。这些旧数字仅代表当时范围，不代表当前 revision。
+
+T-08 证据：
+
+| 文件 | 内容 |
+|---|---|
+| `evidence/t08-fix-host-node-tests.tap` | 当前 166/166 TAP（wp-022-fix-t08） |
+| `evidence/t08-fix-ohpm-install.log` | `ohpm install`（修复 revision） |
+| `evidence/t08-fix-clean-assemble.log` | `hvigorw clean assembleHap --no-daemon`（修复 revision） |
+| `evidence/t08-fix-codelinter.log` | `codelinter -c code-linter.json5 -p default .`（产品源码） |
+| `evidence/t08-fix-ohosTest-assemble.log` | 附加：ohosTest HAP 编译（不等于设备执行） |
+| `evidence/t08-host-node-tests.tap` 等 | T-08 初版证据（历史 revision） |
 
 ## 3. `hvigorw test` 的真实状态：BLOCKED（环境）
 
@@ -112,12 +131,13 @@ Node host runner 是本环境唯一已实证的可执行 host 路径，覆盖纯
 
 | 层 | 路径 | 运行条件 | 当前 |
 |---|---|---|---|
-| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 122/122**（wp-018-fix-t07 后） |
+| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 166/166**（wp-022-fix-t08 后） |
 | Hypium host | `entry/src/test/List.test.ets` | `hvigorw test` + Linux Previewer | **BLOCKED**（见 §3） |
-| 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README） |
+| 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README；storage 套件已注册但未执行） |
 
 ## 5. 证据纪律
 
 - 每次修复/变更后重跑 `run-host-tests.sh`，把 TAP 输出保存到 `evidence/` 或 T-19 报告；
 - 测试失败必须保留命令、退出码、失败断言；不得删除断言换 PASS；
-- host 测试通过不等于产品验收；性能/真实网络/真实 BLE/UI 渲染仍标 `UNAVAILABLE`。
+- host 测试通过不等于产品验收；性能/真实网络/真实 BLE/UI 渲染仍标 `UNAVAILABLE`；
+- `codelinter` 不覆盖测试源码，报告“静态检查通过”时须限定为产品源码。

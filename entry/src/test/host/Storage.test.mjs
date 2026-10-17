@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import { AppError } from '../../main/ets/common/types/AppError.ets';
 import { SecureBytes } from '../../main/ets/common/types/SecureBytes.ets';
 import { MigrationRegistry } from '../../main/ets/service/storage/MigrationRegistry.ets';
+import { RdbTransactionRunner } from '../../main/ets/service/storage/RdbTransactionRunner.ets';
 import { SecretDraftStore } from '../../main/ets/service/storage/SecretDraftStore.ets';
 import { StorageService } from '../../main/ets/service/storage/StorageService.ets';
 import {
@@ -43,6 +44,39 @@ const expectSyncCode = (fn, code) => {
 const isZeroed = (bytes) => bytes.every((value) => value === 0);
 
 const newDraftStore = (clock) => new SecretDraftStore(new SyncRandom(), clock);
+
+class FakeTransactionDriver {
+  constructor(failBeginOnce = false) {
+    this.failBeginOnce = failBeginOnce;
+    this.beginCalls = 0;
+    this.commitCalls = 0;
+    this.rollBackCalls = 0;
+  }
+
+  begin() {
+    this.beginCalls += 1;
+    if (this.failBeginOnce) {
+      this.failBeginOnce = false;
+      throw Object.assign(new Error('platform begin failed'), { code: 14800000 });
+    }
+  }
+
+  commit() {
+    this.commitCalls += 1;
+  }
+
+  rollBack() {
+    this.rollBackCalls += 1;
+  }
+}
+
+const fakeTransaction = {
+  async execute() {
+  },
+  async query() {
+    return [];
+  },
+};
 
 const storageHarness = () => {
   const clock = new FixedClock(FIXED_MS);
@@ -219,6 +253,41 @@ test('C06_InMemorySecretStore_aliasGrammarAndListingHaveNoSecretValues', async (
   await expectCode(() => secrets.put('a'.repeat(128), SecureBytes.fromHex(SECRET_HEX)),
     'SECRET_ALIAS_INVALID');
   await expectCode(() => secrets.withSecret('missing.alias', async () => 1), 'ASSET_NOT_FOUND');
+});
+
+test('C06_RdbTransactionRunner_beginFailureMapsAndRecovers', async () => {
+  const runner = new RdbTransactionRunner();
+  const driver = new FakeTransactionDriver(true);
+  let callbacks = 0;
+  await assert.rejects(
+    () => runner.transaction(async () => driver, fakeTransaction, async () => {
+      callbacks += 1;
+      return 1;
+    }),
+    (error) => {
+      assert.ok(error instanceof AppError);
+      assert.equal(error.code, 'STORAGE_RDB_ERROR');
+      assert.equal(error.details[0].name, 'platformCode');
+      assert.equal(error.details[0].value, '14800000');
+      return true;
+    });
+  // R-02: the callback never ran, rollback was attempted, and the runner is
+  // reusable rather than permanently stuck in `inTransaction`.
+  assert.equal(callbacks, 0);
+  assert.equal(driver.beginCalls, 1);
+  assert.equal(driver.commitCalls, 0);
+  assert.equal(driver.rollBackCalls, 1);
+  assert.equal(runner.isActive(), false);
+
+  const value = await runner.transaction(async () => driver, fakeTransaction, async () => {
+    callbacks += 1;
+    return 7;
+  });
+  assert.equal(value, 7);
+  assert.equal(callbacks, 1);
+  assert.equal(driver.beginCalls, 2);
+  assert.equal(driver.commitCalls, 1);
+  assert.equal(runner.isActive(), false);
 });
 
 test('C06_SecretDraftStore_multipleDraftsAreIndependentAndUniqueIds', () => {

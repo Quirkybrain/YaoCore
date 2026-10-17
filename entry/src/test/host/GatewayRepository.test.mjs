@@ -252,6 +252,27 @@ test('C07_commitBinding_secretWriteFails_writesNoRoute', async () => {
   assert.equal(h.secrets.size(), 0);
 });
 
+test('C07_commitBinding_rejectsShortAndOversizedDraftSecretsBeforePersisting', async () => {
+  const h = await setup();
+  // SC-04 Must: 1-byte secret (review probe R-01) and an oversized draft must
+  // both be rejected without writing a secret or route; the draft is consumed.
+  const invalidHex = ['00', '00'.repeat(4097)];
+  for (const hex of invalidHex) {
+    const draftId = draftFor(h.drafts, hex);
+    await assert.rejects(
+      () => h.repo.commitBinding(makeResult({ draftId }), draftId, FAMILY_A),
+      (error) => {
+        assert.ok(error instanceof AppError);
+        assert.equal(error.code, 'CONFIGURATION_ERROR');
+        assert.deepEqual(error.details.map((detail) => detail.value), ['secret']);
+        return true;
+      });
+    assert.equal(await h.repo.isBound('gw-a'), false);
+    assert.equal(h.secrets.size(), 0);
+    assert.equal(h.drafts.size(), 0);
+  }
+});
+
 test('C07_commitBinding_withoutDraftReusesSecretAndRequiresExistingBinding', async () => {
   const h = await setup();
   await bindDraft(h, SECRET_OLD);
@@ -264,6 +285,60 @@ test('C07_commitBinding_withoutDraftReusesSecretAndRequiresExistingBinding', asy
 
   await expectCode(() => h.repo.commitBinding(makeResult({ gatewayId: 'gw-missing' }), '',
     FAMILY_A), 'PROVISIONING_CREDENTIAL_MISSING');
+});
+
+test('C07_commitBinding_markSeenFailureStillReportsCommittedBinding', async () => {
+  const h = await setup();
+  const draftId = draftFor(h.drafts, SECRET_OLD);
+  h.repo.markSeen = async () => {
+    throw AppErrors.of('STORAGE_RDB_ERROR', []);
+  };
+  const route = await h.repo.commitBinding(makeResult({ draftId }), draftId, FAMILY_A);
+  // R-05: route + secret are durable before markSeen; a failure must not be
+  // reported as a failed binding. last_seen_at may lag.
+  assert.equal(route.gatewayId, 'gw-a');
+  assert.equal(route.lastSeenAt, undefined);
+  assert.equal(await h.repo.isBound('gw-a'), true);
+  assert.equal(await secretHexViaRepo(h.repo, 'gw-a'), SECRET_OLD);
+  assert.equal(h.drafts.size(), 0);
+});
+
+test('C07_commitBinding_reusePath_markSeenFailureStillReportsCommittedBinding', async () => {
+  const h = await setup();
+  await bindDraft(h, SECRET_OLD);
+  h.clock.value = FIXED_MS + 60000;
+  h.repo.markSeen = async () => {
+    throw AppErrors.of('STORAGE_RDB_ERROR', []);
+  };
+  const route = await h.repo.commitBinding(
+    makeResult({ gatewayName: 'Renamed after reuse', ip: '192.168.1.55' }), '', FAMILY_A);
+  assert.equal(route.gatewayName, 'Renamed after reuse');
+  assert.equal(route.localIp, '192.168.1.55');
+  assert.equal(route.lastSeenAt, FIXED_TS);
+  assert.equal(await secretHexViaRepo(h.repo, 'gw-a'), SECRET_OLD);
+});
+
+test('C07_commitBinding_readBackFailureReturnsCommittedSnapshot', async () => {
+  const h = await setup();
+  const draftId = draftFor(h.drafts, SECRET_OLD);
+  const originalReadRoute = h.repo.readRoute.bind(h.repo);
+  let readCalls = 0;
+  h.repo.readRoute = async (gatewayId) => {
+    readCalls += 1;
+    // Fresh binding read order: existing check, markSeen guard, final read-back.
+    if (readCalls === 3) {
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
+    return originalReadRoute(gatewayId);
+  };
+  const route = await h.repo.commitBinding(makeResult({ draftId }), draftId, FAMILY_A);
+  // The write already committed, so return the committed snapshot rather than
+  // a false failure; the persisted row still contains markSeen's timestamp.
+  assert.equal(route.gatewayId, 'gw-a');
+  assert.equal(route.lastSeenAt, undefined);
+  assert.equal(await h.repo.isBound('gw-a'), true);
+  assert.equal((await h.repo.getRoute('gw-a')).lastSeenAt, FIXED_TS);
+  assert.equal(await secretHexViaRepo(h.repo, 'gw-a'), SECRET_OLD);
 });
 
 test('C07_commitBinding_missingDraftMeansExpired', async () => {
