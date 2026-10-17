@@ -91,7 +91,8 @@ export class ErrorCatalog {
     if (code === 'STORAGE_RDB_ERROR' || code === 'STORAGE_PREFERENCES_ERROR') {
       return 'errors.app.storage_error';
     }
-    if (code === 'INVITE_AEAD_FAILED' || code === 'INVITE_JOIN_REQUEST_INVALID') {
+    if (code === 'INVITE_AEAD_FAILED' || code === 'INVITE_JOIN_REQUEST_INVALID' ||
+      code === 'INVITE_VERSION_UNSUPPORTED') {
       return 'errors.app.invite_invalid';
     }
     if (code === 'PROVISIONING_CREDENTIAL_MISSING' || code === 'PROVISIONING_SECRET_DRAFT_EXPIRED') {

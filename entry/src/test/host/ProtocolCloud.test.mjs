@@ -149,6 +149,14 @@ test('C03_CloudCommandSerializer_rejectsNonCanonicalValueAndFields', () => {
   expectCode(() => CloudCommandSerializer.serialize(
     envelope({ paras: { Nonce: 'short' } })), 'PROTOCOL_INVALID_IDENTIFIER');
   expectCode(() => CloudCommandSerializer.serialize(
+    envelope({ paras: { Nonce: '9f2a7c001122' } })), 'PROTOCOL_INVALID_IDENTIFIER');
+  expectCode(() => CloudCommandSerializer.serialize(
+    envelope({ paras: { Nonce: '0123456789ABCDEF0123456789ABCDEF' } })),
+  'PROTOCOL_INVALID_IDENTIFIER');
+  expectCode(() => CloudCommandSerializer.serialize(
+    envelope({ paras: { Nonce: '0123456789abcdef-123456789abcdef' } })),
+  'PROTOCOL_INVALID_IDENTIFIER');
+  expectCode(() => CloudCommandSerializer.serialize(
     envelope({ paras: { Alg: 'HMAC-SHA1' } })), 'PROTOCOL_UNSUPPORTED_VERSION');
   expectCode(() => CloudCommandSerializer.serialize(
     envelope({ paras: { KeyId: 'other' } })), 'PROTOCOL_UNSUPPORTED_VERSION');
@@ -230,6 +238,43 @@ test('C03_StateReportMapper_shadowShapeAndDevicesShapeAreAccepted', () => {
   assert.equal(devices.devices[0].lastRequestId, 'req-device');
   assert.equal(devices.devices[0].lastSeq, 5);
   assert.equal(devices.gatewayOnline, true);
+});
+
+test('C03_StateReportMapper_servicesShapeIsStrictPerSchema', () => {
+  const context = new ShadowMapContext('gw-device-1', receivedAtMs);
+  const full = fixedProperties();
+
+  const missingRequired = stateReport((() => {
+    const copy = { ...full };
+    delete copy.Gateway_RSSI;
+    return copy;
+  })());
+  expectCode(() => StateReportMapper.map(encode(missingRequired), context), 'CLOUD_SHADOW_INVALID');
+
+  expectCode(() => StateReportMapper.map(encode(stateReport({ ...full, Unknown_Property: 1 })),
+    context), 'CLOUD_SHADOW_INVALID');
+
+  const topLevelUnknown = { ...stateReport(full), extra: true };
+  expectCode(() => StateReportMapper.map(encode(topLevelUnknown), context), 'CLOUD_SHADOW_INVALID');
+
+  expectCode(() => StateReportMapper.map(encode(stateReport({ ...full, Door_01_Online: 'true' })),
+    context), 'CLOUD_SHADOW_INVALID');
+
+  expectCode(() => StateReportMapper.map(encode(stateReport({ ...full, Gateway_RSSI: -55.5 })),
+    context), 'CLOUD_SHADOW_INVALID');
+
+  // SHADOW/DEVICES shapes remain partial-tolerant in T-06; T-14 owns the full
+  // strict cloud adapter and DeviceInventoryJson.
+  const partialShadow = StateReportMapper.map(encode({
+    shadow: [{
+      service_id: 'SmartHomeService',
+      reported: {
+        properties: { Light_01_Online: true },
+        event_time: '20261017T120000Z',
+      },
+    }],
+  }), context);
+  assert.equal(partialShadow.devices.length, 1);
 });
 
 test('C03_StateReportMapper_rejectsUnknownShapesAndInvalidProperties', () => {

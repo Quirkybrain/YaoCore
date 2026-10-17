@@ -115,10 +115,32 @@ test('C03_DiscoverMapper_readsKnownAliasesOnlyWhenCanonicalIsAbsent', () => {
   assert.equal(item.powerStatus, true);
   assert.equal(item.openStatus, false);
   assert.equal(item.targetTemperature, 24);
-  assert.equal(snapshot.isPartial, true);
+  assert.equal(snapshot.isPartial, false);
+  assert.equal(snapshot.aliasUsed, true);
   const counts = counter.counts();
   assert.equal(counts.get(DeviationCode.ALIAS_FIELD_USED), 4);
   assert.equal(counts.get(DeviationCode.SUCCESS_FIELD_IGNORED), 1);
+});
+
+test('C03_DiscoverMapper_aliasAndPartialAreIndependentDiagnostics', () => {
+  const { snapshot } = map(baseEnvelope([
+    device({ deviceId: 'Light_02', online: undefined, isOnline: true }),
+    device({ deviceId: 'Bad:01' }),
+  ]));
+  assert.equal(snapshot.devices.length, 1);
+  assert.equal(snapshot.isPartial, true);
+  assert.equal(snapshot.aliasUsed, true);
+
+  const skippedAlias = map(baseEnvelope([
+    device({ online: undefined, isOnline: true, updatedAt: 'not-a-time' }),
+  ])).snapshot;
+  assert.equal(skippedAlias.devices.length, 0);
+  assert.equal(skippedAlias.isPartial, true);
+  assert.equal(skippedAlias.aliasUsed, true);
+
+  const clean = map(baseEnvelope([device()])).snapshot;
+  assert.equal(clean.isPartial, false);
+  assert.equal(clean.aliasUsed, false);
 });
 
 test('C03_DiscoverMapper_canonicalWinsAliasConflict', () => {
@@ -156,6 +178,11 @@ test('C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated', ()
   const counts = counter.counts();
   assert.equal(counts.get(DeviationCode.UNKNOWN_DEVICE_TYPE), 1);
   assert.equal(counts.get(DeviationCode.ROOM_NAME_MISSING), 1);
+  const unknownTypeDeviation = snapshot.deviations.find(
+    (item) => item.code === DeviationCode.UNKNOWN_DEVICE_TYPE,
+  );
+  assert.equal(unknownTypeDeviation.detail, 'unrecognized_type');
+  assert.equal(snapshot.deviations.some((item) => item.detail === 'weird'), false);
 
   const ac = snapshot.devices[1];
   assert.equal(ac.color, '#AABBCC');

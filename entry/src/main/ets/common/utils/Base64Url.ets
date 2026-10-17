@@ -35,7 +35,8 @@ export class Base64Url {
 
   static decode(text: string): Uint8Array {
     if (text.length === 0) {
-      return new Uint8Array(0);
+      // DES-A §4.2: an empty encoded value is not a valid secret payload.
+      throw Base64Url.invalid();
     }
     if (text.length % 4 === 1) {
       throw Base64Url.invalid();

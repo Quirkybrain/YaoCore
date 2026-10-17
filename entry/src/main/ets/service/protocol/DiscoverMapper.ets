@@ -5,7 +5,8 @@
  *
  * Top-level envelope failures are fail-closed. Device-level failures skip the
  * device and set isPartial=true. Alias fields are read only when the canonical
- * wire field is absent; `success` is always ignored.
+ * wire field is absent; alias use sets the diagnostic aliasUsed flag but not
+ * isPartial. `success` is always ignored.
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { ProtocolConstants } from '../../common/constants/ProtocolConstants';
@@ -96,15 +97,23 @@ export class DiscoverMapper {
     }
     const devices: DeviceSnapshot[] = [];
     let isPartial = false;
+    let aliasUsed = false;
     for (let index = 0; index < devicesNode.arrayValue.length; index++) {
+      const deviationStart = collected.length;
       try {
         const mapped = DiscoverMapper.mapDevice(devicesNode.arrayValue[index], gatewayId, collected, deviations);
         devices.push(mapped.snapshot);
         if (mapped.partial) {
           isPartial = true;
         }
+        if (mapped.aliasUsed) {
+          aliasUsed = true;
+        }
       } catch (error) {
         isPartial = true;
+        if (DiscoverMapper.usedAliasSince(collected, deviationStart)) {
+          aliasUsed = true;
+        }
         const deviceId = DiscoverMapper.optionalDeviceIdForDiagnostics(devicesNode.arrayValue[index]);
         DiscoverMapper.record(collected, deviations, new ProtocolDeviation(DeviationCode.DEVICE_SKIPPED,
           gatewayId, deviceId, 'devices', DiscoverMapper.errorReason(error)));
@@ -120,12 +129,14 @@ export class DiscoverMapper {
     init.security = security;
     init.devices = devices;
     init.isPartial = isPartial;
+    init.aliasUsed = aliasUsed;
     init.deviations = collected;
     return DiscoverySnapshot.create(init);
   }
 
   private static mapDevice(node: JsonNode, gatewayId: string, collected: ProtocolDeviation[],
     sink: ProtocolDeviationSink): MappedDevice {
+    const deviationStart = collected.length;
     if (node.kind !== JsonKind.OBJECT) {
       throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'device');
     }
@@ -173,7 +184,7 @@ export class DiscoverMapper {
     if (deviceType === undefined) {
       partial = true;
       DiscoverMapper.record(collected, sink, new ProtocolDeviation(DeviationCode.UNKNOWN_DEVICE_TYPE,
-        gatewayId, deviceId, 'deviceType', deviceTypeRaw));
+        gatewayId, deviceId, 'deviceType', 'unrecognized_type'));
     }
     let brand: string | undefined = undefined;
     if (node.has('brand')) {
@@ -315,11 +326,9 @@ export class DiscoverMapper {
     init.lastRequestId = lastRequestId;
     init.lastSeq = lastSeq;
     init.updatedAt = updatedAt;
-    if (DiscoverMapper.hasDeviation(collected, deviceId, DeviationCode.ALIAS_FIELD_USED)) {
-      partial = true;
-    }
+    const aliasUsed = DiscoverMapper.usedAliasSince(collected, deviationStart);
     const snapshot = DeviceSnapshot.create(init);
-    return new MappedDevice(snapshot, partial);
+    return new MappedDevice(snapshot, partial, aliasUsed);
   }
 
   private static readAliased(node: JsonNode, canonical: string, alias: string, gatewayId: string,
@@ -464,11 +473,9 @@ export class DiscoverMapper {
     return DiscoverMapper.optionalString(node, 'deviceId');
   }
 
-  private static hasDeviation(collected: ProtocolDeviation[], deviceId: string,
-    code: DeviationCode): boolean {
-    for (let index = 0; index < collected.length; index++) {
-      const deviation = collected[index];
-      if (deviation.code === code && deviation.deviceId === deviceId) {
+  private static usedAliasSince(collected: ProtocolDeviation[], start: number): boolean {
+    for (let index = start; index < collected.length; index++) {
+      if (collected[index].code === DeviationCode.ALIAS_FIELD_USED) {
         return true;
       }
     }
@@ -508,9 +515,11 @@ export class DiscoverMapper {
 class MappedDevice {
   readonly snapshot: DeviceSnapshot;
   readonly partial: boolean;
+  readonly aliasUsed: boolean;
 
-  constructor(snapshot: DeviceSnapshot, partial: boolean) {
+  constructor(snapshot: DeviceSnapshot, partial: boolean, aliasUsed: boolean) {
     this.snapshot = snapshot;
     this.partial = partial;
+    this.aliasUsed = aliasUsed;
   }
 }

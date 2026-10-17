@@ -20,7 +20,7 @@ const REQUEST: ControlRequestDto = {
     value: 68
   },
   timestamp: '20260714T080000Z',
-  nonce: '9f2a7c001122',
+  nonce: '0123456789abcdef0123456789abcdef',
   alg: 'HMAC-SHA256',
   key_id: 'app-key-v1',
   sign: '3555f16eeee3c30e0f79e967357f057d9a5387a8bf13aa2f8a32e80e944fbaae'
@@ -48,7 +48,7 @@ export function ControlRequestSerializerSuite(): void {
           value: 68
         },
         timestamp: '20260714T080000Z',
-        nonce: '9f2a7c001122',
+        nonce: '0123456789abcdef0123456789abcdef',
         alg: 'HMAC-SHA256',
         key_id: 'app-key-v1',
         sign: 'A'.repeat(64)

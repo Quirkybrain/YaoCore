@@ -137,6 +137,10 @@ export class ControlOutcome {
     if (init.shouldApplyState && !init.ackAccepted) {
       throw AppErrors.of('CONFIGURATION_ERROR', []);
     }
+    if (init.shouldApplyState && init.reportedState === undefined) {
+      // DES-A §5.1.4: only a device-side reported_state can be applied.
+      throw AppErrors.of('CONFIGURATION_ERROR', []);
+    }
     if (init.gatewayResult.success !== (init.resultCode === 0)) {
       throw AppErrors.of('CONFIGURATION_ERROR', []);
     }

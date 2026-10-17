@@ -92,7 +92,8 @@ export class CloudCommandSerializer {
       }
     }
     DateTimeUtil.parseUtcCompact(paras.Timestamp);
-    if (!ProtocolConstants.NONCE_PATTERN.test(paras.Nonce)) {
+    // DES-A §3.3/§18.5: outbound nonce is 16 random bytes as 32 lowercase hex.
+    if (!ProtocolConstants.HEX_LOWER_32.test(paras.Nonce)) {
       throw AppErrors.protocol('PROTOCOL_INVALID_IDENTIFIER', 'Nonce');
     }
     if (paras.Alg !== ProtocolConstants.ALG_HMAC_SHA256) {

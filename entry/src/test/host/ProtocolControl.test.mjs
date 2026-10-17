@@ -56,8 +56,14 @@ const expectCode = (request, code) => {
 
 test('C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder', () => {
   assert.equal(vectorDoc.vectors.length, 4);
+  // V-01 fixture nonces are 12-hex test data. DES-A §3.3/§18.5 requires
+  // App-generated outbound nonces to be 32 lowercase hex, enforced by the
+  // serializer (R-08). Substitute only the nonce for the serialization order
+  // check; the canonical oracle still validates the fixture verbatim.
+  const contractNonce = '0123456789abcdef0123456789abcdef';
   for (const vector of vectorDoc.vectors) {
-    const bytes = ControlRequestSerializer.serialize(vector.request);
+    const serializable = { ...vector.request, nonce: contractNonce };
+    const bytes = ControlRequestSerializer.serialize(serializable);
     const text = Utf8.decode(bytes);
     assert.ok(!text.endsWith('\n'), `${vector.name}: trailing newline`);
     assert.ok(!text.includes(' '), `${vector.name}: compact JSON contains whitespace`);
@@ -74,8 +80,23 @@ test('C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder', () => {
     assert.equal(parsed.seq, vector.request.seq);
     assert.equal(parsed.target, vector.request.target);
     assert.equal(parsed.payload.action, vector.request.payload.action);
+    assert.equal(parsed.payload.value, vector.request.payload.value);
+    assert.equal(parsed.timestamp, vector.request.timestamp);
+    assert.equal(parsed.nonce, contractNonce);
+    assert.equal(parsed.alg, vector.request.alg);
+    assert.equal(parsed.key_id, vector.request.key_id);
     assert.equal(parsed.sign, vector.expectedSign);
     assert.equal(controlCanonical(vector.request), vector.canonical, vector.name);
+  }
+});
+
+test('C03_ControlRequestSerializer_fixtureNoncesAreOutsideOutboundContract', () => {
+  // R-08 deviation record: the V-01 fixture predates the 32-hex generation
+  // rule. The serializer rejects those 12-hex nonces, so the vector test above
+  // substitutes a contract-valid nonce for the field-order check while the
+  // canonical/HMAC fixture remains authoritative for T-07.
+  for (const vector of vectorDoc.vectors) {
+    expectCode(vector.request, 'PROTOCOL_INVALID_IDENTIFIER');
   }
 });
 
@@ -115,6 +136,35 @@ test('C03_ControlRequestSerializer_rejectsFieldViolations', () => {
   expectCode(validRequest({ key_id: 'other-key' }), 'PROTOCOL_UNSUPPORTED_VERSION');
   expectCode(validRequest({ sign: 'A'.repeat(64) }), 'PROTOCOL_INVALID_IDENTIFIER');
   expectCode(validRequest({ sign: 'a'.repeat(63) }), 'PROTOCOL_INVALID_IDENTIFIER');
+});
+
+test('C03_ControlRequestSerializer_enforcesActionValueKind', () => {
+  expectCode(validRequest({ payload: { action: 'SET_BRIGHTNESS', value: 'oops' } }),
+    'PROTOCOL_INVALID_TYPE');
+  expectCode(validRequest({ payload: { action: 'SET_MODE', value: 3 } }),
+    'PROTOCOL_INVALID_TYPE');
+  expectCode(validRequest({ payload: { action: 'SET_COLOR', value: true } }),
+    'PROTOCOL_INVALID_TYPE');
+  expectCode(validRequest({ payload: { action: 'BOARD_LED_ON', value: 42 } }),
+    'PROTOCOL_INVALID_TYPE');
+  expectCode(validRequest({ payload: { action: 'PING', value: true } }),
+    'PROTOCOL_INVALID_TYPE');
+  expectCode(validRequest({ payload: { action: 'OPEN', value: 'open' } }),
+    'PROTOCOL_INVALID_TYPE');
+  // 7-value SET_MODE vocabulary belongs to C-11/C-16; the serializer only
+  // enforces the string kind (V-01 uses a non-vocabulary encoding fixture).
+  assert.equal(JSON.parse(Utf8.decode(ControlRequestSerializer.serialize(
+    validRequest({ payload: { action: 'SET_MODE', value: '制冷' } })))).payload.value, '制冷');
+});
+
+test('C03_ControlRequestSerializer_enforcesHexLower32Nonce', () => {
+  expectCode(validRequest({ nonce: '9f2a7c001122' }), 'PROTOCOL_INVALID_IDENTIFIER');
+  expectCode(validRequest({ nonce: '0123456789ABCDEF0123456789ABCDEF' }),
+    'PROTOCOL_INVALID_IDENTIFIER');
+  expectCode(validRequest({ nonce: '0123456789abcdef-123456789abcdef' }),
+    'PROTOCOL_INVALID_IDENTIFIER');
+  const parsed = JSON.parse(Utf8.decode(ControlRequestSerializer.serialize(validRequest())));
+  assert.equal(parsed.nonce, '0123456789abcdef0123456789abcdef');
 });
 
 test('C03_ControlRequestSerializer_enforcesOutboundValueBounds', () => {

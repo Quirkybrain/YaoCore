@@ -119,6 +119,12 @@ export class ControlAckMapper {
     const gatewayResult = GatewayResultClassifier.classify(resultCode, errorCode);
 
     if (resultCode !== 0) {
+      // DES-A §6.1.4 step 1/§18.7: schema validation precedes result
+      // classification. A present but malformed reported_state on an error
+      // ACK is still a protocol violation.
+      if (root.has('reported_state')) {
+        ControlAckMapper.validateReportedState(root.require('reported_state'), collected, deviations);
+      }
       const init = ControlAckMapper.baseOutcome(requestId, seq, resultCode, errorCode, serverTime,
         idempotentReplay, gatewayResult);
       init.ackAccepted = false;
@@ -163,8 +169,32 @@ export class ControlAckMapper {
     init.reportedState = deviceState;
     init.gatewayBoardState = gatewayState;
     init.stateVerification = stateVerification;
-    init.shouldApplyState = !(idempotentReplay && expected.alreadyApplied);
+    // DES-A §5.1.4: shouldApplyState only applies a device-side patch.
+    init.shouldApplyState = init.ackAccepted && deviceState !== undefined &&
+      !(idempotentReplay && expected.alreadyApplied);
     return ControlOutcome.create(init);
+  }
+
+  /**
+   * R-04: strict schema validation for a reported_state that is present on a
+   * non-zero result ACK. The value is diagnostic only and is not exposed on
+   * ControlOutcome for the error path.
+   */
+  private static validateReportedState(node: JsonNode, collected: ProtocolDeviation[],
+    deviations: ProtocolDeviationSink): void {
+    if (node.kind !== JsonKind.OBJECT) {
+      throw ProtocolErrors.ackProtocolViolation('reported_state');
+    }
+    const hasDeviceId = node.has('deviceId');
+    const hasGatewayId = node.has('gatewayId');
+    if (hasDeviceId === hasGatewayId) {
+      throw ProtocolErrors.ackProtocolViolation('reported_state');
+    }
+    if (hasDeviceId) {
+      ControlAckMapper.mapDeviceState(node, collected, deviations);
+    } else {
+      ControlAckMapper.mapGatewayState(node, collected, deviations);
+    }
   }
 
   private static baseOutcome(requestId: string, seq: number, resultCode: number,
@@ -353,8 +383,10 @@ export class ControlAckMapper {
       return ControlAckMapper.numericMatch(expected.requestedValue, deviceState.targetTemperature);
     }
     if (expected.action === DeviceAction.SET_MODE) {
-      if (deviceState.mode === undefined || !deviceState.modeStandard ||
-        typeof expected.requestedValue !== 'string') {
+      // DES-A §5.1.4/§6.1.4 step 8 compares the reported value with the
+      // requested raw value. Non-standard vocabulary is C-11/C-16/CB §6.3
+      // enforcement and DES-B §8.1.6 cloud policy, not this LAN mapper.
+      if (deviceState.mode === undefined || typeof expected.requestedValue !== 'string') {
         return StateVerification.UNVERIFIED;
       }
       return expected.requestedValue === deviceState.mode ? StateVerification.MATCH :
@@ -426,7 +458,7 @@ export class ControlAckMapper {
     const keys = node.keys();
     for (let index = 0; index < keys.length; index++) {
       if (allowed.indexOf(keys[index]) < 0) {
-        throw AppErrors.protocol('PROTOCOL_UNKNOWN_FIELD', keys[index]);
+        throw ProtocolErrors.ackProtocolViolation(keys[index]);
       }
     }
   }

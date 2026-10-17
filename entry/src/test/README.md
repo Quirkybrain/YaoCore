@@ -1,7 +1,7 @@
 # Host 单元测试（无设备）
 
 - **Producer**: agent:test-engineer
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`（R-12 更新当前 revision）
 - **状态**: **可运行（Node host runner）**；`hvigorw test` 的 Hypium 入口可编译，但本环境无法执行（见 §3）。
 
 ## 1. 目录与约定
@@ -43,15 +43,17 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前结果：**15/15 PASS**（`evidence/host-node-tests.tap`）。覆盖：
+当前 revision：**88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`，T-06 修复后）。覆盖：
 
-- 4 条控制 HMAC 向量（canonical + HMAC-SHA256）；
+- 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
-- golden discover / ACK / replay 结构断言；
+- golden discover / ACK / replay 结构断言与 ACK 严格 schema 负例；
 - `valueAtom` 语义；
 - 测试证书 SPKI-SHA256 与 Python 仿真器 pin 一致；
 - NFR 4.3 测量 harness（percentile/样本/报告分类）；
 - host runner 基线断言。
+
+T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）；该数字仅代表 T-05 建立 runner 时的范围，不代表当前 revision。
 
 ## 3. `hvigorw test` 的真实状态：BLOCKED（环境）
 
@@ -92,7 +94,7 @@ Node host runner 是本环境唯一已实证的可执行 host 路径，覆盖纯
 
 | 层 | 路径 | 运行条件 | 当前 |
 |---|---|---|---|
-| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 15/15** |
+| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 88/88**（T-05 基线 15/15） |
 | Hypium host | `entry/src/test/List.test.ets` | `hvigorw test` + Linux Previewer | **BLOCKED**（见 §3） |
 | 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README） |
 

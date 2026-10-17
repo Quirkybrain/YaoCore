@@ -8,7 +8,7 @@
  */
 import { AppErrors } from '../../common/types/AppError';
 import { ProtocolConstants } from '../../common/constants/ProtocolConstants';
-import { DeviceAction } from '../../common/constants/DeviceConstants';
+import { ActionValueKind, DeviceAction, DeviceConstants } from '../../common/constants/DeviceConstants';
 import { JsonNode, NameValueNode } from '../../common/types/JsonNode';
 import { JsonAtom } from '../../common/utils/JsonAtom';
 import type { CommandValue } from '../../common/utils/JsonAtom';
@@ -85,7 +85,10 @@ export class ControlRequestSerializer {
     }
     ControlRequestSerializer.validateValue(request.payload.action, request.payload.value);
     DateTimeUtil.parseUtcCompact(request.timestamp);
-    if (!ProtocolConstants.NONCE_PATTERN.test(request.nonce)) {
+    // DES-A §3.3/§18.5: App-generated outbound nonce is 16 random bytes as
+    // 32 lowercase hex characters. The wire schema is looser; this serializer
+    // is the last structural gate before signing.
+    if (!ProtocolConstants.HEX_LOWER_32.test(request.nonce)) {
       throw AppErrors.protocol('PROTOCOL_INVALID_IDENTIFIER', 'nonce');
     }
     if (request.alg !== ProtocolConstants.ALG_HMAC_SHA256) {
@@ -103,8 +106,18 @@ export class ControlRequestSerializer {
     if (value === undefined) {
       return;
     }
-    if (typeof value === 'number') {
-      if (!Number.isFinite(value)) {
+    const kind = DeviceConstants.actionToValueKind(action as DeviceAction);
+    if (kind === ActionValueKind.NONE) {
+      throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'value');
+    }
+    if (kind === ActionValueKind.BOOLEAN) {
+      if (typeof value !== 'boolean') {
+        throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'value');
+      }
+      return;
+    }
+    if (kind === ActionValueKind.NUMBER) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
         throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'value');
       }
       if (action === DeviceAction.SET_BRIGHTNESS && (value < 0 || value > 100)) {
@@ -119,22 +132,18 @@ export class ControlRequestSerializer {
       }
       return;
     }
-    if (typeof value === 'string') {
-      const maxLength = action === DeviceAction.SET_MODE ?
-        ProtocolConstants.MAX_MODE_LENGTH_OUTBOUND : 63;
-      if (value.length > maxLength) {
-        throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'value');
-      }
-      if (action === DeviceAction.SET_COLOR && !COLOR_PATTERN.test(value)) {
-        throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'value');
-      }
-      // Reject lone surrogates before they reach JSON encoding.
-      JsonAtom.normalizeString(value);
-      return;
+    if (typeof value !== 'string') {
+      throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'value');
     }
-    if (typeof value === 'boolean') {
-      return;
+    const maxLength = action === DeviceAction.SET_MODE ?
+      ProtocolConstants.MAX_MODE_LENGTH_OUTBOUND : 63;
+    if (value.length > maxLength) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'value');
     }
-    throw AppErrors.protocol('PROTOCOL_INVALID_TYPE', 'value');
+    if (kind === ActionValueKind.COLOR && !COLOR_PATTERN.test(value)) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'value');
+    }
+    // Reject lone surrogates before they reach JSON encoding.
+    JsonAtom.normalizeString(value);
   }
 }

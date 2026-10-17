@@ -60,6 +60,10 @@ test('C01_AppError_catalogCarriesCategoryRetryableAndI18nKey', () => {
   assert.equal(ErrorCatalog.resolve('HTTP_404').retryable, false);
   assert.equal(ErrorCatalog.resolve('PROVISIONING_WIFI_AUTH_ERROR').i18nKey,
     'provisioning.error.auth_error');
+  assert.equal(ErrorCatalog.resolve('INVITE_VERSION_UNSUPPORTED').i18nKey,
+    'errors.app.invite_invalid');
+  assert.equal(ErrorCatalog.resolve('INVITE_AEAD_FAILED').i18nKey,
+    'errors.app.invite_invalid');
   assert.equal(ErrorCatalog.resolve('UNKNOWN_FUTURE_CODE').category, ErrorCategory.INTERNAL);
 });
 
@@ -164,7 +168,9 @@ test('C01_Base64Url_isUnpaddedAndStrict', () => {
   assert.deepEqual(Array.from(Base64Url.decode('-_8')), [0xfb, 0xff]);
   assert.equal(BytesUtil.fromUtf8(Base64Url.decode(Base64Url.encode(BytesUtil.utf8('YaoCore')))),
     'YaoCore');
-  assert.equal(Base64Url.decode('').length, 0);
+  assert.equal(Base64Url.encode(new Uint8Array([])), '');
+  expectCode(() => Base64Url.decode(''), 'SECRET_ENCODING_INVALID');
+  assert.equal(Base64Url.isValid(''), false);
   assert.equal(Base64Url.isValid('Zm9v'), true);
   assert.equal(Base64Url.isValid('Zm9v='), false);
   assert.equal(Base64Url.isValid('a'), false);

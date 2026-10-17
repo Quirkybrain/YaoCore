@@ -56,7 +56,8 @@ export function DiscoverMapperSuite(): void {
         new DiscoverMapContext(undefined, 0), counter);
       expect(snapshot.devices[0].isOnline).assertTrue();
       expect(snapshot.devices[0].powerStatus).assertTrue();
-      expect(snapshot.isPartial).assertTrue();
+      expect(snapshot.isPartial).assertFalse();
+      expect(snapshot.aliasUsed).assertTrue();
       expect(counter.counts().get(DeviationCode.ALIAS_FIELD_USED)).assertEqual(2);
       expect(counter.counts().get(DeviationCode.SUCCESS_FIELD_IGNORED)).assertEqual(1);
     });

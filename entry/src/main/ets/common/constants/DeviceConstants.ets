@@ -105,6 +105,11 @@ export class DeviceConstants {
   }
 
   static actionToValueKind(action: DeviceAction): ActionValueKind {
+    if (action === DeviceAction.OPEN || action === DeviceAction.CLOSE ||
+      action === DeviceAction.TURN_ON || action === DeviceAction.TURN_OFF ||
+      action === DeviceAction.BOARD_LED_ON || action === DeviceAction.BOARD_LED_OFF) {
+      return ActionValueKind.BOOLEAN;
+    }
     if (action === DeviceAction.SET_BRIGHTNESS || action === DeviceAction.SET_TARGET_TEMPERATURE ||
       action === DeviceAction.SET_POSITION || action === DeviceAction.SET_SPEED ||
       action === DeviceAction.SET_VOLUME) {

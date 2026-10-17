@@ -25,8 +25,35 @@ import {
 } from '../../model/CloudModels';
 
 const SERVICE_FIELDS: ReadonlyArray<string> = ['service_id', 'properties', 'event_time'];
+const SERVICES_ROOT_FIELDS: ReadonlyArray<string> = ['services'];
 const SHADOW_SERVICE_FIELDS: ReadonlyArray<string> = ['service_id', 'reported', 'desired', 'version'];
 const SHADOW_REPORTED_FIELDS: ReadonlyArray<string> = ['properties', 'event_time'];
+
+/** Required fixed properties from input/api/protocol/state-report.schema.json. */
+const REQUIRED_SERVICE_PROPERTIES: ReadonlyArray<string> = [
+  'Door_01_Online', 'Light_01_Online', 'Sensor_01_Online', 'Presence_01_Online',
+  'AC_01_Online', 'Gateway_Online', 'Gateway_RSSI'
+];
+
+const REQUIRED_BOOLEAN_PROPERTIES: ReadonlyArray<string> = [
+  'Door_01_Online', 'Light_01_Online', 'Sensor_01_Online', 'Presence_01_Online',
+  'AC_01_Online', 'Gateway_Online'
+];
+
+/** Full property allowlist (schema additionalProperties:false). */
+const SERVICE_PROPERTY_FIELDS: ReadonlyArray<string> = [
+  'DeviceInventoryJson',
+  'Door_01_Online', 'Door_01_Status', 'Door_01_LastRequestId', 'Door_01_LastSeq',
+  'Door_01_StateSource',
+  'Light_01_Online', 'Light_01_Status', 'Light_01_Brightness', 'Light_01_LastRequestId',
+  'Light_01_LastSeq', 'Light_01_StateSource', 'Light_01_TriggerDeviceId', 'Light_01_AutomationId',
+  'Sensor_01_Online',
+  'Presence_01_Online', 'Presence_01_Detected',
+  'AC_01_Online', 'AC_01_Status', 'AC_01_TargetTemp', 'AC_01_Mode', 'AC_01_LastRequestId',
+  'AC_01_LastSeq', 'AC_01_StateSource', 'AC_01_TriggerDeviceId', 'AC_01_AutomationId',
+  'Room_01_Temperature', 'Room_01_Humidity',
+  'Gateway_Online', 'Gateway_RSSI'
+];
 
 export class ShadowMapContext {
   readonly gatewayDeviceId: string;
@@ -69,6 +96,11 @@ export class StateReportMapper {
   }
 
   private static mapServices(root: JsonNode, context: ShadowMapContext): StateReportSnapshot {
+    // R-09: state-report.schema.json is authoritative for the SERVICES shape.
+    // Top-level and service-level objects are closed; the seven fixed
+    // properties are required. SHADOW/DEVICES shapes remain tolerant in T-06;
+    // T-14 owns the full strict cloud adapter and DeviceInventoryJson.
+    StateReportMapper.rejectUnknown(root, SERVICES_ROOT_FIELDS);
     const servicesNode = root.require('services');
     if (servicesNode.kind !== JsonKind.ARRAY || servicesNode.arrayValue.length !== 1) {
       throw StateReportMapper.invalid('services');
@@ -83,6 +115,10 @@ export class StateReportMapper {
       throw StateReportMapper.invalid('service_id');
     }
     const propertiesNode = serviceNode.require('properties');
+    if (propertiesNode.kind !== JsonKind.OBJECT) {
+      throw StateReportMapper.invalid('properties');
+    }
+    StateReportMapper.validateServiceProperties(propertiesNode);
     const properties = StateReportMapper.flattenProperties(propertiesNode);
     const eventTime = StateReportMapper.requiredString(serviceNode, 'event_time');
     const eventEpochMs = DateTimeUtil.parseUtcCompact(eventTime);
@@ -296,6 +332,30 @@ export class StateReportMapper {
       devices.push(ShadowDeviceState.create(init));
     }
     return devices;
+  }
+
+  private static validateServiceProperties(node: JsonNode): void {
+    for (let index = 0; index < REQUIRED_SERVICE_PROPERTIES.length; index++) {
+      if (!node.has(REQUIRED_SERVICE_PROPERTIES[index])) {
+        throw StateReportMapper.invalid(REQUIRED_SERVICE_PROPERTIES[index]);
+      }
+    }
+    const keys = node.keys();
+    for (let index = 0; index < keys.length; index++) {
+      if (SERVICE_PROPERTY_FIELDS.indexOf(keys[index]) < 0) {
+        throw StateReportMapper.invalid(keys[index]);
+      }
+    }
+    for (let index = 0; index < REQUIRED_BOOLEAN_PROPERTIES.length; index++) {
+      if (node.require(REQUIRED_BOOLEAN_PROPERTIES[index]).kind !== JsonKind.BOOLEAN) {
+        throw StateReportMapper.invalid(REQUIRED_BOOLEAN_PROPERTIES[index]);
+      }
+    }
+    const rssi = node.require('Gateway_RSSI');
+    if (rssi.kind !== JsonKind.NUMBER || !Number.isInteger(rssi.numberValue) ||
+      rssi.numberValue < -127 || rssi.numberValue > 0) {
+      throw StateReportMapper.invalid('Gateway_RSSI');
+    }
   }
 
   private static flattenProperties(node: JsonNode): NameValue[] {

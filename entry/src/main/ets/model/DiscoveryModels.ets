@@ -38,6 +38,7 @@ export class DiscoverySnapshotInit {
     ProtocolConstants.KEY_ID_V1, ProtocolConstants.TIME_WINDOW_SECONDS, ProtocolConstants.NONCE_TTL_SECONDS);
   devices: ReadonlyArray<DeviceSnapshot> = [];
   isPartial: boolean = false;
+  aliasUsed: boolean = false;
   deviations: ReadonlyArray<ProtocolDeviation> = [];
 }
 
@@ -50,6 +51,8 @@ export class DiscoverySnapshot {
   readonly security: DiscoverySecurity;
   readonly devices: ReadonlyArray<DeviceSnapshot>;
   readonly isPartial: boolean;
+  /** Diagnostic only: at least one device used an inbound alias wire field. */
+  readonly aliasUsed: boolean;
   readonly deviations: ReadonlyArray<ProtocolDeviation>;
 
   private constructor(init: DiscoverySnapshotInit) {
@@ -61,6 +64,7 @@ export class DiscoverySnapshot {
     this.security = init.security;
     this.devices = init.devices;
     this.isPartial = init.isPartial;
+    this.aliasUsed = init.aliasUsed;
     this.deviations = init.deviations;
   }
 

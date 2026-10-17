@@ -185,8 +185,8 @@ test('C03_ControlAckMapper_stateVerificationDistinguishesMatchMismatchUnverified
   assert.equal(unverified.stateVerification, StateVerification.UNVERIFIED);
 });
 
-test('C03_ControlAckMapper_gatewayBoardStateIsComparedAndApplied', () => {
-  const exp = new AckExpectation('req-led', 2, 'gw_01', DeviceAction.BOARD_LED_ON, undefined, false);
+test('C03_ControlAckMapper_gatewayBoardStateIsExposedButNotApplied', () => {
+  const exp = new AckExpectation('req-led', 2, 'gw_01', DeviceAction.BOARD_LED_ON, true, false);
   const { outcome } = map(ack({
     request_id: 'req-led',
     seq: 2,
@@ -200,7 +200,8 @@ test('C03_ControlAckMapper_gatewayBoardStateIsComparedAndApplied', () => {
   assert.equal(outcome.ackAccepted, true);
   assert.equal(outcome.stateVerification, StateVerification.MATCH);
   assert.equal(outcome.gatewayBoardState.boardLed, true);
-  assert.equal(outcome.shouldApplyState, true);
+  assert.equal(outcome.reportedState, undefined);
+  assert.equal(outcome.shouldApplyState, false);
 });
 
 test('C03_ControlAckMapper_successFieldIsAlwaysIgnoredAndCounted', () => {
@@ -228,7 +229,7 @@ test('C03_ControlAckMapper_errorCodeOnSuccessIsDiagnosticOnly', () => {
 });
 
 test('C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes', () => {
-  assert.equal(mapError(ack({ unexpected: true })).code, 'PROTOCOL_UNKNOWN_FIELD');
+  assert.equal(mapError(ack({ unexpected: true })).code, 'ACK_PROTOCOL_VIOLATION');
   assert.equal(mapError(ack({ message: '' })).code, 'ACK_PROTOCOL_VIOLATION');
   assert.equal(mapError(ack({ server_time: '2026-10-16T15:55:34Z' })).code,
     'PROTOCOL_INVALID_TIMESTAMP');
@@ -241,9 +242,79 @@ test('C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes', () => {
   } })).code, 'ACK_PROTOCOL_VIOLATION');
 });
 
-test('C03_ControlAckMapper_nonStandardModeIsUnverifiedNotSuccess', () => {
-  const exp = new AckExpectation('req-mode', 3, 'AC_01', DeviceAction.SET_MODE, 'COOL', false);
-  const { outcome, counter } = map(ack({
+test('C03_ControlAckMapper_unknownFieldsUseAckProtocolViolationInAllShapes', () => {
+  assert.equal(mapError(ack({ unexpected: true })).code, 'ACK_PROTOCOL_VIOLATION');
+  assert.equal(mapError(ack({ reported_state: {
+    deviceId: 'Light_01',
+    online: true,
+    brightness: 42,
+    unexpected: true,
+    updatedAt: '20261016T155534Z',
+  } })).code, 'ACK_PROTOCOL_VIOLATION');
+  const gateway = new AckExpectation('req-led', 2, 'gw_01', DeviceAction.BOARD_LED_ON, true, false);
+  assert.equal(mapError(ack({
+    request_id: 'req-led',
+    seq: 2,
+    reported_state: {
+      gatewayId: 'gw_01',
+      online: true,
+      boardLed: true,
+      unexpected: true,
+      updatedAt: '20261016T155534Z',
+    },
+  }), gateway).code, 'ACK_PROTOCOL_VIOLATION');
+});
+
+test('C03_ControlAckMapper_nonZeroResultStillValidatesReportedStateSchema', () => {
+  const bothShapes = ack({
+    result_code: 1007,
+    reported_state: {
+      deviceId: 'Light_01',
+      gatewayId: 'gw_01',
+      online: true,
+      boardLed: true,
+      updatedAt: '20261016T155534Z',
+    },
+  });
+  assert.equal(mapError(bothShapes).code, 'ACK_PROTOCOL_VIOLATION');
+
+  const unknownField = ack({
+    result_code: 1007,
+    reported_state: {
+      deviceId: 'Light_01',
+      online: true,
+      unexpected: true,
+      updatedAt: '20261016T155534Z',
+    },
+  });
+  assert.equal(mapError(unknownField).code, 'ACK_PROTOCOL_VIOLATION');
+
+  const invalidType = ack({
+    result_code: 1007,
+    reported_state: {
+      deviceId: 'Light_01',
+      online: 'true',
+      updatedAt: '20261016T155534Z',
+    },
+  });
+  assert.equal(mapError(invalidType).code, 'ACK_PROTOCOL_VIOLATION');
+
+  const valid = map(ack({
+    result_code: 1007,
+    reported_state: {
+      deviceId: 'Light_01',
+      online: true,
+      updatedAt: '20261016T155534Z',
+    },
+  })).outcome;
+  assert.equal(valid.ackAccepted, false);
+  assert.equal(valid.reportedState, undefined);
+  assert.equal(valid.shouldApplyState, false);
+});
+
+test('C03_ControlAckMapper_nonStandardModeComparesRawValue', () => {
+  const mismatched = new AckExpectation('req-mode', 3, 'AC_01', DeviceAction.SET_MODE, 'COOL', false);
+  const different = map(ack({
     request_id: 'req-mode',
     seq: 3,
     reported_state: {
@@ -252,10 +323,37 @@ test('C03_ControlAckMapper_nonStandardModeIsUnverifiedNotSuccess', () => {
       mode: 'TURBO',
       updatedAt: '20261016T155534Z',
     },
-  }), exp);
-  assert.equal(outcome.ackAccepted, true);
-  assert.equal(outcome.stateVerification, StateVerification.UNVERIFIED);
-  assert.equal(counter.counts().get(DeviationCode.NON_STANDARD_AC_MODE), 1);
+  }), mismatched);
+  assert.equal(different.outcome.ackAccepted, true);
+  assert.equal(different.outcome.stateVerification, StateVerification.MISMATCH);
+  assert.equal(different.counter.counts().get(DeviationCode.NON_STANDARD_AC_MODE), 1);
+
+  const matched = new AckExpectation('req-mode', 3, 'AC_01', DeviceAction.SET_MODE, 'TURBO', false);
+  const equal = map(ack({
+    request_id: 'req-mode',
+    seq: 3,
+    reported_state: {
+      deviceId: 'AC_01',
+      online: true,
+      mode: 'TURBO',
+      updatedAt: '20261016T155534Z',
+    },
+  }), matched);
+  assert.equal(equal.outcome.ackAccepted, true);
+  assert.equal(equal.outcome.stateVerification, StateVerification.MATCH);
+  assert.equal(equal.counter.counts().get(DeviationCode.NON_STANDARD_AC_MODE), 1);
+
+  const missing = map(ack({
+    request_id: 'req-mode',
+    seq: 3,
+    reported_state: {
+      deviceId: 'AC_01',
+      online: true,
+      updatedAt: '20261016T155534Z',
+    },
+  }), mismatched);
+  assert.equal(missing.outcome.ackAccepted, true);
+  assert.equal(missing.outcome.stateVerification, StateVerification.UNVERIFIED);
 });
 
 test('C03_ControlAckMapper_lowercaseColorIsNormalizedForComparison', () => {
