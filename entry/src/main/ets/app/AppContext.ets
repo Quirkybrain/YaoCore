@@ -53,11 +53,26 @@ export interface SessionGateAuthPort {
   lockAll(): Promise<void>;
 }
 
+/**
+ * C-22 onboarding capability reachable from the NO_PROFILE gate (F-02).
+ * Implemented by app/OnboardingService; AppContext only owns the gate refresh.
+ * Joining is two-step because a KEY_WRAP invitation answers a YCR1 request
+ * created by this device (FamilyJoinSession.start -> submitInvitation).
+ */
+export interface OnboardingPort {
+  createFamily(familyName: string, ownerDisplayName: string, password: string): Promise<void>;
+  startJoin(displayName: string): Promise<string>;
+  completeJoin(invitationText: string, code: string, displayName: string,
+    password: string): Promise<void>;
+  cancelJoin(): Promise<void>;
+}
+
 /** C-28 services needed by AppContext; AppCompositionRoot implements this. */
 export interface AppContextRootPort {
   readonly i18n: I18nService;
   readonly sessionAuth: SessionGateAuthPort;
   readonly activeFamily: ActiveFamilyPort;
+  readonly onboarding: OnboardingPort;
   readonly preferences: PreferencesStore;
   readonly secretDrafts: SecretDraftPort;
   readonly ble: IBleProvisioningClient;
@@ -153,8 +168,12 @@ export class AppContext {
 
     let next: SessionGateState = SessionGateState.NO_PROFILE;
     if (family !== undefined && hasProfile) {
-      next = this.root.sessionAuth.getActiveSession() === undefined
-        ? SessionGateState.LOCKED : SessionGateState.UNLOCKED;
+      const session = this.root.sessionAuth.getActiveSession();
+      // F-13: a session for another family must never unlock this family.
+      const hasSessionForActiveFamily = session !== undefined &&
+        session.familyId === family.familyId;
+      next = hasSessionForActiveFamily
+        ? SessionGateState.UNLOCKED : SessionGateState.LOCKED;
     }
     this.setGate(next);
   }
@@ -171,7 +190,33 @@ export class AppContext {
 
   async setActiveFamily(familyId: string): Promise<void> {
     await this.root.activeFamily.setActiveFamily(familyId);
+    // F-13: switching the active family must never inherit the previous
+    // family's session; lock first, then recompute the gate.
+    await this.root.sessionAuth.lockAll();
     await this.refreshSessionGate();
+  }
+
+  /** F-02: NO_PROFILE onboarding; creates family + owner profile, then locks. */
+  async createFamily(familyName: string, ownerDisplayName: string,
+    password: string): Promise<void> {
+    await this.root.onboarding.createFamily(familyName, ownerDisplayName, password);
+    await this.refreshSessionGate();
+  }
+
+  /** F-02: creates this device's YCR1 join request for an admin. */
+  startJoin(displayName: string): Promise<string> {
+    return this.root.onboarding.startJoin(displayName);
+  }
+
+  /** F-02: accepts the admin's YCI1 invitation, then locks. */
+  async completeJoin(invitationText: string, code: string, displayName: string,
+    password: string): Promise<void> {
+    await this.root.onboarding.completeJoin(invitationText, code, displayName, password);
+    await this.refreshSessionGate();
+  }
+
+  cancelJoin(): Promise<void> {
+    return this.root.onboarding.cancelJoin();
   }
 
   async unlock(profileId: string, password: string): Promise<SessionInfo> {

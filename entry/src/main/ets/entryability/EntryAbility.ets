@@ -20,9 +20,12 @@
  *
  * onCreate builds the one AppCompositionRoot + AppContext and starts
  * AppContext.initialize() without blocking or leaking an unhandled rejection.
- * onWindowStageCreate loads pages/Index only after initialization settles; the
- * context/error travel through one LocalStorage bootstrap. No auto discovery,
- * auto cloud polling or auto unlock happens at startup.
+ * onWindowStageCreate applies the immersive window layout (UIUX §2.1: system
+ * bars are drawn edge-to-edge; Index content stays inside the safe area) and
+ * loads pages/Index only after initialization settles. The context/error travel
+ * through one ability LocalStorage bootstrap; Index declares
+ * `@Entry({ useSharedStorage: true })` so that instance is the page storage.
+ * No auto discovery, auto cloud polling or auto unlock happens at startup.
  */
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -75,6 +78,7 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'onWindowStageCreate');
     this.windowStage = windowStage;
+    this.applyImmersiveWindow(windowStage);
     this.initPromise.then((): void => {
       this.loadIndex(windowStage);
     }).catch((): void => {
@@ -104,6 +108,28 @@ export default class EntryAbility extends UIAbility {
       context.onBackground().catch((error: Object): void => {
         hilog.warn(DOMAIN, TAG, '%{public}s', 'on_background_failed');
       });
+    }
+  }
+
+  /**
+   * UIUX §2.1 / DES-B §17.1.4: draw the ambient backdrop edge-to-edge under
+   * the system bars while ArkUI keeps page content inside the safe area
+   * (ShellBackdrop opts into expandSafeArea; interactive content does not).
+   */
+  private applyImmersiveWindow(windowStage: window.WindowStage): void {
+    try {
+      const mainWindow = windowStage.getMainWindowSync();
+      mainWindow.setWindowLayoutFullScreen(true).catch((error: Object): void => {
+        hilog.warn(DOMAIN, TAG, '%{public}s', 'window_layout_full_screen_failed');
+      });
+      mainWindow.setWindowSystemBarProperties({
+        statusBarColor: '#00000000',
+        navigationBarColor: '#00000000'
+      }).catch((error: Object): void => {
+        hilog.warn(DOMAIN, TAG, '%{public}s', 'window_system_bar_failed');
+      });
+    } catch (error) {
+      hilog.warn(DOMAIN, TAG, '%{public}s', 'window_layout_unavailable');
     }
   }
 

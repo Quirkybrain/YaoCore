@@ -7,11 +7,16 @@
  * records every construction and initialization step through AssemblyTrace;
  * an out-of-order or repeated step fails closed with CONFIGURATION_ERROR.
  *
- * Deviation from DES-B §2.4 (recorded in artifacts/50-implementation/t17-ui-shell.md):
- * SceneService depends on the BACKGROUND IGatewayClient/DeviceControlPort, so
- * it is constructed after the two LocalGatewayService instances instead of at
- * step 13. RoomService/FamilyService remain at the step-13 position. Every
- * other dependency edge follows §2.4.
+ * Deviations from DES-B §2.4 (recorded in the T-17 implementation and fix
+ * reports):
+ * - SceneService depends on the BACKGROUND IGatewayClient/DeviceControlPort, so
+ *   it is constructed after the two LocalGatewayService instances instead of at
+ *   step 13. RoomService/FamilyService remain at the step-13 position.
+ * - CryptoService is constructed in PLATFORM (step 1) instead of the §2.4
+ *   security stack (step 5). It only depends on OhosCryptoProvider and
+ *   CryptoRandomSource; no storage edge exists. SECURITY is still recorded as
+ *   the §2.4 security-stack step.
+ * Every other dependency edge follows §2.4.
  */
 
 import { AppErrors } from '../common/types/AppError';

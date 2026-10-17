@@ -15,24 +15,55 @@ import {
   SessionGateState
 } from '../app/AppContext';
 import { NavigationService } from '../app/NavigationService';
+import { ShellGateEntry, ShellGateRouting } from '../app/ShellGateRouting';
 import { ShellTheme } from '../app/ShellTheme';
+import { OnboardingMode, OnboardingView } from './OnboardingView';
 
 @Component
 export struct SessionGateView {
   @Require appContext: AppContext;
   @Require i18n: I18nService;
-  @Prop gate: SessionGateState = SessionGateState.NO_PROFILE;
+  @Prop @Watch('onGateChanged') gate: SessionGateState = SessionGateState.NO_PROFILE;
   @Prop familyName: string = '';
+  @Prop @Watch('onFamilyChanged') activeFamilyId: string = '';
   @State profiles: SessionGateProfile[] = [];
   @State selectedProfileId: string = '';
   @State password: string = '';
   @State busy: boolean = false;
   @State errorKey: string = '';
+  @State profilesError: boolean = false;
+  @State onboardingMode: OnboardingMode = OnboardingMode.NONE;
 
   aboutToAppear(): void {
     if (this.gate === SessionGateState.LOCKED) {
       this.loadProfiles();
     }
+  }
+
+  /** F-04: NO_PROFILE -> LOCKED (onboarding/create/join) reloads profiles. */
+  private onGateChanged(): void {
+    this.resetEntryState();
+    if (this.gate === SessionGateState.LOCKED) {
+      this.loadProfiles();
+    } else {
+      this.profiles = [];
+      this.profilesError = false;
+    }
+  }
+
+  /** F-04: a family switch must not keep the previous family's profile list. */
+  private onFamilyChanged(): void {
+    this.resetEntryState();
+    if (this.gate === SessionGateState.LOCKED) {
+      this.loadProfiles();
+    }
+  }
+
+  private resetEntryState(): void {
+    this.selectedProfileId = '';
+    this.password = '';
+    this.errorKey = '';
+    this.onboardingMode = OnboardingMode.NONE;
   }
 
   build() {
@@ -50,6 +81,39 @@ export struct SessionGateView {
           .fontSize(ShellTheme.FONT_BODY)
           .fontColor($r('app.color.shell_ink_soft'))
           .textAlign(TextAlign.Center)
+        if (this.onboardingMode === OnboardingMode.NONE) {
+          if (ShellGateRouting.hasEntry(this.gate, ShellGateEntry.CREATE_FAMILY)) {
+            Button(this.i18n.t('family.create'))
+              .width('100%')
+              .fontSize(ShellTheme.FONT_BODY)
+              .fontColor(Color.White)
+              .backgroundColor($r('app.color.shell_primary'))
+              .borderRadius(ShellTheme.BUTTON_RADIUS)
+              .onClick((): void => {
+                this.onboardingMode = OnboardingMode.CREATE;
+              })
+          }
+          if (ShellGateRouting.hasEntry(this.gate, ShellGateEntry.JOIN_FAMILY)) {
+            Button(this.i18n.t('family.switch'))
+              .width('100%')
+              .fontSize(ShellTheme.FONT_BODY)
+              .fontColor($r('app.color.shell_ink'))
+              .backgroundColor($r('app.color.shell_surface'))
+              .borderRadius(ShellTheme.BUTTON_RADIUS)
+              .onClick((): void => {
+                this.onboardingMode = OnboardingMode.JOIN;
+              })
+          }
+        } else {
+          OnboardingView({
+            appContext: this.appContext,
+            i18n: this.i18n,
+            mode: this.onboardingMode,
+            onCancel: (): void => {
+              this.onboardingMode = OnboardingMode.NONE;
+            }
+          })
+        }
       } else {
         Text($r('app.string.session_locked_title'))
           .fontSize(ShellTheme.FONT_TITLE)
@@ -67,6 +131,20 @@ export struct SessionGateView {
         Text($r('app.string.session_profile_prompt'))
           .fontSize(ShellTheme.FONT_LABEL)
           .fontColor($r('app.color.shell_muted'))
+        if (this.profilesError) {
+          Text($r('app.string.common_refresh_failed'))
+            .fontSize(ShellTheme.FONT_LABEL)
+            .fontColor($r('app.color.shell_danger'))
+            .textAlign(TextAlign.Center)
+          Button($r('app.string.common_retry'))
+            .fontSize(ShellTheme.FONT_BODY)
+            .fontColor($r('app.color.shell_ink'))
+            .backgroundColor($r('app.color.shell_surface'))
+            .borderRadius(ShellTheme.BUTTON_RADIUS)
+            .onClick((): void => {
+              this.loadProfiles();
+            })
+        }
         ForEach(this.profiles, (profile: SessionGateProfile): void => {
           Button(profile.displayName)
             .width('100%')
@@ -123,15 +201,25 @@ export struct SessionGateView {
   }
 
   private loadProfiles(): void {
+    this.profilesError = false;
     this.appContext.listProfiles().then(
       (profiles: ReadonlyArray<SessionGateProfile>): void => {
         this.profiles = profiles.slice();
-        if (this.selectedProfileId.length === 0 && profiles.length > 0) {
-          this.selectedProfileId = profiles[0].profileId;
+        let selectionStillValid = false;
+        for (let index = 0; index < profiles.length; index++) {
+          if (profiles[index].profileId === this.selectedProfileId) {
+            selectionStillValid = true;
+            break;
+          }
+        }
+        if (!selectionStillValid) {
+          this.selectedProfileId = profiles.length > 0 ? profiles[0].profileId : '';
         }
       },
       (error: Object): void => {
         this.profiles = [];
+        this.selectedProfileId = '';
+        this.profilesError = true;
       });
   }
 

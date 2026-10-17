@@ -51,6 +51,12 @@ export interface PermissionPort {
 export class PermissionPolicy {
   static readonly INTERNET: string = 'ohos.permission.INTERNET';
   static readonly ACCESS_BLUETOOTH: string = 'ohos.permission.ACCESS_BLUETOOTH';
+  /**
+   * `abilityAccessCtrl.AtManager.getSelfPermissionStatus` is @since 20. The
+   * project compatibility floor is API 14, where checkAccessTokenSync only
+   * reports granted/denied and cannot express NOT_DETERMINED.
+   */
+  static readonly SELF_PERMISSION_STATUS_MIN_API: number = 20;
 
   /** Permissions declared in entry/src/main/module.json5 (v1). */
   static manifestPermissions(): ReadonlyArray<string> {
@@ -99,6 +105,33 @@ export class PermissionPolicy {
       return PermissionState.NOT_DETERMINED;
     }
     return PermissionState.UNAVAILABLE;
+  }
+
+  /**
+   * F-03: on API < 20, checkAccessTokenSync cannot distinguish "never asked"
+   * from "denied". A non-granted token therefore maps to NOT_DETERMINED so the
+   * action entry requests the permission once; API 20+ keeps the precise
+   * denied state and never re-prompts automatically.
+   */
+  static stateFromTokenCheck(granted: boolean, apiLevel: number): PermissionState {
+    if (granted) {
+      return PermissionState.GRANTED;
+    }
+    return apiLevel >= PermissionPolicy.SELF_PERMISSION_STATUS_MIN_API
+      ? PermissionState.DENIED : PermissionState.NOT_DETERMINED;
+  }
+
+  /**
+   * Request only an undetermined permission, and at most once per process for
+   * a given kind. After the first request, a still-undetermined state is
+   * reported as DENIED + canOpenSettings (never a request loop).
+   */
+  static shouldRequestPermission(state: PermissionState, requestedInProcess: boolean): boolean {
+    return state === PermissionState.NOT_DETERMINED && !requestedInProcess;
+  }
+
+  static stateAfterSuppressedRequest(): PermissionState {
+    return PermissionState.DENIED;
   }
 
   /** PermissionRequestResult.authResults values: 0 granted, negative denied. */

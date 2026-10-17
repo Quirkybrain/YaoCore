@@ -4,11 +4,15 @@
  * Contract: DES-B §17.1.5, §17.3; DES-B-C28-STATE
  *
  * Boot sequence:
- *   1. read the ShellBootstrap written by EntryAbility;
+ *   1. read the ShellBootstrap written by EntryAbility's ability LocalStorage;
  *   2. subscribe session-gate + locale changes;
  *   3. await AppContext.initialize();
  *   4. render StartupErrorView, SessionGateView, or MainShell.
  * No business page is constructed before the session gate is UNLOCKED.
+ *
+ * `useSharedStorage: true` is required (API 12+): without it the framework
+ * creates a page-local LocalStorage and `bootstrap` never resolves to the
+ * instance passed to `windowStage.loadContent('pages/Index', storage)`.
  */
 import { common } from '@kit.AbilityKit';
 import { AppError, AppErrors } from '../common/types/AppError';
@@ -20,7 +24,7 @@ import { MainShell } from './MainShell';
 import { ShellBackdrop } from './ShellBackdrop';
 import { SessionGateView, StartupErrorView } from './ShellViews';
 
-@Entry
+@Entry({ useSharedStorage: true })
 @Component
 struct Index {
   @LocalStorageProp('bootstrap') bootstrap: ShellBootstrap = new ShellBootstrap();
@@ -136,7 +140,9 @@ struct Index {
           appContext: this.appContext,
           i18n: this.appContext.i18n,
           gate: this.sessionGate,
-          familyName: this.appContext.activeFamilyName
+          familyName: this.appContext.activeFamilyName,
+          activeFamilyId: this.appContext.activeFamilyId === undefined
+            ? '' : this.appContext.activeFamilyId
         })
       } else {
         MainShell({
@@ -175,7 +181,7 @@ struct Index {
 
   private exit(): void {
     try {
-      const context = getContext(this) as common.UIAbilityContext;
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       context.terminateSelf();
     } catch (error) {
       // Nothing else can be safely done from a startup error state.

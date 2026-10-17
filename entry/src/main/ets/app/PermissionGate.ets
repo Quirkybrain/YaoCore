@@ -10,6 +10,7 @@
  * pure decisions live in PermissionPolicy so they are host-testable.
  */
 import { abilityAccessCtrl, bundleManager, common, Permissions, Want } from '@kit.AbilityKit';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { AppErrors } from '../common/types/AppError';
 import type { LoggerPort } from '../common/types/Ports';
 import {
@@ -29,6 +30,12 @@ import type {
 export class PermissionGate implements PermissionPort {
   private readonly context: common.UIAbilityContext;
   private readonly logger: LoggerPort;
+  /**
+   * F-03: API < 20 cannot report NOT_DETERMINED, so the action entry requests
+   * once per process. This set prevents repeated permission dialogs after a
+   * denial; the UI then offers "open settings" via canOpenSettings.
+   */
+  private readonly requestedInProcess: Set<PermissionKind> = new Set<PermissionKind>();
 
   constructor(context: common.UIAbilityContext, logger: LoggerPort) {
     this.context = context;
@@ -45,12 +52,20 @@ export class PermissionGate implements PermissionPort {
       return PermissionPolicy.resultFor(kind, PermissionState.UNAVAILABLE);
     }
     const current = await this.check(kind);
-    if (current !== PermissionState.NOT_DETERMINED) {
+    if (!PermissionPolicy.shouldRequestPermission(
+      current, this.requestedInProcess.has(kind))) {
+      if (current === PermissionState.NOT_DETERMINED) {
+        // Already requested in this process and still not granted: report the
+        // terminal state instead of opening another system dialog.
+        return PermissionPolicy.resultFor(kind,
+          PermissionPolicy.stateAfterSuppressedRequest());
+      }
       return PermissionPolicy.resultFor(kind, current);
     }
     if (!PermissionPolicy.isRuntimeRequestable(kind)) {
       return PermissionPolicy.resultFor(kind, PermissionState.UNAVAILABLE);
     }
+    this.requestedInProcess.add(kind);
     const permission = PermissionPolicy.permissionName(kind);
     try {
       const manager = abilityAccessCtrl.createAtManager();
@@ -76,15 +91,21 @@ export class PermissionGate implements PermissionPort {
     const permission = PermissionPolicy.permissionName(kind);
     try {
       const manager = abilityAccessCtrl.createAtManager();
-      try {
-        return PermissionPolicy.stateFromSelfStatus(
-          manager.getSelfPermissionStatus(permission as Permissions));
-      } catch (error) {
-        const tokenId = bundleManager.getBundleInfoForSelfSync(0).appInfo.accessTokenId;
-        const granted = manager.checkAccessTokenSync(tokenId, permission as Permissions) ===
-          abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
-        return granted ? PermissionState.GRANTED : PermissionState.DENIED;
+      const apiLevel = deviceInfo.sdkApiVersion;
+      if (apiLevel >= PermissionPolicy.SELF_PERMISSION_STATUS_MIN_API) {
+        try {
+          return PermissionPolicy.stateFromSelfStatus(
+            manager.getSelfPermissionStatus(permission as Permissions));
+        } catch (error) {
+          // SDK/device mismatch on a newer runtime: fall through to the
+          // token-only check without losing the API-level semantics.
+          this.logger.warn('PermissionGate', 'self_status_unavailable');
+        }
       }
+      const tokenId = bundleManager.getBundleInfoForSelfSync(0).appInfo.accessTokenId;
+      const granted = manager.checkAccessTokenSync(tokenId, permission as Permissions) ===
+        abilityAccessCtrl.GrantStatus.PERMISSION_GRANTED;
+      return PermissionPolicy.stateFromTokenCheck(granted, apiLevel);
     } catch (error) {
       this.logger.warn('PermissionGate', 'check_failed');
       return PermissionState.UNAVAILABLE;

@@ -12,6 +12,7 @@ import { AppContext } from '../app/AppContext';
 import {
   AppRoute,
   AppRouteParams,
+  AppRouteValidation,
   NavigationService
 } from '../app/NavigationService';
 import { ShellTheme } from '../app/ShellTheme';
@@ -48,7 +49,9 @@ export struct MainShell {
   @Builder
   tabBar(index: number, title: Resource) {
     Column({ space: ShellTheme.SPACING_XXS }) {
-      Circle()
+      // F-10: Ellipse.fill(ResourceColor) is API 10/11; Circle.fill(Resource)
+      // resolves to the API 26 ColorMetrics overload on this SDK.
+      Ellipse()
         .width(6)
         .height(6)
         .fill(this.selectedTab === index
@@ -64,9 +67,25 @@ export struct MainShell {
     .justifyContent(FlexAlign.Center)
   }
 
+  /**
+   * F-05: validate the route name and its required parameters at the
+   * NavDestination boundary too, so a direct NavPathStack push cannot bypass
+   * `NavigationService.push/replace`. Invalid input renders the ErrorState.
+   */
+  private routeIsValid(name: string, param: Object): boolean {
+    const route = AppRouteValidation.fromName(name);
+    if (route === undefined) {
+      return false;
+    }
+    return AppRouteValidation.accepts(route,
+      param instanceof AppRouteParams ? param as AppRouteParams : undefined);
+  }
+
   @Builder
   routeBuilder(name: string, param: Object) {
-    if (name === AppRoute.DEVICE_CONTROL) {
+    if (!this.routeIsValid(name, param)) {
+      UnknownRouteView({ navigation: this.navigation })
+    } else if (name === AppRoute.DEVICE_CONTROL) {
       DeviceControlPage({
         params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
         navigation: this.navigation

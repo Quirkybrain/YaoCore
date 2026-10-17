@@ -152,6 +152,13 @@ export class AppRouteValidation {
   }
 }
 
+/**
+ * Implementation sentinel pushed/replaced instead of an invalid destination.
+ * It is not an AppRoute (the route enum stays frozen); MainShell.routeBuilder
+ * maps every unknown name to UnknownRouteView / ErrorState.
+ */
+export const INVALID_ROUTE_NAME: string = 'invalid-route';
+
 export type TabChangeListener = (index: number) => void;
 
 export class NavigationService {
@@ -172,6 +179,10 @@ export class NavigationService {
       this.switchTab(route);
       return;
     }
+    if (!AppRouteValidation.accepts(route, params)) {
+      this.stack.pushPathByName(INVALID_ROUTE_NAME, new AppRouteParams(), false);
+      return;
+    }
     this.stack.pushPathByName(route, params === undefined ? new AppRouteParams() : params, false);
   }
 
@@ -184,6 +195,18 @@ export class NavigationService {
   replace(route: AppRoute, params?: AppRouteParams): void {
     if (AppRouteValidation.isTab(route)) {
       this.switchTab(route);
+      return;
+    }
+    if (!AppRouteValidation.accepts(route, params)) {
+      if (this.stack.size() === 0) {
+        this.stack.pushPathByName(INVALID_ROUTE_NAME, new AppRouteParams(), false);
+      } else {
+        this.stack.replacePathByName(INVALID_ROUTE_NAME, new AppRouteParams(), false);
+      }
+      return;
+    }
+    if (this.stack.size() === 0) {
+      this.stack.pushPathByName(route, params === undefined ? new AppRouteParams() : params, false);
       return;
     }
     this.stack.replacePathByName(route, params === undefined ? new AppRouteParams() : params, false);

@@ -80,7 +80,12 @@ import { SettingsViewModel } from '../viewmodel/SettingsViewModel';
 import {
   AppContext
 } from './AppContext';
-import type { ActiveFamilyPort, AppContextRootPort, SessionGateAuthPort } from './AppContext';
+import type {
+  ActiveFamilyPort,
+  AppContextRootPort,
+  OnboardingPort,
+  SessionGateAuthPort
+} from './AppContext';
 import {
   ActiveFamilyAdapter,
   ManualDiscoveryAdapter,
@@ -94,6 +99,7 @@ import {
   ConstructionStep,
   InitializationStep
 } from './CompositionPlan';
+import { OnboardingService } from './OnboardingService';
 import { BleViewModelPermissionGate, PermissionGate } from './PermissionGate';
 import {
   HilogLogger,
@@ -156,6 +162,7 @@ export class AppCompositionRoot implements AppContextRootPort {
   private readonly activeFamilyAdapter: ActiveFamilyAdapter;
   private readonly inviteService: InviteService;
   private readonly familyService: FamilyService;
+  private readonly onboardingService: OnboardingService;
   private readonly roomService: RoomService;
   private readonly sceneService: SceneService;
 
@@ -204,6 +211,10 @@ export class AppCompositionRoot implements AppContextRootPort {
     this.ids = new UuidGenerator();
     this.loggerPort = new HilogLogger();
     this.metrics = new HilogMetrics();
+    // F-09 / DES-B §2.4: CryptoService is listed with the security stack
+    // (step 5), but it only depends on OhosCryptoProvider/CryptoRandomSource
+    // and has no storage edge, so it is constructed here. SECURITY still marks
+    // the §2.4 security stack; CompositionPlan documents this deviation.
     this.crypto = new CryptoService(new OhosCryptoProvider());
     this.random = new CryptoRandomSource(this.crypto);
 
@@ -268,6 +279,7 @@ export class AppCompositionRoot implements AppContextRootPort {
     this.familyService = new FamilyService(this.familyRepositoryValue, inviteAdapter,
       this.authService, this.gatewayRepository, this.clock, this.ids, this.loggerPort,
       this.rdbAdapter, this.roomRepository, this.operationGate);
+    this.onboardingService = new OnboardingService(this.familyService, this.authService);
     this.roomService = new RoomService(this.roomRepository, this.deviceRepository,
       this.familyRepositoryValue, this.rdbAdapter, this.clock, this.loggerPort,
       this.operationGate, this.deviceRepository);
@@ -441,6 +453,10 @@ export class AppCompositionRoot implements AppContextRootPort {
     return this.activeFamilyAdapter;
   }
 
+  get onboarding(): OnboardingPort {
+    return this.onboardingService;
+  }
+
   get familyRepository(): FamilyRepository {
     return this.familyRepositoryValue;
   }
@@ -524,6 +540,14 @@ export class AppCompositionRoot implements AppContextRootPort {
       await this.bleService.cancel();
     } catch (error) {
       // Best-effort shutdown.
+    }
+    // F-08 / DES-B §17.1.2: dispose() clears the session/gate, not just
+    // storage handles. AppContext.lock() locks AuthService and recomputes the
+    // gate. Best-effort: a failure must not skip the closes below.
+    try {
+      await this.appContextValue.lock();
+    } catch (error) {
+      this.loggerPort.warn('AppCompositionRoot', 'dispose_lock_failed');
     }
     this.drafts.clearAll();
     this.i18nService.dispose();

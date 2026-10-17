@@ -34,6 +34,12 @@ import {
   PermissionPolicy,
   PermissionState
 } from '../../main/ets/app/PermissionPolicy.ets';
+import { INVALID_ROUTE_NAME } from '../../main/ets/app/NavigationService.ets';
+import {
+  ShellGateEntry,
+  ShellGateRouting
+} from '../../main/ets/app/ShellGateRouting.ets';
+import { OnboardingService } from '../../main/ets/app/OnboardingService.ets';
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -159,6 +165,126 @@ class FakeLogger {
   }
 }
 
+class FakeOnboarding {
+  constructor(root) {
+    this.root = root;
+    this.calls = root.calls;
+  }
+
+  async createFamily(familyName, displayName, password) {
+    this.calls.push('onboarding.createFamily');
+    this.lastCreate = { familyName, displayName, password };
+    this.root.family.family = { familyId: 'family-new', familyName };
+    this.root.auth.profiles = [{ profileId: 'p-new', displayName }];
+    this.root.auth.session = undefined;
+  }
+
+  async startJoin(displayName) {
+    this.calls.push('onboarding.startJoin');
+    this.lastStartJoin = { displayName };
+    return 'YCR1.join-request-' + displayName;
+  }
+
+  async completeJoin(invitationText, code, displayName, password) {
+    this.calls.push('onboarding.completeJoin');
+    this.lastJoin = { invitationText, code, displayName, password };
+    this.root.family.family = { familyId: 'family-joined', familyName: 'Joined' };
+    this.root.auth.profiles = [{ profileId: 'p-joined', displayName }];
+    this.root.auth.session = undefined;
+  }
+
+  async cancelJoin() {
+    this.calls.push('onboarding.cancelJoin');
+  }
+}
+
+class FakeJoinSession {
+  constructor(calls) {
+    this.calls = calls;
+    this.accepted = {
+      familyId: 'family-joined',
+      familyName: 'Joined',
+      memberId: 'member-joined',
+      role: 'MEMBER'
+    };
+  }
+
+  async start(displayName) {
+    this.calls.push('join.start');
+    this.displayName = displayName;
+    return { text: 'YCR1.fake-request' };
+  }
+
+  async submitInvitation(text, code) {
+    this.calls.push('join.submitInvitation');
+    this.text = text;
+    this.code = code;
+    return this.accepted;
+  }
+
+  async markProfileBound() {
+    this.calls.push('join.markProfileBound');
+  }
+
+  async cancel() {
+    this.calls.push('join.cancel');
+  }
+
+  dispose() {
+    this.calls.push('join.dispose');
+  }
+}
+
+class FakeOnboardingFamilyService {
+  constructor(calls) {
+    this.calls = calls;
+    this.joinSession = new FakeJoinSession(calls);
+  }
+
+  async createFamily(familyName, ownerDisplayName) {
+    this.calls.push('families.createFamily');
+    this.familyName = familyName;
+    this.ownerDisplayName = ownerDisplayName;
+    return {
+      familyId: 'family-created',
+      familyName,
+      ownerMemberId: 'member-owner'
+    };
+  }
+
+  async switchFamily(familyId) {
+    this.calls.push('families.switchFamily');
+    this.switchedTo = familyId;
+    return { requiresUnlock: true };
+  }
+
+  createJoinSession() {
+    this.calls.push('families.createJoinSession');
+    return this.joinSession;
+  }
+}
+
+class FakeOnboardingAuthService {
+  constructor(calls) {
+    this.calls = calls;
+    this.profiles = [];
+    this.failProfileCreate = undefined;
+  }
+
+  async createProfile(input) {
+    this.calls.push('auth.createProfile');
+    if (this.failProfileCreate !== undefined) {
+      throw this.failProfileCreate;
+    }
+    this.profiles.push(input);
+    this.created = input;
+  }
+
+  async listProfiles() {
+    return this.profiles;
+  }
+}
+
 class FakeI18n {
   constructor() {
     this.reloads = 0;
@@ -188,6 +314,7 @@ class FakeRoot {
     this.ble = new FakeBle(this.calls);
     this.cloud = new FakeCloud(this.calls);
     this.logger = new FakeLogger();
+    this.onboardingValue = new FakeOnboarding(this);
     this.i18nValue = new FakeI18n();
     this.fail = options.fail;
     this.initialized = false;
@@ -204,6 +331,10 @@ class FakeRoot {
 
   get activeFamily() {
     return this.family;
+  }
+
+  get onboarding() {
+    return this.onboardingValue;
   }
 
   async initialize() {
@@ -278,6 +409,19 @@ function source(relative) {
   return fs.readFileSync(path.join(REPO_ROOT, relative), 'utf8');
 }
 
+function walkEtsFiles(root) {
+  const result = [];
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const full = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      result.push(...walkEtsFiles(full));
+    } else if (entry.name.endsWith('.ets')) {
+      result.push(full);
+    }
+  }
+  return result;
+}
+
 test('T17_sessionGateNoFamilyIsNoProfile', async () => {
   const root = new FakeRoot({ family: undefined });
   const context = new AppContext(root);
@@ -303,7 +447,7 @@ test('T17_sessionGateProfileWithoutSessionIsLocked', async () => {
 
 test('T17_sessionGateProfileWithSessionIsUnlocked', async () => {
   const root = new FakeRoot({ profiles: [{ profileId: 'p-1', displayName: 'Owner' }] });
-  root.auth.session = { sessionId: 's-1', profileId: 'p-1' };
+  root.auth.session = { sessionId: 's-1', profileId: 'p-1', familyId: FAMILY.familyId };
   const context = new AppContext(root);
   await context.initialize();
   assert.equal(context.sessionGate, SessionGateState.UNLOCKED);
@@ -324,7 +468,7 @@ test('T17_unlockRefreshesGateAndMapsProfiles', async () => {
 
 test('T17_lockReturnsToLocked', async () => {
   const root = new FakeRoot({ profiles: [{ profileId: 'p-1', displayName: 'Owner' }] });
-  root.auth.session = { sessionId: 's-1', profileId: 'p-1' };
+  root.auth.session = { sessionId: 's-1', profileId: 'p-1', familyId: FAMILY.familyId };
   const context = new AppContext(root);
   await context.initialize();
   assert.equal(context.sessionGate, SessionGateState.UNLOCKED);
@@ -335,7 +479,7 @@ test('T17_lockReturnsToLocked', async () => {
 test('T17_backgroundCleanupOrderMatchesContract', async () => {
   const calls = [];
   const root = new FakeRoot({ calls, profiles: [{ profileId: 'p-1', displayName: 'Owner' }] });
-  root.auth.session = { sessionId: 's-1', profileId: 'p-1' };
+  root.auth.session = { sessionId: 's-1', profileId: 'p-1', familyId: FAMILY.familyId };
   const context = new AppContext(root);
   await context.initialize();
   context.subscribeLifecycle({
@@ -593,4 +737,242 @@ test('T17_brandAndSingleGatewayResourcesExist', () => {
     assert.equal(typeof bundle.settings.cloud.single_gateway_required, 'string');
     assert.ok(bundle.settings.cloud.single_gateway_required.length > 0);
   }
+});
+
+test('T17_gateEntryMappingCoversFreshInstallAndLock', () => {
+  assert.deepEqual(ShellGateRouting.entriesFor(SessionGateState.NO_PROFILE),
+    [ShellGateEntry.CREATE_FAMILY, ShellGateEntry.JOIN_FAMILY]);
+  assert.deepEqual(ShellGateRouting.entriesFor(SessionGateState.LOCKED),
+    [ShellGateEntry.UNLOCK]);
+  assert.deepEqual(ShellGateRouting.entriesFor(SessionGateState.UNLOCKED), []);
+  assert.equal(ShellGateRouting.hasEntry(SessionGateState.NO_PROFILE,
+    ShellGateEntry.CREATE_FAMILY), true);
+  assert.equal(ShellGateRouting.hasEntry(SessionGateState.LOCKED,
+    ShellGateEntry.JOIN_FAMILY), false);
+});
+
+test('T17_sessionGateViewWiresOnboardingAndReloadsOnGateOrFamilyChange', () => {
+  const shell = source('entry/src/main/ets/pages/ShellViews.ets');
+  assert.ok(shell.includes("@Watch('onGateChanged')"));
+  assert.ok(shell.includes("@Watch('onFamilyChanged')"));
+  assert.ok(shell.includes('OnboardingView('));
+  assert.ok(shell.includes('ShellGateRouting.hasEntry'));
+  assert.ok(shell.includes('this.loadProfiles();'));
+  assert.ok(shell.includes('profilesError'));
+  const onboarding = source('entry/src/main/ets/pages/OnboardingView.ets');
+  assert.ok(onboarding.includes('this.appContext.createFamily('));
+  assert.ok(onboarding.includes('this.appContext.startJoin('));
+  assert.ok(onboarding.includes('this.appContext.completeJoin('));
+  assert.ok(onboarding.includes('PASSWORD_MIN_LENGTH'));
+});
+
+test('T17_entryUsesSharedStorageAndAbilityWritesBootstrap', () => {
+  const index = source('entry/src/main/ets/pages/Index.ets');
+  assert.ok(index.includes('@Entry({ useSharedStorage: true })'));
+  assert.ok(index.includes("@LocalStorageProp('bootstrap')"));
+  const ability = source('entry/src/main/ets/entryability/EntryAbility.ets');
+  assert.ok(ability.includes('new LocalStorage()'));
+  assert.ok(ability.includes("storage.setOrCreate('bootstrap'"));
+  assert.ok(ability.includes("windowStage.loadContent('pages/Index', storage"));
+});
+
+test('T17_onboardingCreateAndJoinLandLocked', async () => {
+  const createRoot = new FakeRoot({ family: undefined });
+  const createContext = new AppContext(createRoot);
+  await createContext.createFamily('Home', 'Owner', 'password1');
+  assert.equal(createContext.sessionGate, SessionGateState.LOCKED);
+  assert.equal(createContext.activeFamilyId, 'family-new');
+  assert.equal(createRoot.auth.session, undefined);
+  assert.equal(createRoot.onboardingValue.lastCreate.familyName, 'Home');
+
+  const joinRoot = new FakeRoot({ family: undefined });
+  const joinContext = new AppContext(joinRoot);
+  const requestText = await joinContext.startJoin('Member');
+  assert.equal(requestText, 'YCR1.join-request-Member');
+  await joinContext.completeJoin('YCI1.container', '123456', 'Member', 'password1');
+  assert.equal(joinContext.sessionGate, SessionGateState.LOCKED);
+  assert.equal(joinContext.activeFamilyId, 'family-joined');
+  assert.equal(joinRoot.auth.session, undefined);
+  assert.equal(joinRoot.onboardingValue.lastJoin.invitationText, 'YCI1.container');
+  await joinContext.cancelJoin();
+  assert.ok(joinRoot.calls.includes('onboarding.cancelJoin'));
+});
+
+test('T17_setActiveFamilyLocksPreviousSession', async () => {
+  const root = new FakeRoot({ profiles: [{ profileId: 'p-1', displayName: 'Owner' }] });
+  root.auth.session = {
+    sessionId: 's-1', profileId: 'p-1', familyId: FAMILY.familyId
+  };
+  const context = new AppContext(root);
+  await context.initialize();
+  assert.equal(context.sessionGate, SessionGateState.UNLOCKED);
+  await context.setActiveFamily('family-2');
+  assert.equal(root.auth.session, undefined);
+  assert.equal(context.sessionGate, SessionGateState.LOCKED);
+});
+
+test('T17_sessionFromAnotherFamilyCannotUnlock', async () => {
+  const root = new FakeRoot({ profiles: [{ profileId: 'p-1', displayName: 'Owner' }] });
+  root.auth.session = {
+    sessionId: 's-1', profileId: 'p-1', familyId: 'family-2'
+  };
+  const context = new AppContext(root);
+  await context.initialize();
+  assert.equal(context.sessionGate, SessionGateState.LOCKED);
+});
+
+test('T17_routeValidationWiredIntoPushAndReplace', () => {
+  const stack = new FakeNavStack();
+  const navigation = new NavigationService(stack);
+  navigation.push(AppRoute.DEVICE_CONTROL);
+  assert.equal(stack.entries[0].name, INVALID_ROUTE_NAME);
+  navigation.push(AppRoute.DEVICE_CONTROL,
+    new AppRouteParams({ gatewayId: 'gw-1', deviceId: 'dev-1' }));
+  assert.equal(stack.entries[1].name, AppRoute.DEVICE_CONTROL);
+  navigation.replace(AppRoute.PROVISIONING, new AppRouteParams({ mode: 'UNKNOWN' }));
+  assert.equal(stack.entries[1].name, INVALID_ROUTE_NAME);
+  navigation.replace(AppRoute.PROVISIONING, new AppRouteParams({ mode: 'ROTATE_SECRET' }));
+  assert.equal(stack.entries[1].name, AppRoute.PROVISIONING);
+});
+
+test('T17_routeBuilderValidatesParametersBeforeConstructingPage', () => {
+  const shell = source('entry/src/main/ets/pages/MainShell.ets');
+  assert.ok(shell.includes('routeIsValid'));
+  assert.ok(shell.includes('AppRouteValidation.accepts'));
+  assert.ok(shell.indexOf('!this.routeIsValid(name, param)') <
+    shell.indexOf('name === AppRoute.DEVICE_CONTROL'));
+  assert.ok(shell.includes('UnknownRouteView'));
+});
+
+test('T17_permissionApi14FallbackIsRequestableOnce', () => {
+  assert.equal(PermissionPolicy.stateFromTokenCheck(false, 14),
+    PermissionState.NOT_DETERMINED);
+  assert.equal(PermissionPolicy.stateFromTokenCheck(false, 20), PermissionState.DENIED);
+  assert.equal(PermissionPolicy.stateFromTokenCheck(true, 14), PermissionState.GRANTED);
+  assert.equal(PermissionPolicy.shouldRequestPermission(PermissionState.NOT_DETERMINED,
+    false), true);
+  assert.equal(PermissionPolicy.shouldRequestPermission(PermissionState.NOT_DETERMINED,
+    true), false);
+  assert.equal(PermissionPolicy.shouldRequestPermission(PermissionState.DENIED, false), false);
+  assert.equal(PermissionPolicy.stateAfterSuppressedRequest(), PermissionState.DENIED);
+  const gate = source('entry/src/main/ets/app/PermissionGate.ets');
+  assert.ok(gate.includes('deviceInfo.sdkApiVersion'));
+  assert.ok(gate.includes('SELF_PERMISSION_STATUS_MIN_API'));
+  assert.ok(gate.includes('shouldRequestPermission'));
+  assert.ok(gate.includes('requestPermissionsFromUser'));
+});
+
+test('T17_disposeLocksSessionBeforeClosingStorage', () => {
+  const text = source('entry/src/main/ets/app/AppCompositionRoot.ets');
+  const disposeStart = text.indexOf('async dispose()');
+  const lock = text.indexOf('await this.appContextValue.lock();', disposeStart);
+  const close = text.indexOf('await this.storage.close();', disposeStart);
+  assert.ok(disposeStart >= 0);
+  assert.ok(lock > disposeStart, 'dispose must lock the session and gate');
+  assert.ok(close > lock, 'storage must close after the session lock');
+});
+
+test('T17_productionMockExclusionCoversAllMainSources', () => {
+  const mainRoot = path.join(REPO_ROOT, 'entry/src/main/ets');
+  const files = walkEtsFiles(mainRoot);
+  assert.ok(files.length > 50);
+  for (const file of files) {
+    const relative = path.relative(mainRoot, file).split(path.sep).join('/');
+    if (relative.startsWith('service/mock/')) {
+      continue;
+    }
+    const text = fs.readFileSync(file, 'utf8');
+    assert.ok(!/from\s+['"][^'"]*(?:Mock|ohosTest|service\/mock)/.test(text),
+      relative + ' imports a Mock/ohosTest module');
+  }
+  for (const directory of ['app', 'pages', 'entryability']) {
+    const root = path.join(mainRoot, directory);
+    for (const file of walkEtsFiles(root)) {
+      const text = fs.readFileSync(file, 'utf8');
+      assert.ok(!/DEV-ONLY|DEV_ONLY/.test(text),
+        path.relative(mainRoot, file) + ' contains a development-only branch');
+    }
+  }
+});
+
+test('T17_shellUsesApi14CompatibleEllipseFill', () => {
+  for (const relative of ['entry/src/main/ets/pages/MainShell.ets',
+    'entry/src/main/ets/pages/ShellBackdrop.ets']) {
+    const text = source(relative);
+    assert.ok(!text.includes('Circle()'), relative + ' must not use Circle.fill');
+    assert.ok(text.includes('Ellipse()'), relative + ' must use Ellipse.fill');
+  }
+});
+
+test('T17_entryAbilityAppliesImmersiveWindowLayout', () => {
+  const ability = source('entry/src/main/ets/entryability/EntryAbility.ets');
+  assert.ok(ability.includes('applyImmersiveWindow'));
+  assert.ok(ability.includes('setWindowLayoutFullScreen(true)'));
+  assert.ok(ability.includes('setWindowSystemBarProperties'));
+  const backdrop = source('entry/src/main/ets/pages/ShellBackdrop.ets');
+  assert.ok(backdrop.includes('expandSafeArea([SafeAreaType.SYSTEM]'));
+});
+
+test('T17_indexExitUsesNonDeprecatedHostContext', () => {
+  const index = source('entry/src/main/ets/pages/Index.ets');
+  assert.ok(index.includes('this.getUIContext().getHostContext()'));
+  assert.ok(!index.includes('getContext(this)'));
+});
+
+test('T17_onboardingServiceCreatesFamilyProfileThenSwitches', async () => {
+  const calls = [];
+  const families = new FakeOnboardingFamilyService(calls);
+  const auth = new FakeOnboardingAuthService(calls);
+  const service = new OnboardingService(families, auth);
+  await service.createFamily('Home', 'Owner', 'password1');
+  assert.deepEqual(calls, [
+    'families.createFamily',
+    'auth.createProfile',
+    'families.switchFamily'
+  ]);
+  assert.equal(families.switchedTo, 'family-created');
+  assert.equal(auth.created.memberId, 'member-owner');
+  assert.equal(auth.created.displayName, 'Owner');
+  assert.equal(auth.created.familyId, 'family-created');
+});
+
+test('T17_onboardingServiceJoinIsTwoStepAndDisposesSession', async () => {
+  const calls = [];
+  const families = new FakeOnboardingFamilyService(calls);
+  const auth = new FakeOnboardingAuthService(calls);
+  const service = new OnboardingService(families, auth);
+  const requestText = await service.startJoin('Member');
+  assert.equal(requestText, 'YCR1.fake-request');
+  assert.deepEqual(calls, ['families.createJoinSession', 'join.start']);
+  await service.completeJoin('YCI1.container', '123456', 'Member', 'password1');
+  assert.deepEqual(calls, [
+    'families.createJoinSession',
+    'join.start',
+    'join.submitInvitation',
+    'auth.createProfile',
+    'families.switchFamily',
+    'join.markProfileBound',
+    'join.cancel',
+    'join.dispose'
+  ]);
+  assert.equal(auth.created.familyId, 'family-joined');
+  assert.equal(auth.created.memberId, 'member-joined');
+});
+
+test('T17_onboardingServiceProfileConflictOnlyIdempotentForSameMember', async () => {
+  const calls = [];
+  const families = new FakeOnboardingFamilyService(calls);
+  const auth = new FakeOnboardingAuthService(calls);
+  const service = new OnboardingService(families, auth);
+
+  auth.failProfileCreate = AppErrors.of('AUTH_PROFILE_EXISTS', []);
+  auth.profiles = [{ memberId: 'member-joined' }];
+  await service.startJoin('Member');
+  await service.completeJoin('YCI1.container', '', 'Member', 'password1');
+  assert.equal(families.switchedTo, 'family-joined');
+
+  auth.profiles = [{ memberId: 'member-other' }];
+  await service.startJoin('Member');
+  await assert.rejects(service.completeJoin('YCI1.container', '', 'Member', 'password1'),
+    (error) => error.code === 'AUTH_PROFILE_EXISTS');
 });
