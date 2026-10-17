@@ -1,0 +1,45 @@
+> hvigor UP-TO-DATE :entry:ohosTest@PreBuild...
+> hvigor Finished :entry:ohosTest@CreateModuleInfo... after 1 ms
+> hvigor Finished :entry:ohosTest@GenerateMetadata... after 2 ms
+> hvigor Finished :entry:ohosTest@ConfigureCmake... after 1 ms
+> hvigor Finished :entry:ohosTest@MergeProfile... after 5 ms
+> hvigor Finished :entry:ohosTest@CreateBuildProfile... after 2 ms
+> hvigor Finished :entry:ohosTest@PreCheckSyscap... after 1 ms
+> hvigor Finished :entry:ohosTest@GenerateOhosTestTemplate... after 4 ms
+> hvigor Finished :entry:ohosTest@GeneratePkgContextInfo... after 5 ms
+> hvigor Finished :entry:ohosTest@GeneratePkgSdkInfo... after 2 ms
+> hvigor Finished :entry:ohosTest@ProcessIntegratedHsp... after 1 ms
+> hvigor Finished :entry:ohosTest@BuildNativeWithCmake... after 1 ms
+> hvigor Finished :entry:ohosTest@MakePackInfo... after 2 ms
+> hvigor Finished :entry:ohosTest@SyscapTransform... after 9 ms
+> hvigor Finished :entry:ohosTest@ProcessProfile... after 50 ms
+> hvigor Finished :entry:ohosTest@ProcessRouterMap... after 2 ms
+> hvigor Finished :entry:ohosTest@ProcessShareConfig... after 1 ms
+> hvigor Finished :entry:ohosTest@ProcessStartupConfig... after 1 ms
+> hvigor Finished :entry:ohosTest@BuildNativeWithNinja... after 1 ms
+> hvigor Finished :entry:ohosTest@ProcessResource... after 4 ms
+> hvigor Finished :entry:ohosTest@GenerateLoaderJson... after 5 ms
+> hvigor Finished :entry:ohosTest@ProcessLibs... after 3 ms
+> hvigor WARN: Warning: 'start_window_background' conflict, first declared.
+at /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/resources/base/element/color.json
+but declared again.
+at /home/quirkybrain/code/harmony-projects/YaoCore/entry/.test/default/intermediates/src/ohosTest/resources/base/element/color.json
+
+> hvigor Finished :entry:ohosTest@CompileResource... after 73 ms
+> hvigor Finished :entry:ohosTest@DoNativeStrip... after 2 ms
+> hvigor Finished :entry:ohosTest@OhosTestBuildJS... after 1 ms
+> hvigor Finished :entry:ohosTest@CacheNativeLibs... after 7 ms
+> hvigor Finished :entry:ohosTest@OhosTestCompileArkTS... after 3 s 599 ms
+> hvigor Finished :entry:ohosTest@OhosTestCopyMockConfigJson... after 1 ms
+> hvigor Finished :entry:ohosTest@GeneratePkgModuleJson... after 2 ms
+> hvigor Finished :entry:ohosTest@ProcessCompiledResources... after 1 ms
+> hvigor Finished :entry:ohosTest@PackageHap... after 297 ms
+> hvigor Finished :entry:ohosTest@PackingCheck... after 2 ms
+> hvigor WARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
+             If needed, configure the signingConfigs in /home/quirkybrain/code/harmony-projects/YaoCore/build-profile.json5.
+> hvigor Finished :entry:ohosTest@SignHap... after 1 ms
+> hvigor Finished :entry:ohosTest@CollectDebugSymbol... after 1 ms
+> hvigor Finished :entry:assembleHap... after 1 ms
+> hvigor BUILD SUCCESSFUL in 6 s 161 ms
+
+35 tasks in total: 34 executed, 1 up-to-date
