@@ -3,8 +3,8 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。
 - **Date**: 2026-10-17
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
@@ -103,6 +103,20 @@
 |---|---|---|
 | **R2-01** `releaseReceipt` 契约登记（Medium） | 登记 `InviteServicePort.releaseReceipt(receiptText, inviteId)`（`EXT-DES-B-26`）：新增方法，`verifyReceipt` 签名不变；**仅** C-08 在 `importReceipt` 的 RDB 单事务失败后调用，删除本次 canonical 账本条目以便重试；不是通用账本删除 API，不得暴露给 C-22/UI。失败处理与补偿失败残留（R2-04；建议跟踪项 `T13-R-15`）见 §23.6。 | §3.3.4、§23.3、§23.6 |
 | **R2-02** ADR-003 §5.4 回执形态（Low/Medium） | ADR-003 §5.4 同步为 canonical `YCP1` 正式形态（HMAC 公式不变、canonical 编码、不兼容裸 hex），原裸 hex 定义标注为历史存档；DES-A §13.2.1 仍为实现口径。 | ADR-003 §5.4（跨文件同步；见其 Revision） |
+
+### 0.6 T-14 裁定同步（2026-10-17）
+
+> **裁定人**：solution-architect（任务 `wp-057-t14-rulings`）。**输入**：`artifacts/70-review/t14-review.md`（F-03/F-04/F-05/F-06）与 `artifacts/50-implementation/t14-cloud-ac.md`。**边界**：只裁定契约语义与设计边界，不改代码、不重写 DES-A/DES-B 冻结签名、不改变 G-004 语义；F-01（v4 `cloud_config` DDL 不一致）、F-02（`saveConfig` 无 token 复位）、F-07..F-11 是代码修复/测试/卫生项，不在本裁定内。F-03 的“状态写入”冲突与 F-06 的“冻结形状无 `gatewayId`”缺口按本节口径记录，不以当前实现反推契约。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **F-03 `testConnection` 状态语义** | 拆分为**持久配置状态**与**瞬时运行健康**两层：`testConnection` 不写持久配置/ Token；成功时清除瞬时网络不可用（实现 `UNAVAILABLE → CONFIGURED`）并通知，401/403 时记录瞬时 Token 失败，其他失败不单独提升 `UNAVAILABLE`。`saveConfig` 仍是唯一持久写入入口。 | §8.1.7、§8.3.1、§8.5 |
+| **F-04 `Gateway`/固定名经 inventory** | v1 固定名注册表 `Gateway`、`Door_01`、`Light_01`、`AC_01`、`Sensor_01`、`Presence_01` 精确匹配；`Gateway` 与只读传感器一律 `UNSUPPORTED`，`Door_01/Light_01/AC_01` 只走固定属性载体；**仅不在注册表中的外部模块设备**可走 `DeviceInventoryJson`，且缺载体仍 `UNSUPPORTED`，绝不 `CONFIRMED`。 | §8.1.6、§8.3.3、§8.4、§8.5 |
+| **F-06 多网关/一致性** | v1 只支持**单一 active 云配置**；`command.gatewayId` 无法映射到当前 active 云作用域/网关凭据时，在分配 seq/签名/发 HTTP 前以 `CLOUD_NOT_CONFIGURED` fail-closed。冻结 `CloudConfig` 无 `gatewayId`，持久绑定不在 v1 合同内：多网关家庭不得启用云，切换网关必须清除/重配云；`RISK-CLOUD-MULTIGATEWAY` 记为 **ACCEPTED (v1)**，后续以 Change Impact 增加 `gatewayId`。 | §8.1.4、§8.1.5、§8.1.7、§8.3.1、§8.5、§22.1 |
+| **F-05 `brand.*` 资源键** | 键名固定为顶层 `brand.gree` / `brand.haier` / `brand.midea` / `brand.generic`（不是 `ac.brand.*`）；由 **T-18 资源任务**（C-27 设置/关于资源面）拥有，C-24（T-17）与 C-27（T-18）为消费面；补齐 zh-CN/en-US 并纳入 key parity/动态键检查。 | §7.4.2、§7.4.3、§9.1、§9.4、§9.6、§24.2 |
+
+- **不改变**：§8.1.4 的 10 字段/HMAC 线格式、§8.1.6 的双匹配+新鲜度规则、§8.2 错误码命名空间、§9.1 的 7 值/温度/纯映射约束、G-004 的契约语义。
+- **仍阻断 CQG-T14**：F-01 的 v4 DDL 不一致按 DES-B §2.7 由实现修复；本裁定不把 F-01 写成已关闭。F-03/F-04/F-06 的修复与回归测试、F-05 的资源补齐必须在 CQG-T14/相关 Gate 中留下证据；在此之前 C-15/C-16 证据为 `UNVERIFIED`/`DEFERRED`。
 
 ---
 
@@ -2209,7 +2223,8 @@ entry/src/main/resources/
 | `room` | `room.unassigned.title`、`room.delete.title`、`room.delete.warning`、`room.assign.title` | 房间/池 |
 | `device` | `device.type.*`、`device.state.online/offline`、`device.unsupported.read_only`、`device.disabled.unassigned` | 设备 |
 | `door` | `door.state.secured/unconfirmed/unknown`、`door.alert.unconfirmed`、`door.link.unverified` | 门锁 |
-| `ac` | `ac.mode.*`、`ac.temperature.target`、`ac.brand.*` | 空调 |
+| `ac` | `ac.mode.*`、`ac.temperature.target` | 空调 |
+| `brand` | `brand.gree`、`brand.haier`、`brand.midea`、`brand.generic` | 品牌专名（顶层 `brand.*`；见 §9.6） |
 | `scene` | `scene.run`、`scene.running`、`scene.partial_failed`、`scene.no_rollback`、`scene.step.failed` | 场景 |
 | `family` | `family.switch`、`family.create`、`family.member.remove`、`family.last_admin` | 家庭 |
 | `invite` | `invite.mode.key_wrap`、`invite.mode.code_kek`、`invite.security.weak_mode_warning`、`invite.security.guest_scope_not_crypto`、`invite.receipt.pending` | 邀请 |
@@ -2507,6 +2522,12 @@ export class CloudCommandClient {
 9. 4xx/5xx → 映射 §8.2；不得重试 401/403/404；5xx/429 可按策略有限重试（默认 1 次，退避 500ms；`CloudService` 可配置）。
 10. 响应体未知字段/结构 → 记录 `CLOUD_RESPONSE_INVALID` 偏差，但 2xx 仍返回 receipt（IoTDA 受理事实）；不得据此确认执行。
 
+**v1 active-scope 前置条件（F-06 裁定，2026-10-17）**：
+
+- v1 只支持单一 active 云配置；`CloudCommandClient` 只服务 C-28 为当前 active gateway 装配的 C-15 实例。
+- 在 `seq` 分配/签名/HTTP 之前，若 `command.gatewayId` 没有已绑定网关凭据或无法证明属于当前 active 云作用域，必须映射为 `CLOUD_NOT_CONFIGURED`（不重试、不消耗 seq、不读取 secret、不发请求）。
+- 冻结 `CloudConfig` 无 `gatewayId`，C-15 不能从持久化配置独立重建“配置↔网关”绑定；该绑定由 C-28 的 active-gateway 装配作用域提供。v1 产品限制与残余风险见 §8.3.1 和 `RISK-CLOUD-MULTIGATEWAY`（§22.1）。
+
 **Body 字段（严格 10 项）**：
 
 | `paras` 字段 | 值 |
@@ -2545,6 +2566,7 @@ export class ShadowReader {
 - `event_time` 解析失败 → `CLOUD_SHADOW_INVALID`；`rawSha256 = hexLower(sha256(response.body))`。
 - 响应体大小上限 64 KiB（JsonLimits）；超过 → `CLOUD_SHADOW_INVALID`。
 - 不缓存影子；每次轮询新读；不把旧影子当新状态。
+- `gatewayId` 参数用于作用域断言/日志；v1 URL 始终使用 `config.deviceId`。调用方必须保证 `gatewayId` 与当前 active 云配置属于同一网关；无法保证时按 §8.1.4 的 `CLOUD_NOT_CONFIGURED` 规则 fail-closed（F-06 裁定）。
 
 #### 8.1.6 `CloudCompletionEvaluator`
 
@@ -2572,12 +2594,14 @@ export class DeviceInventoryParser {
 
 **判定规则**：
 1. **新鲜度**：`shadow.eventEpochMs + 2000 < expectation.notBeforeMs` → `STALE`（旧影子，不得确认）。
-2. **内置固定属性**（D-014 一等公民）：
-   - 目标 `Door_01`/`Light_01`/`AC_01` → 读 `<Prefix>_LastRequestId`/`<Prefix>_LastSeq`；
-   - 两者都等于 expectation → `CONFIRMED`；只匹配一个/缺失 → `PENDING`（继续轮询）；
-   - 目标 `Sensor_01`/`Presence_01` 是只读传感器，不存在控制命令；返回 `UNSUPPORTED`；
-   - 目标 `Gateway`/其他固定名无云完成属性 → `UNSUPPORTED`。
-3. **外部模块 inventory**（PB-02）：
+2. **保留固定名路由**（D-014 一等公民；F-04 裁定，2026-10-17）：
+   - v1 固定名注册表（建议实现名 `NON_INVENTORY_FIXED`；精确匹配、区分大小写）：`Gateway`、`Door_01`、`Light_01`、`AC_01`、`Sensor_01`、`Presence_01`。新增内置固定设备必须先登记该表（Change Impact）；登记前该名称不得作为可控目标上线。
+   - 目标 `Door_01`/`Light_01`/`AC_01` → **只**读 `<Prefix>_LastRequestId`/`<Prefix>_LastSeq` 与 `event_time` 新鲜度；两者都等于 expectation → `CONFIRMED`；只匹配一个/缺失 → `PENDING`（继续轮询）；**永不**查 inventory（即使 inventory 中出现同名条目）。
+   - 目标 `Sensor_01`/`Presence_01` 是只读传感器，不存在控制命令 → `UNSUPPORTED`（`CLOUD_COMPLETION_UNSUPPORTED`；reason `READ_ONLY_SENSOR`）；**永不**查 inventory。
+   - 目标 `Gateway` **没有云控制完成载体**：`Gateway_Online`/`Gateway_RSSI` 是网关状态而非命令回执 → `UNSUPPORTED`（`CLOUD_COMPLETION_UNSUPPORTED`；reason `GATEWAY_NOT_SUPPORTED`）。**即使 `DeviceInventoryJson` 含 `device_id=Gateway` 且携带匹配的 `last_request_id`/`last_seq`/新鲜 `event_time`，也不得 `CONFIRMED`**。C-15 不提供网关级云控制；C-21/UI 不得把网关自身作为可控设备下发云命令。
+   - 未登记的新内置固定名：登记前不得上线可控；运行时若未登记，只能按外部模块路径 fail-closed（无有效 inventory 载体 → `UNSUPPORTED`），不得因同名 inventory 条目转为 `CONFIRMED`。
+3. **外部模块 inventory**（PB-02；仅限非保留固定名目标）：
+   - 仅当目标 `deviceId` **不在**固定名注册表中时，才允许进入 inventory 路径；进入前先做注册表精确拒绝（F-04）。
    - 在 `shadow.deviceInventory` 中按 `deviceId` 查找；
    - 条目缺 `lastRequestId`/`lastSeq`/`eventTime` → `UNSUPPORTED`（`CLOUD_INVENTORY_UNSUPPORTED`），**绝不** CONFIRMED；
    - 两者匹配 + 条目 `eventTime + 2000 >= notBeforeMs` → `CONFIRMED`；
@@ -2592,6 +2616,20 @@ export class DeviceInventoryParser {
    - 缺字段 → `UNVERIFIED`；值不等 → `MISMATCH`；相等 → `MATCH`。
 5. `completion=CONFIRMED` 且 `stateVerification=MISMATCH` → 命令已执行但目标状态不符；`CloudControlOutcome.executionAccepted=true`，VM 必须 REVERT 到 reported state。
 6. `completion=INVALID` 只在 shadow 结构非法时返回；`CloudService` 将其视为错误，不应用状态。
+
+**v1 完成判定路由表（F-04 裁定，2026-10-17）**：
+
+| 目标 `deviceId` | 判定路径 | 允许结果 |
+|---|---|---|
+| `Door_01`/`Light_01`/`AC_01` | 固定属性载体（`*_LastRequestId`/`*_LastSeq` + 新鲜度） | `CONFIRMED`/`PENDING`/`STALE`/`INVALID` |
+| `Sensor_01`/`Presence_01` | 无控制命令 | `UNSUPPORTED`（`READ_ONLY_SENSOR`） |
+| `Gateway` | 无云控制完成载体；`Gateway_Online`/`Gateway_RSSI` 不是回执 | `UNSUPPORTED`（`GATEWAY_NOT_SUPPORTED`） |
+| 未登记的新内置固定名 | 登记前不得作为可控目标；按外部模块路径 fail-closed | `UNSUPPORTED`（无有效 inventory 载体时） |
+| 外部模块设备（**不在**固定名注册表） | inventory（PB-02） | `CONFIRMED`/`PENDING`/`UNSUPPORTED`/`INVALID` |
+
+> inventory 中出现固定名注册表条目不影响上述路由：固定名永不因 inventory 同名条目转为 `CONFIRMED`。新增内置固定设备名必须先走 Change Impact 更新本表。
+>
+> `STALE`/`INVALID` 是全局前置结果（§8.3.3 的新鲜度/结构检查），可先于本表返回；无论前置结果如何，固定名与缺失载体的目标都不得 `CONFIRMED`。
 
 #### 8.1.7 `CloudService`
 
@@ -2649,7 +2687,10 @@ export class CloudStateChangedEvent {
 - `saveConfig`：`CloudConfigValidator` 校验；写 `cloud_config`；`token` 非空时 `credentials.putToken(token)`；token 只写 Asset Store；保存后状态 `CONFIGURED`（token 存在）或 `TOKEN_MISSING`（token 为空）。
 - `clearConfig`：删除 `cloud_config` + 删除 Asset Store token（避免孤儿）；状态 `NOT_CONFIGURED`。`clearToken`：只删 token，保留配置；状态 `TOKEN_MISSING`。
 - `validateConfig`：endpoint 必须 `https://`，只允许 host（可含端口），不得含路径/查询；projectId/deviceId 非空且匹配 ID 词表；`shadowEndpoint` 若存在必须 `https://`；`accessTokenAlias` 必须为固定别名（`yaocore.cloud.token.v2`）。
-- `testConnection`：`ShadowReader.read`；成功 → `valid=true`；401/403 → `TOKEN_EXPIRED`/`TOKEN_INVALID`；其他错误返回 `valid=false` + errors；不写入状态。
+- `testConnection`（F-03 裁定，2026-10-17）：对**已持久化配置**的只读探测，语义分两层：
+  - **持久配置层**（`cloud_config` + Asset token）：**不写**。不创建/修改/删除配置，不 `putToken`/`removeToken`；无配置 → `CLOUD_NOT_CONFIGURED`，无 token → `CLOUD_TOKEN_MISSING`，配置非法 → 返回校验错误；这些情况不发起网络请求。
+  - **瞬时运行健康层**（进程内 `networkFailures`/`unavailable`/`tokenFailure`/`lastError`）：按探测结果更新。成功（`ShadowReader.read` 成功且结构合法）→ `valid=true`；清零连续网络失败与 `unavailable`、清除网络类 `lastError`；若报告状态因此变化则 `notify()`（实现 `UNAVAILABLE → CONFIGURED` 恢复边）。401/403 → 记录 `TOKEN_EXPIRED`/`TOKEN_INVALID`、`authFailureAt` 与 `lastError`，并 `notify()`；不回写 token、不自动重试。其他错误 → `valid=false` + errors；**不**增加连续失败计数、**不**单独把状态提升为 `UNAVAILABLE`（手动探测失败不是“持续网络失败”），已有 `UNAVAILABLE` 保持不变。
+  - **“不写入状态”只指不写持久配置/Token**；不得解释为忽略探测得到的瞬时健康结果。Token 失败状态只由携带新的非空 token 的 `saveConfig` 清除（§8.3.1；F-02 修复口径）。
 - `sendAndConfirm`：先以 `clock.nowMs()` 记录 `notBeforeMs`（命令发出时刻），`send` → 构造 `CloudCommandExpectation`（同一 `notBeforeMs`；`requestId/seq` 取 receipt）→ `awaitCompletion`。
 - `awaitCompletion`：轮询 `ShadowReader.read`；每轮 `evaluator.evaluate`；`CONFIRMED` → 返回；`UNSUPPORTED` → 立即返回 `CLOUD_COMPLETION_UNSUPPORTED`；`INVALID` → `CLOUD_SHADOW_INVALID`；`STALE/PENDING` → 等待 `intervalMs`；超过 `maxElapsedMs`/`maxAttempts` → `CLOUD_COMPLETION_TIMEOUT`；取消 → `PROVISIONING_CANCELLED`/调用方映射。
 - `stopPolling`：取消当前轮询定时器；不删除状态；应用后台调用。
@@ -2661,6 +2702,7 @@ export class CloudStateChangedEvent {
 | 场景 | 错误码 | 可重试 | i18n 键 |
 |---|---|---|---|
 | 未配置 | `CLOUD_NOT_CONFIGURED` | 否 | `errors.cloud.not_configured` |
+| 命令 `gatewayId` 不在 active 云作用域/无绑定凭据（F-06） | `CLOUD_NOT_CONFIGURED` | 否 | `errors.cloud.not_configured` |
 | endpoint 非 HTTPS/含路径 | `CLOUD_ENDPOINT_INVALID` | 否 | `errors.cloud.endpoint_invalid` |
 | token 缺失 | `CLOUD_TOKEN_MISSING` | 否 | `errors.cloud.token_missing` |
 | token 过期（401/403） | `CLOUD_TOKEN_EXPIRED` | 否 | `errors.cloud.token_expired` |
@@ -2684,6 +2726,12 @@ export class CloudStateChangedEvent {
 
 #### 8.3.1 配置/Token 状态
 
+**两层状态（F-03 裁定，2026-10-17）**：
+
+- **持久配置状态（L1）**：`cloud_config`（v4 单例行）+ Asset token 的存在性/有效性基线；只由 `saveConfig`/`clearConfig`/`clearToken` 改变。
+- **瞬时运行健康（L2）**：进程内 `tokenFailure`（401/403）、`unavailable`（连续网络失败 ≥2）、`lastError`；由 `send`/`awaitCompletion`/`testConnection` 的观测更新，重启即清空，不持久化。
+- `getState()` 判定优先级：`NOT_CONFIGURED`（无配置）→ `UNAVAILABLE`（配置非法/读取失败）→ `TOKEN_MISSING`（无 token）→ `TOKEN_EXPIRED`/`TOKEN_INVALID`（L2 Token 失败）→ `UNAVAILABLE`（L2 网络不可用）→ `CONFIGURED`。`testConnection` 只改 L2。
+
 ```mermaid
 stateDiagram-v2
     [*] --> NOT_CONFIGURED
@@ -2697,6 +2745,8 @@ stateDiagram-v2
     TOKEN_MISSING --> CONFIGURED: saveConfig(new token)
     CONFIGURED --> UNAVAILABLE: network/DNS persistent failure
     UNAVAILABLE --> CONFIGURED: testConnection success
+    UNAVAILABLE --> TOKEN_EXPIRED: testConnection 401
+    UNAVAILABLE --> TOKEN_INVALID: testConnection 403
     CONFIGURED --> NOT_CONFIGURED: clearConfig
     TOKEN_MISSING --> NOT_CONFIGURED: clearConfig
     CONFIGURED --> TOKEN_MISSING: clearToken
@@ -2709,7 +2759,11 @@ stateDiagram-v2
 - `saveConfig` 不自动测试网络；`testConnection` 单独调用。
 - Token 过期后不得自动刷新/重试旧 token；用户必须更新。
 - `CloudConfig` 中 `accessTokenAlias` 只是别名；token 本体只在 Asset Store。
-- **v1 云配置为单网关作用域**：`CloudConfig.deviceId` 是该网关的 IoTDA 设备 ID；`CloudService` 只对当前 active gateway 使用。多网关家庭需要多份 cloud config/本地 `gatewayId` 映射，`CloudConfig` 无 `gatewayId` 字段，属 Change Impact（`RISK-CLOUD-MULTIGATEWAY`）。在单配置下，若命令 `gatewayId` 与当前云配置网关不一致，返回 `CLOUD_NOT_CONFIGURED`，不得用错误网关的 token/设备 ID。
+- **v1 云配置为单 active 作用域（F-06 裁定，2026-10-17）**：
+  - `cloud_config` 是单例（`singleton_id=1`），只描述**一个** active 网关的 IoTDA 绑定；`CloudConfig.deviceId` 是该网关的 IoTDA 设备 ID。v1 不支持多份云配置/按网关切换。
+  - C-28 为当前 active gateway 装配 C-15；C-21 只对该 active gateway 回退云。若 `command.gatewayId` 无法映射到当前 active 云作用域或没有已绑定网关凭据，**在分配 seq/签名/发 HTTP 前**以 `CLOUD_NOT_CONFIGURED` fail-closed（不重试、不消耗 seq、不读 secret、不发影子请求）；不得用 `config.deviceId` 的 token/设备 ID 为另一个网关签名或读影子。
+  - 冻结 `CloudConfig` 无 `gatewayId`，C-15 不能从持久化配置独立证明“配置↔网关”绑定；因此 v1 产品限制为：**多网关家庭不得启用云控制**（C-23 设置页检测已绑定网关数（`GatewayRepository.listRoutes()`/`Family.gatewayIds`）`> 1` 时禁用/清除云配置并提示），切换 active 网关时必须 `clearConfig`/重新配置。该限制是 v1 合同的一部分，不得以“运行时未报错”视为多网关安全。
+  - `RISK-CLOUD-MULTIGATEWAY` = **ACCEPTED (v1)**；后续路径：Change Impact 扩展 `CloudConfig.gatewayId` + v5 `cloud_config` 绑定列 + C-15 入口一致性校验与负例测试；关闭前多网关云控制保持 `UNSUPPORTED`。
 
 #### 8.3.2 云命令生命周期
 
@@ -2747,7 +2801,9 @@ flowchart TD
     D -- 是 --> E{LastRequestId & LastSeq 都匹配?}
     E -- 是 --> F[CONFIRMED + stateVerification]
     E -- 否 --> P[PENDING]
-    D -- 否 --> G{Inventory 有条目?}
+    D -- 否 --> R{保留固定名?}
+    R -- 是 --> U3[UNSUPPORTED]
+    R -- 否 --> G{Inventory 有条目?}
     G -- 否 --> U[UNSUPPORTED]
     G -- 是 --> H{last_request_id & last_seq & event_time?}
     H -- 否 --> U2[UNSUPPORTED / PB-02]
@@ -2759,9 +2815,11 @@ flowchart TD
     J -- 否/缺 --> MM[MISMATCH/UNVERIFIED]
 ```
 
-- 固定属性映射表（v1，来自 SR）：
-  - `Door_01` → `Door_01_*`；`Light_01` → `Light_01_*`；`AC_01` → `AC_01_*`；`Sensor_01`/`Presence_01` 只读。
-  - 其他 deviceId → inventory（PB-02）。
+- 固定属性映射表（v1，来自 SR；F-04 裁定）：
+  - `Door_01` → `Door_01_*`；`Light_01` → `Light_01_*`；`AC_01` → `AC_01_*`；`Sensor_01`/`Presence_01` 只读 → `UNSUPPORTED`。
+  - `Gateway` → 无控制完成载体 → `UNSUPPORTED`；`Gateway_Online`/`Gateway_RSSI` 不构成命令回执。
+  - 仅**不在**固定名注册表中的外部模块 deviceId → inventory（PB-02）；inventory 中出现 `Gateway`/`Door_01`/`Light_01`/`AC_01`/`Sensor_01`/`Presence_01` 条目不得用于完成判定。
+  - 新增内置固定设备名必须先走 Change Impact 登记注册表；未登记前按 fail-closed 处理。
 - `LastRequestId`/`LastSeq` 必须**同时**匹配；只看其一不得确认。
 - 新鲜度容差 2s（CB §7.1；归档 `NetworkService.ets` L520-525 行为参考）。
 - 旧影子/网关缓存/IoTDA 受理均不构成确认（PR-10；需求 L10）。
@@ -2773,7 +2831,7 @@ flowchart TD
 
 **已确定可实现部分（T-14 必须实现）**：
 1. 内置固定属性路径：`Door_01/Light_01/AC_01` 的 `*_LastRequestId`/`*_LastSeq` + `event_time` 新鲜度；完整测试。
-2. `DeviceInventoryJson` 解析器：严格上限（≤8192 字符、≤32 条、`device_id` 非空 ≤63）；只接受 §8.6 候选字段；缺 `last_request_id`/`last_seq`/`event_time` → `UNSUPPORTED`；任何未知/非法结构 → `UNSUPPORTED`/`CLOUD_SHADOW_INVALID`，**绝不 CONFIRMED**。
+2. `DeviceInventoryJson` 解析器：严格上限（≤8192 字符、≤32 条、`device_id` 非空 ≤63）；只接受 §8.6 候选字段；缺 `last_request_id`/`last_seq`/`event_time` → `UNSUPPORTED`；任何未知/非法结构 → `UNSUPPORTED`/`CLOUD_SHADOW_INVALID`，**绝不 CONFIRMED**。inventory 仅服务不在固定名注册表中的外部模块设备；`Gateway` 与只读固定名即使出现在 inventory 中也必须 `UNSUPPORTED`（§8.1.6；F-04）。
 3. 合成 fixture（`CloudFixture.inventory.*`）标注 `PUBLIC TEST DATA ONLY` + `PROPOSED_PB02`；不声称与真实固件互操作。
 4. UI/验收：外部模块云完成判定标记 `FIRMWARE_PENDING`/`UNSUPPORTED`；不得写成 PASS。
 
@@ -2821,9 +2879,12 @@ flowchart TD
   - inventory：候选 fixture 匹配/缺字段 UNSUPPORTED/未知字段忽略但记录偏差；
   - 轮询超时/取消/Token 过期中途停止；
   - `stopPolling`/`dispose` 取消定时器；
+  - **F-03 状态语义**：两次网络失败 → `UNAVAILABLE`；`testConnection` 成功 → `CONFIGURED` 且订阅收到通知；`testConnection` 网络失败不增加失败计数/不新增 `UNAVAILABLE`；`testConnection` 401/403 → `TOKEN_EXPIRED`/`TOKEN_INVALID` 且 token 仍在；无配置/无 token/配置非法时不发网络请求；`testConnection` 不调用 `CloudConfigStore.save/clear` 或 `CloudCredentialPort.putToken/removeToken`。
+  - **F-04 固定名路由**：`Gateway` + 伪造匹配 inventory → `UNSUPPORTED`（`GATEWAY_NOT_SUPPORTED`）；`Sensor_01`/`Presence_01` + 伪造 inventory → `UNSUPPORTED`；`Door_01`/`Light_01`/`AC_01` + 匹配 inventory 但固定载体缺失 → `PENDING`，固定载体匹配 → `CONFIRMED`（inventory 不参与）；外部模块 `MODULE_01` + 匹配 inventory → `CONFIRMED`（正例）；外部模块缺载体 → `UNSUPPORTED`。
+  - **F-06 单 active 作用域**：`command.gatewayId` 无已绑定凭据/超出 active 云作用域 → `CLOUD_NOT_CONFIGURED`，传输 fake 调用次数为 0、seq 未推进、secret 未读取；已存在 `UNAVAILABLE` 不因此改变；多网关 UI 限制由 C-23 VM 测试覆盖（已绑定网关数 `>1` → 云设置禁用/清除提示）。
   - UI 状态：`NOT_CONFIGURED`/`CONFIGURED`/`TOKEN_EXPIRED`。
 - IT（Mock/仿真器）：CreateCommand → 影子 → 确认全链路；真实 IoTDA 不在自动门禁（`UNAVAILABLE`）。
-- 夹具：`CloudCommandGolden`（固定 secret/seq/时间）、`ShadowFixture`（services/shadow/devices、fresh/stale/missing）、`InventoryFixture`（候选/缺字段/超限）。
+- 夹具：`CloudCommandGolden`（固定 secret/seq/时间）、`ShadowFixture`（services/shadow/devices、fresh/stale/missing）、`InventoryFixture`（候选/缺字段/超限/固定名伪造条目）。
 
 ### 8.6 Traceability（`DES-B-C15-TRACE`）
 
@@ -2837,6 +2898,9 @@ flowchart TD
 | D-012 手工 Token | `CloudCredentialPort`；无自动刷新 |
 | `UNRESOLVED-PB02-INVENTORY` | §8.4；`DeviceInventoryParser` |
 | `A-CB-1` 影子 DTO 假设 | `ShadowDtoAdapter`；`CLOUD_SHADOW_INVALID` |
+| F-03（`t14-review.md`） | `testConnection` 两层状态语义（§8.1.7/§8.3.1） |
+| F-04（`t14-review.md`） | 固定名注册表/inventory 路由（§8.1.6/§8.3.3） |
+| F-06（`t14-review.md`） | v1 单 active 云作用域/`CLOUD_NOT_CONFIGURED`（§8.3.1；`RISK-CLOUD-MULTIGATEWAY`） |
 | T-14 | 本组件主交付 |
 
 ---
@@ -2902,7 +2966,7 @@ export class AcViewState {
   readonly targetTemperature?: number;
   readonly mode: AcModeView;
   readonly brand: AcBrand;
-  readonly brandI18nKey: string;           // brand.gree 等
+  readonly brandI18nKey: string;           // 顶层 brand.* 固定映射（§9.6）
   readonly isReadOnly: boolean;            // 设备不受支持/离线只读
 }
 
@@ -2919,6 +2983,7 @@ export class AcAdapterFactory {
 - `GreeAcAdapter`/`HaierAcAdapter`/`MideaAcAdapter` 可覆盖 `capabilities`/`normalizeInboundMode` 的差异（例如入站中文/别名归一），但**不得**改变 7 值出站词表；不得 import 仓储/网络/I18nService（品牌显示键由 `brandI18nKey` 提供，不调用 `t()`）。
 - `GenericAcAdapter` 是默认；未知品牌回退 Generic，不阻断控制。
 - `toViewState`：`mode` 表内 → `STANDARD`；表外 → `NON_STANDARD` + 原文；`patch.mode` 缺失 → `UNKNOWN`；`brandI18nKey` 只返回键，不返回文案。
+- `brandI18nKey` 的键名固定为顶层 `brand.gree`/`brand.haier`/`brand.midea`/`brand.generic`，由固定的 `AcBrand → key` 映射返回，不做字符串拼接；资源归属与待办见 §9.6（F-05 裁定）。
 - `normalizeInboundTemperature`：数值必须在 16..30；越界 → `PROTOCOL_VALUE_OUT_OF_RANGE`；不得静默 clamp（入站展示可标记异常，但适配器不 clamp）。
 
 ### 9.2 错误（`DES-B-C16-ERR`）
@@ -2952,6 +3017,8 @@ export class AcAdapterFactory {
   - 温度 16/30 边界；15.9/30.1 抛错；NaN/Infinity；
   - `toViewState` 缺字段/未知 mode；
   - 四个 adapter 的 `capabilities` 一致（7 值/16..30）；
+  - `brandI18nKey` 对四个品牌返回固定的顶层 `brand.*` 键（不做动态拼接）；
+  - `brand.gree`/`brand.haier`/`brand.midea`/`brand.generic` 在 zh-CN/en-US rawfile 均存在且非空（F-05；跨组件资源待办 §9.6）；
   - 适配器不 import 仓储/网络（静态扫描）。
 - CT：与 C-21 `ClimateViewModel` 联合：滑杆 55ms/TouchUp 只发标准值。
 - 夹具：`AcFixture`（品牌/模式/温度边界）。
@@ -2965,7 +3032,19 @@ export class AcAdapterFactory {
 | ADR-001 §2 | 统一动作/值 |
 | DM §2.2 | `targetTemperature`/`mode`/`brand` |
 | PC PL-08 | 适配器解耦、纯映射 |
+| I18N-02 / F-05 | 顶层 `brand.*` 资源键；资源归属 T-18（§9.6） |
 | T-14 | 本组件主交付 |
+
+### 9.6 `brand.*` 资源键待办（`T-14 裁定同步`，2026-10-17；F-05）
+
+> **归属**：`brand.*` 是**资源任务**，不是适配器代码；最终由 **T-18（C-27 设置/关于资源面）** 拥有，**C-24（T-17）** 与 **C-27（T-18）** 是消费面。T-17 若先触及资源文件可提前补齐，但不得改变键名/语义；否则 CQG-T14 把该项记为 `DEFERRED` 跨组件依赖，不得以 host 测试通过掩盖。
+
+- **键名约定（冻结）**：顶层 `brand.*`，小写品牌名：`brand.gree`、`brand.haier`、`brand.midea`、`brand.generic`；**不使用** `ac.brand.*`（§7.4.2 已同步）。zh-CN：格力/海尔/美的/通用；en-US：Gree/Haier/Midea/Generic。品牌名是数据显示，不进入业务分支；不得在代码中写死展示文案。
+- **关闭条件**：
+  1. 两个 rawfile（`zh-CN.json`/`en-US.json`）都存在四键且值非空；`string.json` 仅在 `$r` 使用时才需要同步。
+  2. `AcAdapterFactory.brandI18nKey`/`AcViewState.brandI18nKey` 由固定映射返回（禁止 `'brand.' + lower(...)` 动态拼接），使 CHK-05/CHK-06 可静态核对；或把动态键列入显式 allowlist 并加测试。
+  3. 增加“四品牌键存在 + zh/en parity”的 host/检查器证据；在 CQG-T14/CQG-T17/CQG-T18 记录依赖。
+  4. 未知品牌回退 `GENERIC` 的展示仍用 `brand.generic`；调用侧诊断记录见 F-08（不改变本键名约定）。
 
 ---
 
@@ -4068,6 +4147,7 @@ stateDiagram-v2
 ```
 
 - Token 只手工更新；无自动刷新；过期提示必须明确“更新 IAM Token”。
+- 云配置 v1 单网关限制（F-06）：当前家庭绑定网关数 `>1` 时，CLOUD 分区禁用/只读并提示“v1 仅支持单网关联云”；切换 active 网关时必须提示清除或重新配置云；不得在 UI 上默认多网关安全。`testConnection` 成功清除瞬时 `UNAVAILABLE`，网络错误只显示本次探测失败（F-03）。
 - 设置页显示 P-HMAC/P-TLS-PIN/运行期 P-BLOCKED；P-HMAC 必须显示“仅完整性，无机密性”；P-TLS-PIN 显示 pin 状态；不得允许手工编辑 pin（仅 BLE 重新配网）。
 - 手动 IP：默认折叠；仅已绑定；失败不猜测/不切换；移除硬编码默认 IP（D-015）。
 - 语言：跟随系统/简体中文/English；即时生效；失败提示。
@@ -4084,7 +4164,7 @@ stateDiagram-v2
   - 取消清理：`ble.cancel` 调用、`drafts.destroy`、Wi-Fi/PoP 字段清空；
   - Wi-Fi AuthError → 回 step3；NetworkNotFound；超时；
   - `commitBinding` 失败不显示 BOUND；`addGatewayToFamily` 失败提示；
-  - Settings：locale 切换/apply 失败；cloud token 缺失/过期/更新；手动 IP 未绑定拒绝；P-HMAC 文案键存在；
+  - Settings：locale 切换/apply 失败；cloud token 缺失/过期/更新；手动 IP 未绑定拒绝；P-HMAC 文案键存在；多网关家庭云设置禁用/清除提示（F-06）；`testConnection` 成功恢复云状态/失败不新增不可用（F-03）；
   - 设置持久化/重启。
 - device/IT：Mock BLE 全流程；真实 BLE 不在自动门禁（`UNAVAILABLE`）；设置页 UI smoke。
 - 夹具：`BleProgressFixture`（每状态）、`CloudConfigFixture`、`GatewaySecurityFixture`。
@@ -4096,6 +4176,7 @@ stateDiagram-v2
 | FR-GW-001/002/003 | 配网向导/权限/Security1/Wi-Fi/绑定 |
 | FR-SET-002/003 | 安全配置/云/i18n 设置 |
 | FR-HOME-001 | 云/网关状态展示 |
+| F-03/F-06（`t14-review.md`） | 云状态恢复/单网关联云 UI 限制（§12.3.2、§8.3.1） |
 | ADR-002 §6/§7；ADR-004 §5/§7.2 | 通道档案/语言/高级 IP |
 | D-012/D-015/D-016 | 手工 Token/高级 IP/门锁关联提示 |
 | BLE §7；PR-13 | 10s 扫描/有限退避/清理 |
@@ -4790,7 +4871,7 @@ SettingsPage
 
 **行为**：
 - 语言：三项；切换即时生效；`platformApplied=false` 显示“部分文案需重启”；失败回滚。
-- 云：输入 endpoint/projectId/deviceId/token；token password 输入；保存前 `validateConfig`；`testConnection` 显示成功/401/403/网络错误；Token 过期明确提示“更新 IAM Token”，无自动刷新；`clearToken` 保留配置。
+- 云：输入 endpoint/projectId/deviceId/token；token password 输入；保存前 `validateConfig`；`testConnection` 显示成功/401/403/网络错误；成功清除瞬时 `UNAVAILABLE` 并刷新状态，网络错误只显示本次探测失败（F-03）；Token 过期明确提示“更新 IAM Token”，无自动刷新；`clearToken` 保留配置。v1 单网关限制：已绑定网关数（`GatewayRepository.listRoutes()`/`Family.gatewayIds`）`>1` 时禁用云配置并提示“v1 仅支持单网关联云”；切换网关需清除/重配（F-06）。
 - 安全：显示每网关持久 profile/effective profile/pinCount/最近错误；P-HMAC 显示“仅完整性，无机密性”；P-TLS-PIN 显示“TLS + pin”；P-BLOCKED 显示重新配网入口；**不允许手工添加/编辑 pin**；轮换引导进入 ProvisioningPage `ROTATE_SECRET`。
 - 高级 IP：默认折叠；仅已绑定网关；输入 IPv4/port；`probeManualAddress` 验签+identity；失败“该地址不是已绑定的网关”；不得创建新绑定；移除硬编码默认 IP。
 - 通知：开关 + 系统权限状态；不承诺后台常驻。
@@ -5521,7 +5602,7 @@ sequenceDiagram
 | `SceneFixture` | 成功/预检失败/局部失败/取消/空/禁用 | 同上 |
 | `CloudCommandGolden` | 固定 secret/seq/时间；paras/canonical/sign | `PUBLIC TEST DATA ONLY`；非生产密钥 |
 | `ShadowFixture` | services/shadow/devices；fresh/stale/missing/invalid | 同上 |
-| `InventoryFixture` | `PROPOSAL-PB02-1` 候选/缺字段/超限；标 `PROPOSED_PB02` | `FIRMWARE_PENDING` |
+| `InventoryFixture` | `PROPOSAL-PB02-1` 候选/缺字段/超限；`Gateway`/固定名伪造条目（F-04 回归）；标 `PROPOSED_PB02` | `FIRMWARE_PENDING` |
 | `I18nFixture` | 最小 zh-CN/en-US bundle；复数/插值/缺失/空值 | `PUBLIC TEST DATA ONLY` |
 | `BleProgressFixture` | 每个 `ProvisioningState` 的进度序列 | 同上 |
 | `FamilyFixture` | 家庭/成员/邀请/回执；角色/到期 | 同上 |
@@ -5561,7 +5642,7 @@ CQG-Txx
 
 | ID | 项 | 类型 | 影响 | 处置 | 关闭条件 |
 |---|---|---|---|---|---|
-| `UNRESOLVED-PB02-INVENTORY` | `DeviceInventoryJson` 字段结构 | `UNRESOLVED`（PB-02） | 外部模块云完成判定 | §8.4：内置路径完整；inventory fail-closed；`PROPOSAL-PB02-1`；验收标 `FIRMWARE_PENDING` | 固件 schema/fixture；Change Impact |
+| `UNRESOLVED-PB02-INVENTORY` | `DeviceInventoryJson` 字段结构 | `UNRESOLVED`（PB-02） | 外部模块云完成判定 | §8.4：内置路径完整；inventory fail-closed；固定名禁止 inventory（§8.1.6）；`PROPOSAL-PB02-1`；验收标 `FIRMWARE_PENDING` | 固件 schema/fixture；Change Impact |
 | `RISK-CLOUD-SHADOW-DTO` | IoTDA 影子 REST 字段（A-CB-1） | `RISK` | 影子解析/完成判定 | `ShadowDtoAdapter` 三形态 + fail-closed；`CLOUD_SHADOW_INVALID` | Mock/真实 IoTDA 验证；文档补全 |
 | `RISK-I18N-RUNTIME-LOCALE` | 运行时 `$r` 切换 API | `RISK` | 语言切换一致性 | `LocaleApplierPort`；T-10 验证；失败提示重启 | T-10 设备/模拟器验证 |
 | `RISK-I18N-LEGACY-MIGRATION` | 615 条迁移成本/术语 | `RISK` | 缺文案/硬编码 | 逐条登记表；CHK-01..09；T-10 只建键空间/检查器 | T-10/T-19 报告 |
@@ -5570,7 +5651,8 @@ CQG-Txx
 | `RISK-MULTIFAMILY-PROFILE` | `LocalProfile.familyId` 单值 | `RISK` | 多家庭切换/档案 | v1 每家庭一个档案；切换锁会话；声明限制 | 产品确认/未来模型扩展 |
 | `RISK-UNASSIGNED-DEFAULT` | 新设备未分配默认禁用 | `RISK` | 新设备控制体验 | 指派后启用；UI 解释；与“安全禁用池”一致 | T-17/T-18 产品评审 |
 | `RISK-CLOUD-SEQ-SHARED` | 云/LAN 共用 `seq` | `RISK` | 固件序列预期 | 复用 `GatewaySequencePort`；文档化 | 固件确认/仿真器 |
-| `RISK-CLOUD-MULTIGATEWAY` | `CloudConfig` 无 `gatewayId`，v1 单配置 | `RISK` | 多网关云命令/Token | v1 单网关作用域；多网关需 Change Impact（多行配置/`gatewayId` 映射） | 产品/架构确认 |
+| `RISK-CLOUD-MULTIGATEWAY` | `CloudConfig` 无 `gatewayId`，v1 单 active 配置（F-06） | `RISK` → **ACCEPTED (v1, 2026-10-17)** | 多网关家庭云命令/Token 可能跨网关；冻结形状无法持久化配置↔网关绑定 | v1 只允许单网关家庭启用云；`command.gatewayId` 不可映射/超出 active 作用域 → `CLOUD_NOT_CONFIGURED`（分配 seq/签名/HTTP 前 fail-closed）；切换网关必须清除/重配；多网关家庭云控制 `UNSUPPORTED` | Change Impact 增加 `CloudConfig.gatewayId` + v5 `cloud_config` 绑定列 + 入口一致性校验与负例；复审通过 |
+| `RISK-AC-BRAND-I18N-KEYS` | `brand.*` 四键资源缺失（F-05） | `RISK`（展示） | C-16 展示原始键 | 键名固定为顶层 `brand.*`；由 T-18 资源任务补齐 zh/en；固定映射 + parity 测试（§9.6） | 四键存在且 CHK/测试通过 |
 | `UNRESOLVED-BLE-PERMISSIONS` | BLE 权限集合/API | `UNRESOLVED`（T-17） | 配网权限 | `PermissionGate` 配置化；预期 INTERNET+ACCESS_BLUETOOTH；位置权限仅按 SDK | T-17 设备验证 |
 | `RISK-DEVICE-EPOCH-SECONDS` | 秒级 `updatedAt` 同秒冲突 | `RISK` | 状态覆盖顺序 | 同 epoch 覆盖 + `SAME_EPOCH_OVERWRITE` 偏差 | 固件/联调确认 |
 | `RISK-SCENE-NO-ROLLBACK` | 局部失败不回滚 | `RISK`（产品语义） | 用户误解 | UI 强制 `scene.no_rollback`；步骤明细 | 评审/用户确认 |
@@ -5579,7 +5661,7 @@ CQG-Txx
 | `RISK-ROOM-DELETE-CROSS-REPO` | 房间删除跨 C-08/C-10/C-09 | `RISK` | 半删除 | 同一 RDB 事务 + 端口；回滚测试 | T-09 集成测试 |
 | `RISK-HOME-PERF` | 大列表/光核性能 | `RISK`（NFR 4.3） | 卡顿 | `LazyForEach`/分页；TEST-001 口径 | 设备测量 |
 | `RISK-I18N-DUAL-STORE` | 双存储文案漂移 | `RISK` | 中英混排 | 一个 key 一处；CHK-01/02/09；运行时同时切换 | T-10/T-19 |
-| `RISK-PB02-INVENTORY-PARSER` | 候选 parser 与固件不一致 | `RISK` | 外部模块误判 | fail-closed；`UNSUPPORTED`；不声明 PASS | 固件 schema |
+| `RISK-PB02-INVENTORY-PARSER` | 候选 parser 与固件不一致 | `RISK` | 外部模块误判 | inventory 仅外部模块设备；固定名注册表一律 `UNSUPPORTED`；fail-closed；不声明 PASS | 固件 schema |
 | `RISK-FR-FAM-004-CONSISTENCY` | 退出/解散跨设备一致性 | `RISK`（v1 声明） | 旧成员仍可控制 | 轮换引导；UI 声明；不承诺实时 | 产品/安全评审 |
 | `RISK-INVITE-RECEIPT-REPLAY` | 回执账本语义重放/跨进程并发（R3-01/F-01/F-04） | `RISK`（Medium） | 多用途 CODE_KEK 的 `usedCount` 可被陈旧/变体回执消耗，后续合法成员被 `INVITE_MAX_USES` 拒绝；多进程无 CAS | C-13 canonical `YCP1` + `(inviteId, receiptHash)` 持久账本（§23.6）；非规范回执在解码阶段拒绝；单进程 gate 语义，多进程需 RDB 唯一约束；不得以别名唯一性论证 | T-13 修复（F-01/F-04/F-07）+ 复审 |
 | `RISK-IMPORTED-FAMILY-OWNER` | 导入家庭 owner 占位/权威成员收敛 | `RISK`（Low） | 本机加入设备的 owner 指针与 `transferAdmin` | `importFamily` 使用占位 owner；RBAC 仍按 `targetRole`；`transferAdmin` 在权威同步前不可用；不新增在线协议 | 接触式同步/后续 Change Impact |
@@ -5604,6 +5686,7 @@ CQG-Txx
 - 本文不声明任何真实 TLS/云/BLE/硬件行为已验证；所有相关证据标 `MOCK_ONLY`/`FIRMWARE_PENDING`/`UNAVAILABLE`。
 - `FR-FAM-004`、`FR-HOME-001`、`FR-SET-002`、`NFR-4.1`、`NFR-4.3` 的能力边界必须在 UI/README/评审中如实声明（DP-05/DP-06；SC-16）。
 - PB-02 未关闭前，不得把外部模块云完成判定写入验收 PASS；T-14 报告必须列出 `UNSUPPORTED`/`FIRMWARE_PENDING`。
+- T-14 裁定同步（2026-10-17，§0.6）：F-03/F-04/F-06 的契约冲突已按 §8 口径解决；实现修复与回归测试、F-05 资源补齐完成前，C-15/C-16 证据保持 `UNVERIFIED`/`DEFERRED`，多网关云控制明确 `UNSUPPORTED`，不得写成 PASS。
 
 ---
 
@@ -5814,8 +5897,8 @@ export interface DeviceStatePort {
 | C-10 | T-09 | CQG-T09 | §5 |
 | C-11 | T-09 | CQG-T09 | §6 |
 | C-14 | T-10 | CQG-T10 | §7 |
-| C-15 | T-14 | CQG-T14 | §8 |
-| C-16 | T-14 | CQG-T14 | §9 |
+| C-15 | T-14 | CQG-T14 | §8（F-03/F-04/F-06 裁定见 §0.6） |
+| C-16 | T-14 | CQG-T14 | §9（`brand.*` 资源由 T-18 补齐，§9.6） |
 | C-21 | T-15 | CQG-T15；IG-2 | §10 |
 | C-22 | T-16 | CQG-T16；IG-2 | §11 |
 | C-23 | T-16 | CQG-T16；IG-2 | §12 |
@@ -5832,13 +5915,23 @@ export interface DeviceStatePort {
 |---|---|---|---|
 | T-09 | §2/§3/§4/§5/§6/§21 | `DES-B-C08..C11-*` | 仓储/用例/场景 + host 测试 |
 | T-10 | §2.2/§7/§21 | `DES-B-C14-*` | I18nService/资源/CHK |
-| T-14 | §2.4/§8/§9/§21 | `DES-B-C15..C16-*` | CloudService/AC + fixtures |
+| T-14 | §2.4/§8/§9/§21 | `DES-B-C15..C16-*` | CloudService/AC + fixtures（F-03/F-04/F-06 见 §0.6；F-05 见 §9.6） |
 | T-15 | §10/§19.1/§21 | `DES-B-C21-*` | Home/Device/Climate/Door VM |
 | T-16 | §11/§12/§19.3/§19.4 | `DES-B-C22..C23-*` | Family/Room/Scene/Provisioning/Settings VM |
 | T-17 | §2.1/§13/§14/§17/§18 | `DES-B-C24/C25/C28-*` | UI 壳/页面/组合根/权限 |
 | T-18 | §15/§16/§2.1 | `DES-B-C26/C27-*` | 二级页面/设置/关于/Profile |
 | T-19 | §20/§21/§22 | 全部 | 测试报告/覆盖矩阵 |
 | T-20 | §22/§24.3 | 全部 | 独立评审 |
+
+**T-14 裁定后续待办（2026-10-17，§0.6）**：
+
+| 项 | 归属 | 状态 | 关闭条件 |
+|---|---|---|---|
+| F-03 `testConnection` 两层状态语义 | T-14 修复轮 | `OPEN` | §8.1.7/§8.3.1 实现 + §8.5 回归测试 |
+| F-04 固定名/inventory 路由 | T-14 修复轮 | `OPEN` | §8.1.6/§8.3.3 实现 + `Gateway` 冒充 inventory 回归测试 |
+| F-06 v1 单 active 云作用域 | T-14 修复轮（C-15）；C-23/C-28（UI 限制） | `OPEN` | `CLOUD_NOT_CONFIGURED` 负例 + 多网关 UI 限制 + `RISK-CLOUD-MULTIGATEWAY` 接受记录 |
+| F-05 `brand.*` 资源键 | T-18（C-27）；消费面 C-24/C-27 | `DEFERRED` | §9.6 四键 + zh/en parity + 固定映射/检查器证据 |
+| F-01 v4 `cloud_config` DDL 对齐 | T-14 修复轮（实现） | `OPEN`（阻断 CQG-T14） | 按 §2.7 v4 DDL 修复 + 迁移后读写测试 + 复审 |
 
 ### 24.3 契约条目索引（80 条）
 
@@ -5868,6 +5961,7 @@ export interface DeviceStatePort {
 - [x] 每个组件有明确职责/边界/依赖/构造注入/测试 seam。
 - [x] 领域语义：SSOT/`stateEpochMs` 仲裁（§5.3.2）、房间删除/未分配池（§4.3.2/§19.2）、设备删除 tombstone（§5.3.4）、场景局部失败（§6.3.3）、邀请/回执（§3.3.3/§3.3.4）。
 - [x] 云路径：配置/Token/命令/影子/完成判定/PB-02（§8）。
+- [x] T-14 裁定同步（§0.6）：F-03 两层状态、F-04 固定名/inventory 路由、F-06 单 active 云作用域、F-05 `brand.*` 资源归属均已登记，未改冻结签名/G-004 语义。
 - [x] i18n：API/资源布局/fallback/键规则/迁移/CHK（§7）。
 - [x] VM：state/event/selector/异步/错误映射/节流/防乐观（§10-§12）。
 - [x] UI：页面/导航/组件 props/events/主题/动效/空态/加载/错误/可访问性（§13-§16）。

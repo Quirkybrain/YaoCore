@@ -164,6 +164,7 @@ export class InMemoryRoutePort implements GatewayRoutePort {
 
 export class InMemoryCredentials implements GatewayCredentialPort {
   private readonly secrets: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+  secretReads: number = 0;
 
   set(gatewayId: string, secret: Uint8Array): void {
     this.secrets.set(gatewayId, secret);
@@ -175,6 +176,7 @@ export class InMemoryCredentials implements GatewayCredentialPort {
     if (secret === undefined) {
       throw AppErrors.of('GATEWAY_NOT_BOUND', []);
     }
+    this.secretReads++;
     const copy = new Uint8Array(secret.length);
     copy.set(secret);
     try {

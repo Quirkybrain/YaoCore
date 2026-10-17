@@ -10,6 +10,7 @@
 import baselineTest from './Baseline.test';
 import authInviteDeviceTest from './family/AuthInviteDevice.test';
 import bleProvisioningDeviceTest from './ble/BleProvisioningDevice.test';
+import cloudDeviceTest from './cloud/CloudDevice.test';
 import foundationDeviceTest from './foundation/FoundationDevice.test';
 import gatewayTransportDeviceTest from './gateway/GatewayTransportDevice.test';
 import i18nDeviceTest from './i18n/I18nDevice.test';
@@ -25,4 +26,5 @@ export default function testsuite() {
   gatewayTransportDeviceTest();
   bleProvisioningDeviceTest();
   authInviteDeviceTest();
+  cloudDeviceTest();
 }
