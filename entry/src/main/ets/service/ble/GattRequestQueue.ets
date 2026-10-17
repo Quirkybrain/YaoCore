@@ -10,7 +10,7 @@
  * and later runs fail with GATT_BUSY instead of starting concurrently. The
  * caller tears the link/session down and reconnects from Security1 step0.
  */
-import { AppErrors } from '../../common/types/AppError';
+import { AppError, AppErrors } from '../../common/types/AppError';
 
 export class GattRequestQueue {
   private readonly timeoutMs: number;
@@ -77,7 +77,7 @@ export class GattRequestQueue {
 
   private async execute<T>(operation: () => Promise<T>): Promise<T> {
     let timer: number = 0;
-    const timeout = new Promise<T>((_resolve: (value: T) => void, reject: (error: Error) => void) => {
+    const timeout = new Promise<T>((_resolve: (value: T) => void, reject: (error: AppError) => void) => {
       timer = setTimeout((): void => {
         this.broken = true;
         reject(AppErrors.of('PROVISIONING_GATT_BUSY', []));

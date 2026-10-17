@@ -3,9 +3,9 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。
-- **Date**: 2026-10-17
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。
+- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-17 裁定同步，§0.8）
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
 - **Target Stage**: `implementation`
@@ -66,7 +66,7 @@
 6. **i18n 双存储边界不变**：`string.json` 只放 UI 静态字面量与元数据；`rawfile/i18n/{zh-CN,en-US}.json` 放参数化/代码路径文案；`t(key, params)` 同步查找，fallback 链 `当前 locale → zh-CN → key 文本`；运行时切换通过 `LocaleApplierPort` 应用并通知 UI（I18N-DESIGN §2-§4）。
 7. **云“受理 ≠ 执行”**：`CreateCommand` 2xx 只产生 `CloudCommandReceipt`；`CloudCompletionEvaluator` 必须用**不早于命令时刻**的影子/状态、且 `LastRequestId == RequestId` 与 `LastSeq == Seq` 同时匹配才 `CONFIRMED`；`DeviceInventoryJson` 路径因 PB-02 `UNRESOLVED`，未知结构一律 `UNSUPPORTED`，不得声明成功（CB §7.1；PR-10）。
 8. **VM 是纯逻辑 + 可注入时钟/定时器**：`@Observed` 不进入 VM；VM 暴露 `getState()`/`subscribe()`，状态用不可变 `ObservableState` 替换；55ms 节流、三态、门锁四阶段、配网映射均可在 `entry/src/test` 直接测试（D-018；DES-A §23）。
-9. **UI 契约以 props/events 为主**：组件不直接调用仓储/传输；页面通过构造注入的 VM 和 `@Provide('i18n')` 获取文案；主题/动效 token 集中在 C-24；导航用 `Navigation` + `NavPathStack`，`main_pages.json` 仅注册 `pages/Index`（UIUX §3；ARCH §2）。
+9. **UI 契约以 props/events 为主**：组件不直接调用仓储/传输；页面通过组合根构造的 VM 和显式 `i18n` props 获取文案；主题/动效 token 集中在 C-24；导航用 `Navigation` + `NavPathStack`，`main_pages.json` 仅注册 `pages/Index`（UIUX §3；ARCH §2）。T-17 裁定：UI 依赖传递统一用显式 `@Require`/`@Prop` props，不使用 `@Provide/@Consume`（§0.8）。
 10. **组合根只装配生产适配器**：C-28 构造顺序固定；`Mock*`/`ohosTest/**` 不得进入生产 import 图；`DEV-ONLY` 响应由 C-17 拒收（SC-11；F-05；DES-A §17.3）。
 
 ### 0.3 未决项速览
@@ -130,6 +130,21 @@
 
 - **Change Impact**：C-08/C-22 的实现与 T-16 现有 `T16_Family_joinStateMachineAndProfileCompletion`（把“submit 后即 COMPLETED”固化为期望）在修复并复审前为 `UNVERIFIED`；C-09..C-21/C-23 不受影响。不得把旧 host 593/593 当作本裁定的闭合证据；修复后必须重跑 `entry/src/test/run-host-tests.sh`、`codelinter`、clean `assembleHap` 与 ohosTest 编译，并补 §3.4/§11.4 的 F-06/F-07 用例。
 
+### 0.8 T-17 裁定同步（2026-10-18）
+
+> **裁定人**：solution-architect（任务 `wp-071-t17-ruling`）。**输入**：`artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）与 `artifacts/50-implementation/t17-fix-report.md`。**边界**：只裁定分层规则、UI 依赖注入与已登记构造顺序偏差；不实现代码，不重写 DES-A/DES-B 冻结签名，不改变 G-004 语义。F-01 的启动键名按已实现修复做契约同步；F-09 按 `CompositionPlan` 已登记顺序做最小同步（`CryptoService` 提前到 PLATFORM、`SceneService` 后移到 BACKGROUND 客户端之后），不改变依赖语义；F-02..F-08、F-10..F-13 的代码/测试项不在本裁定内，不得以本裁定替代 CQG-T17/IG-3 证据。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **U-01 D-12/D-17 分工** | D-12 与 D-17 不是同一维度：**D-12 管 `pages/**`/`components/**` 的 import 白名单，D-17 管 `app/**` 的依赖方向与可见性**。修订后 D-17 取代旧句“只能被 `entryability/**`/`pages/Index.ets` 引用”：`app/**` 可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；`app/**` 可依赖 `viewmodel/**`，但**仅限 VM 工厂与 VM 端口适配**（`AppCompositionRoot.create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `PermissionPort` 适配），不得在 app 内实现业务规则；`viewmodel/**` 不得反向 import `app/**`。D-12 增补 `app/{ShellBootstrap,ShellTheme,ShellGateRouting,ContinuousGestureGuard,PermissionPolicy}.ets` UI seam；`ShellTheme` 是 T-17/T-18 过渡，C-24 全量迁移到 `common/theme/**` 后从 app 白名单移除。 | §2.3 D-12/D-17；§13.1.3；§17.1.2/§17.1.5；§18.1 |
+| **U-01 UI 依赖注入** | 生产装配唯一方式 = `AppCompositionRoot` **构造注入**（服务/仓储/适配器/VM）；禁止全局单例、服务定位器、页面自行 `new` 服务/仓储/VM。UI 依赖传递唯一方式 = **显式类型化 props**：必需依赖 `@Require`，单向状态 `@Prop`，双向/可观察状态 `@Link`/`@ObjectLink`，事件用回调。**`@Provide`/`@Consume` 不作为生产依赖注入机制**；T-17 的显式 `@Require` props 被确认。`@LocalStorageProp('bootstrap')` 只用于 EntryAbility→Index 启动交接，`AppStorage`/`@StorageLink` 不得用于服务/VM 实例传递，二者均不得作为通用服务定位器；`Index` 只持有实例并向直接子组件显式传参。 | §0.2-9；§1.1-8；§12.4；§13.1.3；§17.1.2/§17.1.4/§17.1.5；§17.4 |
+| **F-01 启动键名同步** | `EntryAbility` 向 ability `LocalStorage` 写入单个 `ShellBootstrap` 包装对象（键 `bootstrap`，含 `appContext`/`startupError`）；`Index` 必须用 `@Entry({ useSharedStorage: true })` + `@LocalStorageProp('bootstrap')` 读取。§17.1.4/§17.1.5 旧“写入 `appContext` 键”的文字被取代；这是对已实现修复的契约同步，不改变 `AppContext`/`AppCompositionRoot` 签名。若 T-18 需要拆分键，必须走 Change Impact。 | §17.1.4/§17.1.5 |
+| **F-09 CryptoService 顺序（最小裁定）** | 接受 `CryptoService`/`CryptoRandomSource` 在 `PLATFORM`（第 1 步）构造：它只依赖 `OhosCryptoProvider`/`CryptoRandomSource`，无存储边；§2.4 第 5 步仍是安全栈的逻辑分组，`CompositionPlan.ASSEMBLY_CONSTRUCTION_ORDER` 是可执行构造顺序。该偏差与已登记的 `SceneService` 偏差一并视为 T-17 接受项；除此之外不得新增顺序偏差，变更需 Change Impact。 | §2.4；§17.1.2；§18.1 |
+| **测试/评审要求** | `check_layering.py`（C-29）必须按修订后的 D-12/D-17 实现；检查器落地前由评审执行等价静态扫描并记录命令/结果。评审必须检查：生产 `pages/**`/`components/**` 无 `@Provide`/`@Consume`；`Index` 使用 `@Entry({ useSharedStorage: true })` 且 `bootstrap.appContext` 非空；`AppCompositionRoot` 是唯一构造点、无页面 `new` 服务/VM；`app→viewmodel` 仅工厂/端口适配且无反向 import；`CompositionPlan` 顺序测试覆盖 F-09/SceneService 两项已登记偏差。 | §17.4；§18.1；§24.4/§24.5 |
+
+- **不改变**：DES-A/DES-B 冻结方法签名、`AppCompositionRoot`/`AppContext`/`PermissionPort` 公开签名、C-28 路由枚举/参数、G-004 契约语义。
+- **仍阻断 CQG-T17/IG-3**：本裁定只关闭 U-01/F-09 的架构文字冲突，不关闭 t17-review.md 的 F-01..F-13 代码/测试/设备证据项；F-01 的运行时 smoke、F-02/F-03 的修复与独立复审仍按评审 §6 执行。
+
 ---
 
 ## 1. 范围、基线引用与阅读约定
@@ -152,7 +167,7 @@
 5. 新发现未分配设备默认 `isEnabled=false`（与“未分配设备池（安全禁用）”一致）。
 6. `v1 每家庭一个本地档案` 的多家庭实现方式（不改变 `LocalProfile` 字段）。
 7. `CloudCompletionPolicy` 的轮询参数与 `DeviceInventoryJson` 候选解析器（`PROPOSAL-PB02-1`，非冻结契约）。
-8. UI 组件的 props/events 形状与 `@Provide('i18n')` 注入方式。
+8. UI 组件的 props/events 形状与显式 `i18n`/`localeRevision` props 传递方式（T-17 裁定：不使用 `@Provide/@Consume`，见 §0.8）。
 
 ### 1.2 基线缩写与路径
 
@@ -430,12 +445,14 @@ entry/src/main/resources/
 | D-09 | `repository/**` 不得 import `service/**` 实现；跨仓储协调通过 `contracts/**` 端口 + C-28 组合根 | `check_layering.py` |
 | D-10 | `service/{family,room,scene,cloud,i18n}/**` 不得 import `@ohos.*`；平台适配器只在 `adapters/**` | `check_host_safe_imports.py` |
 | D-11 | `viewmodel/**` 只通过构造注入引用 C-07..C-15 用例类/接口（含 `GatewayRepository`/`DeviceRepository`）与 `contracts/**`；可 import `common/**`/`model/**`/C-14 `I18nService`；不得 import `@ohos.*`、`service/{gateway,ble,crypto}/**`、`*/adapters/**`，不得自行 `new` 服务 | `check_layering.py` + `check_host_safe_imports.py` |
-| D-12 | `pages/**`、`components/**` 只 import `common/theme/**`、`app/{AppContext,NavigationService}.ets`、`contracts/PermissionPort.ets`、`model/**`、`viewmodel/**`、C-14 接口、C-24 组件；不得 import 仓储/传输/存储/crypto | 评审 + 静态扫描 |
+| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件，以及 props/events 所需的 C-11/C-15 只读结果 DTO（必须 `import type`）；**不得 import `app/**`、`repository/**`、传输/存储/crypto、`service/**` 实现类，也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29） |
 | D-13 | `adapter/ac/**` 只 import `common/**`、`model/**`；不得 import 仓储/传输/网络 | 评审 + 静态扫描 |
 | D-14 | 生产 `entry/src/main/ets/**` 不得 import `entry/src/ohosTest/**`/`Mock*`；组合根不得出现 `DEV-ONLY` 分支 | `check_production_mock_exclusion.py` |
 | D-15 | `service/cloud/**` 只能通过 `HttpTransport`/`CloudCredentialPort`/`CloudConfigStore` 访问外部；不得直接 `@ohos.net.http` | 评审 + 静态扫描 |
 | D-16 | 所有 UI 用户可见文本必须经 `$r('app.string.*')` 或 `I18nService.t()`；不得在 `pages/`/`components/` 出现 CJK 字面量或英文句子 | CHK-07 |
-| D-17 | `app/**`（C-28 应用壳）可依赖 `service/**`/`repository/**`/`contracts/**`/`common/**`；只能被 `entryability/**`/`pages/Index.ets` 引用；不得被 `viewmodel/**`/`repository/**`/`service/**`/`components/**` 反向依赖 | `check_layering.py` |
+| D-17 | **app 层依赖方向**：`app/**`（C-28）可依赖 `service/**`、`repository/**`、`contracts/**`、`common/**`、`model/**`，以及 `viewmodel/**`（仅 VM 工厂与 VM 端口适配：`AppCompositionRoot` 的 `create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `PermissionPort` 适配；不得在 app 内实现业务规则）；可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；不得被 `viewmodel/**`/`repository/**`/`service/**`/`model/**`/`common/**`/`components/**` 反向依赖 | `check_layering.py` + 评审 |
+
+> **T-17 裁定同步（2026-10-18；`artifacts/70-review/t17-review.md` U-01）**：D-12 与 D-17 按维度分工——D-12 管 UI import 白名单，D-17 管 `app/**` 依赖方向与可见性。旧 D-17“只能被 `entryability/**`/`pages/Index.ets` 引用”与旧 D-12 未列 `ShellTheme`/`ShellBootstrap` 的文字均被本表取代。若两条规则在具体 import 上交叉，按“更严格者优先”执行；任何放宽必须走 Change Impact，不得在实现/评审中静默修改。`app→viewmodel` 是单向边，`viewmodel/**` 不得为工厂/适配反向 import `app/**`。
 
 **依赖图（DES-B 新增边）**：
 
@@ -498,6 +515,7 @@ graph TD
 
 ```text
 1.  Platform: ClockPort / RandomPort / IdPort / LoggerPort / MetricsPort
+      + CryptoService (CryptoPort) / CryptoRandomSource   // T-17 裁定：无存储边，提前到第 1 步（F-09）
 2.  PreferencesStore / RdbStore / SecretStore / SecretDraftPort
 3.  MigrationRegistry:
       C-06 v1  (gw_route/gw_sequence/gw_dismissed_device)
@@ -505,18 +523,19 @@ graph TD
       C-12 v3  (auth_profile)
       C-08/C-09/C-10/C-11/C-15 v4 (DES-B：room/device_state/scene/cloud_config)
 4.  StorageService.initialize()
-5.  CryptoService (CryptoPort)
-6.  SecurityService (CanonicalBuilder/RequestSigner/ResponseVerifier/NonceCache/ClockSkewTracker)
-7.  AuthService.initialize()
-8.  GatewayRepository.initialize()
-9.  FamilyRepository.initialize()
-10. RoomRepository.initialize()
-11. SceneRepository.initialize()
-12. DeviceRepository.initialize()
-13. RoomService / FamilyService / SceneService (注入端口实现)
-14. GatewayControlAdapter (DeviceControlPort)
-15. UI_CONTROL IGatewayClient + BACKGROUND IGatewayClient
-16. LocalGatewayService x2（同一依赖，不同 GatewayRequestPolicy）
+5.  SecurityService (CanonicalBuilder/RequestSigner/ResponseVerifier/NonceCache/ClockSkewTracker)
+      // CryptoService/CryptoRandomSource 已在第 1 步构造；本步是安全栈逻辑分组
+6.  AuthService.initialize()
+7.  GatewayRepository.initialize()
+8.  FamilyRepository.initialize()
+9.  RoomRepository.initialize()
+10. SceneRepository.initialize()
+11. DeviceRepository.initialize()
+12. RoomService / FamilyService (注入端口实现)
+13. GatewayControlAdapter (DeviceControlPort)
+14. UI_CONTROL IGatewayClient + BACKGROUND IGatewayClient
+15. LocalGatewayService x2（同一依赖，不同 GatewayRequestPolicy）
+16. SceneService（依赖 BACKGROUND 客户端/DeviceControlPort；T-17 已登记偏差）
 17. GatewayDiscoveryService
 18. BleProvisioningService
 19. CloudConfigStore / CloudCredentialPort / CloudCommandClient / ShadowReader / CloudCompletionEvaluator / CloudService
@@ -526,6 +545,8 @@ graph TD
 23. AppContext（activeFamily、session、foreground 状态）
 24. UI 页面按需构造 VM（页面生命周期内，不全局单例）
 ```
+
+> **T-17 裁定同步（2026-10-18；`t17-review.md` F-09）**：`CryptoService`/`CryptoRandomSource` 在 PLATFORM（第 1 步）构造，原因是仅依赖 `OhosCryptoProvider`/`CryptoRandomSource`、无存储边；`SceneService` 在 BACKGROUND 客户端之后构造，原因是依赖 `DeviceControlPort`/BACKGROUND 策略。两项均为 `CompositionPlan` 已登记的 T-17 接受偏差；§2.4 其余顺序是逻辑依赖顺序，`CompositionPlan.ASSEMBLY_CONSTRUCTION_ORDER` 是可执行构造顺序。除此之外不得新增偏差；任何顺序变更必须走 Change Impact。
 
 **约束**：
 - 必须显式构造器注入；禁止全局单例/服务定位器（DES-A §2.3）。
@@ -4401,7 +4422,7 @@ export class UiAction {
 
 #### 13.1.3 复用组件 props/events
 
-> 以下为 ArkUI 组件的公开字段契约；实现可使用 `@Prop`/`@Link`/`@ObjectLink`，但字段名/语义不得改变。所有组件额外声明 `@Consume('i18n') i18n: I18nService` 与 `@Consume('localeRevision') localeRevision: number`；用户可见文本通过 `t()` 或页面传入的 `*Key` 解析；组件不直接调用仓储/VM。
+> 以下为 ArkUI 组件的公开字段契约；实现可使用 `@Prop`/`@Link`/`@ObjectLink`，但字段名/语义不得改变。所有组件额外声明 `@Require i18n: I18nService` 与 `@Prop localeRevision: number`，由页面显式传入；**不使用 `@Provide`/`@Consume`**（T-17 裁定同步，2026-10-18；`t17-review.md` U-01；见 §0.8）。用户可见文本通过 `t()` 或页面传入的 `*Key` 解析；组件不直接调用仓储/VM。
 
 ```ts
 @Component
@@ -4553,12 +4574,12 @@ export struct SensorTile {
 6. **动效**：只使用 `AppMotionTokens`；页面切换/卡片展开/回弹；关闭动效时功能不变。
 7. **空/加载/错误**：每个列表/页面必须有 `LoadingSkeleton`/`EmptyState`/`ErrorState`；不得用空白代替错误。
 8. **无业务逻辑**：组件不计算 RBAC/状态仲裁/ACK 判定；只展示 VM 传入的值。
-9. **运行时语言切换**：组件通过 `@Consume('i18n')` 取 `I18nService`、`@Consume('localeRevision')` 触发重建；`build()` 中调用 `t()` 时必须引用 `localeRevision`（如 `this.localeRevision;`）以确保语言切换后重渲染；不得缓存 `t()` 结果到静态字段。
-10. **组件测试**：UI smoke 需 `@Provide` 假 i18n/revision；纯逻辑抽离到 `components/support/**` 以便 host 测试。
+9. **运行时语言切换**：组件通过显式 `@Require i18n` props 取 `I18nService`、通过 `@Prop localeRevision` 触发重建；`build()` 中调用 `t()` 时必须引用 `localeRevision`（如 `this.localeRevision;`）以确保语言切换后重渲染；不得缓存 `t()` 结果到静态字段（T-17 裁定同步，2026-10-18：不使用 `@Consume`）。
+10. **组件测试**：UI smoke 以显式 props 传入假 i18n/revision（不需要 `@Provide` 包装）；纯逻辑抽离到 `components/support/**` 以便 host 测试。
 
 ### 13.4 依赖注入与测试 seam（`DES-B-C24-SEAM`）
 
-- 依赖：`common/theme/**`、`model/**`、`components/**`、C-14 `I18nService`（`@Consume('i18n')`）；不 import 仓储/传输/平台 API。
+- 依赖：`common/theme/**`、`model/**`、`components/**`、C-14 `I18nService`（显式 `@Require i18n` props）；不 import 仓储/传输/平台 API。
 - 纯逻辑抽离：`CardVisualState` 映射、`formatValue`/`clamp`/`remainingCountdown` 等放在 `components/support/*.ets` 纯函数，host 可测。
 - UI 测试限制：无设备/模拟器时只做 ArkTS 编译 + `ohosTest` smoke；视觉/动画/触感标 `UNAVAILABLE`；不得声称 UI PASS。
 - i18n：CHK-07 扫描 `components/**`；所有 `Text`/`Button` 文案键存在；`en-US` 长文本不截断（人工/截图评审）。
@@ -5095,9 +5116,11 @@ export class AppCompositionRoot {
 ```
 
 - 构造顺序见 §2.4；所有依赖构造器注入。
+- **T-17 裁定（U-01，2026-10-18）**：`create*ViewModel` 工厂与 `ViewModelAppContextBridge`/`AppContextAdapters`/`PermissionGate` 的 VM 端口适配是 `app→viewmodel` 的唯一允许边（D-17）；不得在 app 内实现 VM 业务逻辑，`viewmodel/**` 不得 import `app/**`。
+- 页面/组件不得自行构造 VM；VM 由 C-28 组合根工厂在页面生命周期内创建，经 `Index`/`MainShell` 以显式 props 传入。T-18 若需要新的 VM 工厂 seam，按增量契约处理，不改变现有 `AppContext`/`AppCompositionRoot` 签名。
 - `initialize()` 幂等；重复调用返回同一 Promise；失败保留 `initializationError`，不部分启动业务页。
 - `dispose()`：取消订阅、停止轮询、关闭 Storage/RDB/Asset 句柄、清空会话/草稿；只用于应用退出/测试。
-- **禁止** `AppCompositionRoot` 单例全局变量；由 `AppContext`/`Index` 持有实例。UI 通过 `@Provide('appContext')` 获取（C-28 根组件），不通过 import 全局。
+- **禁止** `AppCompositionRoot` 单例全局变量；由 `AppContext`/`Index` 持有实例。UI 通过 `Index` 的显式 `@Require` props 获取实例，不通过 import 全局，也不使用 `@Provide/@Consume`（T-17 裁定，见 §0.8）。
 
 #### 17.1.3 `AppContext` 与生命周期
 
@@ -5169,7 +5192,7 @@ export default class EntryAbility extends UIAbility {
 
 **生命周期契约**：
 - `onCreate`：创建 `AppCompositionRoot` + `AppContext`，启动 `root.initialize()` 并保存 Promise（生命周期方法不阻塞/不抛未捕获异常）；设置颜色模式跟随系统；不申请蓝牙权限。
-- `onWindowStageCreate`：用 `initPromise.then(...).catch(...)` 在初始化完成后加载内容（不阻塞生命周期、不抛未捕获异常）；创建 ability 级 `LocalStorage`，写入 `appContext`（C-28 实例）；`windowStage.loadContent('pages/Index', storage)`；设置窗口全屏/安全区（UIUX 428×872 基准，实际自适应）；失败显示启动错误页（Index 内 `StartupErrorState`）。不使用全局单例；`Index` 通过 `@LocalStorageProp('appContext')` 取得实例，再 `@Provide` 给子树。
+- `onWindowStageCreate`：用 `initPromise.then(...).catch(...)` 在初始化完成后加载内容（不阻塞生命周期、不抛未捕获异常）；创建 ability 级 `LocalStorage`，写入单个 `ShellBootstrap` 包装对象（键 `bootstrap`，含 `appContext` 与 `startupError`）；`windowStage.loadContent('pages/Index', storage)`；设置窗口全屏/安全区（UIUX 428×872 基准，实际自适应）；失败显示启动错误页（Index 内 `StartupErrorState`）。不使用全局单例；`Index` 必须用 `@Entry({ useSharedStorage: true })` 才能读取该 `LocalStorage`，通过 `@LocalStorageProp('bootstrap')` 取得包装对象，再以显式 props 传给子树（不使用 `@Provide/@Consume`）。**T-17 裁定同步（2026-10-18；`t17-review.md` F-01/U-01）**：旧“写入 `appContext` 键 / `@LocalStorageProp('appContext')`”文字被本段取代；`ShellBootstrap` 只是启动交接值，不改变 `AppContext`/`AppCompositionRoot` 签名。
 - `onForeground`：`appContext.onForeground()`。
 - `onBackground`：`appContext.onBackground()`。
 - `onWindowStageDestroy`：释放 window 引用；不销毁 root（Ability 可能恢复）。
@@ -5179,33 +5202,33 @@ export default class EntryAbility extends UIAbility {
 #### 17.1.5 `Index.ets` 导航壳
 
 ```text
-Index (@Entry)
-├── @LocalStorageProp('appContext') appContext
+Index (@Entry({ useSharedStorage: true }))
+├── @LocalStorageProp('bootstrap') bootstrap: ShellBootstrap
 ├── @State sessionGate: SessionGateState
-├── @Provide('i18n') i18n
-├── @Provide('localeRevision') localeRevision   // i18n.onLocaleChanged 递增，驱动重建
-├── @Provide('appContext') appContext
-├── @Provide('navigation') navigation
-├── if appContext.initializationError -> StartupErrorView(retry)
-├── else if sessionGate != UNLOCKED -> SessionGateView
+├── @State localeRevision: number                 // i18n.onLocaleChanged 递增，驱动重建
+├── （无 @Provide/@Consume；所有依赖经显式 props 传给直接子组件）
+├── if bootstrap.startupError/initializationError -> StartupErrorView({ error, i18n, onRetry, onExit })
+├── else if sessionGate != UNLOCKED -> SessionGateView({ appContext, i18n, gate, familyName, activeFamilyId })
 │   ├── NO_PROFILE -> 创建家庭/加入家庭入口
 │   └── LOCKED -> 档案选择 + 密码解锁（SessionGate，覆盖层/全屏，不是路由）
-├── else Navigation(navStack)
-│   ├── Tabs(selectedTab)
-│   │   ├── TabContent HomePage
-│   │   ├── TabContent RoomsPage
-│   │   ├── TabContent ScenePage
-│   │   └── TabContent ProfilePage
-│   └── navDestination(routeBuilder)
-│       ├── DeviceControlPage
-│       ├── FamilyManagePage
-│       ├── RoomManagePage
-│       ├── ProvisioningPage
-│       ├── SettingsPage
-│       └── AboutPage
-└── CustomTabBar（4 Tab；安全区/手势条）
+├── else MainShell({ appContext, i18n, navigation, localeRevision })
+│   ├── Navigation(navStack)
+│   │   ├── Tabs(selectedTab)
+│   │   │   ├── TabContent HomePage
+│   │   │   ├── TabContent RoomsPage
+│   │   │   ├── TabContent ScenePage
+│   │   │   └── TabContent ProfilePage
+│   │   └── navDestination(routeBuilder)
+│   │       ├── DeviceControlPage
+│   │       ├── FamilyManagePage
+│   │       ├── RoomManagePage
+│   │       ├── ProvisioningPage
+│   │       ├── SettingsPage
+│   │       └── AboutPage
+│   └── CustomTabBar（4 Tab；安全区/手势条）
 ```
 
+- **T-17 裁定同步（2026-10-18；`t17-review.md` U-01/F-01）**：`Index` 不使用 `@Provide`；`appContext`/`i18n`/`navigation`/`localeRevision` 通过 `@Require`/`@Prop` 显式传给 `StartupErrorView`/`SessionGateView`/`MainShell`，子组件不得用 `@Consume` 反向查找。`@LocalStorageProp('bootstrap')` 只用于 EntryAbility→Index 启动交接，不是通用服务定位器；`Index` 自身持有 `AppContext`/`NavigationService` 实例并向下传参。
 - `Tabs` 使用自定义 `TabBar`（毛玻璃/圆角 24vp）；4 Tab 文案 `$r('app.string.tab_*')`。
 - `Navigation` 使用 `NavPathStack`；`navDestination` builder 根据 `AppRoute` 构造页面；未知路由 → `ErrorState`（不崩溃）。
 - `onBackPress`：优先 `navigation.onBack()`；在 Tab 根页返回 false（系统退出/后台）。
@@ -5326,6 +5349,12 @@ stateDiagram-v2
 - 静态检查：`check_production_mock_exclusion.py`、`check_layering.py`、`check_host_safe_imports.py`。
 - 构建：`hvigorw clean assembleHap`/`assembleApp`；`codelinter`；测试 HAP 编译（BB §7）。
 - 夹具：`FakeAppContext`/`FakeNavigationStack`/`FakePermissionGate`。
+- **T-17 裁定（2026-10-18，`t17-review.md` U-01/F-09）**：
+  - `AppCompositionRoot`：唯一构造点/无全局单例/无服务定位器；`CompositionPlan` 顺序断言必须覆盖 `CryptoService`（PLATFORM）与 `SceneService`（BACKGROUND 客户端之后）两项已登记偏差；新增顺序偏差必须失败并提示 Change Impact。
+  - `app→viewmodel`：仅允许 VM 工厂与 VM 端口适配；静态扫描确认 `viewmodel/**`/`repository/**`/`service/**`/`components/**` 不 import `app/**`。
+  - UI DI：生产 `pages/**`/`components/**` 不得出现 `@Provide`/`@Consume`；`Index` 必须 `@Entry({ useSharedStorage: true })` 且使用 `@LocalStorageProp('bootstrap')`；所有必需依赖以 `@Require` props 传入；页面/组件不得 `new` 服务、仓储、VM。
+  - 检查器：`check_layering.py` 按修订后的 D-12/D-17 实现（C-29）；检查器落地前，评审用等价的 import 白名单 grep/脚本并记录命令与结果。
+  - 设备/Previewer smoke（BLOCKED 时如实记录）：启动后断言 `bootstrap.appContext` 非空、Index 进入 SessionGate/MainShell；T-18/T-19 承接。
 
 ### 17.5 Traceability（`DES-B-C28-TRACE`）
 
@@ -5379,6 +5408,7 @@ tools/
 
 - 工具不进入 ArkTS 构建链；不包含真实 secret；仿真器/夹具标注 `DEV-ONLY`/`PUBLIC TEST DATA`。
 - `check_layering.py` 规则映射 §2.3 D-01..D-17；`viewmodel/**` 不得 import 服务实现；`components/**`/`pages/**` 不得 import 仓储/传输。
+- **T-17 裁定同步（2026-10-18；`t17-review.md` U-01）**：`check_layering.py` 的 D-12 必须按“`pages/**` 可 import `app/**` UI seam；`components/**` 不得 import `app/**`/`repository/**`/`service/**` 实现/传输/存储/crypto，仅允许 `import type` 的 C-11/C-15 只读结果 DTO，且不得调用/构造 VM”实现；D-17 必须允许 `app→viewmodel` 的 VM 工厂/端口适配边并禁止反向 import。旧 D-17“仅 `pages/Index.ets`”文字不得作为检查器规则；检查器规则与 §0.8/§2.3 不一致时，以 §0.8/§2.3 为准并先修正检查器。
 - `check_production_mock_exclusion.py` allowlist 仅允许 C-17 `DEV-ONLY` 常量与测试目录；生产 import 即失败。
 - `check_i18n.py` 输出 C-14 §7.4.4 报告；CI/CQG 留痕。
 - README（T-21）必须包含：构建/运行/测试命令、环境限制（无设备/无签名）、Mock/TLS 边界、i18n 检查命令、已知限制；不得把未运行写成 PASS。
@@ -5758,6 +5788,7 @@ CQG-Txx
 - PB-02 未关闭前，不得把外部模块云完成判定写入验收 PASS；T-14 报告必须列出 `UNSUPPORTED`/`FIRMWARE_PENDING`。
 - T-14 裁定同步（2026-10-17，§0.6）：F-03/F-04/F-06 的契约冲突已按 §8 口径解决；实现修复与回归测试、F-05 资源补齐完成前，C-15/C-16 证据保持 `UNVERIFIED`/`DEFERRED`，多网关云控制明确 `UNSUPPORTED`，不得写成 PASS。
 - T-15 裁定同步（2026-10-17，§0.7）：F-06/F-07 的加入完成语义已按 §3/§11 口径解决；C-08/C-22 实现与 T-16 现有 join 用例在修复并复审前保持 `UNVERIFIED`，不得以旧 host 593/593 作为闭合证据；`MEMBER_BOUND` 不得被 UI/测试当作完成态。
+- T-17 裁定同步（2026-10-18，§0.8）：U-01 的分层/DI 文字冲突已按 §2.3/§17 口径解决；F-01 的启动键名与 F-09 的构造顺序已登记。该裁定不关闭 t17-review.md 的 F-01..F-13 代码/测试项；CQG-T17/IG-3 仍以修复、测试、设备 smoke 与独立复审证据为准。
 
 ---
 
@@ -5990,8 +6021,8 @@ export interface DeviceStatePort {
 | T-14 | §2.4/§8/§9/§21 | `DES-B-C15..C16-*` | CloudService/AC + fixtures（F-03/F-04/F-06 见 §0.6；F-05 见 §9.6） |
 | T-15 | §10/§19.1/§21 | `DES-B-C21-*` | Home/Device/Climate/Door VM |
 | T-16 | §11/§12/§19.3/§19.4 | `DES-B-C22..C23-*` | Family/Room/Scene/Provisioning/Settings VM |
-| T-17 | §2.1/§13/§14/§17/§18 | `DES-B-C24/C25/C28-*` | UI 壳/页面/组合根/权限 |
-| T-18 | §15/§16/§2.1 | `DES-B-C26/C27-*` | 二级页面/设置/关于/Profile |
+| T-17 | §2.1/§2.3/§13/§14/§17/§18 | `DES-B-C24/C25/C28-*` | UI 壳/页面/组合根/权限（U-01/F-09 见 §0.8） |
+| T-18 | §15/§16/§2.1/§2.3/§0.8 | `DES-B-C26/C27-*` | 二级页面/设置/关于/Profile；按 §0.8 使用显式 props DI |
 | T-19 | §20/§21/§22 | 全部 | 测试报告/覆盖矩阵 |
 | T-20 | §22/§24.3 | 全部 | 独立评审 |
 
@@ -6013,6 +6044,15 @@ export interface DeviceStatePort {
 | F-07 部分失败重试/`needsUnlock` | C-22 修复轮 | `OPEN` | `AUTH_PROFILE_EXISTS` 同成员幂等重试；`requiresUnlock` 写入 `needsUnlock`；失败保留 `accepted`；`appContext.lock()`/`refreshSessionGate()` 调用；回归通过 |
 | T-16 现有 join 用例与 `FakeJoinSession` | test-engineer/实现者 | `STALE` | 更新 `T16_Family_joinStateMachineAndProfileCompletion` 与 `FakeJoinSession` 到 §0.7；旧“submit 即 `COMPLETED`”期望作废 |
 | C-08/C-22 证据 | Orchestrator/CQG-T15/T16 | `UNVERIFIED` | 修复 + 上述测试 + host/assemble/ohosTest + 独立复审后重评；不得沿用旧 593/593 |
+
+**T-17 裁定后续待办（2026-10-18，§0.8）**：
+
+| 项 | 归属 | 状态 | 关闭条件 |
+|---|---|---|---|
+| U-01 D-12/D-17 + UI 显式 props DI | T-18/IG-3；C-29 检查器 | `OPEN` | 按 §0.8/§2.3 实现 `check_layering.py`；T-18 页面/组件遵守显式 `@Require`/`@Prop` props；评审确认生产 UI 无 `@Provide`/`@Consume`、无反向 `app` import |
+| F-01 启动键名/`useSharedStorage` | T-17 修复（已实现）；T-19 UI smoke | `OPEN`（设备证据） | Previewer/真机断言 `bootstrap.appContext` 非空、Index 进入 SessionGate/MainShell；host 测试不能替代 |
+| F-09 CryptoService/SceneService 顺序 | 实现/CQG-T17 | `ACCEPTED（记录）` | `CompositionPlan` 顺序断言覆盖两项偏差；评审确认无新增偏差 |
+| T-17 证据 | Orchestrator/CQG-T17 | `UNVERIFIED` | 按 t17-review.md §6 重跑 host/codelinter/assemble/ohosTest/i18n + 独立复审；不得以本裁定代替 F-02/F-03 等修复 |
 
 ### 24.3 契约条目索引（80 条）
 
@@ -6043,6 +6083,7 @@ export interface DeviceStatePort {
 - [x] 领域语义：SSOT/`stateEpochMs` 仲裁（§5.3.2）、房间删除/未分配池（§4.3.2/§19.2）、设备删除 tombstone（§5.3.4）、场景局部失败（§6.3.3）、邀请/回执（§3.3.3/§3.3.4）。
 - [x] 云路径：配置/Token/命令/影子/完成判定/PB-02（§8）。
 - [x] T-14 裁定同步（§0.6）：F-03 两层状态、F-04 固定名/inventory 路由、F-06 单 active 云作用域、F-05 `brand.*` 资源归属均已登记，未改冻结签名/G-004 语义。
+- [x] T-17 裁定同步（§0.8）：U-01 D-12/D-17 分工、UI 显式 props DI（无 `@Provide/@Consume`）、F-01 `bootstrap` 启动键、F-09 CryptoService/SceneService 顺序偏差均已登记；未改冻结签名/G-004 语义。
 - [x] i18n：API/资源布局/fallback/键规则/迁移/CHK（§7）。
 - [x] VM：state/event/selector/异步/错误映射/节流/防乐观（§10-§12）。
 - [x] UI：页面/导航/组件 props/events/主题/动效/空态/加载/错误/可访问性（§13-§16）。
@@ -6069,6 +6110,8 @@ export interface DeviceStatePort {
 8. 检查门锁 `UNVERIFIED/UNCONFIRMED/UNKNOWN` 文案与“已锁好”禁用。
 9. 检查 C-28 组合根是否只装配生产适配器、无 Mock import、权限最小化。
 10. 检查 §23 扩展是否全部为增量，未改 DES-A 冻结签名。
+11. 检查 U-01：生产 `pages/**`/`components/**` 无 `@Provide`/`@Consume`、无页面 `new` 服务/VM；`app→viewmodel` 仅工厂/端口适配且无反向 import；`check_layering.py` 按修订后的 D-12/D-17 运行。
+12. 检查 F-01/F-09：`Index` 使用 `@Entry({ useSharedStorage: true })` 且 `bootstrap.appContext` 非空；`CompositionPlan` 覆盖 CryptoService/SceneService 两项已登记顺序偏差。
 
 ---
 

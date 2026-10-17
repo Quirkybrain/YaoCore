@@ -3,6 +3,82 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "shell_background",
+      "value": "#EAF4F8"
+    },
+    {
+      "name": "shell_ink",
+      "value": "#24364B"
+    },
+    {
+      "name": "shell_ink_soft",
+      "value": "#3A5063"
+    },
+    {
+      "name": "shell_muted",
+      "value": "#8293A2"
+    },
+    {
+      "name": "shell_muted_light",
+      "value": "#9EACB8"
+    },
+    {
+      "name": "shell_surface",
+      "value": "#B3FFFFFF"
+    },
+    {
+      "name": "shell_surface_strong",
+      "value": "#E0FFFFFF"
+    },
+    {
+      "name": "shell_edge",
+      "value": "#F0FFFFFF"
+    },
+    {
+      "name": "shell_line",
+      "value": "#217A96A4"
+    },
+    {
+      "name": "shell_primary",
+      "value": "#3F88C9"
+    },
+    {
+      "name": "shell_primary_dark",
+      "value": "#246AA4"
+    },
+    {
+      "name": "shell_success",
+      "value": "#39AF91"
+    },
+    {
+      "name": "shell_warning",
+      "value": "#E0A051"
+    },
+    {
+      "name": "shell_danger",
+      "value": "#D97174"
+    },
+    {
+      "name": "shell_tab_background",
+      "value": "#E6FFFFFF"
+    },
+    {
+      "name": "orb_apricot",
+      "value": "#FFE2C2"
+    },
+    {
+      "name": "orb_mint",
+      "value": "#C8F0E0"
+    },
+    {
+      "name": "orb_aqua",
+      "value": "#C8EAFF"
+    },
+    {
+      "name": "orb_lilac",
+      "value": "#E7DCF9"
     }
   ]
 }

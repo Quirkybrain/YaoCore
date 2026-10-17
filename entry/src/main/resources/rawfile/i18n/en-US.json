@@ -303,5 +303,16 @@
     "room": {
       "all": "All rooms"
     }
+  },
+  "brand": {
+    "gree": "Gree",
+    "haier": "Haier",
+    "midea": "Midea",
+    "generic": "Generic"
+  },
+  "settings": {
+    "cloud": {
+      "single_gateway_required": "v1 supports cloud connection for a single gateway only. Remove extra gateways or clear the cloud configuration."
+    }
   }
 }

@@ -1,0 +1,33 @@
+The configuration file /home/quirkybrain/code/harmony-projects/YaoCore/code-linter.json5 is in use.
+Currently active product:default
+Finished...[==================================================]100%
+CodeLinter found some defects in your code.
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/AboutPage.ets(1)
+10:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/DeviceControlPage.ets(1)
+12:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/FamilyManagePage.ets(1)
+10:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/HomePage.ets(1)
+11:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/PlaceholderContent.ets(2)
+12:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+34:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/ProfilePage.ets(1)
+15:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/ProvisioningPage.ets(1)
+10:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/RoomManagePage.ets(1)
+10:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/RoomsPage.ets(1)
+11:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/ScenePage.ets(1)
+10:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/SettingsPage.ets(1)
+15:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/ShellBackdrop.ets(1)
+14:15       warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/pages/ShellViews.ets(2)
+158:15      warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+203:15      warn        Preferentially use the @Builder method instead of custom components.    @performance/avoid-overusing-custom-component-check
+-Defects: 15; Errors: 0; Warns: 15; Suggestions: 0;

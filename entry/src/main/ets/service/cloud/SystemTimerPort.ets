@@ -6,13 +6,13 @@
  * The platform timer stays out of the cloud logic. CloudService only sees the
  * TimerPort seam; host tests inject a deterministic fake.
  */
-import { AppErrors } from '../../common/types/AppError';
+import { AppError, AppErrors } from '../../common/types/AppError';
 import type { CancellationToken } from '../../common/types/Ports';
 import type { TimerPort } from './CloudPorts';
 
 export class SystemTimerPort implements TimerPort {
   private timer: number | undefined = undefined;
-  private rejecter: ((error: Error) => void) | undefined = undefined;
+  private rejecter: ((error: AppError) => void) | undefined = undefined;
 
   sleep(ms: number, cancellation?: CancellationToken): Promise<void> {
     if (!Number.isFinite(ms) || ms < 0) {
