@@ -6,7 +6,7 @@
  * The tool itself throws SECRET_ENCODING_INVALID. C-13 wraps that error as
  * INVITE_INVALID when decoding invitation payloads.
  */
-import { AppErrors } from '../types/AppError';
+import { AppError, AppErrors } from '../types/AppError';
 
 export class Base64Url {
   private static readonly ALPHABET: string =

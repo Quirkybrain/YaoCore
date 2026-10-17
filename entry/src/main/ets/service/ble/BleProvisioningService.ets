@@ -77,6 +77,31 @@ const PROTO_VER_PROBE: string = 'ESP';
 const DEFAULT_SCAN_TIMEOUT_MS: number = 10000;
 const DEFAULT_NAME_PREFIX: string = 'YaoCore-GW-';
 
+class DelegatingScanListener implements BleScanListener {
+  private readonly found: (device: BleProvisioningDevice) => void;
+  private readonly finished: () => void;
+  private readonly failed: (error: AppError) => void;
+
+  constructor(found: (device: BleProvisioningDevice) => void, finished: () => void,
+    failed: (error: AppError) => void) {
+    this.found = found;
+    this.finished = finished;
+    this.failed = failed;
+  }
+
+  onDeviceFound(device: BleProvisioningDevice): void {
+    this.found(device);
+  }
+
+  onScanFinished(): void {
+    this.finished();
+  }
+
+  onScanError(error: AppError): void {
+    this.failed(error);
+  }
+}
+
 export class BleProvisioningService implements IBleProvisioningClient {
   private readonly transport: BleTransport;
   private readonly crypto: CryptoPort;
@@ -143,8 +168,8 @@ export class BleProvisioningService implements IBleProvisioningClient {
     this.publicScanListener = listener;
     this.publicScanActive = true;
     const seen: Map<string, boolean> = new Map<string, boolean>();
-    const wrapped: BleScanListener = {
-      onDeviceFound: (device: BleProvisioningDevice): void => {
+    const wrapped = new DelegatingScanListener(
+      (device: BleProvisioningDevice): void => {
         if (!this.publicScanActive) {
           return;
         }
@@ -158,14 +183,13 @@ export class BleProvisioningService implements IBleProvisioningClient {
         this.lastDevice = device;
         listener.onDeviceFound(device);
       },
-      onScanFinished: (): void => {
+      (): void => {
         this.finishPublicScan(listener);
       },
-      onScanError: (error: AppError): void => {
+      (error: AppError): void => {
         this.stopPublicScan(false);
         listener.onScanError(error);
-      }
-    };
+      });
     try {
       await this.transport.startScan(filter, wrapped);
     } catch (error) {
@@ -393,25 +417,24 @@ export class BleProvisioningService implements IBleProvisioningClient {
     const firstFound = new Promise<void>((resolve: () => void) => {
       settle = resolve;
     });
-    const listener: BleScanListener = {
-      onDeviceFound: (device: BleProvisioningDevice): void => {
+    const listener = new DelegatingScanListener(
+      (device: BleProvisioningDevice): void => {
         found.set(device.deviceId, device);
         if (settle !== undefined) {
           settle();
         }
       },
-      onScanFinished: (): void => {
+      (): void => {
         if (settle !== undefined) {
           settle();
         }
       },
-      onScanError: (error: AppError): void => {
+      (error: AppError): void => {
         scanError = error;
         if (settle !== undefined) {
           settle();
         }
-      }
-    };
+      });
     try {
       await this.transport.startScan(filter, listener);
     } catch (error) {
@@ -456,7 +479,7 @@ export class BleProvisioningService implements IBleProvisioningClient {
       this.connection = await this.transport.connect(deviceId, cancellation);
     } catch (error) {
       if (isCode(error as Error, 'PROVISIONING_CANCELLED')) {
-        throw error;
+        throw error as Error;
       }
       throw mapProvisioningError(error as Error, 'PROVISIONING_CONNECT_FAILED', 'connect');
     }

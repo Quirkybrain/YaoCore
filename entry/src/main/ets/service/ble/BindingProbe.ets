@@ -231,7 +231,7 @@ export class BindingProber {
       if (draftPort !== undefined) {
         draftPort.destroy();
       }
-      throw error;
+      throw error as Error;
     }
   }
 
