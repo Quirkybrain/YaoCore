@@ -18,7 +18,6 @@ import { CreateProfileInput } from '../service/auth/AuthModels';
 import type { AuthService } from '../service/auth/AuthService';
 import type { FamilyService } from '../service/family/FamilyService';
 import type { FamilyJoinSession } from '../service/family/FamilyJoinSession';
-import type { AcceptedInvitation } from '../service/family/FamilyModels';
 import type { OnboardingPort } from './AppContext';
 
 export class OnboardingService implements OnboardingPort {
@@ -34,9 +33,20 @@ export class OnboardingService implements OnboardingPort {
   async createFamily(familyName: string, ownerDisplayName: string,
     password: string): Promise<void> {
     const family = await this.families.createFamily(familyName, ownerDisplayName);
-    const profile = new CreateProfileInput(OnboardingService.profileIdFor(family.ownerMemberId),
-      family.familyId, family.ownerMemberId, ownerDisplayName, password, MemberRole.ADMIN);
-    await this.auth.createProfile(profile);
+    try {
+      await this.createProfileIfMissing(family.familyId, family.ownerMemberId,
+        ownerDisplayName, password, MemberRole.ADMIN);
+    } catch (error) {
+      // R2-03: never leave a family row without a local profile after a failed
+      // create. Best-effort cleanup; the original error is still surfaced.
+      try {
+        await this.families.dissolveFamily(family.familyId, family.ownerMemberId);
+      } catch (cleanupError) {
+        // The caller sees the original failure; a failed cleanup is reported
+        // by the retry path (no local profile => NO_PROFILE gate).
+      }
+      throw error as Error;
+    }
     // switchFamily locks every session and makes the gate recompute LOCKED.
     await this.families.switchFamily(family.familyId);
   }
@@ -62,7 +72,8 @@ export class OnboardingService implements OnboardingPort {
     }
     const accepted = await session.submitInvitation(invitationText,
       code.length === 0 ? undefined : code);
-    await this.createProfileIfMissing(accepted, displayName, password);
+    await this.createProfileIfMissing(accepted.familyId, accepted.memberId, displayName,
+      password, accepted.role);
     await this.families.switchFamily(accepted.familyId);
     await session.markProfileBound();
     await this.cancelJoin();
@@ -87,18 +98,18 @@ export class OnboardingService implements OnboardingPort {
    * the exact member already has a profile in the accepted family. Any other
    * conflict is rethrown so the gate never binds a foreign profile.
    */
-  private async createProfileIfMissing(accepted: AcceptedInvitation,
-    displayName: string, password: string): Promise<void> {
-    const profile = new CreateProfileInput(OnboardingService.profileIdFor(accepted.memberId),
-      accepted.familyId, accepted.memberId, displayName, password, accepted.role);
+  private async createProfileIfMissing(familyId: string, memberId: string,
+    displayName: string, password: string, role: MemberRole): Promise<void> {
+    const profile = new CreateProfileInput(OnboardingService.profileIdFor(memberId),
+      familyId, memberId, displayName, password, role);
     try {
       await this.auth.createProfile(profile);
     } catch (error) {
       const appError = error as AppError;
       if (appError instanceof AppError && appError.code === 'AUTH_PROFILE_EXISTS') {
-        const profiles = await this.auth.listProfiles(accepted.familyId);
+        const profiles = await this.auth.listProfiles(familyId);
         for (let index = 0; index < profiles.length; index++) {
-          if (profiles[index].memberId === accepted.memberId) {
+          if (profiles[index].memberId === memberId) {
             return;
           }
         }

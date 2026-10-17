@@ -16,7 +16,7 @@ import {
 } from '../app/AppContext';
 import { NavigationService } from '../app/NavigationService';
 import { ShellGateEntry, ShellGateRouting } from '../app/ShellGateRouting';
-import { ShellTheme } from '../app/ShellTheme';
+import { ShellTheme } from '../common/theme/ShellTheme';
 import { OnboardingMode, OnboardingView } from './OnboardingView';
 
 @Component
@@ -26,6 +26,7 @@ export struct SessionGateView {
   @Prop @Watch('onGateChanged') gate: SessionGateState = SessionGateState.NO_PROFILE;
   @Prop familyName: string = '';
   @Prop @Watch('onFamilyChanged') activeFamilyId: string = '';
+  @Prop localeRevision: number = 0;
   @State profiles: SessionGateProfile[] = [];
   @State selectedProfileId: string = '';
   @State password: string = '';
@@ -108,6 +109,7 @@ export struct SessionGateView {
           OnboardingView({
             appContext: this.appContext,
             i18n: this.i18n,
+            localeRevision: this.localeRevision,
             mode: this.onboardingMode,
             onCancel: (): void => {
               this.onboardingMode = OnboardingMode.NONE;
@@ -198,6 +200,7 @@ export struct SessionGateView {
     .padding(ShellTheme.SPACING_LG)
     .justifyContent(FlexAlign.Center)
     .backgroundColor($r('app.color.shell_background'))
+    .id('session-gate-locale-' + this.localeRevision)
   }
 
   private loadProfiles(): void {
@@ -289,19 +292,21 @@ export struct StartupErrorView {
 
 @Component
 export struct UnknownRouteView {
+  @Require i18n: I18nService;
   @Require navigation: NavigationService;
+  @Prop localeRevision: number = 0;
 
   build() {
     Column({ space: ShellTheme.SPACING_MD }) {
-      Text($r('app.string.route_unknown_title'))
+      Text(this.i18n.t('route.unknown.title'))
         .fontSize(ShellTheme.FONT_TITLE)
         .fontWeight(FontWeight.Bold)
         .fontColor($r('app.color.shell_ink'))
-      Text($r('app.string.route_unknown_message'))
+      Text(this.i18n.t('route.unknown.message'))
         .fontSize(ShellTheme.FONT_BODY)
         .fontColor($r('app.color.shell_ink_soft'))
         .textAlign(TextAlign.Center)
-      Button($r('app.string.common_back'))
+      Button(this.i18n.t('common.back'))
         .fontSize(ShellTheme.FONT_BODY)
         .fontColor(Color.White)
         .backgroundColor($r('app.color.shell_primary'))
@@ -314,5 +319,6 @@ export struct UnknownRouteView {
     .height('100%')
     .padding(ShellTheme.SPACING_LG)
     .justifyContent(FlexAlign.Center)
+    .id('unknown-route-locale-' + this.localeRevision)
   }
 }

@@ -8,14 +8,13 @@
  * create a family + owner profile, or accept an invitation container and
  * create the local profile. It never unlocks automatically.
  *
- * Labels reuse existing app.string / rawfile keys because resources/** is
- * outside this task's write scope; T-18 should add dedicated family.join and
- * field-label keys when it owns the full page.
+ * Labels use dedicated onboarding keys (T-18 R2-02); no shell-placeholder
+ * family labels are reused.
  */
 import { AppError } from '../common/types/AppError';
 import type { I18nService } from '../service/i18n/I18nService';
 import { AppContext } from '../app/AppContext';
-import { ShellTheme } from '../app/ShellTheme';
+import { ShellTheme } from '../common/theme/ShellTheme';
 
 export enum OnboardingMode {
   NONE,
@@ -29,6 +28,7 @@ const PASSWORD_MIN_LENGTH: number = 8;
 export struct OnboardingView {
   @Require appContext: AppContext;
   @Require i18n: I18nService;
+  @Prop localeRevision: number = 0;
   @Prop mode: OnboardingMode = OnboardingMode.NONE;
   onCancel: () => void = (): void => {};
   @State familyName: string = '';
@@ -43,13 +43,13 @@ export struct OnboardingView {
   build() {
     Column({ space: ShellTheme.SPACING_SM }) {
       Text(this.mode === OnboardingMode.JOIN
-        ? this.i18n.t('family.switch') : this.i18n.t('family.create'))
+        ? this.i18n.t('onboarding.join.title') : this.i18n.t('onboarding.create.title'))
         .fontSize(ShellTheme.FONT_TITLE)
         .fontWeight(FontWeight.Medium)
         .fontColor($r('app.color.shell_ink'))
       if (this.mode === OnboardingMode.CREATE) {
         TextInput({
-          placeholder: $r('app.string.page_family'),
+          placeholder: this.i18n.t('onboarding.family_name'),
           text: this.familyName
         })
           .fontSize(ShellTheme.FONT_BODY)
@@ -59,7 +59,7 @@ export struct OnboardingView {
           })
       }
       TextInput({
-        placeholder: $r('app.string.tab_profile'),
+        placeholder: this.i18n.t('onboarding.display_name'),
         text: this.displayName
       })
         .fontSize(ShellTheme.FONT_BODY)
@@ -69,7 +69,7 @@ export struct OnboardingView {
           this.displayName = value;
         })
       TextInput({
-        placeholder: $r('app.string.session_password_placeholder'),
+        placeholder: this.i18n.t('onboarding.password'),
         text: this.password
       })
         .type(InputType.Password)
@@ -80,7 +80,7 @@ export struct OnboardingView {
         })
       if (this.mode === OnboardingMode.JOIN) {
         if (this.joinRequestText.length === 0) {
-          Button($r('app.string.common_confirm'))
+          Button(this.i18n.t('onboarding.start_join'))
             .width('100%')
             .fontSize(ShellTheme.FONT_BODY)
             .fontColor(Color.White)
@@ -98,7 +98,7 @@ export struct OnboardingView {
             .wordBreak(WordBreak.BREAK_ALL)
             .copyOption(CopyOptions.LocalDevice)
           TextInput({
-            placeholder: $r('app.string.session_no_profile_message'),
+            placeholder: this.i18n.t('onboarding.invitation_text'),
             text: this.invitationText
           })
             .fontSize(ShellTheme.FONT_BODY)
@@ -107,7 +107,7 @@ export struct OnboardingView {
               this.invitationText = value;
             })
           TextInput({
-            placeholder: this.i18n.t('invite.mode.code_kek'),
+            placeholder: this.i18n.t('onboarding.invitation_code'),
             text: this.invitationCode
           })
             .fontSize(ShellTheme.FONT_BODY)
@@ -130,7 +130,8 @@ export struct OnboardingView {
           .color($r('app.color.shell_primary'))
       }
       Row({ space: ShellTheme.SPACING_SM }) {
-        Button($r('app.string.common_confirm'))
+        Button(this.i18n.t(this.mode === OnboardingMode.CREATE
+          ? 'onboarding.create_action' : 'onboarding.complete_join'))
           .fontSize(ShellTheme.FONT_BODY)
           .fontColor(Color.White)
           .backgroundColor($r('app.color.shell_primary'))
@@ -139,7 +140,7 @@ export struct OnboardingView {
           .onClick((): void => {
             this.submit();
           })
-        Button($r('app.string.common_cancel'))
+        Button(this.i18n.t('common.cancel'))
           .fontSize(ShellTheme.FONT_BODY)
           .fontColor($r('app.color.shell_ink'))
           .backgroundColor($r('app.color.shell_surface'))
@@ -157,6 +158,7 @@ export struct OnboardingView {
     .padding(ShellTheme.SPACING_MD)
     .backgroundColor($r('app.color.shell_surface'))
     .borderRadius(ShellTheme.BUTTON_RADIUS)
+    .id('onboarding-locale-' + this.localeRevision)
   }
 
   private canSubmit(): boolean {

@@ -1,4 +1,198 @@
 {
+  "about": {
+    "guest": {
+      "body": "Guest room scoping is an application policy, not a cryptographic boundary. Rotate gateway secrets after removing members or revoking invitations; revocation is not remote data erasure.",
+      "heading": "Guests and invitations"
+    },
+    "license": {
+      "body": "Source and issue tracker links are listed in the release notes. This page never shows endpoints, tokens or secrets.",
+      "heading": "License and feedback"
+    },
+    "open_source": {
+      "body": "This project uses HarmonyOS ArkUI and the Hypium test framework. The full license list ships with the release package.",
+      "heading": "Open source"
+    },
+    "privacy": {
+      "body": "Family, device, room and scene data stay on this device. The app has no proprietary server and only contacts a cloud platform after manual configuration.",
+      "heading": "Local first",
+      "title": "Privacy and connectivity"
+    },
+    "security": {
+      "body": "LAN control uses P-HMAC (integrity and replay protection only, no confidentiality) or P-TLS-PIN (TLS with pinned certificates). Choose according to gateway capability and protect the local profile password.",
+      "heading": "Security boundary"
+    },
+    "version": "Version"
+  },
+  "ac": {
+    "mode": {
+      "auto": "Auto",
+      "cool": "Cool",
+      "dry": "Dry",
+      "eco": "Eco",
+      "fan": "Fan",
+      "heat": "Heat",
+      "sleep": "Sleep",
+      "unknown": "Non-standard mode ({mode})"
+    }
+  },
+  "brand": {
+    "generic": "Generic",
+    "gree": "Gree",
+    "haier": "Haier",
+    "midea": "Midea"
+  },
+  "card": {
+    "state": {
+      "committed": "Confirmed",
+      "disabled": "Unavailable",
+      "idle": "Ready",
+      "pending": "Applying",
+      "read_only": "Read-only",
+      "revert": "Reverted"
+    }
+  },
+  "cloud": {
+    "command": {
+      "accepted_not_confirmed": "The cloud accepted the command, but the device has not confirmed execution."
+    },
+    "completion": {
+      "unsupported": "This gateway does not support cloud completion confirmation."
+    },
+    "state": {
+      "configured": "Configured",
+      "not_configured": "Not configured",
+      "token_expired": "Token expired",
+      "token_invalid": "Token invalid",
+      "token_missing": "Token missing",
+      "unavailable": "Cloud unavailable"
+    },
+    "token": {
+      "expired": "The cloud access token has expired. Update it.",
+      "invalid": "Cloud access token is invalid.",
+      "missing": "No cloud access token is configured."
+    }
+  },
+  "common": {
+    "add": "Add",
+    "all": "All",
+    "back": "Back",
+    "cancel": "Cancel",
+    "close": "Close",
+    "collapse": "Collapse",
+    "confirm": "Confirm",
+    "create": "Create",
+    "delete": "Delete",
+    "disabled": "Disabled",
+    "done": "Done",
+    "edit": "Edit",
+    "empty": "Nothing here yet",
+    "enabled": "Enabled",
+    "error": "Something went wrong",
+    "expand": "Expand",
+    "loading": "Loading…",
+    "next": "Next",
+    "off": "Off",
+    "on": "On",
+    "previous": "Previous",
+    "read_only": "Read-only",
+    "refresh": "Refresh",
+    "refresh_failed": "Refresh failed. Please try again.",
+    "remove": "Remove",
+    "rename": "Rename",
+    "retry": "Retry",
+    "save": "Save",
+    "unknown": "Unknown",
+    "view": "View"
+  },
+  "device": {
+    "climate": {
+      "nonstandard_hint": "Non-standard modes are shown read-only."
+    },
+    "control": {
+      "title": "Device control"
+    },
+    "count": "{count} devices",
+    "count_one": "{count} device",
+    "count_other": "{count} devices",
+    "disabled": {
+      "banner": "This device is unassigned or disabled; controls are unavailable.",
+      "hint": "Unassigned / disabled",
+      "unassigned": "The device is unassigned and disabled."
+    },
+    "door": {
+      "configure_link": "Link contact sensor",
+      "link_guide": {
+        "confirm": "Link first sensor",
+        "message": "A linked contact sensor can confirm the door is actually locked. Skipping does not block unlocking.",
+        "skip": "Skip for now",
+        "title": "Link a contact sensor (optional)"
+      },
+      "lock": "Lock",
+      "open": "Unlock",
+      "stage": {
+        "failed": "Failed",
+        "gateway_confirmed": "Gateway confirmed",
+        "idle": "Idle",
+        "marker": "Stage",
+        "open": "Door open",
+        "pending": "Sent, awaiting gateway confirmation",
+        "waiting_contact": "Waiting for contact sensor"
+      },
+      "stages": "Confirmation stages"
+    },
+    "info": {
+      "device": "Device",
+      "gateway": "Gateway",
+      "source": "State source",
+      "title": "Device information",
+      "updated": "Last updated"
+    },
+    "not_found": {
+      "message": "The device may have been deleted or its gateway removed.",
+      "title": "Device not found"
+    },
+    "offline": {
+      "banner": "Device offline; showing the last confirmed state."
+    },
+    "removed": {
+      "message": "The device was removed. Return to the device list."
+    },
+    "sensor": {
+      "read_only": "Sensors are read-only."
+    },
+    "state": {
+      "offline": "Offline",
+      "online": "Online"
+    },
+    "type": {
+      "ac": "Air conditioner",
+      "camera": "Camera",
+      "curtain": "Curtain",
+      "door": "Door lock",
+      "fan": "Fan",
+      "light": "Light",
+      "sensor": "Sensor",
+      "speaker": "Speaker",
+      "switch": "Switch",
+      "unknown": "Unknown device"
+    },
+    "unsupported": {
+      "read_only": "This device type is read-only; only status is shown."
+    }
+  },
+  "door": {
+    "alert": {
+      "unconfirmed": "The lock state is unconfirmed. Check it."
+    },
+    "link": {
+      "unverified": "The door sensor link is unverified."
+    },
+    "state": {
+      "secured": "Locked",
+      "unconfirmed": "Unconfirmed",
+      "unknown": "Unknown"
+    }
+  },
   "errors": {
     "app": {
       "ack_correlation_mismatch": "The ACK correlation does not match. Please retry.",
@@ -21,24 +215,39 @@
       "crypto_operation_failed": "A local security operation failed. Please retry.",
       "crypto_tag_mismatch": "Security verification failed; the data may have been altered.",
       "crypto_unavailable": "The local security component is unavailable.",
+      "dev_simulator_rejected": "The production build cannot connect to a development protocol simulator.",
       "device_disabled": "This device is disabled and cannot be controlled.",
       "device_dismissed": "The device was removed and can no longer be controlled.",
       "device_name_invalid": "The device name is not valid.",
       "device_not_found": "The device was not found.",
       "device_unassigned": "This device is not assigned to a room.",
       "discovery_invalid_response": "The gateway discovery response is invalid.",
+      "discovery_no_candidates": "No available gateway was found.",
+      "discovery_transport_unavailable": "The network capability required for gateway discovery is unavailable.",
       "gateway_id_mismatch": "The gateway identity does not match; binding stopped.",
       "gateway_not_bound": "No gateway is bound.",
       "gateway_profile_blocked": "The gateway security profile is blocked. Provision it again.",
+      "gateway_timeout": "Gateway response timed out.",
+      "gateway_unreachable": "The gateway is unreachable. Check the network.",
+      "http_error": "The network request failed (HTTP {status}).",
+      "i18n_bundle_invalid": "The language resource format is invalid.",
+      "i18n_locale_unsupported": "The selected language is not supported.",
+      "i18n_platform_locale_failed": "The system language could not be applied; some text may need a restart.",
+      "i18n_resource_load_failed": "Language resources failed to load.",
       "internal_error": "The operation failed. Please retry.",
+      "invite_aead_failed": "The invitation credential could not be decrypted.",
+      "invite_code_invalid": "The invitation code is invalid.",
       "invite_expired": "The invitation has expired.",
       "invite_invalid": "The invitation is invalid.",
       "invite_key_missing": "The invitation key is missing; the family cannot be joined.",
       "invite_max_uses": "The invitation has reached its usage limit.",
       "invite_receipt_invalid": "The invitation receipt is invalid.",
       "invite_revoked": "The invitation was revoked.",
+      "invite_version_unsupported": "The invitation version is not supported.",
+      "local_request_failed": "The LAN request failed. Check the network.",
       "manual_address_not_bound": "The manual address is not bound to a gateway.",
       "manual_address_rejected": "The manually entered gateway address was rejected.",
+      "nonce_reused": "The replayed request was rejected.",
       "protocol_invalid_identifier": "A protocol identifier is invalid.",
       "protocol_invalid_json": "The protocol payload is invalid.",
       "protocol_invalid_timestamp": "The protocol timestamp is invalid.",
@@ -62,43 +271,13 @@
       "storage_error": "A local storage operation failed. Please retry.",
       "storage_migration_failed": "Local data migration failed.",
       "storage_not_initialized": "Local storage is not initialized.",
-      "tls_pin_config_invalid": "The TLS pin configuration is invalid.",
-      "tls_profile_inconsistent": "The TLS security profile is inconsistent. Provision again.",
-      "i18n_resource_load_failed": "Language resources failed to load.",
-      "i18n_bundle_invalid": "The language resource format is invalid.",
-      "i18n_locale_unsupported": "The selected language is not supported.",
-      "i18n_platform_locale_failed": "The system language could not be applied; some text may need a restart.",
-      "nonce_reused": "The replayed request was rejected.",
       "timestamp_out_of_window": "The phone and gateway clocks differ too much. Calibrate the time.",
-      "http_error": "The network request failed (HTTP {status}).",
-      "local_request_failed": "The LAN request failed. Check the network.",
-      "dev_simulator_rejected": "The production build cannot connect to a development protocol simulator.",
-      "gateway_unreachable": "The gateway is unreachable. Check the network.",
-      "gateway_timeout": "The gateway timed out.",
-      "discovery_no_candidates": "No available gateway was found.",
-      "discovery_transport_unavailable": "The network capability required for gateway discovery is unavailable.",
-      "tls_pin_mismatch": "The gateway certificate does not match the pinned fingerprint; the connection was refused.",
       "tls_handshake_failed": "The TLS handshake with the gateway failed.",
+      "tls_pin_config_invalid": "The TLS pin configuration is invalid.",
+      "tls_pin_mismatch": "The gateway certificate does not match the pinned fingerprint; the connection was refused.",
+      "tls_profile_inconsistent": "The TLS security profile is inconsistent. Provision again.",
       "tls_unavailable_advertised": "The gateway advertised an unusable TLS configuration.",
-      "tls_verifier_unavailable": "The TLS verifier is unavailable; the connection was refused.",
-      "invite_code_invalid": "The invitation code is invalid.",
-      "invite_version_unsupported": "The invitation version is not supported.",
-      "invite_aead_failed": "The invitation credential could not be decrypted."
-    },
-    "gateway": {
-      "success": "Success",
-      "invalid_request": "The request is invalid.",
-      "unsupported_security": "The gateway does not support this security configuration.",
-      "timestamp_rejected": "The gateway rejected the request time. Calibrate the clock.",
-      "bad_signature": "The request signature is invalid.",
-      "replay": "The replayed request was rejected.",
-      "unsupported_command": "The gateway does not support this command.",
-      "unknown_device": "The gateway could not find the target device.",
-      "unsupported_action": "The device does not support this action.",
-      "unsupported_gateway_action": "The gateway does not support this action.",
-      "device_offline": "The device is offline.",
-      "hardware_timeout": "The device did not confirm execution in time.",
-      "unknown": "The gateway returned an unknown error ({code})."
+      "tls_verifier_unavailable": "The TLS verifier is unavailable; the connection was refused."
     },
     "cloud": {
       "device_not_found": "The device was not found in the cloud.",
@@ -115,204 +294,508 @@
       "token_invalid": "The cloud access token is invalid.",
       "token_missing": "The cloud access token is missing."
     },
+    "gateway": {
+      "bad_signature": "The request signature is invalid.",
+      "device_offline": "The device is offline.",
+      "hardware_timeout": "The device did not confirm execution in time.",
+      "invalid_request": "The request is invalid.",
+      "replay": "The replayed request was rejected.",
+      "success": "Success",
+      "timestamp_rejected": "The gateway rejected the request time. Calibrate the clock.",
+      "unknown": "The gateway returned an unknown error ({code}).",
+      "unknown_device": "The gateway could not find the target device.",
+      "unsupported_action": "The device does not support this action.",
+      "unsupported_command": "The gateway does not support this command.",
+      "unsupported_gateway_action": "The gateway does not support this action.",
+      "unsupported_security": "The gateway does not support this security configuration."
+    },
     "scene": {
       "run_in_progress": "The scene is already running. Try again later."
     }
   },
-  "provisioning": {
-    "error": {
-      "credential_missing": "Provisioning credentials are missing.",
-      "identity_invalid": "The gateway identity is invalid; provisioning stopped.",
-      "auth_error": "Wi-Fi authentication failed. Check the password.",
-      "network_not_found": "The requested Wi-Fi network was not found.",
-      "bluetooth_off": "Bluetooth is off.",
-      "device_not_found": "The provisioning device was not found.",
-      "connect_failed": "Failed to connect to the provisioning device.",
-      "gatt_busy": "The Bluetooth channel is busy. Try again later.",
-      "gatt_incomplete": "The Bluetooth connection is incomplete. Please retry.",
-      "mtu_too_small": "The Bluetooth packet size is too small for provisioning.",
-      "multiple_devices": "Multiple provisioning devices were found. Move closer to the target device and retry.",
-      "permission_denied": "The permissions required for provisioning are missing.",
-      "pop_invalid": "The setup code is invalid. Check the gateway PoP.",
-      "security_handshake_failed": "The provisioning security handshake failed.",
-      "wifi_scan_failed": "The gateway failed to scan Wi-Fi.",
-      "wifi_timeout": "The Wi-Fi connection timed out.",
-      "done_rejected": "The gateway rejected the provisioning completion request.",
-      "binding_probe_failed": "The binding probe failed.",
-      "binding_identity_mismatch": "The gateway identity changed during binding; binding stopped.",
-      "capability_unsupported": "The provisioning device does not support the required capability.",
-      "board_led_unconfirmed": "The board LED state could not be confirmed.",
-      "cancelled": "Provisioning was cancelled.",
-      "unknown": "Provisioning failed ({code})."
-    }
-  },
-  "cloud": {
-    "token": {
-      "expired": "The cloud access token has expired. Update it.",
-      "missing": "No cloud access token is configured."
+  "family": {
+    "contact_sync_only": "Members show last contact sync only, not presence.",
+    "create": "Create family",
+    "current": "Current",
+    "dissolve": "Dissolve family",
+    "dissolve_confirm": "Dissolving removes the family and local member profiles, and requires rotation/unbinding. Continue?",
+    "invite": {
+      "admin_only": "Only admins can manage invitations.",
+      "code_once": "6-digit code (shown once)",
+      "create_code": "Create 6-digit code (weak)",
+      "create_from_request": "Create YCI1 invitation",
+      "created": "Invitation created",
+      "import_receipt": "Import receipt",
+      "join_request": "YCR1 join request",
+      "join_request_placeholder": "Paste the member YCR1 text",
+      "key_wrap_hint": "Default flow: the member shows a YCR1 join request; the admin pastes it and returns a YCI1 invitation.",
+      "receipt": "Receipt",
+      "receipt_placeholder": "Paste a YCP1 receipt",
+      "remaining": "{hours}h {minutes}m remaining",
+      "revoke": "Revoke invitation",
+      "revoke_confirm": "The invitation becomes invalid immediately. Revoke?",
+      "role": "Invited role",
+      "rooms": "Allowed rooms"
     },
-    "command": {
-      "accepted_not_confirmed": "The cloud accepted the command, but the device has not confirmed execution."
+    "join": {
+      "cancel": "Cancel join",
+      "code_optional": "6-digit code (optional)",
+      "complete": "Create profile",
+      "display_name": "Display name",
+      "hint": "Joining is two steps: the member shows YCR1, the admin returns YCI1.",
+      "invitation": "YCI1 invitation",
+      "password": "Profile password",
+      "phase": {
+        "applying": "Joining",
+        "cancelled": "Cancelled",
+        "code_required": "Invitation code required",
+        "completed": "Completed",
+        "failed": "Join failed",
+        "idle": "Not started",
+        "member_bound": "Joined; profile required",
+        "request_ready": "Waiting for the admin invitation",
+        "validating": "Validating",
+        "waiting": "Waiting for invitation"
+      },
+      "profile_hint": "Invitation accepted. Create a local profile to unlock.",
+      "request_ready": "Join request ready; show it to the admin.",
+      "start": "Create YCR1 join request",
+      "submit": "Validate and join"
     },
-    "completion": {
-      "unsupported": "This gateway does not support cloud completion confirmation."
-    }
-  },
-  "stateSource": {
-    "sensor_physical": "Sensor reading",
-    "device_feedback": "Device feedback",
-    "automation_local": "Local automation",
-    "app_lan": "App LAN control",
-    "app_cloud": "App cloud control",
-    "unknown": "Unknown source ({value})"
-  },
-  "ac": {
-    "mode": {
-      "auto": "Auto",
-      "cool": "Cool",
-      "heat": "Heat",
-      "dry": "Dry",
-      "fan": "Fan",
-      "eco": "Eco",
-      "sleep": "Sleep",
-      "unknown": "Non-standard mode ({mode})"
-    }
-  },
-  "door": {
-    "state": {
-      "secured": "Locked",
-      "unconfirmed": "Unconfirmed",
-      "unknown": "Unknown"
+    "last_admin": "The last administrator cannot be removed.",
+    "leave": "Leave family",
+    "leave_confirm": "Leaving removes this device access to the family. Continue?",
+    "member": {
+      "change_role": "Change role",
+      "extend": "Extend guest",
+      "remove": "Remove member",
+      "transfer": "Transfer admin"
     },
-    "alert": {
-      "unconfirmed": "The lock state is unconfirmed. Check it."
+    "members": {
+      "empty": {
+        "message": "Invite members to this family.",
+        "title": "No members yet"
+      }
     },
-    "link": {
-      "unverified": "The door sensor link is unverified."
+    "needs_unlock": "Switching family requires unlocking again.",
+    "none": "No family",
+    "none_message": "Create or join a family first.",
+    "remove": {
+      "confirm": "The member will lose local credentials and gateway secrets must be rotated. Remove?"
+    },
+    "rotation": {
+      "notice": "Rotate gateway secrets after removing members or dissolving the family."
+    },
+    "section": {
+      "family": "Family",
+      "invites": "Invitations",
+      "join": "Join",
+      "members": "Members"
+    },
+    "switch": "Switch family",
+    "transfer": {
+      "confirm": "Transfer admin to this member?"
     }
   },
   "gateway": {
     "security": {
-      "hmac_only": "HMAC only (no confidentiality)",
-      "tls_pinned": "TLS with pinned certificate",
-      "pin_mismatch": "Gateway certificate pin mismatch",
       "handshake_failed": "Gateway TLS handshake failed",
+      "hmac_only": "HMAC only (no confidentiality)",
+      "pin_mismatch": "Gateway certificate pin mismatch",
       "state_inconsistent": "Gateway security state is inconsistent",
+      "tls_pinned": "TLS with pinned certificate",
       "unavailable": "Gateway secure channel unavailable"
+    }
+  },
+  "home": {
+    "cloud": {
+      "configured": "Cloud configured",
+      "not_configured": "Cloud not configured"
+    },
+    "empty": {
+      "message": "Add a gateway and finish provisioning to see devices here.",
+      "title": "No devices yet"
+    },
+    "environment": {
+      "empty": "No sensor data received yet.",
+      "humidity": "Humidity",
+      "presence": "Presence",
+      "presence_clear": "Clear",
+      "presence_detected": "Present",
+      "source": "Source",
+      "temperature": "Temperature",
+      "title": "Environment"
+    },
+    "gateway": {
+      "none": "No gateway bound",
+      "offline": "Gateway offline",
+      "online": "Gateway online"
+    },
+    "grid": {
+      "hint": "Tap a card for details; common devices support quick toggles."
+    },
+    "metric": {
+      "rtt_ms": "Round-trip time {value} ms"
+    },
+    "no_family": {
+      "message": "Create or join a family to see devices.",
+      "title": "No family yet"
+    },
+    "open_room": "Open this room",
+    "room": {
+      "all": "All rooms"
     }
   },
   "invite": {
     "mode": {
-      "key_wrap": "Key wrap",
-      "code_kek": "Code + KEK"
-    },
-    "security": {
-      "weak_mode_warning": "This invitation mode has weaker security.",
-      "guest_scope_not_crypto": "Guest room scope is an app policy, not a cryptographic boundary."
+      "code_kek": "Code + KEK",
+      "key_wrap": "Key wrap"
     },
     "receipt": {
       "pending": "The invitation receipt is pending."
     },
+    "security": {
+      "guest_scope_not_crypto": "Guest room scope is an app policy, not a cryptographic boundary.",
+      "weak_mode_warning": "This invitation mode has weaker security."
+    },
     "status": {
-      "pending": "Pending",
       "accepted": "Accepted",
       "expired": "Expired",
+      "pending": "Pending",
       "revoked": "Revoked"
     }
   },
   "member": {
     "role": {
       "admin": "Administrator",
-      "member": "Member",
-      "guest": "Guest"
+      "guest": "Guest",
+      "member": "Member"
     },
     "status": {
       "active": "Active",
-      "invited": "Invited",
       "disabled": "Disabled",
-      "expired": "Expired"
+      "expired": "Expired",
+      "invited": "Invited"
     },
     "sync": {
       "last_at": "Last synced: {time}",
       "never": "Never synced"
     }
   },
-  "device": {
-    "type": {
-      "door": "Door lock",
-      "light": "Light",
-      "sensor": "Sensor",
-      "ac": "Air conditioner",
-      "switch": "Switch",
-      "camera": "Camera",
-      "curtain": "Curtain",
-      "fan": "Fan",
-      "speaker": "Speaker",
-      "unknown": "Unknown device"
+  "onboarding": {
+    "complete_join": "Accept invitation and join",
+    "create": {
+      "title": "Create a family"
     },
-    "state": {
-      "online": "Online",
-      "offline": "Offline"
+    "create_action": "Create family and profile",
+    "display_name": "Display name",
+    "family_name": "Family name",
+    "invitation_code": "Invitation code (weak mode only)",
+    "invitation_text": "Paste the invitation from the admin",
+    "join": {
+      "title": "Join a family"
     },
-    "unsupported": {
-      "read_only": "This device type is read-only; only status is shown."
-    },
-    "disabled": {
-      "unassigned": "The device is unassigned and disabled."
-    },
-    "count_one": "{count} device",
-    "count_other": "{count} devices"
+    "join_request_hint": "Ask an admin to prepare an invitation; this device will create a join request.",
+    "password": "Password (8+ characters)",
+    "start_join": "Create join request"
   },
-  "scene": {
-    "run": "Run",
-    "running": "Running",
-    "partial_failed": "Some steps failed",
-    "no_rollback": "Completed steps are not rolled back.",
-    "step": {
-      "failed": "A step failed."
+  "page": {
+    "about": {
+      "title": "About"
+    },
+    "family": {
+      "title": "Family and access"
+    },
+    "settings": {
+      "title": "Settings"
+    }
+  },
+  "profile": {
+    "about": "About",
+    "entries": "Shortcuts",
+    "family": "Family",
+    "guest": {
+      "expires": "Guest expires"
+    },
+    "local_only": "Local profile information only; no cross-device presence.",
+    "lock": "Lock and exit",
+    "manage_family": "Manage family",
+    "provisioning": "Add gateway",
+    "settings": "Settings",
+    "unknown": "Local profile"
+  },
+  "provisioning": {
+    "apply": {
+      "apply": "Apply and connect",
+      "message": "The gateway joins this network over the encrypted channel; a 30-second timeout prompts a retry.",
+      "password": "Wi-Fi password",
+      "password_placeholder": "Leave empty for open networks",
+      "secret_hint": "The password stays in memory; it is never logged or stored locally.",
+      "title": "Apply Wi-Fi credentials"
+    },
+    "bound": {
+      "assign_room": "Assign a room",
+      "done": "Done",
+      "led_confirmed": "Board LED confirmed",
+      "title": "Gateway bound",
+      "unassigned_hint": "New devices are in the unassigned pool; assign them from Rooms."
+    },
+    "cancel": "Cancel provisioning",
+    "error": {
+      "auth_error": "Wi-Fi authentication failed. Check the password.",
+      "binding_identity_mismatch": "The gateway identity changed during binding; binding stopped.",
+      "binding_probe_failed": "The binding probe failed.",
+      "bluetooth_off": "Bluetooth is off.",
+      "board_led_unconfirmed": "The board LED state could not be confirmed.",
+      "cancelled": "Provisioning was cancelled.",
+      "capability_unsupported": "The provisioning device does not support the required capability.",
+      "connect_failed": "Failed to connect to the provisioning device.",
+      "credential_missing": "Provisioning credentials are missing.",
+      "device_not_found": "The provisioning device was not found.",
+      "done_rejected": "The gateway rejected the provisioning completion request.",
+      "gatt_busy": "The Bluetooth channel is busy. Try again later.",
+      "gatt_incomplete": "The Bluetooth connection is incomplete. Please retry.",
+      "identity_invalid": "The gateway identity is invalid; provisioning stopped.",
+      "mtu_too_small": "The Bluetooth packet size is too small for provisioning.",
+      "multiple_devices": "Multiple provisioning devices were found. Move closer to the target device and retry.",
+      "network_not_found": "The requested Wi-Fi network was not found.",
+      "permission_denied": "The permissions required for provisioning are missing.",
+      "pop_invalid": "The setup code is invalid. Check the gateway PoP.",
+      "security_handshake_failed": "The provisioning security handshake failed.",
+      "unknown": "Provisioning failed ({code}).",
+      "wifi_scan_failed": "The gateway failed to scan Wi-Fi.",
+      "wifi_timeout": "The Wi-Fi connection timed out."
+    },
+    "handshake": {
+      "message": "The PoP stays in memory only and is cleared on cancel or leave.",
+      "pop": "PoP",
+      "pop_placeholder": "Gateway PoP",
+      "title": "Enter the PoP"
+    },
+    "permission": {
+      "message": "Provisioning needs Bluetooth to discover and connect to nearby gateways.",
+      "request": "Grant and start scanning",
+      "title": "Bluetooth permission"
+    },
+    "progress": {
+      "ap_scanning": "Scanning Wi-Fi",
+      "bound": "Bound",
+      "cancelled": "Cancelled",
+      "capability_check": "Checking capabilities",
+      "connecting": "Connecting",
+      "discovering": "Discovering services",
+      "discovering_on_lan": "LAN probe",
+      "failed": "Failed",
+      "idle": "Idle",
+      "permission": "Checking permission",
+      "scanning": "Scanning",
+      "secure_identity": "Verifying identity",
+      "security_handshake": "Security handshake",
+      "sending_credentials": "Sending credentials",
+      "waiting_for_wifi": "Waiting for Wi-Fi"
+    },
+    "rotate": {
+      "hint": "After rotation, members need redistributed credentials."
+    },
+    "scan": {
+      "connect": "Connect",
+      "empty": {
+        "message": "Put the gateway into provisioning mode and retry.",
+        "title": "No devices found"
+      },
+      "hint": "Only YaoCore-GW-* devices advertising the provisioning service are shown; retry after 10 seconds.",
+      "rescan": "Scan again",
+      "scanning": "Scanning…",
+      "selected": "Selected",
+      "title": "Choose a gateway"
+    },
+    "step0": "Permission",
+    "step1": "Scan",
+    "step2": "Security",
+    "step3": "Wi-Fi",
+    "step4": "Apply",
+    "step5": "Bound",
+    "title": "Add gateway",
+    "wifi": {
+      "ssid": "Wi-Fi name (SSID)",
+      "ssid_placeholder": "2.4 GHz Wi-Fi name",
+      "title": "Choose Wi-Fi"
     }
   },
   "room": {
-    "unassigned": {
-      "title": "Unassigned devices"
+    "assign": {
+      "action": "Assign room",
+      "title": "Assign room"
     },
     "delete": {
       "title": "Delete room",
-      "warning": "Devices in this room will become unassigned and disabled."
+      "warning": "Deleting a room does not delete physical devices. Devices move to the disabled unassigned pool and can be reassigned later."
     },
-    "assign": {
-      "title": "Assign room"
+    "manage": {
+      "title": "Room management"
+    },
+    "move": {
+      "down": "Move down",
+      "up": "Move up"
+    },
+    "name": {
+      "placeholder": "Room name"
+    },
+    "new": "New",
+    "unassigned": {
+      "empty": "The unassigned pool is empty.",
+      "title": "Unassigned devices"
     }
   },
-  "family": {
-    "switch": "Switch family",
-    "create": "Create family",
-    "member": {
-      "remove": "Remove member"
+  "rooms": {
+    "add_room": "Add room",
+    "devices": {
+      "empty": {
+        "message": "Assign a device from the unassigned pool or add a new one.",
+        "title": "No devices in this room"
+      }
     },
-    "last_admin": "The last administrator cannot be removed."
+    "empty": {
+      "message": "Create the first room, then assign devices.",
+      "title": "No rooms yet"
+    },
+    "selected": {
+      "title": "Room devices"
+    },
+    "title": "Rooms and devices",
+    "unassigned_count": "Unassigned pool: {count}"
   },
-  "home": {
-    "gateway": {
-      "online": "Gateway online",
-      "offline": "Gateway offline"
-    },
-    "metric": {
-      "rtt_ms": "Round-trip time {value} ms"
-    },
-    "room": {
-      "all": "All rooms"
+  "route": {
+    "unknown": {
+      "message": "The requested page does not exist or its parameters are missing.",
+      "title": "Page unavailable"
     }
   },
-  "brand": {
-    "gree": "Gree",
-    "haier": "Haier",
-    "midea": "Midea",
-    "generic": "Generic"
+  "scene": {
+    "actions": "{count} actions",
+    "cancel": "Cancel run",
+    "disabled_hint": "Scene disabled.",
+    "edit": {
+      "title": "Scene editing",
+      "unavailable": "Scene editing is deferred to a later delivery; existing scenes can run now."
+    },
+    "empty": {
+      "message": "Scene editing is not part of this delivery; existing scenes can run.",
+      "title": "No scenes yet"
+    },
+    "no_rollback": "Executed steps are not rolled back.",
+    "no_rollback_hint": "Scenes run in order; executed steps are never automatically rolled back.",
+    "partial_failed": "Some steps failed",
+    "run": "Run",
+    "running": "Running",
+    "state": {
+      "cancelled": "Cancelled",
+      "failed": "Failed",
+      "idle": "Idle",
+      "preflight": "Preflight",
+      "succeeded": "Succeeded"
+    },
+    "step": {
+      "cancelled": "Cancelled",
+      "failed": "Failed",
+      "line": "Step {index} · {device}",
+      "pending": "Pending",
+      "running": "Running",
+      "skipped": "Skipped",
+      "succeeded": "Succeeded"
+    },
+    "title": "Scenes"
+  },
+  "session": {
+    "lock": "Lock",
+    "locked": {
+      "message": "Choose a profile and enter its password.",
+      "title": "Locked"
+    },
+    "no_profile": {
+      "message": "Create or join a family to get started.",
+      "title": "No local profile"
+    },
+    "password": {
+      "placeholder": "Password"
+    },
+    "profile": {
+      "prompt": "Choose a profile"
+    },
+    "unlock": "Unlock"
   },
   "settings": {
+    "advanced": {
+      "accepted": "Address verified.",
+      "hint": "Manual IP only applies to bound gateways and never creates a new binding.",
+      "ip": "Gateway IPv4 address",
+      "ip_placeholder": "192.168.1.10",
+      "no_gateway": "No bound gateway available.",
+      "port": "Port",
+      "port_placeholder": "8443",
+      "probe": "Test address"
+    },
+    "appearance": {
+      "system": "Appearance and dark mode follow the system."
+    },
     "cloud": {
-      "single_gateway_required": "v1 supports cloud connection for a single gateway only. Remove extra gateways or clear the cloud configuration."
+      "clear_token": "Clear token",
+      "device": "Cloud device ID",
+      "device_placeholder": "IoTDA device ID",
+      "endpoint": "Endpoint",
+      "endpoint_placeholder": "https://iotda.example.com",
+      "project": "Project ID",
+      "project_placeholder": "Project ID",
+      "single_gateway_required": "v1 supports cloud connection for a single gateway only. Remove extra gateways or clear the cloud configuration.",
+      "state": "State",
+      "test": "Test connection",
+      "token": "IAM token",
+      "token_manual_hint": "Tokens are manual only, never auto-refreshed and never logged.",
+      "token_placeholder": "Paste the IAM token"
+    },
+    "language": {
+      "auto": "Follow system",
+      "current": "Current language",
+      "en_us": "English",
+      "restart_required": "Platform language switched; some system strings need a restart.",
+      "zh_cn": "Simplified Chinese"
+    },
+    "motion": "Light and motion",
+    "notifications": "Notifications",
+    "section": {
+      "about": "About",
+      "advanced": "Advanced",
+      "behaviour": "Notifications and motion",
+      "cloud": "Cloud",
+      "language": "Language",
+      "notifications": "Notifications",
+      "security": "Security"
+    },
+    "security": {
+      "empty": {
+        "message": "Provision a gateway to see its security profile here.",
+        "title": "No gateway bound"
+      },
+      "no_manual_pins": "Pinned certificates are written by provisioning; manual editing is not allowed.",
+      "pin_count": "{count} pinned certificates",
+      "reprovision": "Re-provision",
+      "rotate": "Rotate secret",
+      "rotation_recommended": "Rotation recommended"
+    },
+    "version": "Version"
+  },
+  "startup": {
+    "error": {
+      "message": "The app could not initialize. Retry or exit.",
+      "title": "Startup failed"
     }
+  },
+  "stateSource": {
+    "app_cloud": "App cloud control",
+    "app_lan": "App LAN control",
+    "automation_local": "Local automation",
+    "device_feedback": "Device feedback",
+    "sensor_physical": "Sensor reading",
+    "unknown": "Unknown source ({value})"
   }
 }

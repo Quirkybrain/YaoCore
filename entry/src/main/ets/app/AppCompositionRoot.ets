@@ -110,6 +110,7 @@ import {
   UuidGenerator
 } from './AppPlatformPorts';
 import { ViewModelAppContextBridge } from './ViewModelAppContextBridge';
+import type { PageVmFactoryPort } from './PageVmFactory';
 
 const UI_CONNECT_TIMEOUT_MS: number = 2000;
 const UI_READ_TIMEOUT_MS: number = 3000;
@@ -119,7 +120,7 @@ const RETRY_BASE_DELAY_MS: number = 300;
 const RETRY_MAX_DELAY_MS: number = 900;
 const DOMAIN_GATE_WAIT_MS: number = 2000;
 
-export class AppCompositionRoot implements AppContextRootPort {
+export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort {
   private readonly constructionTrace: AssemblyTrace =
     new AssemblyTrace(ASSEMBLY_CONSTRUCTION_ORDER);
   private readonly initializationTrace: AssemblyTrace =
@@ -442,6 +443,11 @@ export class AppCompositionRoot implements AppContextRootPort {
 
   get appContext(): AppContext {
     return this.appContextValue;
+  }
+
+  /** C-28 UI seam: Index reads this once and passes it as an explicit prop. */
+  get pageVms(): PageVmFactoryPort {
+    return this;
   }
 
   // AppContextRootPort narrow getters

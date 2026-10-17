@@ -19,7 +19,7 @@ import { AppError, AppErrors } from '../common/types/AppError';
 import { AppContext, SessionGateState } from '../app/AppContext';
 import { NavigationService } from '../app/NavigationService';
 import { ShellBootstrap } from '../app/ShellBootstrap';
-import { ShellTheme } from '../app/ShellTheme';
+import { ShellTheme } from '../common/theme/ShellTheme';
 import { MainShell } from './MainShell';
 import { ShellBackdrop } from './ShellBackdrop';
 import { SessionGateView, StartupErrorView } from './ShellViews';
@@ -140,6 +140,7 @@ struct Index {
           appContext: this.appContext,
           i18n: this.appContext.i18n,
           gate: this.sessionGate,
+          localeRevision: this.localeRevision,
           familyName: this.appContext.activeFamilyName,
           activeFamilyId: this.appContext.activeFamilyId === undefined
             ? '' : this.appContext.activeFamilyId
@@ -149,7 +150,9 @@ struct Index {
           appContext: this.appContext,
           i18n: this.appContext.i18n,
           navigation: this.navigation,
-          localeRevision: this.localeRevision
+          vmFactory: this.appContext.pageVms,
+          localeRevision: this.localeRevision,
+          motionEnabled: this.motionEnabled
         })
       }
     }

@@ -1,11 +1,14 @@
 /*
- * YaoCore T-17 MainShell: Tabs + Navigation/NavDestination.
- * Producer: agent:implementation-engineer | Task: T-17 / wp-067-ui-shell
- * Contract: DES-B §17.1.5; UIUX §3
+ * YaoCore C-28/C-25/C-26/C-27 MainShell: Tabs + Navigation/NavDestination.
+ * Producer: agent:implementation-engineer | Task: T-18 / wp-073-ui-pages
+ * Contract: DES-B §17.1.5, §14.1.1, §15.1.1, §16.1.1; UIUX §3
  *
  * Home/Rooms/Scenes/Profile are TabContent pages. Secondary pages are
  * NavDestination entries built from AppRoute. Unknown routes render
  * UnknownRouteView instead of crashing. Tab state survives secondary pages.
+ *
+ * DI: AppContext/i18n/navigation/vmFactory/localeRevision are explicit props.
+ * No @Provide/@Consume; pages create VMs only through vmFactory.
  */
 import type { I18nService } from '../service/i18n/I18nService';
 import { AppContext } from '../app/AppContext';
@@ -15,7 +18,9 @@ import {
   AppRouteValidation,
   NavigationService
 } from '../app/NavigationService';
-import { ShellTheme } from '../app/ShellTheme';
+import type { PageVmFactoryPort } from '../app/PageVmFactory';
+import { AppColors, AppMotionTokens, AppRadius, AppSpacing, AppTypography } from '../common/theme/AppTheme';
+import { ShellTheme } from '../common/theme/ShellTheme';
 import { AboutPage } from './AboutPage';
 import { DeviceControlPage } from './DeviceControlPage';
 import { FamilyManagePage } from './FamilyManagePage';
@@ -33,12 +38,22 @@ export struct MainShell {
   @Require appContext: AppContext;
   @Require i18n: I18nService;
   @Require navigation: NavigationService;
+  @Require vmFactory: PageVmFactoryPort;
   @Prop localeRevision: number = 0;
+  @Prop motionEnabled: boolean = true;
   @State selectedTab: number = 0;
+  @State roomsHighlight: string = '';
 
   aboutToAppear(): void {
+    this.selectedTab = this.navigation.getSelectedTabIndex();
     this.navigation.setTabChangeListener((index: number): void => {
       this.selectedTab = index;
+      if (index === 1) {
+        const highlight = this.navigation.consumeRoomsHighlight();
+        if (highlight !== undefined) {
+          this.roomsHighlight = highlight;
+        }
+      }
     });
   }
 
@@ -55,12 +70,13 @@ export struct MainShell {
         .width(6)
         .height(6)
         .fill(this.selectedTab === index
-          ? $r('app.color.shell_primary') : $r('app.color.shell_muted_light'))
+          ? AppColors.primary() : AppColors.mutedLight())
       Text(title)
-        .fontSize(ShellTheme.FONT_CAPTION)
+        .fontSize(AppTypography.caption)
         .fontColor(this.selectedTab === index
-          ? $r('app.color.shell_primary') : $r('app.color.shell_muted'))
-        .fontWeight(this.selectedTab === index ? FontWeight.Medium : FontWeight.Regular)
+          ? AppColors.primary() : AppColors.muted())
+        .fontWeight(this.selectedTab === index
+          ? AppTypography.weightMedium : AppTypography.weightRegular)
     }
     .width('25%')
     .height('100%')
@@ -84,24 +100,70 @@ export struct MainShell {
   @Builder
   routeBuilder(name: string, param: Object) {
     if (!this.routeIsValid(name, param)) {
-      UnknownRouteView({ navigation: this.navigation })
+      UnknownRouteView({ i18n: this.i18n, navigation: this.navigation,
+        localeRevision: this.localeRevision })
     } else if (name === AppRoute.DEVICE_CONTROL) {
       DeviceControlPage({
         params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
-        navigation: this.navigation
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
       })
     } else if (name === AppRoute.FAMILY) {
-      FamilyManagePage({ navigation: this.navigation })
+      FamilyManagePage({
+        params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
+      })
     } else if (name === AppRoute.ROOM_MANAGE) {
-      RoomManagePage({ navigation: this.navigation })
+      RoomManagePage({
+        params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
+      })
     } else if (name === AppRoute.PROVISIONING) {
-      ProvisioningPage({ navigation: this.navigation })
+      ProvisioningPage({
+        params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
+      })
     } else if (name === AppRoute.SETTINGS) {
-      SettingsPage({ i18n: this.i18n, navigation: this.navigation })
+      SettingsPage({
+        params: param instanceof AppRouteParams ? param as AppRouteParams : new AppRouteParams(),
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
+      })
     } else if (name === AppRoute.ABOUT) {
-      AboutPage({ navigation: this.navigation })
+      AboutPage({
+        appContext: this.appContext,
+        i18n: this.i18n,
+        navigation: this.navigation,
+        vmFactory: this.vmFactory,
+        localeRevision: this.localeRevision,
+        motionEnabled: this.motionEnabled
+      })
     } else {
-      UnknownRouteView({ navigation: this.navigation })
+      UnknownRouteView({ i18n: this.i18n, navigation: this.navigation,
+        localeRevision: this.localeRevision })
     }
   }
 
@@ -110,45 +172,74 @@ export struct MainShell {
       Column() {
         Row() {
           Text($r('app.string.shell_app_title'))
-            .fontSize(ShellTheme.FONT_TITLE)
+            .fontSize(AppTypography.title)
             .fontWeight(FontWeight.Bold)
-            .fontColor($r('app.color.shell_ink'))
+            .fontColor(AppColors.ink())
           Blank()
           Text(this.appContext.activeFamilyName.length > 0
             ? this.appContext.activeFamilyName : $r('app.string.shell_no_family'))
-            .fontSize(ShellTheme.FONT_LABEL)
-            .fontColor($r('app.color.shell_muted'))
+            .fontSize(AppTypography.label)
+            .fontColor(AppColors.muted())
         }
         .width('100%')
         .height(ShellTheme.HEADER_HEIGHT)
         .padding({
-          left: ShellTheme.SPACING_LG,
-          right: ShellTheme.SPACING_LG
+          left: AppSpacing.lg,
+          right: AppSpacing.lg
         })
 
         Tabs({ barPosition: BarPosition.End, index: this.selectedTab }) {
           TabContent() {
-            HomePage({ navigation: this.navigation })
+            HomePage({
+              appContext: this.appContext,
+              i18n: this.i18n,
+              navigation: this.navigation,
+              vmFactory: this.vmFactory,
+              localeRevision: this.localeRevision,
+              motionEnabled: this.motionEnabled
+            })
           }
           .tabBar(this.tabBar(0, $r('app.string.tab_home')))
 
           TabContent() {
-            RoomsPage({ navigation: this.navigation })
+            RoomsPage({
+              appContext: this.appContext,
+              i18n: this.i18n,
+              navigation: this.navigation,
+              vmFactory: this.vmFactory,
+              localeRevision: this.localeRevision,
+              motionEnabled: this.motionEnabled,
+              highlightRoomId: this.roomsHighlight
+            })
           }
           .tabBar(this.tabBar(1, $r('app.string.tab_rooms')))
 
           TabContent() {
-            ScenePage()
+            ScenePage({
+              appContext: this.appContext,
+              i18n: this.i18n,
+              navigation: this.navigation,
+              vmFactory: this.vmFactory,
+              localeRevision: this.localeRevision,
+              motionEnabled: this.motionEnabled
+            })
           }
           .tabBar(this.tabBar(2, $r('app.string.tab_scenes')))
 
           TabContent() {
-            ProfilePage({ appContext: this.appContext, navigation: this.navigation })
+            ProfilePage({
+              appContext: this.appContext,
+              i18n: this.i18n,
+              navigation: this.navigation,
+              vmFactory: this.vmFactory,
+              localeRevision: this.localeRevision,
+              motionEnabled: this.motionEnabled
+            })
           }
           .tabBar(this.tabBar(3, $r('app.string.tab_profile')))
         }
         .barHeight(ShellTheme.TAB_BAR_HEIGHT)
-        .barBackgroundColor($r('app.color.shell_tab_background'))
+        .barBackgroundColor(AppColors.tabBackground())
         .layoutWeight(1)
         .onChange((index: number): void => {
           this.selectedTab = index;

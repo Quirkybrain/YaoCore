@@ -17,6 +17,7 @@ import type { CloudService } from '../service/cloud/CloudService';
 import type { I18nService } from '../service/i18n/I18nService';
 import type { PreferencesStore } from '../service/storage/PreferencesStore';
 import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
+import type { PageVmFactoryPort } from './PageVmFactory';
 
 export enum SessionGateState {
   NO_PROFILE = 'NO_PROFILE',
@@ -78,6 +79,7 @@ export interface AppContextRootPort {
   readonly ble: IBleProvisioningClient;
   readonly cloud: CloudService;
   readonly logger: LoggerPort;
+  readonly pageVms: PageVmFactoryPort;
 
   initialize(): Promise<void>;
   isInitialized(): boolean;
@@ -85,6 +87,7 @@ export interface AppContextRootPort {
 }
 
 export type SessionGateListener = (state: SessionGateState) => void;
+export type ActiveFamilyListener = (familyId: string | undefined) => void;
 
 const MOTION_PREF_KEY: string = 'app.motion.enabled';
 
@@ -97,6 +100,7 @@ export class AppContext {
   private initPromise: Promise<void> | undefined = undefined;
   private initializationErrorValue: AppError | undefined = undefined;
   private readonly gateListeners: SessionGateListener[] = [];
+  private readonly activeFamilyListeners: ActiveFamilyListener[] = [];
   private readonly lifecycleObservers: AppLifecycleObserver[] = [];
 
   constructor(root: AppContextRootPort) {
@@ -131,6 +135,11 @@ export class AppContext {
     return this.root.i18n;
   }
 
+  /** T-18 additive seam: pages obtain VM factories through Index props (no globals). */
+  get pageVms(): PageVmFactoryPort {
+    return this.root.pageVms;
+  }
+
   initialize(): Promise<void> {
     if (this.initPromise !== undefined) {
       return this.initPromise;
@@ -147,6 +156,7 @@ export class AppContext {
   }
 
   async refreshSessionGate(): Promise<void> {
+    const previousFamilyId = this.activeFamilyIdValue;
     let family: Family | undefined = undefined;
     try {
       family = await this.root.activeFamily.getActiveFamily();
@@ -176,6 +186,23 @@ export class AppContext {
         ? SessionGateState.UNLOCKED : SessionGateState.LOCKED;
     }
     this.setGate(next);
+    if (previousFamilyId !== this.activeFamilyIdValue) {
+      this.notifyActiveFamily(this.activeFamilyIdValue);
+    }
+  }
+
+  /**
+   * R2-06: active-family changes are observable. Index/MainShell and Home use
+   * this instead of polling `activeFamilyId`.
+   */
+  subscribeActiveFamily(listener: ActiveFamilyListener): () => void {
+    this.activeFamilyListeners.push(listener);
+    return (): void => {
+      const index = this.activeFamilyListeners.indexOf(listener);
+      if (index >= 0) {
+        this.activeFamilyListeners.splice(index, 1);
+      }
+    };
   }
 
   subscribeSessionGate(listener: SessionGateListener): () => void {
@@ -242,6 +269,7 @@ export class AppContext {
 
   async onForeground(): Promise<void> {
     this.foreground = true;
+    const previousFamilyId = this.activeFamilyIdValue;
     for (let index = 0; index < this.lifecycleObservers.length; index++) {
       try {
         await this.lifecycleObservers[index].onForeground();
@@ -253,6 +281,9 @@ export class AppContext {
       const family = await this.root.activeFamily.getActiveFamily();
       this.activeFamilyIdValue = family === undefined ? undefined : family.familyId;
       this.activeFamilyNameValue = family === undefined ? '' : family.familyName;
+      if (previousFamilyId !== this.activeFamilyIdValue) {
+        this.notifyActiveFamily(this.activeFamilyIdValue);
+      }
     } catch (error) {
       this.root.logger.warn('AppContext', 'foreground_family_read_failed');
     }
@@ -358,6 +389,17 @@ export class AppContext {
         listeners[index](next);
       } catch (error) {
         this.root.logger.warn('AppContext', 'session_gate_listener_failed');
+      }
+    }
+  }
+
+  private notifyActiveFamily(familyId: string | undefined): void {
+    const listeners = this.activeFamilyListeners.slice();
+    for (let index = 0; index < listeners.length; index++) {
+      try {
+        listeners[index](familyId);
+      } catch (error) {
+        this.root.logger.warn('AppContext', 'active_family_listener_failed');
       }
     }
   }
