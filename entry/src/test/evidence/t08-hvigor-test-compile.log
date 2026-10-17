@@ -1,0 +1,170 @@
+> hvigor [32mUP-TO-DATE :entry:default@PreBuild...  [39m
+> hvigor [32mFinished :entry:default@CreateModuleInfo... after 2 ms [39m
+> hvigor [32mFinished :entry:default@CreateBuildProfile... after 2 ms [39m
+> hvigor [32mFinished :entry:default@PreCheckSyscap... after 1 ms [39m
+> hvigor [32mFinished :entry:default@GenerateUnitTestTemplate... after 2 ms [39m
+> hvigor [32mFinished :entry:default@GeneratePkgContextInfo... after 5 ms [39m
+> hvigor [32mFinished :entry:default@MergeProfile... after 4 ms [39m
+> hvigor [32mFinished :entry:default@ProcessRouterMap... after 3 ms [39m
+> hvigor [32mFinished :entry:default@ProcessShareConfig... after 2 ms [39m
+> hvigor [32mFinished :entry:default@ProcessStartupConfig... after 2 ms [39m
+> hvigor [32mFinished :entry:default@ProcessProfile... after 68 ms [39m
+> hvigor [32mFinished :entry:default@GenerateLoaderJson... after 6 ms [39m
+> hvigor [32mFinished :entry:default@UnitTestProcessProfile... after 1 ms [39m
+> hvigor [32mFinished :entry:default@ProcessResource... after 2 ms [39m
+> hvigor [32mFinished :entry:default@CompileResource... after 91 ms [39m
+> hvigor [32mFinished :entry:default@ReplaceUnitTestIndexFile... after 2 ms [39m
+> hvigor [32mFinished :entry:default@BuildUnitTestHook... after 1 ms [39m
+> hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:70:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:82:32
+ The system capacity of this api 'createMd' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:96:29
+ The system capacity of this api 'createMac' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:97:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:108:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:117:35
+ The system capacity of this api 'createKdf' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:126:33
+ The system capacity of this api 'generateSecret' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:137:35
+ The system capacity of this api 'createKdf' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:146:33
+ The system capacity of this api 'generateSecret' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:156:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:160:28
+ The system capacity of this api 'pubKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:160:35
+ The system capacity of this api 'getEncoded' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:162:51
+ The system capacity of this api 'priKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:162:64
+ The system capacity of this api 'pubKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:173:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:177:43
+ The system capacity of this api 'priKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:177:56
+ The system capacity of this api 'pubKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:192:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:196:54
+ The system capacity of this api 'pubKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:208:59
+ The system capacity of this api 'getEncoded' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:220:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:225:41
+ The system capacity of this api 'createKeyAgreement' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:227:38
+ The system capacity of this api 'generateSecret' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:227:81
+ The system capacity of this api 'pubKey' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:238:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:242:38
+ The system capacity of this api 'createCipher' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:248:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:248:50
+ The system capacity of this api 'ENCRYPT_MODE' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:256:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:267:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:271:32
+ The system capacity of this api 'createCipher' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:279:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:279:50
+ The system capacity of this api 'ENCRYPT_MODE' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:295:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:306:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:310:32
+ The system capacity of this api 'createCipher' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:318:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:318:50
+ The system capacity of this api 'DECRYPT_MODE' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:328:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:337:32
+ The system capacity of this api 'createRandom' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:339:21
+ The system capacity of this api 'generateRandomSync' is not supported on all devices
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:113:11
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:167:30
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:174:19
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:177:34
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:179:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:182:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:185:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:188:24
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:190:22
+ Function may throw exceptions. Special handling is required.
+[39m[39m
+[39m
+> hvigor [32mFinished :entry:default@UnitTestArkTS... after 6 s 875 ms [39m
+> hvigor [32mLinux[39m
