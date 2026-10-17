@@ -1,0 +1,30 @@
+# build-profile product default
+{
+ "compileSdkVersion": "26.0.0",
+ "targetSdkVersion": "26.0.0",
+ "compatibleSdkVersion": "5.0.2(14)",
+ "runtimeOS": "HarmonyOS"
+}
+
+# .hvigor/cache/project-config.json
+{
+ "compileSdkVersion": 26,
+ "compatibleSdkVersion": 14,
+ "originCompatibleSdkVersion": "5.0.2(14)",
+ "apiVersion": 26,
+ "sdkInfo": "false:26:26.0.0.105:Release",
+ "runtimeOS": "HarmonyOS"
+}
+
+# HAP module.json app fields
+{
+ "compileSdkVersion": "26.0.0.105",
+ "targetAPIVersion": 260000026,
+ "minAPIVersion": 50002014,
+ "compileSdkType": "HarmonyOS"
+}
+
+# pack.info
+{"summary":{"app":{"bundleName":"com.example.yaocore","bundleType":"app","version":{"code":1000000,"name":"1.0.0"}},"modules":[{"mainAbility":"EntryAbility","deviceType":["phone"],"abilities":[{"name":"EntryAbility","label":"$string:EntryAbility_label"}],"extensionAbilities":[{"name":"EntryBackupAbility","forms":[]}],"distro":{"moduleType":"entry","installationFree":false,"deliveryWithInstall":true,"moduleName":"entry"},"apiVersion":{"compatible":14,"releaseType":"Release","target":26}}]},"packages":[{"deviceType":["phone"],"moduleType":"entry","deliveryWithInstall":true,"name":"entry-default"}]}
+
+# exit=0
