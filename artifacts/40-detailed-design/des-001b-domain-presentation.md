@@ -3,8 +3,8 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。
 - **Date**: 2026-10-17
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
@@ -117,6 +117,18 @@
 
 - **不改变**：§8.1.4 的 10 字段/HMAC 线格式、§8.1.6 的双匹配+新鲜度规则、§8.2 错误码命名空间、§9.1 的 7 值/温度/纯映射约束、G-004 的契约语义。
 - **仍阻断 CQG-T14**：F-01 的 v4 DDL 不一致按 DES-B §2.7 由实现修复；本裁定不把 F-01 写成已关闭。F-03/F-04/F-06 的修复与回归测试、F-05 的资源补齐必须在 CQG-T14/相关 Gate 中留下证据；在此之前 C-15/C-16 证据为 `UNVERIFIED`/`DEFERRED`。
+
+### 0.7 T-15 裁定同步（2026-10-17）
+
+> **裁定人**：solution-architect（任务 `wp-062-t15-rulings`）。**输入**：`artifacts/70-review/t15-16-review.md` F-06/F-07 与 `artifacts/50-implementation/t15-16-vm.md`。**边界**：只裁定 C-08/C-22 的成员加入完成语义、职责、时序与测试要求；不实现代码，不重写 DES-A/DES-B 冻结方法签名，不改变 G-004 的邀请/回执/凭据协议语义。F-01..F-05、F-08、U-01..U-03 不在本裁定内。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **F-06 加入 `COMPLETED` 唯一定义** | `FamilyJoinPhase.COMPLETED` 只有一个含义：**成员已具备可用的本地家庭档案**——① C-13 `acceptInvitation(YCI1)` 成功并返回 `AcceptedInvitation`；② C-08 已完成家庭行导入与成员 `ACTIVE` 绑定；③ C-22 已为该 `(familyId, memberId)` 创建本地 `LocalProfile`；④ `activeFamilyId == accepted.familyId`，C-22 已发布 `needsUnlock=true`（会话已由 `switchFamily` 锁定；解锁后可用；`appContext.lock()`/`refreshSessionGate()` 随后通知）。**Admin 侧回执账本落账不是成员侧完成条件**（异步、跨设备、接触式收敛；见 §3.1.4）。C-08 自身职责的终点改为新增阶段 `MEMBER_BOUND`；只有 C-22 在档案与 active family 落地后调用 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）才发布 `COMPLETED`。 | §3.1.1、§3.1.4、§3.3.4、§3.4、§11.1.1、§11.3.2、§11.4、§23.3 |
+| **F-07 部分失败重试（最小裁定）** | `completeJoinWithProfile` 固定顺序 `createProfile → switchFamily → markProfileBound`；`AUTH_PROFILE_EXISTS` 仅在 `(familyId, memberId)` 已有同成员档案时视为幂等成功并继续，否则原样抛出；任何失败保留 `AcceptedInvitation` 与 `MEMBER_BOUND`，允许重试且不得重复消费容器/删除档案；`FamilySwitchResult.requiresUnlock` 必须写入 `FamilyViewState.needsUnlock`，不得丢弃；不自动解锁。 | §11.1.1、§11.3.2、§11.4 |
+| **不改** | DES-A 冻结签名、邀请容器/回执线格式、错误码命名空间、G-004 语义；既有 `start`/`submitInvitation`/`cancel`/`dispose` 方法签名不变。`submitInvitation` 的成功终态由 `COMPLETED` 改为 `MEMBER_BOUND` 属语义修订，按 `EXT-DES-B-27` 登记；`FamilyJoinPhase.MEMBER_BOUND` 是新增枚举值，所有消费方必须穷举处理，不得把它展示为“加入完成”。 | §3.1.4、§23.3 |
+
+- **Change Impact**：C-08/C-22 的实现与 T-16 现有 `T16_Family_joinStateMachineAndProfileCompletion`（把“submit 后即 COMPLETED”固化为期望）在修复并复审前为 `UNVERIFIED`；C-09..C-21/C-23 不受影响。不得把旧 host 593/593 当作本裁定的闭合证据；修复后必须重跑 `entry/src/test/run-host-tests.sh`、`codelinter`、clean `assembleHap` 与 ohosTest 编译，并补 §3.4/§11.4 的 F-06/F-07 用例。
 
 ---
 
@@ -775,11 +787,14 @@ export enum FamilyJoinPhase {
   CODE_REQUIRED = 'CODE_REQUIRED',
   VALIDATING = 'VALIDATING',
   APPLYING = 'APPLYING',
-  COMPLETED = 'COMPLETED',
+  MEMBER_BOUND = 'MEMBER_BOUND', // T-15 裁定：C-08 职责完成（家庭行+成员已绑定）；等待 C-22 档案
+  COMPLETED = 'COMPLETED',       // T-15 裁定：唯一定义=成员绑定+本地档案+active family（§3.1.4）
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED'
 }
 ```
+
+> **T-15 裁定同步（2026-10-17；F-06 / `EXT-DES-B-27`）**：`MEMBER_BOUND` 是新增枚举值；`COMPLETED` 语义收紧为“成员可实际使用该家庭”（成员绑定 + 家庭行 + 本地档案 + active family），不再表示“邀请已接受/成员已写入”。`submitInvitation` 的成功终态是 `MEMBER_BOUND`；只有 `FamilyJoinSession.markProfileBound()` 发布 `COMPLETED`。所有消费方（C-22/UI/测试）必须穷举新值；把 `MEMBER_BOUND` 显示为“加入完成”属于契约违反。
 
 > `FamilyMemberView` 不包含 `isOnline` 字段；D-010 明确禁止跨设备在线状态。`syncState` 只表达本机接触式同步信息。
 
@@ -925,8 +940,13 @@ export class FamilyJoinSession {
 
   start(displayName?: string): Promise<JoinRequestContainer>; // -> JOIN_REQUEST_READY
   waitForInvitation(): void;                                  // -> WAITING_FOR_INVITATION
-  submitInvitation(text: string, code?: string): Promise<AcceptedInvitation>;
-  cancel(): Promise<void>;                                    // 清理 join 私钥/临时缓冲
+  submitInvitation(text: string, code?: string): Promise<AcceptedInvitation>; // -> MEMBER_BOUND
+  /**
+   * T-15 裁定（F-06 / EXT-DES-B-27）：C-22 在档案+active family 就绪后调用；唯一 COMPLETED 写入点。
+   * 前置不满足 -> CONFIGURATION_ERROR，保持 MEMBER_BOUND 与 accepted（可重试）。
+   */
+  markProfileBound(): Promise<void>;
+  cancel(): Promise<void>;                                    // 清理 join 私钥/临时缓冲（仅 IDLE..APPLYING）
   dispose(): void;
 }
 ```
@@ -937,9 +957,34 @@ export class FamilyJoinSession {
   1. 解析前缀：`YCI1` → 调用 `invites.acceptInvitation(text, { code, nowMs })`；C-13 在解封/校验 `bundle.familyId` 后调用 `families.importFamily(header.familyId, header.familyName)`（`EXT-DES-B-25`），再写成员/路由/凭据；**全新成员设备无需预置家庭行**（F-02）。
   2. 若容器 `kdf.mode=CODE_KEK` 且未提供 `code` → 状态 `CODE_REQUIRED`，不尝试解封；
   3. 成功后 `families.getMember` 不存在则 `upsertMember`（C-13 正常已写入；此处幂等）；
-  4. 更新 state `COMPLETED`；不创建 `LocalProfile`（C-22 负责密码与档案）。
-- `cancel`：调用 `invites.discardJoinRequest(memberId)`（§23 扩展请求）或直接删除 join 私钥别名；清空 state 中的 `joinRequestText`；状态 `CANCELLED`。
-- 同一 `inviteId` 在本地只接受一次：再次 `submitInvitation` 同一容器 → `INVITE_INVALID`/`INVITE_MAX_USES` 由 C-13 决定；session 记录已接受 ID 防止重复。
+  4. 更新 state **`MEMBER_BOUND`** 并保留 `accepted`；不创建 `LocalProfile`（C-22 负责密码与档案），**不发布 `COMPLETED`**（见下）。
+
+**`COMPLETED` 唯一定义（T-15 裁定同步，2026-10-17；F-06 / `EXT-DES-B-27`）**：
+
+`FamilyJoinPhase.COMPLETED` 当且仅当以下四项同时成立：
+1. **邀请已验证（成员侧）**：C-13 `acceptInvitation(YCI1)` 成功（AEAD/`familyId`/`expireAt`/role 校验通过）并返回 `AcceptedInvitation`；这是 **YCI1 邀请容器**的验证，不是 Admin 设备对 `YCP1` 回执的 `verifyReceipt`。成员侧**不等待** Admin 的 `importReceipt`/账本落账。
+2. **家庭行就绪**：`family(accepted.familyId)` 已由 `importFamily` 建立/确保（`EXT-DES-B-25`），不存在新 UUID 或伪造 ADMIN。
+3. **成员绑定**：`family_member(accepted.familyId, accepted.memberId)` 存在且 `status=ACTIVE`，角色为 `accepted.role`。
+4. **本地档案、active family 与待解锁状态**：C-22 已为该 `(familyId, memberId)` 创建 `LocalProfile`，`activeFamilyId == accepted.familyId`，并在发布 `COMPLETED` 前已置 `needsUnlock=true`（会话已由 `switchFamily` 锁定）；`appContext.lock()` 与 `appContext.refreshSessionGate()` 是完成后的 UI 通知，解锁前不得控制。
+
+> **邀请账本落账不是完成条件**：Admin 设备的 `verifyReceipt` 与 `(inviteId, receiptHash)` 账本写入发生在成员接受之后的接触式回执导入（§3.3.3；ADR-003 §5.4；D-022）。成员设备无法观测、也不得等待该事件；`AcceptedInvitation.receipt` 的交付与 Admin 落账属于 FR-FAM-002 的后续收敛，不是成员侧 join 状态机的前置。把“账本已落账”当作 `COMPLETED` 条件会造成 Admin 离线/未接触时的永久未完成，并混淆两台设备的状态机。
+
+**阶段职责与迁移**：
+- `MEMBER_BOUND`（新增值）是 **C-08 自身职责的终点**：家庭行与成员已绑定，等待 C-22 收集密码并创建本地档案。UI 必须把 `MEMBER_BOUND` 映射为“设置本机档案/密码”步骤，**不得**显示“加入完成”，也不得进入家庭控制页。
+- `COMPLETED` 是**整个成员侧加入流程的终点**，只能由 `FamilyJoinSession.markProfileBound()` 发布；C-08 不在 `submitInvitation` 内创建档案（无密码、不承担 C-12 职责）。
+- `markProfileBound()` 的前置校验（全部通过才迁移）：
+  1. 当前 phase 为 `MEMBER_BOUND`；已是 `COMPLETED` → 幂等 no-op；其他阶段 → `CONFIGURATION_ERROR`（保持原阶段）；
+  2. `accepted` 存在；
+  3. `family_member(accepted.familyId, accepted.memberId)` 存在且 `ACTIVE`；
+  4. `auth.listProfiles(accepted.familyId)` 中存在 `(accepted.familyId, accepted.memberId)` 的本地档案（v1 每家庭一个档案，§3.3.1；同成员唯一性由 C-12 `createProfile` 保证）。C-08 是唯一 `COMPLETED` 写入点，必须校验**精确成员绑定**，不能只检查“家庭有档案”；若内部 `FamilyProfileRef` 尚未携带 `memberId`，允许在内部 seam 增量补充该只读字段（不属于 DES-A 冻结签名变更）；
+  5. `families.getActiveFamily()?.familyId === accepted.familyId`。
+  任一不满足 → 抛 `CONFIGURATION_ERROR`（§3.2），**保持 `MEMBER_BOUND` 与 `accepted`**，不改 `FAILED`、不清理 join 材料，允许 C-22 修复后重试。
+  > `needsUnlock=true` 不属于 C-08 的前置校验项：C-22 在调用 `markProfileBound()` 之前把 `needsUnlock = result.requiresUnlock` 发布到 state（`COMPLETED` 定义第 4 项）；`appContext.lock()`/`refreshSessionGate()` 在 `COMPLETED` 发布后通知 UI。C-08 只校验可持久事实（成员/家庭行/档案/active family），不读取 UI 状态。
+- `markProfileBound()` 是**唯一**的 `COMPLETED` 写入点；C-22 只能在 `createProfile` 与 `switchFamily` 都成功后调用（§11.1.1）。该方法是增量方法（`EXT-DES-B-27`），`start`/`submitInvitation`/`cancel`/`dispose` 签名不变。
+- **重复提交幂等**：同一 `text` 在 `MEMBER_BOUND`/`COMPLETED` 下再次 `submitInvitation` 必须返回已保存的 `AcceptedInvitation`，不得迁移到 `FAILED`/`APPLYING`，也不得重复接受容器；不同容器在 `MEMBER_BOUND`/`COMPLETED` 下拒绝（`INVITE_INVALID`）且保持当前阶段与 `accepted`。为此 session 必须保存 `AcceptedInvitation` 本身（不能只保存“已接受容器”布尔值），供幂等返回与 C-22 重试使用。
+- **取消边界**：`cancel()` 仅在 `IDLE`..`APPLYING` 有效；调用 `invites.discardJoinRequest(memberId)`（§23 扩展请求）或直接删除 join 私钥别名，清空 state 中的 `joinRequestText`，状态 `CANCELLED`。`MEMBER_BOUND`/`COMPLETED` 下为 no-op（不调用 `discardJoinRequest`、不迁移 `CANCELLED`、不删除成员/档案/家庭）；成员已由 C-13 持久化，撤销必须走 `leaveFamily`/`removeMember` 的正式路径，不能靠取消加入回滚。
+- **进程重启**：`COMPLETED` 的持久事实是“成员 ACTIVE + 本地档案 + active family”；session 状态是内存投影。重启后不恢复 join session，C-22 以持久事实判断已加入（UI 走 SessionGate 解锁），不得因无法恢复 `AcceptedInvitation` 而回退成员/档案；恢复入口归 T-17/T-18 页面，见 `RISK-JOIN-RESUME`。
+- 同一 `inviteId` 在本地只接受一次：重复提交同一容器在 `MEMBER_BOUND`/`COMPLETED` 下幂等返回已保存的 `accepted`；不同容器在 `MEMBER_BOUND`/`COMPLETED` 下拒绝（`INVITE_INVALID`）且不回退阶段。C-13 仍负责 `INVITE_MAX_USES`/账本判定。
 - C-13 内的 `importFamily` 与 `upsertMember` 是两次独立事务；允许失败后保留空家庭行（幂等重试），但不得在成员行缺失时创建 `LocalProfile`。
 
 #### 3.1.5 `MemberRoomGrantPort`（由 C-08 实现，供 C-09 事务调用）
@@ -962,6 +1007,7 @@ export interface MemberRoomGrantPort {
 | 最后一个 ADMIN 被移除/降级/退出 | `AUTH_RBAC_DENIED` | DES-A §11.2 既有语义 |
 | 成员不存在 | `CONFIGURATION_ERROR` | 不新增码，避免错误空间膨胀 |
 | 成员已存在 | `CONFIGURATION_ERROR` | `upsertMember` 幂等；显式创建重复才失败 |
+| `markProfileBound` 前置不满足（档案缺失/成员非 ACTIVE/active family 不匹配） | `CONFIGURATION_ERROR` | T-15 裁定：保持 `MEMBER_BOUND` 与 `accepted`，允许重试；不改 `FAILED` |
 | 邀请 targetRole=ADMIN | `PROTOCOL_VALUE_OUT_OF_RANGE` | DES-A §11.2 |
 | GUEST 缺 expiresAt | `PROTOCOL_VALUE_OUT_OF_RANGE` | DES-A §11.2 |
 | 邀请过期/撤销/用尽 | `INVITE_EXPIRED` / `INVITE_REVOKED` / `INVITE_MAX_USES` | C-13 映射 |
@@ -1074,6 +1120,7 @@ sequenceDiagram
 - `submitInvitation` 在成员设备完成解封；不依赖服务器/网关家庭端点。
 - **全新成员设备（F-02）**：C-13 在认证后自动建/确保 `family` 行；不要求 Admin 预置家庭。`familyId` 来自邀请头，禁止新 UUID；`familyName` 仅作首次导入快照；同名不同 id 不合并；owner 占位见 §3.1.2。
 - 成员设备接受后生成 canonical `YCP1` 回执；Admin 在下次接触（扫码/同 LAN 用户触发）导入回执；未到达则保持 `PENDING` 至过期。
+- **T-15 裁定同步（2026-10-17；F-06）**：本图的 `AcceptedInvitation + receipt` 只表示**成员侧接受成功**，对应 `MEMBER_BOUND`；成员设备的本地档案创建（C-22→C-12）、`switchFamily` 与 `FamilyJoinSession.markProfileBound()` 是 `COMPLETED` 的必要后续，不在此图展开。回执送达 Admin 并落账（本图末两行）是另一设备的异步收敛，**不是**成员侧完成条件；成员侧也不等待该事件。
 - 加入成功后成员设备拥有 `commandSecret`/pins；无需 BLE 配网（ADR-003 §7）。
 - 任何解封失败统一 `INVITE_INVALID`，不区分“版本/码/篡改”（防 oracle）。回执非规范编码/裸 hex 统一 `INVITE_RECEIPT_INVALID`（DES-A §13.2.1）。
 
@@ -1104,8 +1151,10 @@ sequenceDiagram
   - GUEST 到期/续期/不自动恢复；
   - 邀请状态 PENDING→ACCEPTED/EXPIRED/REVOKED；ACCEPTED→ACCEPTED（未达 `maxUses` 且未过期，D-022）/EXPIRED/REVOKED；`usedCount` 上限；KEY_WRAP `maxUses!=1` 拒绝；
   - 回执校验成功/篡改；同回执即时重复拒绝（C-08 当前防御）；历史回执重放由 C-13 `(inviteId, receiptHash)` 账本拒绝且不递增 `usedCount`（§23.6；R3-01）；D-022 不同回执按 `usedCount < maxUses` 继续成功；
-  - 加入 session：`start → submitInvitation(KEY_WRAP) → COMPLETED`；CODE_KEK 缺码 → `CODE_REQUIRED`；取消清理 join 私钥别名；
-  - **新成员设备（F-02）**：空 `family` 表 → `acceptInvitation` 经 `importFamily` 建固定 `familyId` 行 → `COMPLETED`；重复接受幂等；同名不同 id 并存；`LocalProfile` 在 C-22 前不存在；owner 占位不产生 ADMIN/RBAC 提升；
+  - 加入 session：`start → submitInvitation(KEY_WRAP) → MEMBER_BOUND`（`accepted` 保留、无 `LocalProfile`、不发布 `COMPLETED`）；`markProfileBound()` 在档案 + active family 就绪后 → `COMPLETED`；CODE_KEK 缺码 → `CODE_REQUIRED`；取消清理 join 私钥别名；
+  - **F-06 完成语义（T-15 裁定）**：`markProfileBound()` 在档案缺失/成员非 `ACTIVE`/active family 不匹配时 → `CONFIGURATION_ERROR` 且保持 `MEMBER_BOUND`+`accepted`；已 `COMPLETED` 再调用幂等；同一容器重复 `submitInvitation` 不迁移 `FAILED`；不同容器在 `MEMBER_BOUND` 下拒绝且不回退；`MEMBER_BOUND`/`COMPLETED` 下 `cancel()` no-op（fake 记录 `discardJoinRequest` 0 次）；
+  - **回执账本非完成条件**：fake `InviteService` 只记录 `acceptInvitation`，不调用 `verifyReceipt`/不写入 Admin 账本即可到达 `MEMBER_BOUND`；`COMPLETED` 只能由 C-22 调用 `markProfileBound()` 触发；
+  - **新成员设备（F-02）**：空 `family` 表 → `acceptInvitation` 经 `importFamily` 建固定 `familyId` 行 → `MEMBER_BOUND` → 档案 + active family → `COMPLETED`；重复接受幂等；同名不同 id 并存；`LocalProfile` 在 C-22 前不存在；owner 占位不产生 ADMIN/RBAC 提升；
   - **账本并发（F-04/T13-R-02）**：host 只验证单进程 `DomainOperationGate` 串行化；跨进程/多 VM 无 CAS 不在 host 证据面，标 `NOT_RUN`/未来 RDB 唯一约束；
   - removeMember 调用 `auth.invalidateSessionsForMember`（fake 记录）；
   - D-010：`markContactSync` 只写字段，不产生“在线”语义；
@@ -3664,6 +3713,8 @@ export class FamilyViewState {
   readonly section: FamilySection;
   readonly join?: JoinSessionState;
   readonly pendingAction: boolean;
+  /** T-15 裁定（F-07 / EXT-DES-B-27）：来自 FamilySwitchResult.requiresUnlock；不是授权判定。 */
+  readonly needsUnlock: boolean;
   readonly error?: ViewModelError;
   readonly revision: number;
 }
@@ -3720,9 +3771,17 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
 - `extendGuest`：`expiresAt` UTC 紧凑；只延长，不缩短？允许缩短但 UI 警告；C-08 校验。
 - `importReceipt`：扫码/粘贴回执；`INVITE_RECEIPT_INVALID` → 错误 toast；成功后刷新成员/邀请。
 - `startJoin`：`FamilyJoinSession.start`；state `join.phase=JOIN_REQUEST_READY`；页面展示 QR/复制。
-- `submitJoinInvitation`：调用 session；`CODE_REQUIRED` 时页面显示码输入；`COMPLETED` 后提示创建本地档案/密码（`AuthService.createProfile` 由 `completeJoinWithProfile` 调用）。
-  - 为避免密码泄漏到 VM 状态，`completeJoinWithProfile(displayName, password)` 为独立方法（签名见 §11.1.1）；密码只在调用期间存在，不写入 state。
-  - 在 `submitJoinInvitation` 成功后，`AcceptedInvitation` 存 state；页面收集密码后调用 `completeJoinWithProfile` → `AuthService.createProfile({familyId, memberId, role})` → `families.setActiveFamily` → `appContext.refreshSessionGate()` → `COMPLETED`；密码字符串只在调用期间存在，成功后立即清空输入控件；失败保留 `AcceptedInvitation` 并允许重试（不重复接受容器）。
+- `submitJoinInvitation`：调用 session；`CODE_REQUIRED` 时页面显示码输入；成功后状态为 **`MEMBER_BOUND`**（不是 `COMPLETED`），`AcceptedInvitation` 存 state，页面提示创建本地档案/密码。UI 不得把 `MEMBER_BOUND` 显示为“加入完成”，也不得在此阶段进入家庭控制页。
+  - 为避免密码泄漏到 VM 状态，`completeJoinWithProfile(displayName, password)` 为独立方法（签名见 §11.1.1）；密码只在调用期间存在，不写入 state/日志/持久化。
+  - **固定顺序（T-15 裁定同步，2026-10-17；F-06/F-07）**：`completeJoinWithProfile` 必须按
+    1. 校验 `join.accepted` 存在、`join.phase ∈ {MEMBER_BOUND, COMPLETED}`（无 `accepted` → `INVITE_INVALID`；阶段不符 → `CONFIGURATION_ERROR`；已 `COMPLETED` → 幂等 no-op，仅在需要时刷新）；
+    2. `AuthService.createProfile({profileId: profileIdFor(memberId), familyId, memberId, displayName, password, role})`；`AUTH_PROFILE_EXISTS` **仅在 `(familyId, memberId)` 已有同成员档案时**视为幂等成功并继续，否则原样抛出（不得吞掉 profileId 冲突）；该幂等分支**不重置、不覆盖**首次设置的档案密码，UI 必须提示用户使用已设置的本机档案密码；
+    3. `FamilyService.switchFamily(accepted.familyId)` → `FamilySwitchResult`；**不得丢弃 `requiresUnlock`**；先把 `needsUnlock = result.requiresUnlock` 发布到 state（`switchFamily` 已 `auth.lockAll()`；不自动解锁）；
+    4. `FamilyJoinSession.markProfileBound()` → `COMPLETED`（唯一写入点；C-08 再次校验成员/档案/active family）；
+    5. `appContext.lock()` + `appContext.refreshSessionGate()`，随后 `refresh()`；成功后立即清空密码输入控件。
+  - **失败/重试（F-07）**：任一阶段失败 → 保留 `AcceptedInvitation`、保持 `MEMBER_BOUND`、发布 `ViewModelError`，**不发布 `COMPLETED`**、不删除已创建档案、不重复消费容器；用户可重试。`createProfile` 成功而 `switchFamily` 失败时，重试必须走“幂等创建档案 → 再次 `switchFamily` → `markProfileBound`”，不得因 `AUTH_PROFILE_EXISTS` 卡死。若 `switchFamily` 在 `auth.lockAll()` 之后失败，必须按 `getActiveSession()===undefined` 置 `needsUnlock=true`（不得显示为已解锁）；重试仍以 `MEMBER_BOUND` 为起点。
+  - **`needsUnlock` 边界**：v1 不变量 `needsUnlock == (activeFamily !== undefined && (auth.getActiveSession() === undefined || auth.getActiveSession().familyId !== activeFamily.familyId))`；它表示该家庭档案已存在但当前会话未解锁（或属于其他家庭），控制/管理前必须由 Index `SessionGateView` 解锁，**不是**授权判定（C-12 仍校验会话/RBAC）。`completeJoinWithProfile` 不得自动解锁、不得把 `true` 改为 `false`；解锁成功后由 Gate/后续 `initialize`/`refresh` 按不变量重算，不得永久保留过期 `true`。所有 `switchFamily` 调用点（含 join）都必须写入 `requiresUnlock`。
+  - **`startJoin`/`cancelJoin` 边界**：`startJoin` 在 `MEMBER_BOUND` 下必须拒绝（`CONFIGURATION_ERROR`），不得 `disposeJoin()` 丢弃 `accepted`；`COMPLETED` 可作为新加入流程的起点（成员关系已持久化，旧 session 可丢弃）。`cancelJoin` 仅在 `IDLE`..`APPLYING` 可用；`MEMBER_BOUND`/`COMPLETED` 下拒绝且状态不变；撤销已接受的成员关系走 `leaveFamily`，不回退 join。
 - `startInviteFromJoinRequest`：Admin 扫码/粘贴 YCR1；`InvitationCreationResult` 返回 `container.text`/`code`；页面展示 QR/复制；`code` 只显示一次。
 - `createCodeInvitation`：显式弱模式；UI 强制显示 `invite.security.weak_mode_warning`；`code` 只显示一次。
 - `revokeInvitation`：确认；C-08 更新 REVOKED；展示轮换提示（不自动）。
@@ -3856,8 +3915,10 @@ stateDiagram-v2
     CODE_REQUIRED --> VALIDATING: submitInvitation(code)
     VALIDATING --> APPLYING: acceptInvitation 成功
     VALIDATING --> FAILED: INVITE_*
-    APPLYING --> COMPLETED: createProfile + setActiveFamily
-    APPLYING --> FAILED: 档案/存储失败
+    APPLYING --> MEMBER_BOUND: 家庭行+成员已落库（C-08 职责完成）
+    APPLYING --> FAILED: 成员/存储失败
+    MEMBER_BOUND --> COMPLETED: completeJoinWithProfile（createProfile + switchFamily + markProfileBound）
+    MEMBER_BOUND --> MEMBER_BOUND: 档案/切换失败（保留 accepted，可重试）
     IDLE --> CANCELLED: cancelJoin
     FAILED --> IDLE: clearError
     COMPLETED --> [*]
@@ -3865,7 +3926,12 @@ stateDiagram-v2
 ```
 
 - Admin 生成邀请：`startInviteFromJoinRequest`/`createCodeInvitation` → `PENDING`；UI 展示 24h 倒计时/剩余次数。
-- 成员接受后必须创建本地档案（每家庭一个），否则无法控制；`completeJoinWithProfile` 负责。
+- **单一定义（T-15 裁定同步，2026-10-17；F-06）**：`COMPLETED` 仅在“成员绑定 + 家庭行 + 本地档案 + active family”全部成立时出现；`submitInvitation` 的成功终态是 `MEMBER_BOUND`，不是 `COMPLETED`。C-08 与 C-22 不得各自定义“完成”，也不得用 UI 布尔值替代阶段。
+- 成员接受后必须创建本地档案（每家庭一个），否则无法控制；`completeJoinWithProfile` 负责，并在成功后经 `FamilyJoinSession.markProfileBound()` 发布 `COMPLETED`。
+- `MEMBER_BOUND` 的 UI：展示“已接受邀请，设置本机档案/密码”；不得进入控制页、不得显示成功动效；`cancelJoin` 不可用（成员已持久化，撤销走 `leaveFamily`）。
+- **时序**：`createProfile → switchFamily →（发布 needsUnlock=true）→ markProfileBound →（appContext.lock() + refreshSessionGate）→ refresh`。`switchFamily` 需要该家庭已有档案（否则 `AUTH_PROFILE_NOT_FOUND`），因此不得先切换后建档案；`needsUnlock` 必须在 `COMPLETED` 发布前可见，`appContext.lock()`/`refreshSessionGate()` 在完成后通知 UI；不自动解锁。
+- **重试（F-07）**：失败保留 `AcceptedInvitation` 与 `MEMBER_BOUND`；`AUTH_PROFILE_EXISTS` 仅在 `(familyId, memberId)` 同成员档案存在时幂等继续；不得删除档案或重复接受容器。
+- **回执**：成员侧完成不等待 Admin `importReceipt`/账本落账（§3.1.4）；`AcceptedInvitation.receipt` 的交付是后续接触式收敛。
 - `code` 只在生成时显示一次；VM 不得持久化/日志化；页面关闭即清空。
 - `YCR1` 文本可复制/二维码；`YCI1` 可扫码/粘贴；不接受手工拼接键。
 
@@ -3889,11 +3955,14 @@ stateDiagram-v2
   - 角色矩阵：ADMIN/MEMBER/GUEST 可见性/操作拒绝；GUEST 场景入口不可见且服务层 `canExecuteScene` 拒绝；最后一个 ADMIN；
   - 家庭切换 `requiresUnlock`；创建家庭 + profile；退出/转让/解散 plan；
   - 邀请状态/回执导入/弱模式文案键存在；`CODE_REQUIRED` 流程；
+  - **F-06 加入完成（T-15 裁定）**：`submitJoinInvitation` 成功 → `MEMBER_BOUND`（非 `COMPLETED`）；`completeJoinWithProfile` 调用顺序 `createProfile → switchFamily → markProfileBound`，成功后才 `COMPLETED`；任何状态快照不得出现“无档案的 `COMPLETED`”；`MEMBER_BOUND` 不得进入控制页；
+  - **F-07 部分失败**：`createProfile` 成功 + `switchFamily` 失败 → `MEMBER_BOUND` + `accepted` 保留 + error；重试遇 `AUTH_PROFILE_EXISTS` 幂等继续 → `COMPLETED`；`requiresUnlock → needsUnlock=true`，且 `COMPLETED` 快照的 `needsUnlock` 必须为 `true`；`appContext.lock()`/`refreshSessionGate()` 被调用且不自动解锁；`cancelJoin`/`startJoin` 在 `MEMBER_BOUND` 被拒绝且 `accepted` 保留；同一容器重复提交不迁移 `FAILED`；
+  - **负例**：无 `accepted` 调 `completeJoinWithProfile` → `INVITE_INVALID`；已 `COMPLETED` 再调用幂等（profile 数不增、不重复消费容器）；密码不进入 state/日志；
   - 房间删除预览/确认数不一致/成功刷新；未分配池；
   - 场景进度：SUCCEEDED/PARTIAL_FAILED/FAILED/CANCELLED；`noRollbackNotice=true`；
   - 取消/清错/刷新不产生网络请求（除服务调用）。
 - device/UI：页面 RBAC 可见性/邀请二维码/场景浮层（可用时）；无设备 `UNAVAILABLE`。
-- 夹具：`FamilyMemberFixture`、`InvitationFixture`、`RoomDeletionFixture`、`SceneProgressFixture`。
+- 夹具：`FamilyMemberFixture`、`InvitationFixture`、`RoomDeletionFixture`、`SceneProgressFixture`；`FakeJoinSession` 必须按 §3.1.4 在 `submitInvitation` 后发出 `MEMBER_BOUND`、实现 `markProfileBound()` 后才发 `COMPLETED`，**禁止**用 fake 固化“submit 即 COMPLETED”的旧时序。
 
 ### 11.5 Traceability（`DES-B-C22-TRACE`）
 
@@ -5525,7 +5594,7 @@ sequenceDiagram
 | FR/NFR | 主责组件 | 接口/契约 | Host/CT 测试（建议命名） | Device/IT | 状态/备注 |
 |---|---|---|---|---|---|
 | FR-FAM-001 家庭创建/多家庭 | C-08, C-12, C-22, C-26 | `FamilyService.createFamily/switchFamily`；`AuthService.createProfile` | `C08_FamilyService_createFamily_adminInvariant`、`C22_FamilyViewModel_switchFamily_requiresUnlock` | RDB 持久化/重启 | 完整；每家庭一个本地档案（`RISK-MULTIFAMILY-PROFILE`） |
-| FR-FAM-002 成员邀请 | C-13, C-08, C-12, C-04, C-05, C-22, C-26 | `FamilyJoinSession`、`createInvitationForJoinRequest/createCodeInvitation/importReceipt`、`FamilyRepository.importFamily`（`EXT-DES-B-25`） | `C08_JoinSession_keyWrap_completes`、`C08_Invite_codeKek_requiresCode`、`C13_accept_newDevice_importsFamily`、`C13_receipt_nonCanonical_rejected`、`C13_Invite_*`（DES-A） | Mock/仿真器；回执导入 | 完整（D-009 主路径；CODE_KEK 弱路径；新设备导入 F-02 已裁定） |
+| FR-FAM-002 成员邀请 | C-13, C-08, C-12, C-04, C-05, C-22, C-26 | `FamilyJoinSession`（含 `MEMBER_BOUND`/`markProfileBound`，`EXT-DES-B-27`）、`createInvitationForJoinRequest/createCodeInvitation/importReceipt`、`FamilyRepository.importFamily`（`EXT-DES-B-25`） | `C08_JoinSession_keyWrap_memberBound`、`C08_JoinSession_markProfileBound_completes`、`C08_Invite_codeKek_requiresCode`、`C22_Family_joinProfileCompletion`、`C13_accept_newDevice_importsFamily`、`C13_receipt_nonCanonical_rejected`、`C13_Invite_*`（DES-A） | Mock/仿真器；回执导入 | 完整（D-009 主路径；CODE_KEK 弱路径；新设备导入 F-02 已裁定）；**T-15 裁定后需按 §0.7 修复并复审** |
 | FR-FAM-003 权限/移除 | C-08, C-12, C-22, C-26 | `removeMember/changeMemberRole`；`AuthService.invalidateSessionsForMember` | `C08_removeMember_lastAdmin_rejected`、`C08_removeMember_rotationPlan`、`C12_Rbac_*` | 角色变更会话失效 | 完整；撤销=轮换引导 |
 | FR-FAM-004 退出家庭 | C-08, C-12, C-22, C-26 | `leaveFamily/transferAdmin/dissolveFamily` | `C08_leaveFamily_localOnly_noNetwork`、`C08_transferAdmin_lastAdminGuard` | 无（本地） | **v1 声明性限制**：本地语义+引导，不承诺跨设备强一致（§3.3.6） |
 | FR-ROOM-001 房间创建/ID | C-09, C-22, C-26 | `RoomService.createRoom` | `C09_RoomService_create_uuid`、`C22_RoomViewModel_create` | RDB 持久化 | 完整 |
@@ -5665,6 +5734,7 @@ CQG-Txx
 | `RISK-FR-FAM-004-CONSISTENCY` | 退出/解散跨设备一致性 | `RISK`（v1 声明） | 旧成员仍可控制 | 轮换引导；UI 声明；不承诺实时 | 产品/安全评审 |
 | `RISK-INVITE-RECEIPT-REPLAY` | 回执账本语义重放/跨进程并发（R3-01/F-01/F-04） | `RISK`（Medium） | 多用途 CODE_KEK 的 `usedCount` 可被陈旧/变体回执消耗，后续合法成员被 `INVITE_MAX_USES` 拒绝；多进程无 CAS | C-13 canonical `YCP1` + `(inviteId, receiptHash)` 持久账本（§23.6）；非规范回执在解码阶段拒绝；单进程 gate 语义，多进程需 RDB 唯一约束；不得以别名唯一性论证 | T-13 修复（F-01/F-04/F-07）+ 复审 |
 | `RISK-IMPORTED-FAMILY-OWNER` | 导入家庭 owner 占位/权威成员收敛 | `RISK`（Low） | 本机加入设备的 owner 指针与 `transferAdmin` | `importFamily` 使用占位 owner；RBAC 仍按 `targetRole`；`transferAdmin` 在权威同步前不可用；不新增在线协议 | 接触式同步/后续 Change Impact |
+| `RISK-JOIN-RESUME` | 成员接受后、档案创建前进程终止/离开页面 | `RISK`（Low） | 用户已有成员/家庭行但无可用档案；join session 不持久 | `COMPLETED` 的持久事实是“成员 ACTIVE + `LocalProfile` + active family”，以持久状态判断已加入；重启后由 SessionGate 解锁；T-17/T-18 提供“完成本机档案”恢复入口；不得回退成员/家庭 | T-17/T-18 页面联调；若需持久 join 会话另走 Change Impact |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
 
@@ -5687,6 +5757,7 @@ CQG-Txx
 - `FR-FAM-004`、`FR-HOME-001`、`FR-SET-002`、`NFR-4.1`、`NFR-4.3` 的能力边界必须在 UI/README/评审中如实声明（DP-05/DP-06；SC-16）。
 - PB-02 未关闭前，不得把外部模块云完成判定写入验收 PASS；T-14 报告必须列出 `UNSUPPORTED`/`FIRMWARE_PENDING`。
 - T-14 裁定同步（2026-10-17，§0.6）：F-03/F-04/F-06 的契约冲突已按 §8 口径解决；实现修复与回归测试、F-05 资源补齐完成前，C-15/C-16 证据保持 `UNVERIFIED`/`DEFERRED`，多网关云控制明确 `UNSUPPORTED`，不得写成 PASS。
+- T-15 裁定同步（2026-10-17，§0.7）：F-06/F-07 的加入完成语义已按 §3/§11 口径解决；C-08/C-22 实现与 T-16 现有 join 用例在修复并复审前保持 `UNVERIFIED`，不得以旧 host 593/593 作为闭合证据；`MEMBER_BOUND` 不得被 UI/测试当作完成态。
 
 ---
 
@@ -5762,7 +5833,7 @@ export interface DeviceStatePort {
 | `EXT-DES-B-10` | `DeviceRecord`/`DeviceMergeState`/`DeviceMergeResult` | C-10 UI 附加视图 | 不修改 `DeviceState` |
 | `EXT-DES-B-11` | `DiscoverApplyOptions/Result`、`ControlApplyContext/Result/Reason`、`DeviceRemoval*` | C-10 仲裁/删除 | 纯值 |
 | `EXT-DES-B-12` | `SceneExecutionResult/Progress/StepResult/State`、`SceneCleanupSummary` | C-11 执行/清理 | 纯值 |
-| `EXT-DES-B-13` | `FamilyMemberView`/`InvitationView`/`FamilyDissolutionPlan`/`JoinSessionState`/`FamilyJoinPhase` | C-08/C-22 | 不修改 `FamilyMember`/`InvitationRecord` |
+| `EXT-DES-B-13` | `FamilyMemberView`/`InvitationView`/`FamilyDissolutionPlan`/`JoinSessionState`/`FamilyJoinPhase` | C-08/C-22 | 不修改 `FamilyMember`/`InvitationRecord`；T-15 新增 `MEMBER_BOUND`（见 `EXT-DES-B-27`） |
 | `EXT-DES-B-14` | `CloudConfigView`/`CloudCommandReceipt`/`ShadowSnapshot`/`InventoryDeviceState`/`CloudCompletionVerdict`/`CloudControlOutcome` | C-15 | `InventoryDeviceState` 是 PB-02 候选，非冻结 |
 | `EXT-DES-B-15` | `GatewayStatus`/`ControlUiState`/`DeviceFilter`/`FamilyCapabilities`/`DoorUiState`/`DoorLinkConfig`/`WizardStep`/`ProvisioningPermissionState` | C-21..C-28 | UI/VM 纯值 |
 | `EXT-DES-B-16` | `I18nParams`/`I18nResourceBundle`/`LocaleChangedEvent`/`I18nLoadResult` | C-14 | 纯值 |
@@ -5779,6 +5850,7 @@ export interface DeviceStatePort {
 | `EXT-DES-B-24` | `InviteServicePort`（C-13） | `verifyReceipt`（签名不变） | 增加持久账本去重语义：唯一 `(inviteId, receiptHash)`；历史回执重放拒绝且不递增 `usedCount`；回执输入为 canonical `YCP1`（§23.6；R3-01/F-07） |
 | `EXT-DES-B-25` | `FamilyRepository` | `importFamily(familyId, familyName): Promise<Family>` | F-02/T-13 裁定：按邀请固定 `familyId` 创建/确保本地 `family` 行；幂等；owner 占位；不创建成员/档案；见 §3.1.2 |
 | `EXT-DES-B-26` | `InviteServicePort`（C-13） | `releaseReceipt(receiptText: string, inviteId: string): Promise<void>` | **F-05 补偿专用（R2-01 / T-13 复审收尾）**：新增方法，`verifyReceipt` 签名不变；仅 C-08 在 `importReceipt` 的 RDB 事务失败后调用，删除本次 canonical `(inviteId, receiptHash)` 账本条目以允许同一合法回执重试；入参必须为 canonical `YCP1` 且 `inviteId` 等于载荷值；条目缺失 no-op；其它失败原样抛出。**非通用 API**：不得暴露给 C-22/UI，不得用于撤销/清理；失败处理与残留见 §23.6 |
+| `EXT-DES-B-27` | `FamilyJoinSession` / `FamilyJoinPhase` / `FamilyViewState` | `markProfileBound(): Promise<void>`；`FamilyJoinPhase.MEMBER_BOUND`；`FamilyViewState.needsUnlock: boolean` | **T-15 裁定（F-06/F-07）**：加入 `COMPLETED` 唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）；`submitInvitation` 成功终态改为 `MEMBER_BOUND`；`markProfileBound` 为唯一 `COMPLETED` 写入点（前置校验见 §3.1.4）；`needsUnlock` 暴露 `FamilySwitchResult.requiresUnlock`（不变量见 §11.1.1）。均为增量/语义修订，不改变 `start`/`submitInvitation`/`cancel`/`dispose` 签名、DES-A 冻结签名与 G-004 语义 |
 
 > `AuthService` 不新增 `rebindProfile`：v1 每家庭一个档案，避免修改冻结的 `LocalProfile.familyId` 语义。加入家庭后由 C-22 调用既有 `createProfile`。该选择登记为 `RISK-MULTIFAMILY-PROFILE`。
 
@@ -5932,6 +6004,15 @@ export interface DeviceStatePort {
 | F-06 v1 单 active 云作用域 | T-14 修复轮（C-15）；C-23/C-28（UI 限制） | `OPEN` | `CLOUD_NOT_CONFIGURED` 负例 + 多网关 UI 限制 + `RISK-CLOUD-MULTIGATEWAY` 接受记录 |
 | F-05 `brand.*` 资源键 | T-18（C-27）；消费面 C-24/C-27 | `DEFERRED` | §9.6 四键 + zh/en parity + 固定映射/检查器证据 |
 | F-01 v4 `cloud_config` DDL 对齐 | T-14 修复轮（实现） | `OPEN`（阻断 CQG-T14） | 按 §2.7 v4 DDL 修复 + 迁移后读写测试 + 复审 |
+
+**T-15 裁定后续待办（2026-10-17，§0.7）**：
+
+| 项 | 归属 | 状态 | 关闭条件 |
+|---|---|---|---|
+| F-06 加入 `COMPLETED` 语义 | C-08/C-22 修复轮 + T-16 测试 | `OPEN` | `MEMBER_BOUND` + `markProfileBound()` 落地；`submitInvitation` 不再发布 `COMPLETED`；§3.4/§11.4 回归通过；复审 |
+| F-07 部分失败重试/`needsUnlock` | C-22 修复轮 | `OPEN` | `AUTH_PROFILE_EXISTS` 同成员幂等重试；`requiresUnlock` 写入 `needsUnlock`；失败保留 `accepted`；`appContext.lock()`/`refreshSessionGate()` 调用；回归通过 |
+| T-16 现有 join 用例与 `FakeJoinSession` | test-engineer/实现者 | `STALE` | 更新 `T16_Family_joinStateMachineAndProfileCompletion` 与 `FakeJoinSession` 到 §0.7；旧“submit 即 `COMPLETED`”期望作废 |
+| C-08/C-22 证据 | Orchestrator/CQG-T15/T16 | `UNVERIFIED` | 修复 + 上述测试 + host/assemble/ohosTest + 独立复审后重评；不得沿用旧 593/593 |
 
 ### 24.3 契约条目索引（80 条）
 
