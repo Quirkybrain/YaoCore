@@ -3,9 +3,9 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。
-- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-17 裁定同步，§0.8）
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）；**T-18 裁定同步（2026-10-18）见 §0.9/§23.7**（R2-03 C-09/C-11/C-19/C-23/C-28 增量登记、F-06 D-12 白名单扩展、`GAP-T18-01`/`TRUST-T18-01`；不改变冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-09/C-11/C-19/C-23/C-28 公共签名/端口增量（`EXT-DES-B-28..32`），裁定 D-12 采用文件/符号级白名单扩展（不迁移 UI 类型），并登记 `GAP-T18-01`/`TRUST-T18-01`；见 §0.9/§2.3/§12.1.1/§18.1/§23.7。不改变冻结签名与 G-004 语义。
+- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-18 裁定同步，§0.9/§23.7）
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
 - **Target Stage**: `implementation`
@@ -144,6 +144,25 @@
 
 - **不改变**：DES-A/DES-B 冻结方法签名、`AppCompositionRoot`/`AppContext`/`PermissionPort` 公开签名、C-28 路由枚举/参数、G-004 契约语义。
 - **仍阻断 CQG-T17/IG-3**：本裁定只关闭 U-01/F-09 的架构文字冲突，不关闭 t17-review.md 的 F-01..F-13 代码/测试/设备证据项；F-01 的运行时 smoke、F-02/F-03 的修复与独立复审仍按评审 §6 执行。
+- **T-18 后续（2026-10-18）**：§0.8 的 D-12/D-17 分工仍是基线；T-18 对 D-12 的白名单扩展、C-09/C-11/C-19/C-23/C-28 增量与 `GAP-T18-01` 见 §0.9/§23.7，不改变本节结论。
+
+### 0.9 T-18 裁定同步（2026-10-18）
+
+> **裁定人**：solution-architect（任务 `wp-078-t18-contracts`）。**输入**：`artifacts/70-review/t18-review-b.md`（R2-03、F-06）、`artifacts/50-implementation/t18-fix-report.md`、`artifacts/50-implementation/t18-fix2-report.md`、`des-001a-foundation-transport.md`、`des-001b-domain-presentation.md`。**边界**：只做 T-18 实现增量的契约登记、D-12 白名单裁定与 Change Impact；不实现代码，不重写 DES-A/DES-B 冻结签名，不改变 G-004 语义；冲突只记录，不静默消除。R2-01/R2-02 的代码修复已在 `wp-077-fix-t18b` 完成，本节不替代其复审、设备矩阵或 Stage Gate 证据。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **R2-03 C-09 服务层 RBAC** | `RoomService` 8 个变更方法增加**可选** `actorMemberId?: string`；构造器增加可选 `RoomActorLookupPort`。提供 actor 时必须在 C-08 中为 `ACTIVE` 且 `FamilyRbac.requireAdmin` 通过，否则 `AUTH_RBAC_DENIED`；缺省 actor 是 **v1 local-admin trust**（与 `FamilyService.requireAdmin` 同约定），生产 `RoomViewModel` 始终传入 active memberId。UI 隐藏不是授权。 | §4.1.3；§23.7 `EXT-DES-B-28`；DES-A §27.5 |
+| **R2-03 C-19 additive seam** | `IBleProvisioningClient.scanWifiAccessPoints(BleWifiScanRequest, listener, cancellation?)` 为**新增**方法：真实执行 permission→scan→connect→MTU/discovery→capability→Security1→identity→AP 扫描，随后断链并清零 PoP；不应用 Wi-Fi 凭据。`provision()` 仍是权威聚合流程。代价是 Step2/3 预览与 Step4 `submit` 各建一次 BLE 会话（两次 Security1）；若后续改为复用会话，走 Change Impact。 | §12.1.1；§16.1.2；§23.7 `EXT-DES-B-29`；DES-A §16.1.1/§27.5 |
+| **R2-03 C-23 expectedGatewayId / RECONFIGURE** | `BleProvisioningViewModel.submit(..., expectedGatewayId?)` 把目标 id 写入 `BleProvisioningRequest.expectedGatewayId`；`ROTATE_SECRET`/`RECONFIGURE` 在 `ProvisioningPage.aboutToAppear` 必须携带该 id，缺失直接 `blocked`；`IdentityNegotiator.checkExpected` 在绑定前做最终校验。强校验语义不等于新错误码，沿用既有 `PROTOCOL_INVALID_IDENTIFIER`/`PROVISIONING_BINDING_IDENTITY_MISMATCH` 等。`prepareWifi(pop, expectedGatewayId?)` 与 `PermissionPort.openSettings?` 为同批增量；`openSettings` 是可选能力，缺失时调用方以 `CONFIGURATION_ERROR` fail-closed。 | §12.1.1；§16.1.2；§23.7 `EXT-DES-B-30` |
+| **R2-03 C-28 UI seams** | `PageVmFactoryPort`（9 个 `create*ViewModel`）由 `AppCompositionRoot` 实现，经 `AppContext.pageVms` 与 `Index`/`MainShell` 显式 props 传给页面；`AppContext.subscribeActiveFamily` 提供活动家庭变化订阅；`NavigationService.openRoomsWithHighlight/consumeRoomsHighlight` 提供一次性房间高亮；`OnboardingPort`/`OnboardingService` 提供 NO_PROFILE 创建/加入/取消。均为文档此前未登记的 seam（本次登记；不改变既有 `AppContext`/`AppCompositionRoot` 方法签名）。 | §17.1.1/§17.1.2/§17.1.3；§23.7 `EXT-DES-B-31` |
+| **R2-03 C-11 场景授权** | `SceneExecutionAuthorizationPort` 新增为 `SceneService`/`SceneViewModel` 的可选构造依赖；`SceneService.run()` 在任何命令前 fail-closed，`SceneViewModel.canExecuteScene()` 与 `run()` 使用同一端口。属服务/VM 增量，不改变 DES-A 冻结签名。 | §6.1.4；§11.1.3；§23.7 `EXT-DES-B-32` |
+| **F-06 D-12 唯一裁定** | **采用“白名单扩展”，不做 UI 类型迁移**：① `pages/**` 可 `import type { PageVmFactoryPort }` from `app/PageVmFactory`；② `components/**` 可 import `viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯枚举/只读 UI 状态类型，并可为预览**构造** `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值，但不得 import `*ViewModel`/端口/构造或调用 VM；③ `components/support/UiMapping.ets` 可值 import `service/ac/AcModels` 的 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`，并可构造 `AcViewState`（C-16 预览）与 `DoorUiState`（C-21 门锁预览）两个纯值；`DeviceCards.ets` 仅 `import type AcViewState`；④ components 对 C-10/C-11/C-15 只读结果 DTO 允许 `import type`（当前实际为 `DeviceRecord`、`SceneExecutionResult`）。类型迁移到 `model/**` 作为后续可选重构，不在 T-18 执行；若执行，走 Change Impact，不得与本次白名单并行。**理由**：迁移会改动 C-16/C-21 的类型归属与多个已稳定组件，超出 T-18 写范围；文件/符号级白名单可由 T-20 精确约束，风险更低。 | §2.3 D-12；§18.1；§23.7 `EXT-DES-B-31`（UI seam 部分） |
+| **上游缺口 `addGatewayToFamily`** | `FamilyRepository.addGatewayToFamily(familyId, gatewayId)` 仍无 actor/RBAC 参数；这是 C-08/C-22 上游缺口，登记为 `GAP-T18-01`，由 C-22/C-09/C-15 跟踪。T-18 的 `SettingsPage` RECONFIGURE 已加 `isAdmin()` UI 门（R2-01 修复），但 UI 门不能替代服务层授权；在缺口关闭或由 Stage Gate 书面接受前，不得宣称网关管理 RBAC 已服务层闭合。 | §3.1.2/§23.7；DES-A §27.5 |
+
+- **不改变**：DES-A/DES-B 冻结方法名/参数顺序/返回类型/错误码语义；`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 的 canonical/HMAC/ACK/安全语义。
+- **Change Impact**：见 §23.7 与 DES-A §27.5；T-18 代码证据（`a9d0bb5` 复审、`74e9157` R2 修复、host 690/690、clean assembleHap、codelinter 0 error、i18n blocking=0）继续有效，但 R2-03 的关闭仅指“契约已登记”，T-20 `check_layering.py` 落地与 T-19 设备矩阵仍未完成。
+- **证据边界**：设备/模拟器/Previewer/真实 BLE/权限弹窗/AP 扫描/LAN/云/TLS 仍 `BLOCKED`；本节不宣告 CQG-T18 设备 PASS、IG-3 或 Stage Gate。
 
 ---
 
@@ -381,9 +400,13 @@ entry/src/main/ets/
 │   └── EntryAbility.ets                         # C-28
 └── app/                                         # C-28 应用壳（可依赖 service/repository）
     ├── AppContext.ets                           # 生命周期/会话门禁
+    ├── AppContextAdapters.ets                   # C-23/C-09/C-11 端口适配
     ├── AppCompositionRoot.ets                   # 组合根
     ├── NavigationService.ets                    # 导航
-    └── PermissionGate.ets                       # 权限
+    ├── OnboardingService.ets                    # T-18 NO_PROFILE 创建/加入编排
+    ├── PageVmFactory.ets                        # T-18 PageVmFactoryPort
+    ├── PermissionGate.ets                       # 权限
+    └── PermissionPolicy.ets                     # 纯权限决策
 ```
 
 **测试目录**（D-018；在 DES-A §2.1 基础上新增）：
@@ -445,7 +468,7 @@ entry/src/main/resources/
 | D-09 | `repository/**` 不得 import `service/**` 实现；跨仓储协调通过 `contracts/**` 端口 + C-28 组合根 | `check_layering.py` |
 | D-10 | `service/{family,room,scene,cloud,i18n}/**` 不得 import `@ohos.*`；平台适配器只在 `adapters/**` | `check_host_safe_imports.py` |
 | D-11 | `viewmodel/**` 只通过构造注入引用 C-07..C-15 用例类/接口（含 `GatewayRepository`/`DeviceRepository`）与 `contracts/**`；可 import `common/**`/`model/**`/C-14 `I18nService`；不得 import `@ohos.*`、`service/{gateway,ble,crypto}/**`、`*/adapters/**`，不得自行 `new` 服务 | `check_layering.py` + `check_host_safe_imports.py` |
-| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件，以及 props/events 所需的 C-11/C-15 只读结果 DTO（必须 `import type`）；**不得 import `app/**`、`repository/**`、传输/存储/crypto、`service/**` 实现类，也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29） |
+| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`，以及 **`app/PageVmFactory` 的 `PageVmFactoryPort`（仅 `import type`）**；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件、**`viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯 UI 词汇（枚举/只读状态类型，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import `*ViewModel`/端口或构造/调用 VM）**、C-10/C-11/C-15 只读结果 DTO（必须 `import type`），以及 **`components/support/UiMapping.ets` 对 `service/ac/AcModels` 的纯值 import（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`；仅预览构造，无 I/O；`DeviceCards.ets` 仅 `import type AcViewState`）**；**不得 import `app/**`、`repository/**` 实现、传输/存储/crypto、`service/**` 实现类（`service/ac/AcModels` 为已登记纯值例外），也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29）；T-18 例外为文件/符号级 allowlist |
 | D-13 | `adapter/ac/**` 只 import `common/**`、`model/**`；不得 import 仓储/传输/网络 | 评审 + 静态扫描 |
 | D-14 | 生产 `entry/src/main/ets/**` 不得 import `entry/src/ohosTest/**`/`Mock*`；组合根不得出现 `DEV-ONLY` 分支 | `check_production_mock_exclusion.py` |
 | D-15 | `service/cloud/**` 只能通过 `HttpTransport`/`CloudCredentialPort`/`CloudConfigStore` 访问外部；不得直接 `@ohos.net.http` | 评审 + 静态扫描 |
@@ -453,6 +476,8 @@ entry/src/main/resources/
 | D-17 | **app 层依赖方向**：`app/**`（C-28）可依赖 `service/**`、`repository/**`、`contracts/**`、`common/**`、`model/**`，以及 `viewmodel/**`（仅 VM 工厂与 VM 端口适配：`AppCompositionRoot` 的 `create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `PermissionPort` 适配；不得在 app 内实现业务规则）；可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；不得被 `viewmodel/**`/`repository/**`/`service/**`/`model/**`/`common/**`/`components/**` 反向依赖 | `check_layering.py` + 评审 |
 
 > **T-17 裁定同步（2026-10-18；`artifacts/70-review/t17-review.md` U-01）**：D-12 与 D-17 按维度分工——D-12 管 UI import 白名单，D-17 管 `app/**` 依赖方向与可见性。旧 D-17“只能被 `entryability/**`/`pages/Index.ets` 引用”与旧 D-12 未列 `ShellTheme`/`ShellBootstrap` 的文字均被本表取代。若两条规则在具体 import 上交叉，按“更严格者优先”执行；任何放宽必须走 Change Impact，不得在实现/评审中静默修改。`app→viewmodel` 是单向边，`viewmodel/**` 不得为工厂/适配反向 import `app/**`。
+
+> **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03/F-06）**：D-12 对 T-18 的实际 UI 依赖采用“白名单扩展”，不做 `model/**` 类型迁移。新增允许项仅限：`pages/**` → `app/PageVmFactory`（`import type PageVmFactoryPort`）；`components/**` → `viewmodel/core/{ViewModelCore,DoorConfirmationTracker}`（纯枚举/只读 UI 状态，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import VM/端口/构造或调用 VM）；`components/support/UiMapping.ets` → `service/ac/AcModels`（纯值 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`，仅预览构造；`DeviceCards.ets` 仅 `import type AcViewState`）；components → C-10/C-11/C-15 只读结果 DTO（`import type`）。`check_layering.py` 必须把上述例外编码为**文件/符号级 allowlist**，不得放宽为“components 可 import 整个 viewmodel/service”；未来新增例外必须走 Change Impact 并更新 §0.9/§18.1。若 `viewmodel/core/ViewModelCore.ets`/`DoorConfirmationTracker.ets` 新增 `@ohos`、repository 实现或 transport 依赖，必须先把纯 UI 词汇拆到 `model/**` 或独立无依赖模块，否则检查器按 D-12 失败。
 
 **依赖图（DES-B 新增边）**：
 
@@ -1258,6 +1283,8 @@ export class RoomRepository implements RoomLookupPort {
 
 #### 4.1.3 `RoomService`
 
+> **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03、`t18-fix-report.md` F-03）**：以下代码块是 T-18 前的契约文本；T-18 实现以本小节末尾“T-18 增量签名”为准。原有方法名/返回类型/错误语义不变；T-18 新增可选 actor 参数/端口，`gate`/`deviceNames` 为早期增量并一并按当前签名登记。
+
 ```ts
 export class RoomService {
   constructor(rooms: RoomRepository,
@@ -1303,6 +1330,46 @@ export class RoomDeletionResult {
   readonly affectedMemberCount: number;
 }
 ```
+
+**T-18 增量签名（2026-10-18；R2-03/F-03）**：
+
+```ts
+export interface RoomActorLookupPort {
+  getMember(familyId: string, memberId: string): Promise<FamilyMember | undefined>;
+}
+
+export class RoomService {
+  constructor(rooms: RoomRepository, devices: DeviceAssignmentPort, grants: MemberRoomGrantPort,
+              rdb: RdbStore, clock: ClockPort, logger: LoggerPort,
+              gate?: DomainOperationGate, deviceNames?: RoomDeviceNamePort,
+              actors?: RoomActorLookupPort);
+
+  createRoom(familyId: string, roomName: string, icon?: string,
+             actorMemberId?: string): Promise<Room>;
+  renameRoom(roomId: string, roomName: string, actorMemberId?: string): Promise<Room>;
+  setIcon(roomId: string, icon: string | undefined,
+          actorMemberId?: string): Promise<void>;
+  reorderRooms(familyId: string, orderedRoomIds: ReadonlyArray<string>,
+               actorMemberId?: string): Promise<void>;
+  deleteRoom(roomId: string, confirmation: RoomDeletionConfirmation,
+             actorMemberId?: string): Promise<RoomDeletionResult>;
+  assignDevice(familyId: string, key: DeviceKey, roomId: string,
+               actorMemberId?: string): Promise<DeviceState>;
+  unassignDevice(familyId: string, key: DeviceKey,
+                 actorMemberId?: string): Promise<DeviceState>;
+  moveDevice(familyId: string, key: DeviceKey, targetRoomId: string,
+             actorMemberId?: string): Promise<DeviceState>;
+}
+```
+
+**RBAC 语义（服务层，非 UI）**：
+
+1. 提供 `actorMemberId` 时：`RoomActorLookupPort` 必须存在；C-08 成员必须存在且 `MemberStatus.ACTIVE`，`FamilyRbac.requireAdmin` 必须通过；任一失败 → `AUTH_RBAC_DENIED`，且不得先写后拒。空字符串不是缺省，按“已提供”处理并 fail-closed。
+2. `actorMemberId` 缺省时：沿用 **v1 local-admin trust**（与 `FamilyService.requireAdmin` 同约定），供 host/迁移/受控组合根使用；生产 `RoomViewModel` 始终传入 active memberId。
+3. `actors` 端口缺省且提供了 actor → fail-closed `AUTH_RBAC_DENIED`（不得把“无法判断”当 ADMIN）。
+4. `listRooms`/`previewDelete` 不加 actor；只读不授权。UI 隐藏 Add/Edit/Delete/Assign 仅是可用性措施，不是授权。
+5. 新增参数均为可选，既有调用点源码兼容；`createRoom` 的 `icon?` 在 `actorMemberId?` 之前，调用方必须按位置显式传参（例如 `createRoom(familyId, name, undefined, actorId)`），禁止把 actor 错传到 icon。
+6. `RoomViewModel` 通过可选 `RoomSessionPort` 取 active memberId；无 session 时传 `undefined`，由上述 v1 信任边界处理（见 §11.1.2）。
 
 **方法语义**：
 - `createRoom`：`roomName` trim 后 1..31；`orderIndex` 默认 `nextOrderIndex`；生成 UUID；**不**校验重名（允许同名，ID 区分）。返回 `Room`。
@@ -1932,6 +1999,8 @@ export class SceneExecutor {
           cancellation?: CancellationToken): Promise<SceneExecutionResult>;
 }
 ```
+
+> **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03、`t18-fix-report.md` F-02）**：`SceneService` 构造器新增可选 `authorization?: SceneExecutionAuthorizationPort`（`canExecuteScene(): PolicyDecision`）；既有可选 `rdb`/`gate` 一并登记为当前签名。`run()` 在预检/首条命令前调用；端口缺失或 `allowed=false` → `AUTH_RBAC_DENIED`（fail-closed）。既有 `run`/`cancel`/CRUD 签名不变；C-12 仍是策略所有者，组合根用 `AuthService.getActiveSession()+canExecuteScene(session)` 适配。
 
 **方法语义**：
 - `SceneService` 在构造时创建 `SceneExecutor`（同一 `DeviceControlPort`/`DeviceRepository`/`GatewayRoutePort`/`Clock`/`Timer`/`Logger`；纯逻辑，无平台 API）；测试可直接替换 executor。
@@ -3848,6 +3917,8 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
 }
 ```
 
+> **T-18 裁定同步（2026-10-18；F-03/R2-03）**：`RoomViewModel` 构造器新增可选 `session?: RoomSessionPort`（`getMemberId(): string | undefined`）。所有变更方法把 `session.getMemberId()` 作为 `actorMemberId` 传给 `RoomService`；无 session 时传 `undefined`（v1 local-admin trust）。`RoomViewState`/方法签名不变。
+
 **语义**：
 - `initialize`：`rooms.listRooms` + `devices.listUnassigned`。
 - `previewDelete`：只读；state `deletionPreview`；UI 阻断式确认，必须显示设备数与“不删除物理设备”文案。
@@ -3890,6 +3961,8 @@ export class SceneViewModel implements ViewModelBase<SceneViewState> {
   dispose(): void;
 }
 ```
+
+> **T-18 裁定同步（2026-10-18；F-02/R2-03）**：`SceneViewModel` 构造器新增可选 `authorization?: SceneExecutionAuthorizationPort`；新增 `canExecuteScene(): boolean`，与 `SceneService.run()` 使用同一端口。`run()` 先检查授权；deny 时显示 `errors.app.auth_rbac_denied` 并由页面禁用 Run。既有方法签名不变。
 
 **语义**：
 - `run`：调用 `SceneService.run(sceneId, progress => state.execution=progress)`；`lastResult` 保留；`PARTIAL_FAILED` 必须展示 `scene.no_rollback` 文案；`FAILED` 展示失败步骤/错误；`CANCELLED` 展示已执行/未执行。
@@ -4074,6 +4147,34 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 }
 ```
 
+**T-18 增量签名（2026-10-18；F-07/F-08/F-09；R2-03）**：
+
+> **同名端口冲突记录（不裁定）**：C-23 VM 使用的 `PermissionPort` 在 `viewmodel/ViewModelPorts.ets`，形状为 `ensure(kind): Promise<void>` + 可选 `openSettings?()`；C-28 §17.1.6 的 `PermissionPort` 在 `app/PermissionPolicy.ets`，形状为 `ensure(kind): Promise<PermissionResult>` + `check` + `openSettings()` + `requiredForProvisioning()`。两者同名但不同接口；`BleViewModelPermissionGate` 做适配。T-18 只扩展 **VM-facing** 端口；C-28 端口保持 §17.1.6 契约。**该命名冲突是已记录技术债，不在 T-18 重命名/迁移**；若后续收敛，走 Change Impact，并保持 `BleViewModelPermissionGate` 的 manifest/request 单一所有者语义。
+
+```ts
+// PermissionPort（viewmodel/ViewModelPorts.ets；C-23 VM-facing；可选能力）
+export interface PermissionPort {
+  ensure(kind: PermissionKind): Promise<void>;
+  /** F-08：打开本应用设置页；缺失时调用方以 CONFIGURATION_ERROR fail-closed。 */
+  openSettings?(): Promise<void>;
+}
+
+export class BleProvisioningViewModel {
+  prepareWifi(pop: string, expectedGatewayId?: string): Promise<void>;
+  submit(pop: string, ssid: string, wifiPassword: string,
+         commandSecretHex?: string, expectedGatewayId?: string): Promise<void>;
+  openSettings(): Promise<void>;
+}
+```
+
+**T-18 语义（2026-10-18）**：
+
+- `prepareWifi`：真实执行权限→扫描→连接→MTU/发现→能力门禁→Security1→身份协商→AP 扫描，成功后进入 `STEP_3_WIFI_SELECT` 并发布真实 `accessPoints`；**不**下发 Wi-Fi 凭据。结束后断开 BLE 并清零 PoP。Step4 `submit` 仍执行权威聚合流程，因此预览与提交各握手一次（两次 Security1）；这是为避免改动冻结聚合状态机接受的代价，后续若支持会话复用走 Change Impact。
+- `submit`：第 5 参数 `expectedGatewayId?` 写入 `BleProvisioningRequest.expectedGatewayId`；`ROTATE_SECRET`/`RECONFIGURE` 必须由页面携带目标 id，缺失时页面在进入向导前 `blocked`；C-19 `IdentityNegotiator.checkExpected` 在绑定前做最终校验，失败为 `PROVISIONING_BINDING_IDENTITY_MISMATCH`。**C-19 强校验**：`provision` 在 `credentialDraftId` 为空时必须提供 `expectedGatewayId`（否则 `CONFIGURATION_ERROR`），对应“用已绑定密钥重配”路径；新绑定必须提供 draft；`expectedGatewayId` 的格式在 `BleProvisioningRequest`/`BleWifiScanRequest` 构造时按既有 `PROTOCOL_INVALID_IDENTIFIER` 校验。不得用 UI 校验替代 C-19 校验。
+- `openSettings`：调用可选 `PermissionPort.openSettings`；端口缺失时抛 `CONFIGURATION_ERROR`，不得静默成功；只打开本应用设置页，不新增系统权限。
+- `accessPoints`：来自 `prepareWifi` 的真实结果；Step3 只渲染该列表或既有手工 SSID 回退，不得伪造 AP 或把预览结果当绑定成功。
+- 取消：`cancel()` 与 `prepareWifi`/`submit` 的竞态由 `cancelled`/扫描代际保护；页面在 `busy` 时仍必须提供取消入口（R2-02）；晚到结果不得覆盖取消界面。
+
 **语义**：
 - `initialize`：`step=STEP_0_PERMISSION`；`permission=UNKNOWN`；不自动扫描。
 - `requestPermission`：调用 `permissions.ensure(PermissionKind.BLUETOOTH)`；权限拒绝 → `PROVISIONING_PERMISSION_DENIED`；蓝牙关闭 → `PROVISIONING_BLUETOOTH_OFF`；状态 `ProvisioningPermissionState`；10s 提示（BLE §7；PR-13）。`ble.startScan` 仍由 `BleTransport` 做最终权限检查。
@@ -4181,7 +4282,7 @@ export class SettingsViewModel implements ViewModelBase<SettingsViewState> {
 - `testCloudConnection`：`cloud.testConnection`；401/403 → `TOKEN_EXPIRED`；不自动刷新。
 - `clearCloudToken`：调用 `cloud.clearToken()`；保留 endpoint/projectId/deviceId，仅删除 Asset Store token；`CloudTransportState` 变为 `TOKEN_MISSING`；UI 提示“请更新 IAM Token”；不自动删除配置。
 - `refreshSecurity`：routes + `GatewaySecurityView`；effective profile 通过 `discovery.probeLastKnown` 获取 `ProbeResult.profile`/`tlsPinMatched`；探测不可用则显示持久 profile + `UNKNOWN`，不得把 P-BLOCKED 当 P-HMAC。
-- `probeManualAddress`：`ManualAddressPolicy.validate` + `discovery.probeManual`；仅已绑定；成功更新 last-known；失败提示“不是已绑定的网关”；频率 ≥2s/5 次失败限制由 C-18 执行；Settings VM 只调用一次。
+- `probeManualAddress`：`ManualAddressPolicy.validate` + `discovery.probeManual`；仅已绑定；成功更新 last-known；失败提示“不是已绑定的网关”；频率 ≥2s/5 次失败限制由 C-18 执行；Settings VM 只调用一次。**T-18 裁定同步（2026-10-18；F-03）**：调用前必须检查 active session 的 `canManageFamily`（ADMIN）；非 ADMIN → `AUTH_RBAC_DENIED`，且不得调用 discovery/写 last-known。Settings 隐藏 Advanced 区只是 UI 可用性措施，不是授权。
 - `setMotionEnabled/setNotificationsEnabled`：Preferences 非秘密；影响 UI 动效/通知；不改变业务逻辑。
 - `appVersion`：从 `AppScope/app.json5`/`bundleInfo` 读取（C-28）；不在代码写死版本。
 - `about`：隐私/安全边界文案（P-HMAC 无机密性、GUEST 非密码学边界、Token 手工）强制存在。
@@ -4246,7 +4347,8 @@ stateDiagram-v2
 
 ### 12.4 依赖注入与测试 seam（`DES-B-C23-SEAM`）
 
-- 依赖：`IBleProvisioningClient`、`GatewayRepository`、`FamilyService`、`SecretDraftPort`、`CryptoPort`、`I18nService`、`CloudService`、`GatewayDiscoveryService`、`AuthService`、`PreferencesStore`、`ClockPort`、`TimerPort`、`LoggerPort`；不 import 平台 API。
+- 依赖：`IBleProvisioningClient`、`GatewayRepository`、`FamilyService`、`SecretDraftPort`、`CryptoPort`、`PermissionPort`、`I18nService`、`CloudService`、`GatewayDiscoveryService`、`AuthService`、`PreferencesStore`、`ClockPort`、`TimerPort`、`LoggerPort`；不 import 平台 API。
+- **T-18 裁定同步（2026-10-18；R2-03）**：host 测试必须覆盖 `prepareWifi` 真实 AP 预览（不应用凭据）、`submit` 的 `expectedGatewayId` 传递、`ROTATE_SECRET`/`RECONFIGURE` 缺目标拒绝、`openSettings` 可选端口缺失 fail-closed、`busy` 时取消（R2-02）与中途权限失败的设置 CTA（R2-05）。证据见 `T18_provisioningSeamsAndRecoveryAreWired`、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`、`T18_R2_provisioningCancelStaysAvailableWhileBusy`、`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`。
 - host 测试：
   - 6 步映射：每个 `ProvisioningState` → WizardStep；FAILED/CANCELLED；
   - 权限拒绝/蓝牙关闭；扫描 10s 无结果；
@@ -4942,8 +5044,9 @@ ProvisioningPage
 - Step3：AP 列表；选择 SSID；AuthError/NetworkNotFound 就地提示；允许重试。
 - Step4：Wi-Fi 密码（password 输入，禁止复制/日志）；30s 超时；失败回 Step3 或重试；取消清理。
 - Step5：绑定探针（discover HMAC + identity + board LED）成功 + `commitBinding` + `addGatewayToFamily` 后显示成功；新设备进入未分配池；提供“去房间指派”。
-- 任意步骤取消：停止扫描/断开 GATT/销毁 Security1/清 PoP/Wi-Fi/草稿；显示已取消，不显示成功。
-- `RECONFIGURE`/`ROTATE_SECRET`：复用同一向导，`expectedGatewayId` 校验；轮换需重新输入/生成 command secret；成功后更新 route/secret；提示成员需重新分发凭据（ADR-003 §6.1）。
+- 任意步骤取消：停止扫描/断开 GATT/销毁 Security1/清 PoP/Wi-Fi/草稿；显示已取消，不显示成功。**T-18 裁定同步（2026-10-18；R2-02）**：取消入口在 `busy` 期间也必须可用；`cancel()` 清空 PoP/SSID/Wi-Fi 密码并复位 busy，晚到结果由 VM `cancelled`/代际保护丢弃。
+- `RECONFIGURE`/`ROTATE_SECRET`：复用同一向导，`expectedGatewayId` 校验；轮换需重新输入/生成 command secret；成功后更新 route/secret；提示成员需重新分发凭据（ADR-003 §6.1）。**T-18 裁定同步（2026-10-18；F-09）**：`aboutToAppear` 对 `ROTATE_SECRET`/`RECONFIGURE` 缺 `expectedGatewayId` 直接 `blocked`；Step2 `prepareWifi` 与 Step4 `submit` 均携带该 id；`IdentityNegotiator.checkExpected` 仍是最终服务层校验。
+- **T-18 裁定同步（2026-10-18；F-07/F-08）**：Step0 的 DENIED/BLUETOOTH_OFF 显示“去设置”（`PermissionPort.openSettings?`）；Step2“下一步”调用 `prepareWifi` 执行真实握手/AP 扫描，Step3 渲染真实 `accessPoints`；中途权限失败在 Step2/4 保留当前步骤并提供通用“去设置”CTA（R2-05 页面层镜像）。真实 BLE/AP/权限弹窗仍由 T-19 设备矩阵验证，本节不写 PASS。
 
 #### 16.1.3 SettingsPage
 
@@ -5026,7 +5129,7 @@ SettingsPage
 
 **契约 ID**：`DES-B-C28-API` / `DES-B-C28-ERR` / `DES-B-C28-STATE` / `DES-B-C28-SEAM` / `DES-B-C28-TRACE`
 **职责**：EntryAbility 生命周期、Index/Tabs/Navigation 导航壳、组合根/依赖注入、权限声明与运行时申请、`module.json5`/`pages` 配置、应用级资源/主题/备份配置、Mock 生产排除。
-**路径**：`entry/src/main/ets/entryability/**`、`pages/Index.ets`、`app/{AppContext,AppCompositionRoot,NavigationService,PermissionGate}.ets`、`module.json5`、`resources/base/profile/main_pages.json`、`AppScope/app.json5`。
+**路径**：`entry/src/main/ets/entryability/**`、`pages/Index.ets`、`app/{AppContext,AppContextAdapters,AppCompositionRoot,NavigationService,OnboardingService,PageVmFactory,PermissionGate,PermissionPolicy}.ets`、`module.json5`、`resources/base/profile/main_pages.json`、`AppScope/app.json5`。
 
 ### 17.1 公开契约（`DES-B-C28-API`）
 
@@ -5069,6 +5172,8 @@ export class NavigationService {
   onBack(): boolean;                       // 返回 true = 已消费
 }
 ```
+
+> **T-18 裁定同步（2026-10-18；R2-03）**：`NavigationService` 新增 `openRoomsWithHighlight(roomId: string): void` 与 `consumeRoomsHighlight(): string | undefined`；`AppRouteParams`/`AppRouteParamsInit` 的 `expectedGatewayId?`/`highlightRoomId?` 在 T-18 实现中已存在并在此登记确认。`openRoomsWithHighlight` 写入一次性 `roomsHighlight` 并切到 Rooms tab；`consumeRoomsHighlight` 读取后立即清空，避免重复高亮。既有路由枚举/方法签名不变。
 
 - `Index.ets` 是唯一 `@Entry` 页面；`main_pages.json` 只注册 `pages/Index`。
 - `Home/Rooms/Scenes/Profile` 是 `TabContent` 内的页面组件；`DeviceControl/Family/RoomManage/Provisioning/Settings/About` 是 `NavDestination`。
@@ -5122,6 +5227,38 @@ export class AppCompositionRoot {
 - `dispose()`：取消订阅、停止轮询、关闭 Storage/RDB/Asset 句柄、清空会话/草稿；只用于应用退出/测试。
 - **禁止** `AppCompositionRoot` 单例全局变量；由 `AppContext`/`Index` 持有实例。UI 通过 `Index` 的显式 `@Require` props 获取实例，不通过 import 全局，也不使用 `@Provide/@Consume`（T-17 裁定，见 §0.8）。
 
+**T-18 增量（2026-10-18；R2-03）**：
+
+```ts
+export interface PageVmFactoryPort {
+  createHomeViewModel(): HomeViewModel;
+  createDeviceViewModel(): DeviceViewModel;
+  createClimateViewModel(): ClimateViewModel;
+  createDoorViewModel(): DoorViewModel;
+  createFamilyViewModel(): FamilyViewModel;
+  createRoomViewModel(): RoomViewModel;
+  createSceneViewModel(): SceneViewModel;
+  createBleProvisioningViewModel(): BleProvisioningViewModel;
+  createSettingsViewModel(): SettingsViewModel;
+}
+
+export interface OnboardingPort {
+  createFamily(familyName: string, ownerDisplayName: string, password: string): Promise<void>;
+  startJoin(displayName: string): Promise<string>;
+  completeJoin(invitationText: string, code: string, displayName: string,
+               password: string): Promise<void>;
+  cancelJoin(): Promise<void>;
+}
+
+export class OnboardingService implements OnboardingPort {
+  constructor(families: FamilyService, auth: AuthService);
+}
+```
+
+- `AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort`；`AppContextRootPort` 新增 `readonly pageVms: PageVmFactoryPort` 与 `readonly onboarding: OnboardingPort`。`AppContext.pageVms` 只是把组合根工厂暴露给 `Index`/`MainShell`，页面仍通过显式 props 获取，不形成全局服务定位器。
+- `OnboardingService` 是 NO_PROFILE 门的最小 C-22 编排：create（`FamilyService.createFamily` → `AuthService.createProfile` → `switchFamily`）与 join（`FamilyJoinSession.start` → `submitInvitation` → profile → switch → `markProfileBound`）；不自动解锁，完成后 gate 仍为 `LOCKED`。`cancelJoin` 清理未绑定 `YCR1` 私钥/会话；失败不得伪造成功。
+- 这些 seam 均为本次登记（代码可能早于 T-18，但此前未在 DES-B 记录）；`AppCompositionRoot` 既有服务 getter、`initialize`/`dispose`、`create*ViewModel` 方法签名不变。
+
 #### 17.1.3 `AppContext` 与生命周期
 
 ```ts
@@ -5157,6 +5294,8 @@ export class AppContext {
   onBackground(): Promise<void>;
 }
 ```
+
+> **T-18 裁定同步（2026-10-18；R2-03）**：`AppContext` 本次登记 `get pageVms(): PageVmFactoryPort`、`subscribeActiveFamily(listener: ActiveFamilyListener): () => void`、`retryInitialization(): Promise<void>`，以及 `createFamily/startJoin/completeJoin/cancelJoin`（委托 `OnboardingPort`）。`ActiveFamilyListener = (familyId: string | undefined) => void`；订阅回调在活动家庭变化时触发，返回取消订阅函数。新增项不改变既有 `activeFamilyId`/`session`/`sessionGate`/`initialize`/`refreshSessionGate`/`unlock`/`lock`/生命周期签名。`subscribeActiveFamily` 供 `Index`/`MainShell`/Home 使用，避免轮询 `activeFamilyId`。
 
 **`onBackground` 固定动作（顺序）**：
 1. `auth.lockAll()` + `refreshSessionGate()`；
@@ -5409,6 +5548,13 @@ tools/
 - 工具不进入 ArkTS 构建链；不包含真实 secret；仿真器/夹具标注 `DEV-ONLY`/`PUBLIC TEST DATA`。
 - `check_layering.py` 规则映射 §2.3 D-01..D-17；`viewmodel/**` 不得 import 服务实现；`components/**`/`pages/**` 不得 import 仓储/传输。
 - **T-17 裁定同步（2026-10-18；`t17-review.md` U-01）**：`check_layering.py` 的 D-12 必须按“`pages/**` 可 import `app/**` UI seam；`components/**` 不得 import `app/**`/`repository/**`/`service/**` 实现/传输/存储/crypto，仅允许 `import type` 的 C-11/C-15 只读结果 DTO，且不得调用/构造 VM”实现；D-17 必须允许 `app→viewmodel` 的 VM 工厂/端口适配边并禁止反向 import。旧 D-17“仅 `pages/Index.ets`”文字不得作为检查器规则；检查器规则与 §0.8/§2.3 不一致时，以 §0.8/§2.3 为准并先修正检查器。
+- **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03/F-06）**：`check_layering.py` 的 D-12 还必须实现以下**文件/符号级** allowlist，而不是放宽整个目录：
+  1. `pages/**` → `app/PageVmFactory`：仅允许 `import type { PageVmFactoryPort }`；不得 import `AppCompositionRoot`/`CompositionPlan`，不得 `new` 服务/仓储/VM。
+  2. `components/**` → `viewmodel/core/ViewModelCore.ets`、`viewmodel/core/DoorConfirmationTracker.ets`：允许纯枚举/只读状态类型（值或 `import type`），并允许为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等**纯值类**；拒绝 `viewmodel/*ViewModel.ets`、`viewmodel/ViewModelPorts.ets`、其他 `viewmodel/core` 文件，以及任何 `create*ViewModel`/`*ViewModel` 构造或调用。检查器按**直接 import** 判定；`viewmodel/core` 的传递依赖仍受 D-11/host-safe 规则约束，若其新增 `@ohos`、repository 实现或 transport 依赖，先把纯 UI 词汇拆到 `model/**`/独立模块，否则 D-12 例外失效。
+  3. `components/support/UiMapping.ets` → `service/ac/AcModels.ets`：允许 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary` 的值 import（仅预览构造）；`components/DeviceCards.ets` → `service/ac/AcModels.ets` 仅允许 `import type { AcViewState }`；其他 `components/**` → `service/**` 一律拒绝。
+  4. `components/**` → `repository/DomainModels.ets` 仅允许 `import type` 的 C-10/C-11/C-15 只读结果 DTO（当前实际为 `DeviceRecord`、`SceneExecutionResult`）；值 import、repository 实现、transport/storage/crypto 一律拒绝。
+  5. 生产 `pages/**`/`components/**` 无 `@Provide`/`@Consume`；D-17 允许 `app→viewmodel` 工厂/端口适配，拒绝反向 import。
+  - 检查器必须有 fixture 自测：合法树通过；上述每一类违规 import/构造/装饰器都必须失败。allowlist 纳入版本控制，新增例外需评审与 Change Impact（§18.3-4）。检查器落地前，评审执行等价静态扫描并记录命令/结果（T-17 同款要求）；不得以“评审人工通过”替代 T-20 工具证据。
 - `check_production_mock_exclusion.py` allowlist 仅允许 C-17 `DEV-ONLY` 常量与测试目录；生产 import 即失败。
 - `check_i18n.py` 输出 C-14 §7.4.4 报告；CI/CQG 留痕。
 - README（T-21）必须包含：构建/运行/测试命令、环境限制（无设备/无签名）、Mock/TLS 边界、i18n 检查命令、已知限制；不得把未运行写成 PASS。
@@ -5757,6 +5903,7 @@ CQG-Txx
 | `RISK-SCENE-NO-ROLLBACK` | 局部失败不回滚 | `RISK`（产品语义） | 用户误解 | UI 强制 `scene.no_rollback`；步骤明细 | 评审/用户确认 |
 | `RISK-CLOUD-TOKEN-STRING` | token 字符串无法擦除 | `RISK`（安全） | 内存残留 | 回调式访问；不落日志；短生命周期；Asset Store | 安全评审 |
 | `RISK-BINDING-FAMILY-INDEX` | `commitBinding` 与 `addGatewayToFamily` 非同一事务 | `RISK` | 绑定成功但家庭索引失败 | 幂等重试；错误提示；下次启动修复 | T-12/T-16 测试 |
+| `GAP-T18-01` | `FamilyRepository.addGatewayToFamily` 无 actor/RBAC | `GAP`（Medium） | MEMBER/GUEST 在近场 BLE+PoP 条件下可能触发网关重配/绑定；UI ADMIN 门不是服务层授权 | T-18 登记；由 C-22/C-09/C-15 跟踪；IG-3 前关闭或由 Stage Gate 书面接受；不得宣称服务层 RBAC 已闭合 | 服务层 actor/RBAC 实现 + 宿主/集成负例；或 Stage Gate 记录风险接受 |
 | `RISK-ROOM-DELETE-CROSS-REPO` | 房间删除跨 C-08/C-10/C-09 | `RISK` | 半删除 | 同一 RDB 事务 + 端口；回滚测试 | T-09 集成测试 |
 | `RISK-HOME-PERF` | 大列表/光核性能 | `RISK`（NFR 4.3） | 卡顿 | `LazyForEach`/分页；TEST-001 口径 | 设备测量 |
 | `RISK-I18N-DUAL-STORE` | 双存储文案漂移 | `RISK` | 中英混排 | 一个 key 一处；CHK-01/02/09；运行时同时切换 | T-10/T-19 |
@@ -5767,6 +5914,8 @@ CQG-Txx
 | `RISK-JOIN-RESUME` | 成员接受后、档案创建前进程终止/离开页面 | `RISK`（Low） | 用户已有成员/家庭行但无可用档案；join session 不持久 | `COMPLETED` 的持久事实是“成员 ACTIVE + `LocalProfile` + active family”，以持久状态判断已加入；重启后由 SessionGate 解锁；T-17/T-18 提供“完成本机档案”恢复入口；不得回退成员/家庭 | T-17/T-18 页面联调；若需持久 join 会话另走 Change Impact |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
+
+> `TRUST-T18-01`（`RoomService` 缺省 actor 的 v1 local-admin trust）是已声明的组合边界，不是缺口；见 §23.7。`GAP-T18-01` 是未关闭的上游 RBAC 缺口，不得用 `TRUST-T18-01` 解释为已授权。
 
 ### 22.2 需固件协同
 
@@ -5987,6 +6136,37 @@ export interface DeviceStatePort {
 - **状态**：`IMPLEMENTED / REVIEWED（条件式）`（T-13 @ `69d5374`；`artifacts/70-review/t13-review-b.md` 给出代码级条件式 PASS；R2-01 已按 `EXT-DES-B-26` 登记，R2-02 已同步 ADR-003 §5.4；其余 R2-03..R2-05/F-14..F-18 与设备项仍按原报告跟踪。CQG-T13 记录、C-12/C-13 `STABLE`、Integration/Stage Gate 与设备 PASS 不由本文宣告）。
 - **Change Impact（T-13 裁定同步，2026-10-17）**：F-02/F-07 需要 C-13 实现调用 `importFamily` 并按 canonical 字节记账；C-08 需落地 `EXT-DES-B-25`。这两项在修复并复审前，C-08/C-13 的实现证据为 `UNVERIFIED`；不得把旧 host 469/469 当作本裁定的闭合证据。F-04 仅为措辞/注释修正；F-08 的 C-12 当前实现已 fail-closed，C-22/UI 按 §11.3.1 派生能力。其余组件不受影响；不使无关组件 `STALE`。**T-13 复审收尾（2026-10-17）**：修复与复审已完成（`t13-review-b.md`），上述“修复并复审前”的 `UNVERIFIED` 仅指裁定当时的旧证据；本轮不改变该裁定的组件影响面。
 
+### 23.7 T-18 实现增量登记（2026-10-18；R2-03/F-06）
+
+> **性质**：本节登记 T-18 已实现的公共签名/端口增量，**不修改 G-007 的 23 项清单**，不改变任何已冻结方法名/参数顺序/返回类型/错误语义。`EXT-DES-B-28..32` 为新增登记；`GAP-T18-01`/`TRUST-T18-01` 为边界/缺口记录，不是扩展批准。完整签名以 §4.1.3/§6.1.4/§11.1.2/§11.1.3/§12.1.1/§17.1 与 DES-A §27.5 为准。
+
+| ID | 组件 | 类型 | 增量 | 兼容性/行为 | 证据/消费者 |
+|---|---|---|---|---|---|
+| `EXT-DES-B-28` | C-09 | 增量方法 + 服务级端口 | `RoomActorLookupPort`；`RoomService` 构造器新增可选 `actors`（既有 `gate`/`deviceNames` 一并登记为当前签名）；8 个变更方法可选 `actorMemberId` | 提供 actor 时必须 ACTIVE+ADMIN，否则 `AUTH_RBAC_DENIED`；缺省 actor 为 v1 local-admin trust；旧调用源码兼容；生产 `RoomViewModel` 始终传 active memberId | `T18_C09_roomMutationsRequireAdminActorMatrix`、`T18_RoomViewModel_passesActiveMemberIdToServiceActorChecks`；C-22/C-25/C-26 |
+| `EXT-DES-B-29` | C-19 | 增量方法 + 新请求类型 | `IBleProvisioningClient.scanWifiAccessPoints(request, listener, cancellation?)`；`BleWifiScanRequest` | 新方法；`provision()` 不变；C-19/C-20 已实现；预览与提交各一次 BLE 会话；不应用 Wi-Fi 凭据；PoP 用后清零 | `T18_C19_scanWifiAccessPointsHandshakesWithoutApplyingCredentials`；C-23/C-27；DES-A §27.5 |
+| `EXT-DES-B-30` | C-23 | 增量方法/可选能力 | `prepareWifi(pop, expectedGatewayId?)`；`submit(..., expectedGatewayId?)`；`openSettings()`；`PermissionPort.openSettings?`；`SettingsViewModel.probeManualAddress` ADMIN-only 语义补充（无签名变化） | 可选参数/方法；`expectedGatewayId` 在页面与 C-19 双重校验；`ROTATE_SECRET`/`RECONFIGURE` 缺目标即 blocked；`openSettings` 缺失时 `CONFIGURATION_ERROR`；非 ADMIN `probeManualAddress` → `AUTH_RBAC_DENIED` | `T18_provisioningSeamsAndRecoveryAreWired`、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`、`T18_R2_provisioningCancelStaysAvailableWhileBusy`、`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`、`T16_Settings_manualAddressProbeAcceptsBoundAndRejectsLoopback`（ADMIN 正路径；非 ADMIN 负例待补/T-19）；C-27 |
+| `EXT-DES-B-31` | C-28 | UI seam | `PageVmFactoryPort`；`AppContext.pageVms`；`AppContext.subscribeActiveFamily`；`NavigationService.openRoomsWithHighlight/consumeRoomsHighlight`；`OnboardingPort`/`OnboardingService` | 均为文档此前未登记的接口/getter/方法（本次登记）；页面经显式 props；无全局单例/服务定位器；不改变既有 `AppContext`/`AppCompositionRoot` 方法 | `T18_pagesAndComponentsRespectLayeringGuards`、`T18_nonAdminRoomPoolAndGatewayEntriesAreHidden`、`T18_R2_settingsReprovisionRequiresAdmin`、`T18_R2_doorExplicitLinkButtonReopensGuide`；C-25/C-26/C-27 |
+| `EXT-DES-B-32` | C-11 | 增量端口/构造依赖 | `SceneExecutionAuthorizationPort`；`SceneService`/`SceneViewModel` 可选 `authorization`；`SceneViewModel.canExecuteScene()` | 新端口；缺失或 deny → `AUTH_RBAC_DENIED`（fail-closed）；`run`/CRUD 既有签名不变 | `T18_C11_sceneRunRbacMatrixAdminMemberGuestAndMissingPolicy`、`T18_SceneViewModel_capabilityAndRunRbacMatrix`、`T18_scenePageAndServiceUseTheSameRbacGate`；C-12/C-22 |
+
+> **同名 `PermissionPort` 冲突记录（T-18，不裁定）**：`EXT-DES-B-30` 只涉及 `viewmodel/ViewModelPorts.ets` 的 C-23 VM-facing `PermissionPort`（`ensure(): Promise<void>` + 可选 `openSettings?`）。C-28 §17.1.6 的 `PermissionPort`（`app/PermissionPolicy.ets`，`ensure(): Promise<PermissionResult>` + `check` + `openSettings` + `requiredForProvisioning`）保持原契约；`BleViewModelPermissionGate` 负责适配。两者同名不同接口，属已记录技术债，T-18 不做重命名/迁移；后续收敛走 Change Impact。
+
+**`TRUST-T18-01`（v1 边界，已声明）**：`RoomService.requireAdmin` 在 `actorMemberId === undefined` 时直接放行，沿用 C-08 `FamilyService.requireAdmin` 的 v1 local-admin trust；这是组合根/迁移/受控 host 调用约定，不是 UI 可触达的授权旁路。生产 `RoomViewModel` 通过 `RoomSessionPort` 始终传入 active memberId；任何新调用方必须传 actor，否则视为受控组合根并接受该边界。该边界不改变 `AUTH_RBAC_DENIED` 语义，也不改变 `FamilyRbac`。
+
+**`GAP-T18-01`（上游缺口，未关闭）**：`FamilyRepository.addGatewayToFamily(familyId, gatewayId)` 无 actor/RBAC 参数。T-18 的 `HomePage`/`ProfilePage` 入口隐藏、`SettingsPage.probeManualAddress` ADMIN 守卫与 R2-01 `RECONFIGURE` 的 `isAdmin()` 门均只是 UI 可用性措施，**不构成服务层授权**。该缺口由 C-22/C-09/C-15 跟踪；在关闭或由 Stage Gate 书面接受前，IG-3 不得宣称“网关管理服务层 RBAC 已闭合”。本登记不修改 C-08 冻结签名。
+
+> **D-12 范围边界（T-18，仅记录）**：本次唯一裁定覆盖 F-06 列出的 T-18 增量（`pages/**`→`app/PageVmFactory`；`components/**`→`viewmodel/core`；`UiMapping`→`service/ac/AcModels` + `DoorUiState` 预览；components→C-10/C-11/C-15 只读 DTO `import type`）。pages 既有的 `import type` C-08/C-09/C-11/C-15 公共 DTO（如 `FamilyMemberView`、`RoomDeletionPreview`、`ProvisioningProgress`、`CloudConfigView`）未在本次重新裁定；T-20 落地时按“公共只读 DTO”纳入文件级 allowlist，或另行 Change Impact，不得把本次解释为 pages 可 import 任意 service 实现。
+>
+> **后续可选重构建议（不执行）**：若未来要把 UI 类型迁到 `model/**`，建议最小集合为 `model/AcUiModels.ets`（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`）、`model/DoorUiModels.ets`（`DoorUiState`/`DoorStage`/`DoorLockState`）、`model/ControlUiModels.ets`（`ControlPhase`/`ControlUiState`/`DeviceFilter`/`DeviceFilterKind`），并同步 C-21/C-24 imports、收缩 §18.1 allowlist；该重构需独立 Change Impact，不在 T-18 执行。
+
+**Change Impact（2026-10-18）**：
+
+- **C-09/C-11/C-19/C-23/C-28**：契约文本与 T-18 实现对齐；均为可选参数/新方法/新接口，既有调用源码兼容；不回滚代码。C-19 的 `IBleProvisioningClient` 新方法为非可选接口成员：C-19 生产实现与 C-20 Mock 已实现；任何外部/测试 fake 必须补齐，否则编译失败。
+- **C-24/C-25/C-26/C-27**：消费上述增量；D-12 白名单扩展已登记（§0.9/§2.3/§18.1）；页面/组件无需改签名。`UiMapping`/`DeviceCards` 的 `service/ac/AcModels`（`AcViewState`）与 `viewmodel/core`（含 `DoorUiState` 预览构造）import 仅在 §18.1 的文件/符号级 allowlist 内合法。
+- **C-08**：`GAP-T18-01` 保留；C-08 冻结签名不修改；C-22/C-09/C-15 跟踪。`TRUST-T18-01` 的 v1 缺省 actor 边界继续有效，但不得扩大为“生产 UI 可不传 actor”。
+- **T-20**：`check_layering.py` 必须按 §2.3/§18.1 的 T-18 D-12 例外实现，并有合法/违规 fixture 自测；在落地前，评审执行等价静态扫描并记录命令/结果（T-17 同款要求）。
+- **T-19**：真实 BLE/权限弹窗/AP 扫描/绑定探针/LAN/云/TLS、设备/视觉/动效/触感/读屏仍 `BLOCKED`；R2-03 只关闭“契约未登记”项，不关闭设备项，也不宣告 IG-3/Stage Gate。
+- **冲突记录**：`t18-fix-report.md` §1.2 的“见 §3.1”引用失效（R2-08）不在本文修复；F-06 的“把 UI 类型迁移到 `model/**`”仅作为后续可选重构记录，本次不与白名单扩展并行。
+
 ---
 
 ## 24. 追溯、任务消费索引与自检
@@ -6022,7 +6202,7 @@ export interface DeviceStatePort {
 | T-15 | §10/§19.1/§21 | `DES-B-C21-*` | Home/Device/Climate/Door VM |
 | T-16 | §11/§12/§19.3/§19.4 | `DES-B-C22..C23-*` | Family/Room/Scene/Provisioning/Settings VM |
 | T-17 | §2.1/§2.3/§13/§14/§17/§18 | `DES-B-C24/C25/C28-*` | UI 壳/页面/组合根/权限（U-01/F-09 见 §0.8） |
-| T-18 | §15/§16/§2.1/§2.3/§0.8 | `DES-B-C26/C27-*` | 二级页面/设置/关于/Profile；按 §0.8 使用显式 props DI |
+| T-18 | §15/§16/§2.1/§2.3/§0.8/§0.9/§12.1.1/§17.1/§23.7 | `DES-B-C26/C27-*`；`EXT-DES-B-28..32` | 二级页面/设置/关于/Profile；按 §0.8 使用显式 props DI；T-18 增量登记见 §0.9/§23.7 |
 | T-19 | §20/§21/§22 | 全部 | 测试报告/覆盖矩阵 |
 | T-20 | §22/§24.3 | 全部 | 独立评审 |
 

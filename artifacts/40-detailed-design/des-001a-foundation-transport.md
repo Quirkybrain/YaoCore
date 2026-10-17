@@ -3,10 +3,10 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；冻结签名未变更）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；**T-18 裁定同步（2026-10-18）见 §0.7/§27.5**；冻结签名未变更）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
-- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-19 `scanWifiAccessPoints`/`BleWifiScanRequest`（`EXT-DES-B-29`）与 C-09/C-11/C-23/C-28 增量边界；见 §0.7/§27.5；不改变冻结签名与 G-004 语义。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -122,6 +122,19 @@
 | **F-08 GUEST 场景权限** | v1 裁定：`canExecuteScene(session)` 对 GUEST 一律 fail-closed（`RBAC_DENIED`），因为冻结签名没有场景/房间上下文且场景可跨房间、可含门锁；GUEST 仅通过 `canControl(session, device, room)` 控制授权房间内设备。RBAC 矩阵据此修订；若未来支持 GUEST 场景，必须新增带动作上下文的 API 并走 Change Impact。 | §12.1、§12.3；DES-B §11.1/§11.3 |
 
 > **不作为**：本节不改变 `FamilyJoinSession`/`InviteService` 的冻结方法签名，不新增在线协议、服务器或 LAN GCM；F-01/F-03/F-05 的代码修复与其它 findings 由实现/测试任务按 `t13-review.md` 处理。
+
+### 0.7 T-18 裁定同步（2026-10-18）
+
+> **裁定人**：solution-architect（任务 `wp-078-t18-contracts`）。**输入**：`artifacts/70-review/t18-review-b.md`（R2-03/F-06）、`artifacts/50-implementation/t18-fix-report.md`、`artifacts/50-implementation/t18-fix2-report.md`。**边界**：只登记 T-18 实现中新增/扩展的公共签名与端口，不重写本文冻结签名，不改变 G-004 语义；实现代码不改。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **R2-03 C-19 additive seam** | `IBleProvisioningClient` 新增 `scanWifiAccessPoints(request: BleWifiScanRequest, listener, cancellation?): Promise<ReadonlyArray<WifiAp>>`；新增 `BleWifiScanRequest`。真实执行 permission→scan→connect→MTU/discovery→capability→Security1→identity→AP 扫描，随后断链并清零 PoP；不应用 Wi-Fi 凭据；`provision()` 仍是权威流程。预览与 `provision()` 各建一次 BLE 会话（两次 Security1），已记录为代价。 | §16.1.1 注记；§27.5 `EXT-DES-B-29` |
+| **R2-03 其他组件增量** | C-09 `RoomService` actor/RBAC、C-11 场景授权、C-23 `prepareWifi`/`submit(expectedGatewayId?)`/`PermissionPort.openSettings?`、C-28 `PageVmFactoryPort` 等 UI seam 均为 DES-B 拥有的增量；本文只登记共享类型边界，不重复其完整签名。 | §27.5；DES-B §0.9/§23.7 |
+| **F-06 D-12** | UI 分层采用“白名单扩展”，不做 UI 类型迁移；详见 DES-B §0.9/§2.3/§18.1。本文不新增 DES-A 类型。 | DES-B §0.9/§2.3/§18.1 |
+
+- **不改变**：DES-A 冻结方法名/参数顺序/返回类型/错误码语义；`BleProvisioningRequest`/`BleProvisioningResult`/`DeviceState`/`GatewayRoute` 字段；G-004 的 canonical/HMAC/ACK/安全语义。
+- **证据**：T-18 `a9d0bb5` 复审（`t18-review-b.md`）与 `74e9157` R2 修复；host 690/690、clean assembleHap、codelinter 0 error、i18n blocking=0 由实现报告记录；本节不做设备/BLE PASS 声明。
 
 ---
 
@@ -3889,6 +3902,8 @@ export interface IBleProvisioningClient {
 }
 ```
 
+> **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03、`t18-fix-report.md` F-07）**：`IBleProvisioningClient` 的 T-18 增量方法 `scanWifiAccessPoints(...)` 与 `BleWifiScanRequest` 登记于 §27.5（`EXT-DES-B-29`）。上列既有方法签名不变；`provision()` 仍是权威聚合流程；预览扫描不得下发 Wi-Fi 凭据。
+
 #### 16.1.2 服务
 
 ```ts
@@ -3908,6 +3923,8 @@ export class BleProvisioningService implements IBleProvisioningClient {
   cancel(): Promise<void>;
 }
 ```
+
+> **T-18 裁定同步（2026-10-18；R2-03）**：`BleProvisioningService` 另外实现 `scanWifiAccessPoints`（§27.5），用于 C-23 向导 Step2→3 的真实 AP 预览；不改变上列 `provision()` 签名/状态机。该预览与 `provision()` 各建一次 BLE 会话，代价已登记；若后续复用会话，走 Change Impact。
 
 #### 16.1.3 BLE 传输端口
 
@@ -5430,6 +5447,54 @@ G-007 同一裁定批准的 DES-B §23.4 共 **35 个新 code**，全部为新�
 - §28.1 的任务映射不变；T-09/T-10/T-14..T-18 在 CQG 中同时引用 DES-A 契约 ID、本节 `EXT-DES-B-*` 与 DES-B 对应章节。
 - 扩展文件落点遵守 §2.1：端口在 `contracts/**`（port-only），模型在 `model/**`，i18n 键构造在 `service/i18n/**`；`contracts/**` 不得 import 实现。
 - 后续任何新扩展重复同一路径：DES-B 侧登记 → 对应 Gate/Change Impact 裁定 → 本节更新；不得直接改写 DES-A 冻结签名。
+- **T-18 增量**见 §27.5（`EXT-DES-B-28..32`）；本节 23 项清单不因 T-18 追加而改写。
+
+### 27.5 T-18 扩展记录（2026-10-18；R2-03/F-06）
+
+> **性质**：T-18 实现增量的共享类型边界登记；不是新的 G-007 裁定，不修改 §27.1/§27.2 与 §27.4.1/§27.4.2 的冻结清单。完整签名与行为以 DES-B §4.1.3/§6.1.4/§11.1.2/§11.1.3/§12.1.1/§17.1/§23.7 为准。`t18-review-b.md` R2-03 要求 C-09/C-19/C-23 的公共签名/端口登记与 Change Impact，本节即 DES-A 侧记录。
+
+| ID | 类型 | 扩展内容 | DES-B 位置 | 对 DES-A 的影响 |
+|---|---|---|---|---|
+| `EXT-DES-B-28` | 增量方法 + 服务级端口 | C-09 `RoomService` 8 个变更方法可选 `actorMemberId`；`RoomActorLookupPort`；构造器可选 `actors` | §4.1.3/§23.7 | C-09 属 DES-B 拥有；不改变 DES-A §11.1 `FamilyRepository` 或 §5.1.7 `Room`/`FamilyMember` 形状；`AUTH_RBAC_DENIED` 语义不变 |
+| `EXT-DES-B-29` | 增量方法 + 新类型 | C-19 `IBleProvisioningClient.scanWifiAccessPoints`；`BleWifiScanRequest` | §12.1.1/§16.1.2/§23.7 | **本文 §16.1.1 接口新增一个非可选方法**；既有方法/`BleProvisioningRequest`/`BleProvisioningResult` 不变；C-19/C-20 实现方必须补齐；不改变 §16.7/§16.9 状态机与 §18 canonical/HMAC/ACK |
+| `EXT-DES-B-30` | 增量方法/可选能力 | C-23 `prepareWifi`、`submit(..., expectedGatewayId?)`、`openSettings()`；`PermissionPort.openSettings?` | §12.1.1/§16.1.2/§23.7 | C-23 属 DES-B 拥有；`BleProvisioningRequest.expectedGatewayId` 字段本已存在（§16.1.1），不新增字段；无新错误码；`PermissionPort` 属 `EXT-DES-B-22` 增量，不改变 §16 权限错误语义。**同名 `PermissionPort` 冲突（C-23 VM-facing vs C-28 §17.1.6）见 DES-B §12.1.1/§23.7，仅记录不裁定** |
+| `EXT-DES-B-31` | UI seam | C-28 `PageVmFactoryPort`、`AppContext.pageVms`/`subscribeActiveFamily`、`NavigationService.openRoomsWithHighlight/consumeRoomsHighlight`、`OnboardingPort`/`OnboardingService` | §17.1.1/§17.1.2/§17.1.3/§23.7 | 纯 app/presentation 增量，不进入 DES-A 共享类型面；不改变 §2.2 依赖方向与 §14/§16 传输契约 |
+| `EXT-DES-B-32` | 增量端口/构造依赖 | C-11 `SceneExecutionAuthorizationPort`；`SceneService`/`SceneViewModel` 可选 `authorization`；`SceneViewModel.canExecuteScene()` | §6.1.4/§11.1.3/§23.7 | C-11 属 DES-B 拥有；C-12 `canExecuteScene` 策略面不变；不改变 DES-A §13 邀请/认证或 §18 ACK 判定 |
+
+**C-19 增量签名（登记用；完整行为见 DES-B §12.1.1/§16.1.2/§23.7）**：
+
+```ts
+export class BleWifiScanRequest {
+  readonly pop: Uint8Array;                       // caller-owned；服务复制并清零
+  readonly device?: BleProvisioningDevice;
+  readonly expectedGatewayId?: string;
+  constructor(pop: Uint8Array, device?: BleProvisioningDevice,
+              expectedGatewayId?: string);
+}
+
+export interface IBleProvisioningClient {
+  // ...既有 startScan/stopScan/provision/cancel 不变...
+  scanWifiAccessPoints(request: BleWifiScanRequest,
+                       listener: BleProvisioningProgressListener,
+                       cancellation?: CancellationToken): Promise<ReadonlyArray<WifiAp>>;
+}
+```
+
+- `BleWifiScanRequest` 构造约束：`pop` 长度 1..64，否则 `PROTOCOL_VALUE_OUT_OF_RANGE`；`expectedGatewayId` 非空、长度 ≤ `MAX_DEVICE_ID_LENGTH`、不含 `:`、匹配 `DEVICE_ID_PATTERN`，否则 `PROTOCOL_INVALID_IDENTIFIER`。这些均沿用既有错误码，不新增错误语义。
+- `scanWifiAccessPoints` 真实执行 permission→scan→connect→MTU/discovery→capability→Security1→identity→AP 扫描，随后断链并清零 PoP；**不**下发 SSID/Wi-Fi 密码。`provision()` 仍是权威聚合流程；预览结果不得当绑定成功。
+- **双会话代价**：Step2/3 的 `prepareWifi` 预览与 Step4 `submit` 各建一次 BLE 会话（两次 Security1）。这是为避免改动冻结聚合状态机接受的折中；若后续 C-19/C-23 支持保留会话，必须走 Change Impact，更新本节与 DES-B §23.7。
+
+**`GAP-T18-01`（上游缺口，未关闭）**：`FamilyRepository.addGatewayToFamily(familyId, gatewayId)` 无 actor/RBAC 参数；C-08 冻结签名不修改，由 C-22/C-09/C-15 跟踪。T-18 的 UI ADMIN 门（R2-01）不能替代服务层授权；在缺口关闭或由 Stage Gate 书面接受前，IG-3 不得宣称网关管理服务层 RBAC 已闭合。
+
+**`TRUST-T18-01`（v1 边界，已声明）**：`RoomService` 在 `actorMemberId` 缺省时沿用 C-08 `FamilyService.requireAdmin` 的 v1 local-admin trust；生产 `RoomViewModel` 始终传入 active memberId。该边界不改变 `AUTH_RBAC_DENIED` 语义，也不使 UI 隐藏成为授权。
+
+**Change Impact（2026-10-18）**：
+
+1. `IBleProvisioningClient` 新方法为非可选接口成员：C-19 `BleProvisioningService` 与 C-20 `MockBleProvisioningClient` 已实现；其他 fake/适配器必须补齐，否则编译失败。这是本次唯一的“实现方需改代码”的兼容性影响。
+2. C-09/C-11/C-23/C-28 的增量均为可选参数/新方法/新接口，既有调用源码兼容；T-18 代码证据继续有效，不回滚。
+3. C-08 `GAP-T18-01` 保留；C-22/C-09/C-15 跟踪；不使无关组件 `STALE`。
+4. T-20 `check_layering.py` 必须按 DES-B §2.3/§18.1 的 T-18 D-12 例外实现；T-19 设备/BLE 仍 `BLOCKED`。
+5. 下游文档若仍引用旧 `IBleProvisioningClient` 四方法接口或旧 C-23 `submit` 四参数签名，标 `UNVERIFIED` 并按本节/DES-B §23.7 更新；不得把旧文本当实现依据。
 
 ---
 
