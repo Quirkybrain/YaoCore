@@ -1,39 +1,57 @@
 /*
  * YaoCore C-15 production cloud configuration store.
  * Producer: agent:implementation-engineer | Task: T-14 / wp-055-cloud
- * Contract: DES-B §8.1.3, §8.5
+ * Contract: DES-B §2.7, §8.1.3, §8.5
  *
- * Single active cloud config row (`id='active'`). The token is never stored
- * here; only `accessTokenAlias` is persisted (CB §7.1).
+ * Single active cloud config row. The v4 `cloud_config` schema is owned by
+ * T-09 `DomainMigrations` (singleton_id INTEGER PRIMARY KEY CHECK=1,
+ * updated_at TEXT NOT NULL); this store never creates or alters the table.
+ * The token is never stored here; only `accessTokenAlias` is persisted
+ * (CB §7.1).
  */
 import { AppErrors } from '../../common/types/AppError';
+import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
+import type { ClockPort } from '../../common/types/Ports';
 import { CloudConfig } from '../../model/FamilyModels';
 import type { RdbRow, RdbStore } from '../storage/RdbStore';
 import type { CloudConfigStore } from './CloudPorts';
 
 const TABLE: string = 'cloud_config';
-const ACTIVE_ID: string = 'active';
+const SINGLETON_ID: number = 1;
+const COLUMNS: string = 'singleton_id, endpoint, project_id, device_id, ' +
+  'access_token_alias, shadow_endpoint, updated_at';
 
 export class RdbCloudConfigStore implements CloudConfigStore {
   private readonly rdb: RdbStore;
+  private readonly clock: ClockPort | undefined;
 
-  constructor(rdb: RdbStore) {
+  /**
+   * `clock` should be injected by the composition root so `updated_at` is
+   * deterministic and shares the application time source. It is optional only
+   * to keep the pre-existing device skeleton construction compiling.
+   */
+  constructor(rdb: RdbStore, clock?: ClockPort) {
     this.rdb = rdb;
+    this.clock = clock;
   }
 
+  /**
+   * Verify that the v4 migration created `cloud_config` with the frozen
+   * columns. This method never creates or mutates the table (F-01): the schema
+   * belongs to `DomainMigrations` v4 and must run before this store opens.
+   */
   async initialize(): Promise<void> {
-    await this.rdb.execute('CREATE TABLE IF NOT EXISTS ' + TABLE + ' (' +
-      'id TEXT PRIMARY KEY NOT NULL, ' +
-      'endpoint TEXT NOT NULL, ' +
-      'project_id TEXT NOT NULL, ' +
-      'device_id TEXT NOT NULL, ' +
-      'access_token_alias TEXT NOT NULL, ' +
-      'shadow_endpoint TEXT)');
+    try {
+      await this.rdb.query('SELECT ' + COLUMNS + ' FROM ' + TABLE + ' LIMIT 0');
+    } catch (error) {
+      throw AppErrors.of('STORAGE_MIGRATION_FAILED', []);
+    }
   }
 
   async load(): Promise<CloudConfig | undefined> {
     const rows = await this.rdb.query('SELECT endpoint, project_id, device_id, ' +
-      'access_token_alias, shadow_endpoint FROM ' + TABLE + ' WHERE id = ?', [ACTIVE_ID]);
+      'access_token_alias, shadow_endpoint FROM ' + TABLE + ' WHERE singleton_id = ?',
+      [SINGLETON_ID]);
     if (rows.length === 0) {
       return undefined;
     }
@@ -48,15 +66,21 @@ export class RdbCloudConfigStore implements CloudConfigStore {
   }
 
   async save(config: CloudConfig): Promise<void> {
-    await this.rdb.execute('INSERT OR REPLACE INTO ' + TABLE + ' (id, endpoint, project_id, ' +
-      'device_id, access_token_alias, shadow_endpoint) VALUES (?, ?, ?, ?, ?, ?)', [
-      ACTIVE_ID, config.endpoint, config.projectId, config.deviceId,
-      config.accessTokenAlias, config.shadowEndpoint === undefined ? null : config.shadowEndpoint
+    const updatedAt = DateTimeUtil.formatUtcCompact(this.nowMs());
+    await this.rdb.execute('INSERT OR REPLACE INTO ' + TABLE + ' (' + COLUMNS + ') ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?)', [
+      SINGLETON_ID, config.endpoint, config.projectId, config.deviceId,
+      config.accessTokenAlias, config.shadowEndpoint === undefined ? null : config.shadowEndpoint,
+      updatedAt
     ]);
   }
 
   async clear(): Promise<void> {
-    await this.rdb.execute('DELETE FROM ' + TABLE + ' WHERE id = ?', [ACTIVE_ID]);
+    await this.rdb.execute('DELETE FROM ' + TABLE + ' WHERE singleton_id = ?', [SINGLETON_ID]);
+  }
+
+  private nowMs(): number {
+    return this.clock === undefined ? Date.now() : this.clock.nowMs();
   }
 
   private static required(row: RdbRow, field: string): string {

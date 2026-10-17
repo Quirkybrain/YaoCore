@@ -5,7 +5,7 @@
 - **Task**: T-14 / `wp-055-cloud`（task 分支 `task/wp-055-cloud`，父分支 `feat/yaocore-app`）
 - **Base commit**: `de1b9b60eb4839ee78c2298c2834650a5628279d`
 - **Workflow**: STANDARD / GATED_AUTO
-- **Status**: 实现与本地验证完成，待独立质量评审；不自我批准。
+- **Status**: 实现与本地验证完成，待独立质量评审；不自我批准。T-14 评审修复轮（`wp-058-fix-t14`）的处置与新增证据见 [`t14-fix-report.md`](t14-fix-report.md)；本文件 §3 的 497 条计数与日志属于 `039adec` revision 的历史证据。
 - **上游**:
   - DES-001B §8（C-15）/ §9（C-16）@ `8d094bb5…`
   - DES-001A（传输/安全/错误/端口）@ `3a02ecbf…`
@@ -209,8 +209,15 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --
    响应体仅用于 `command_id` 与诊断，不构成成功判定。若真实 IoTDA 语义不同，需要调整映射。
 4. **PB-02 非冻结**：`DeviceInventoryJson` 采用 §8.4 候选字段与 `PROPOSAL-PB02-1`
    的诊断口径；未升级为冻结契约。真实固件 schema 确认后需按 Change Impact 重写 parser/测试。
-5. **`RdbCloudConfigStore` 建表**：使用 `CREATE TABLE IF NOT EXISTS cloud_config`，
-   尚未纳入 C-06 迁移注册表；C-28 组合根或存储迁移任务应将其纳入版本化迁移。
+5. **`RdbCloudConfigStore` 与 v4 `cloud_config` 对齐**：直接消费 T-09 `DomainMigrations`
+   已冻结的 v4 `cloud_config`（`singleton_id INTEGER PRIMARY KEY CHECK (singleton_id=1)` +
+   `updated_at TEXT NOT NULL`），由 `ClockPort`（缺省 `Date.now()`，组合根应显式注入）
+   写入 `updated_at`；`initialize()` 只校验 schema、不建表，`load/save/clear` 均以
+   `singleton_id=1` 定位单例行。C-28 组合根必须按 DES-B §2.7 先执行 v1..v4 迁移再构造
+   本存储。真实 v4 迁移库上的 `save/load/clear` 由 host 测试
+   `C15_rdbConfigStore_v4MigrationInterop` 覆盖，未迁移库 fail-closed 由
+   `C15_rdbConfigStore_neverCreatesItsOwnSchema` 覆盖（T-14 修复轮，见 `t14-fix-report.md`
+   F-01）。
 6. **`brand.*` i18n 键**：适配器只返回键（符合契约），资源文件当前缺失；不在本任务写范围。
 7. **设备/真实网络未验证**：按 TEST-001 分类为 `BLOCKED`/`UNAVAILABLE`，不得视为发布证据。
 

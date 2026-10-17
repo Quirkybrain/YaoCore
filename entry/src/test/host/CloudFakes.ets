@@ -14,13 +14,14 @@ import type {
   RandomPort
 } from '../../main/ets/common/types/Ports';
 import { CloudConfig } from '../../main/ets/model/FamilyModels';
+import { HttpResponse } from '../../main/ets/service/gateway/GatewayTransportPorts';
 import type {
   HttpRequest,
-  HttpResponse,
   HttpTransport,
   TlsPolicy
 } from '../../main/ets/service/gateway/GatewayTransportPorts';
 import type {
+  CloudActiveScopePort,
   CloudConfigStore,
   CloudCredentialPort,
   TimerPort
@@ -122,6 +123,35 @@ export class InMemoryCloudCredentials implements CloudCredentialPort {
 
   async updatedAt(): Promise<string | undefined> {
     return this.updatedAtValue;
+  }
+}
+
+/**
+ * v1 active cloud scope fake (F-06). `active` is the assembled active gateway;
+ * `bound` lists gateways with persisted credentials. A mismatched or unbound
+ * command gateway must be rejected before seq/sign/HTTP.
+ */
+export class FakeCloudActiveScope implements CloudActiveScopePort {
+  readonly active: string | undefined;
+  private readonly bound: Map<string, boolean> = new Map<string, boolean>();
+  activeChecks: number = 0;
+  boundChecks: number = 0;
+
+  constructor(active: string | undefined, bound: ReadonlyArray<string>) {
+    this.active = active;
+    for (let index = 0; index < bound.length; index++) {
+      this.bound.set(bound[index], true);
+    }
+  }
+
+  async activeGatewayId(): Promise<string | undefined> {
+    this.activeChecks++;
+    return this.active;
+  }
+
+  async isGatewayBound(gatewayId: string): Promise<boolean> {
+    this.boundChecks++;
+    return this.bound.get(gatewayId) === true;
   }
 }
 

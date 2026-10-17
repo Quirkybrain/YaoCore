@@ -10,7 +10,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, createHmac } from 'node:crypto';
 
-import { AppError } from '../../main/ets/common/types/AppError.ets';
+import { AppError, AppErrors } from '../../main/ets/common/types/AppError.ets';
 import { HttpHeaders } from '../../main/ets/common/types/HttpHeaders.ets';
 import { DeviceAction } from '../../main/ets/common/constants/DeviceConstants.ets';
 import { StorageConstants } from '../../main/ets/common/constants/StorageConstants.ets';
@@ -31,6 +31,7 @@ import {
   RecordingMetrics,
 } from './TransportFakes.ets';
 import {
+  FakeCloudActiveScope,
   FakeCloudClock,
   FixedRandom,
   ImmediateCloudTimer,
@@ -38,6 +39,8 @@ import {
   InMemoryCloudCredentials,
   ScriptedCloudTransport,
 } from './CloudFakes.ets';
+import { FixedClock, InMemoryRdbStore } from '../storage/FakeStores.ets';
+import { DomainHarness } from '../domain/DomainHarness.ets';
 import {
   CloudCommandClient,
   CloudSendRetryPolicy,
@@ -51,6 +54,7 @@ import {
 } from '../../main/ets/service/cloud/CloudModels.ets';
 import { CloudCompletionEvaluator } from '../../main/ets/service/cloud/CloudCompletionEvaluator.ets';
 import { CloudConfigValidator } from '../../main/ets/service/cloud/CloudConfigValidator.ets';
+import { RdbCloudConfigStore } from '../../main/ets/service/cloud/CloudConfigStore.ets';
 import { CloudService } from '../../main/ets/service/cloud/CloudService.ets';
 import { DeviceInventoryParser } from '../../main/ets/service/cloud/DeviceInventoryParser.ets';
 import { ShadowReader } from '../../main/ets/service/cloud/ShadowReader.ets';
@@ -140,15 +144,18 @@ async function harness(options = {}) {
     (options.token === undefined ? TOKEN : options.token), '20261017T075000Z');
   const transport = new ScriptedCloudTransport();
   const gatewayCredentials = new InMemoryCredentials();
-  gatewayCredentials.set(GATEWAY, new Uint8Array(SECRET));
+  if (options.gatewaySecret !== null) {
+    gatewayCredentials.set(GATEWAY, new Uint8Array(SECRET));
+  }
   const sequences = new InMemorySequences();
   const logger = new RecordingLogger();
   const metrics = new RecordingMetrics();
   const crypto = new HostCrypto();
   const retryPolicy = options.retryPolicy === undefined ? new CloudSendRetryPolicy(0, 0) :
     options.retryPolicy;
+  const scope = options.scope === undefined ? undefined : options.scope;
   const client = new CloudCommandClient(transport, configs, credentials, gatewayCredentials,
-    sequences, crypto, clock, new FixedRandom(NONCE), logger, retryPolicy);
+    sequences, crypto, clock, new FixedRandom(NONCE), logger, retryPolicy, scope);
   const shadowReader = new ShadowReader(transport, configs, credentials, crypto, clock, logger);
   const policy = options.policy === undefined ? CloudCompletionPolicy.defaults() :
     options.policy;
@@ -157,7 +164,7 @@ async function harness(options = {}) {
   const service = new CloudService(configs, credentials, client, shadowReader, evaluator,
     clock, timer, logger, metrics);
   return { clock, configs, credentials, transport, gatewayCredentials, sequences, logger,
-    metrics, crypto, client, shadowReader, evaluator, timer, service, policy };
+    metrics, crypto, client, shadowReader, evaluator, timer, service, policy, scope };
 }
 
 async function readShadow(env, properties, eventTime = NOW_TEXT) {
@@ -446,7 +453,8 @@ test('C15_completion_builtInDoubleMatchStaleAndVerification', async () => {
     DeviceAction.TURN_ON, undefined, REQUEST_ID, 7, NOW);
   const gatewayVerdict = env.evaluator.evaluate(gateway, fresh);
   assert.equal(gatewayVerdict.completion, CloudCompletion.UNSUPPORTED);
-  assert.equal(gatewayVerdict.error.code, 'CLOUD_INVENTORY_UNSUPPORTED');
+  assert.equal(gatewayVerdict.reason, 'GATEWAY_NOT_SUPPORTED');
+  assert.equal(gatewayVerdict.error.code, 'CLOUD_COMPLETION_UNSUPPORTED');
 
   const futureInit = new ShadowDeviceStateInit();
   futureInit.deviceId = 'Light_01';
@@ -532,6 +540,11 @@ test('C15_inventory_candidateMatchAndFailClosed', async () => {
   'CLOUD_INVENTORY_UNSUPPORTED');
   expectThrowsCode(() => DeviceInventoryParser.parse('x'.repeat(8193)),
     'CLOUD_INVENTORY_UNSUPPORTED');
+  expectThrowsCode(() => DeviceInventoryParser.parse(JSON.stringify({ device_id: 'MODULE_01' })),
+    'CLOUD_INVENTORY_UNSUPPORTED');
+  expectThrowsCode(() => DeviceInventoryParser.parse(JSON.stringify([inventoryEntry({
+    event_time: '2026-10-17T08:00:00Z',
+  })])), 'CLOUD_INVENTORY_UNSUPPORTED');
 });
 
 test('C15_service_configTokenStateAndTestConnection', async () => {
@@ -555,11 +568,13 @@ test('C15_service_configTokenStateAndTestConnection', async () => {
   assert.equal(tested.valid, true);
   assert.equal((await env.service.getState()).state, CloudTransportState.CONFIGURED);
 
+  // F-03: a 401 probe records the transient token failure (no token rewrite).
   env.transport.enqueue(jsonResponse(401, {}));
   const failed = await env.service.testConnection();
   assert.equal(failed.valid, false);
   assert.equal(failed.errors[0].code, 'CLOUD_TOKEN_EXPIRED');
-  assert.equal((await env.service.getState()).state, CloudTransportState.CONFIGURED);
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_EXPIRED);
+  assert.equal(env.credentials.token, TOKEN);
 
   env.transport.enqueue(jsonResponse(401, {}));
   await expectCode(() => env.service.send(command()), 'CLOUD_TOKEN_EXPIRED');
@@ -647,4 +662,271 @@ test('C15_receiptSyntheticAndNoTokenLeakInDetails', async () => {
       assert.notEqual(field.value, TOKEN);
     }
   }
+});
+
+test('C15_rdbConfigStore_v4MigrationInterop', async () => {
+  // F-01: run the real v1..v4 migration chain (T-09 DomainMigrations owns the
+  // frozen v4 cloud_config DDL) before opening the store.
+  const h = new DomainHarness();
+  await h.setup();
+  assert.ok(h.rdb.tableNamesForTest().includes('cloud_config'));
+
+  const store = new RdbCloudConfigStore(h.rdb, h.clock);
+  await store.initialize(); // validate-only; never CREATE TABLE
+  await store.clear();
+  assert.equal(await store.load(), undefined);
+
+  await store.save(config());
+  const loaded = await store.load();
+  assert.ok(loaded !== undefined);
+  assert.equal(loaded.endpoint, 'https://iotda.example.com');
+  assert.equal(loaded.projectId, PROJECT);
+  assert.equal(loaded.deviceId, IOTDA_DEVICE);
+  assert.equal(loaded.accessTokenAlias, StorageConstants.ASSET_CLOUD_TOKEN);
+  assert.equal(loaded.shadowEndpoint, undefined);
+
+  const rows = await h.rdb.query('SELECT singleton_id, updated_at FROM cloud_config');
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].get('singleton_id'), 1);
+  assert.equal(rows[0].get('updated_at'), NOW_TEXT);
+
+  await store.clear();
+  assert.equal(await store.load(), undefined);
+});
+
+test('C15_rdbConfigStore_neverCreatesItsOwnSchema', async () => {
+  // F-01: on a database without the v4 migration the store must fail closed and
+  // must not create a divergent `cloud_config` table.
+  const rdb = new InMemoryRdbStore();
+  const store = new RdbCloudConfigStore(rdb, new FixedClock(NOW));
+  await expectCode(() => store.initialize(), 'STORAGE_MIGRATION_FAILED');
+  assert.deepEqual(rdb.tableNamesForTest(), []);
+  await expectCode(() => store.save(config()), 'STORAGE_RDB_ERROR');
+  assert.deepEqual(rdb.tableNamesForTest(), []);
+});
+
+test('C15_saveConfig_tokenFailureOnlyClearedByNewToken', async () => {
+  const env = await harness();
+  env.transport.enqueue(jsonResponse(401, {}));
+  await expectCode(() => env.service.send(command()), 'CLOUD_TOKEN_EXPIRED');
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_EXPIRED);
+
+  const oldToken = env.credentials.token;
+  const kept = await env.service.saveConfig(config());
+  assert.equal(kept.state, CloudTransportState.TOKEN_EXPIRED);
+  assert.equal(env.credentials.token, oldToken);
+
+  // A second read confirms the transient failure is not accidentally reset.
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_EXPIRED);
+
+  const updated = await env.service.saveConfig(config(), 'NEW-PUBLIC-TEST-TOKEN');
+  assert.equal(updated.state, CloudTransportState.CONFIGURED);
+  assert.equal(env.credentials.token, 'NEW-PUBLIC-TEST-TOKEN');
+
+  env.transport.enqueue(jsonResponse(403, {}));
+  await expectCode(() => env.service.send(command()), 'CLOUD_TOKEN_INVALID');
+  await env.service.saveConfig(config());
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_INVALID);
+
+  // Explicit clear is the other allowed reset path and lands on TOKEN_MISSING.
+  await env.service.saveConfig(config(), '');
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_MISSING);
+  assert.equal(env.credentials.token, undefined);
+});
+
+test('C15_testConnection_twoLayerHealth', async () => {
+  const env = await harness();
+  const events = [];
+  env.service.subscribe((event) => events.push(event));
+
+  env.transport.enqueue(jsonResponse(500, {}));
+  env.transport.enqueue(jsonResponse(500, {}));
+  await expectCode(() => env.service.send(command()), 'CLOUD_SERVICE_UNAVAILABLE');
+  await expectCode(() => env.service.send(command()), 'CLOUD_SERVICE_UNAVAILABLE');
+  assert.equal((await env.service.getState()).state, CloudTransportState.UNAVAILABLE);
+
+  const beforeSuccess = events.length;
+  env.transport.enqueue(jsonResponse(200, stateReport(FULL_FIXED())));
+  const tested = await env.service.testConnection();
+  assert.equal(tested.valid, true);
+  assert.equal((await env.service.getState()).state, CloudTransportState.CONFIGURED);
+  assert.equal(events.length, beforeSuccess + 1);
+
+  const saves = env.configs.saves;
+  const clears = env.configs.clears;
+  const puts = env.credentials.puts;
+  const removals = env.credentials.removals;
+  const beforeFailure = events.length;
+
+  // A manual probe failure is not a persistent network failure.
+  env.transport.enqueue(jsonResponse(500, {}));
+  const probeFailed = await env.service.testConnection();
+  assert.equal(probeFailed.valid, false);
+  assert.equal(probeFailed.errors[0].code, 'CLOUD_SERVICE_UNAVAILABLE');
+  assert.equal((await env.service.getState()).state, CloudTransportState.CONFIGURED);
+  assert.equal(events.length, beforeFailure);
+
+  // 401 records the transient token failure without rewriting the token.
+  env.transport.enqueue(jsonResponse(401, {}));
+  const probeExpired = await env.service.testConnection();
+  assert.equal(probeExpired.valid, false);
+  assert.equal(probeExpired.errors[0].code, 'CLOUD_TOKEN_EXPIRED');
+  assert.equal((await env.service.getState()).state, CloudTransportState.TOKEN_EXPIRED);
+  assert.equal(env.credentials.token, TOKEN);
+  assert.equal(events.length, beforeFailure + 1);
+
+  // The persistent layer is never written by testConnection.
+  assert.equal(env.configs.saves, saves);
+  assert.equal(env.configs.clears, clears);
+  assert.equal(env.credentials.puts, puts);
+  assert.equal(env.credentials.removals, removals);
+});
+
+test('C15_testConnection_preconditionsDoNotTouchNetwork', async () => {
+  const noTokenEnv = await harness({ token: null });
+  const noToken = await noTokenEnv.service.testConnection();
+  assert.equal(noToken.valid, false);
+  assert.equal(noToken.errors[0].code, 'CLOUD_TOKEN_MISSING');
+  assert.equal(noTokenEnv.transport.requests.length, 0);
+
+  const noConfigEnv = await harness({ config: null });
+  const noConfig = await noConfigEnv.service.testConnection();
+  assert.equal(noConfig.valid, false);
+  assert.equal(noConfig.errors[0].code, 'CLOUD_NOT_CONFIGURED');
+  assert.equal(noConfigEnv.transport.requests.length, 0);
+});
+
+test('C15_completion_reservedFixedNamesNeverUseInventory', async () => {
+  const env = await harness();
+  const shadow = await readShadow(env, {
+    ...FULL_FIXED(),
+    Light_01_Status: 'ON',
+    Light_01_Brightness: 68,
+    Light_01_LastRequestId: 'req-other-9',
+    Light_01_LastSeq: 9,
+    DeviceInventoryJson: JSON.stringify([
+      inventoryEntry({ device_id: 'Gateway' }),
+      inventoryEntry({ device_id: 'Sensor_01' }),
+      inventoryEntry({ device_id: 'Presence_01' }),
+      inventoryEntry({ device_id: 'Door_01' }),
+      inventoryEntry({ device_id: 'Light_01' }),
+      inventoryEntry({ device_id: 'AC_01' }),
+    ]),
+  });
+
+  const gateway = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, 'Gateway',
+    DeviceAction.TURN_ON, undefined, REQUEST_ID, 7, NOW), shadow);
+  assert.equal(gateway.completion, CloudCompletion.UNSUPPORTED);
+  assert.equal(gateway.reason, 'GATEWAY_NOT_SUPPORTED');
+  assert.equal(gateway.error.code, 'CLOUD_COMPLETION_UNSUPPORTED');
+
+  for (const target of ['Sensor_01', 'Presence_01']) {
+    const verdict = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, target,
+      DeviceAction.SET_TARGET_TEMPERATURE, 24, REQUEST_ID, 7, NOW), shadow);
+    assert.equal(verdict.completion, CloudCompletion.UNSUPPORTED);
+    assert.equal(verdict.reason, 'READ_ONLY_SENSOR');
+    assert.equal(verdict.error.code, 'CLOUD_COMPLETION_UNSUPPORTED');
+  }
+
+  // Fixed carriers are authoritative: a matching inventory entry alone never
+  // confirms Door_01/AC_01, and never overrides a mismatching Light_01 carrier.
+  const door = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, 'Door_01',
+    DeviceAction.OPEN, undefined, REQUEST_ID, 7, NOW), shadow);
+  assert.equal(door.completion, CloudCompletion.PENDING);
+  const ac = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, 'AC_01',
+    DeviceAction.SET_MODE, 'COOL', REQUEST_ID, 7, NOW), shadow);
+  assert.equal(ac.completion, CloudCompletion.PENDING);
+  const light = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, 'Light_01',
+    DeviceAction.SET_BRIGHTNESS, 68, REQUEST_ID, 7, NOW), shadow);
+  assert.equal(light.completion, CloudCompletion.PENDING);
+
+  // A target outside the registry still requires an inventory carrier.
+  const module = env.evaluator.evaluate(new CloudCommandExpectation(GATEWAY, 'MODULE_01',
+    DeviceAction.SET_BRIGHTNESS, 68, REQUEST_ID, 7, NOW), shadow);
+  assert.equal(module.completion, CloudCompletion.UNSUPPORTED);
+  assert.equal(module.reason, 'INVENTORY_ENTRY_MISSING');
+});
+
+test('C15_command_activeScopeAndCredentialFailClosed', async () => {
+  const mismatchScope = new FakeCloudActiveScope('gateway_02', ['gateway_02']);
+  const mismatch = await harness({ scope: mismatchScope });
+  await expectCode(() => mismatch.client.send(command()), 'CLOUD_NOT_CONFIGURED');
+  assert.equal(mismatch.transport.requests.length, 0);
+  assert.equal(await mismatch.sequences.peekSequence(GATEWAY), 0);
+  assert.equal(mismatch.gatewayCredentials.secretReads, 0);
+  assert.equal(mismatchScope.activeChecks, 1);
+
+  const unboundScope = new FakeCloudActiveScope(GATEWAY, []);
+  const unbound = await harness({ scope: unboundScope });
+  await expectCode(() => unbound.client.send(command()), 'CLOUD_NOT_CONFIGURED');
+  assert.equal(unbound.transport.requests.length, 0);
+  assert.equal(await unbound.sequences.peekSequence(GATEWAY), 0);
+  assert.equal(unbound.gatewayCredentials.secretReads, 0);
+
+  // Without a scope seam the credential precondition is still checked before
+  // seq allocation and secret access.
+  const noCredential = await harness({ gatewaySecret: null });
+  await expectCode(() => noCredential.client.send(command()), 'CLOUD_NOT_CONFIGURED');
+  assert.equal(noCredential.transport.requests.length, 0);
+  assert.equal(await noCredential.sequences.peekSequence(GATEWAY), 0);
+  assert.equal(noCredential.gatewayCredentials.secretReads, 0);
+
+  // CloudService.send goes through the same gate.
+  const serviceEnv = await harness({ scope: mismatchScope });
+  await expectCode(() => serviceEnv.service.send(command()), 'CLOUD_NOT_CONFIGURED');
+  assert.equal(serviceEnv.transport.requests.length, 0);
+  assert.equal(await serviceEnv.sequences.peekSequence(GATEWAY), 0);
+
+  // A gateway inside the active scope still sends normally.
+  const inScope = await harness({ scope: new FakeCloudActiveScope(GATEWAY, [GATEWAY]) });
+  inScope.transport.enqueue(jsonResponse(200, { command_id: 'cmd-in-scope' }));
+  const receipt = await inScope.client.send(command());
+  assert.equal(receipt.seq, 0);
+  assert.equal(receipt.commandId, 'cmd-in-scope');
+  assert.equal(inScope.transport.requests.length, 1);
+});
+
+test('C15_transportFailureRateLimitAndServiceOutcomes', async () => {
+  // Transport throw maps to CLOUD_REQUEST_FAILED without a retry.
+  const transportError = await harness();
+  transportError.transport.enqueueError(AppErrors.of('HTTP_TIMEOUT', []));
+  await expectCode(() => transportError.client.send(command()), 'CLOUD_REQUEST_FAILED');
+  assert.equal(transportError.transport.requests.length, 1);
+
+  // 429 is retried once with the identical signed body and seq.
+  const rateLimited = await harness({ retryPolicy: new CloudSendRetryPolicy(1, 0) });
+  rateLimited.transport.enqueue(jsonResponse(429, {}));
+  rateLimited.transport.enqueue(jsonResponse(200, { command_id: 'cmd-after-429' }));
+  const retried = await rateLimited.client.send(command());
+  assert.equal(rateLimited.transport.requests.length, 2);
+  assert.deepEqual(rateLimited.transport.requests[0].body,
+    rateLimited.transport.requests[1].body);
+  assert.deepEqual(rateLimited.transport.requests[0].headers.entries(),
+    rateLimited.transport.requests[1].headers.entries());
+  assert.equal(retried.seq, 0);
+  assert.equal(retried.commandId, 'cmd-after-429');
+
+  // Service-level UNSUPPORTED is returned as an outcome, not an exception.
+  const unsupported = await harness({ policy: new CloudCompletionPolicy(0, 1, 30000, 3, 2000) });
+  unsupported.transport.enqueue(jsonResponse(200, {}));
+  unsupported.transport.enqueue(jsonResponse(200, stateReport(FULL_FIXED())));
+  const unsupportedOutcome = await unsupported.service.sendAndConfirm(
+    new DeviceControlCommand(GATEWAY, 'Sensor_01', DeviceAction.SET_TARGET_TEMPERATURE, NOW, 24),
+    unsupported.policy);
+  assert.equal(unsupportedOutcome.verdict.completion, CloudCompletion.UNSUPPORTED);
+  assert.equal(unsupportedOutcome.executionAccepted, false);
+  assert.equal(unsupportedOutcome.error.code, 'CLOUD_COMPLETION_UNSUPPORTED');
+  assert.equal(unsupported.transport.requests.length, 2);
+
+  // Service-level INVALID shadow is returned as an outcome with CLOUD_SHADOW_INVALID.
+  const invalid = await harness({ policy: new CloudCompletionPolicy(0, 1, 30000, 3, 2000) });
+  invalid.transport.enqueue(jsonResponse(200, {}));
+  invalid.transport.enqueue(jsonResponse(200, {
+    services: [{ service_id: 'SmartHomeService', properties: FULL_FIXED() }],
+  }));
+  const invalidOutcome = await invalid.service.sendAndConfirm(command(), invalid.policy);
+  assert.equal(invalidOutcome.verdict.completion, CloudCompletion.INVALID);
+  assert.equal(invalidOutcome.executionAccepted, false);
+  assert.equal(invalidOutcome.error.code, 'CLOUD_SHADOW_INVALID');
+  assert.equal(invalid.transport.requests.length, 2);
 });

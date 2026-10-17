@@ -7,7 +7,8 @@
  * LastRequestId AND LastSeq both match the expectation (fixed built-in path)
  * or the same pair in DeviceInventoryJson (PB-02 candidate path) may produce
  * CONFIRMED. Missing/unknown inventory structure is UNSUPPORTED, never
- * CONFIRMED.
+ * CONFIRMED. Reserved fixed names never use inventory: `Gateway` and the
+ * read-only sensors are always UNSUPPORTED (F-04 ruling).
  */
 import { AppErrors } from '../../common/types/AppError';
 import type { ClockPort } from '../../common/types/Ports';
@@ -27,6 +28,10 @@ import { CloudErrors } from './CloudErrors';
 
 const FIXED_PREFIXES: ReadonlyArray<string> = ['Door_01', 'Light_01', 'AC_01'];
 const READ_ONLY_FIXED: ReadonlyArray<string> = ['Sensor_01', 'Presence_01'];
+/** v1 reserved fixed-name registry (DES-B §8.1.6; F-04 ruling). */
+const NON_INVENTORY_FIXED: ReadonlyArray<string> = [
+  'Gateway', 'Door_01', 'Light_01', 'AC_01', 'Sensor_01', 'Presence_01'
+];
 const FUTURE_TOLERANCE_MS: number = 300000;
 
 export class CloudCompletionEvaluator {
@@ -50,13 +55,30 @@ export class CloudCompletionEvaluator {
       return new CloudCompletionVerdict(CloudCompletion.STALE, StateVerification.UNVERIFIED,
         'STALE_SHADOW', undefined, undefined, shadow.eventTime);
     }
-    const prefix = CloudCompletionEvaluator.fixedPrefix(expectation.targetDeviceId);
+    const target = expectation.targetDeviceId;
+    const prefix = CloudCompletionEvaluator.fixedPrefix(target);
     if (prefix !== undefined) {
       return this.evaluateFixed(expectation, shadow, prefix);
     }
-    if (READ_ONLY_FIXED.indexOf(expectation.targetDeviceId) >= 0) {
+    if (READ_ONLY_FIXED.indexOf(target) >= 0) {
       return new CloudCompletionVerdict(CloudCompletion.UNSUPPORTED,
         StateVerification.UNVERIFIED, 'READ_ONLY_SENSOR', undefined, undefined,
+        shadow.eventTime, undefined,
+        AppErrors.of('CLOUD_COMPLETION_UNSUPPORTED', []));
+    }
+    if (target === 'Gateway') {
+      // Gateway_Online/Gateway_RSSI are gateway status, not a command receipt.
+      // Even a matching DeviceInventoryJson entry must never confirm it.
+      return new CloudCompletionVerdict(CloudCompletion.UNSUPPORTED,
+        StateVerification.UNVERIFIED, 'GATEWAY_NOT_SUPPORTED', undefined, undefined,
+        shadow.eventTime, undefined,
+        AppErrors.of('CLOUD_COMPLETION_UNSUPPORTED', []));
+    }
+    if (NON_INVENTORY_FIXED.indexOf(target) >= 0) {
+      // Reserved fixed names never route through inventory (F-04). Any future
+      // registry entry without an explicit carrier therefore fails closed.
+      return new CloudCompletionVerdict(CloudCompletion.UNSUPPORTED,
+        StateVerification.UNVERIFIED, 'FIXED_DEVICE_UNSUPPORTED', undefined, undefined,
         shadow.eventTime, undefined,
         AppErrors.of('CLOUD_COMPLETION_UNSUPPORTED', []));
     }

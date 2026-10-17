@@ -38,3 +38,20 @@ export interface TimerPort {
   sleep(ms: number, cancellation?: CancellationToken): Promise<void>;
   cancel(): void;
 }
+
+/**
+ * v1 active cloud scope assertion (DES-B §8.1.4, §8.3.1; F-06 ruling).
+ *
+ * C-28 assembles the single C-15 instance for the current active gateway and
+ * supplies this seam. `CloudCommandClient` uses it to reject a command whose
+ * `gatewayId` is outside the active cloud scope or has no bound gateway
+ * credential BEFORE allocating a sequence, reading a secret, signing or
+ * sending HTTP. `CloudConfig` has no `gatewayId`, so C-15 cannot rebuild this
+ * binding from persistence alone.
+ */
+export interface CloudActiveScopePort {
+  /** Current active gateway, or undefined when no active scope is selected. */
+  activeGatewayId(): Promise<string | undefined>;
+  /** Whether the gateway has a persisted route/command-credential binding. */
+  isGatewayBound(gatewayId: string): Promise<boolean>;
+}

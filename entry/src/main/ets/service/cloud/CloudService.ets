@@ -143,8 +143,11 @@ export class CloudService {
       } else {
         await this.credentials.removeToken();
       }
+      // F-02: only a new non-empty token (or an explicit clear) resets the
+      // transient token-failure state. A bare saveConfig(config) keeps
+      // TOKEN_EXPIRED/TOKEN_INVALID so the UI still asks for a new token.
+      this.resetFailureState();
     }
-    this.resetFailureState();
     return this.notify();
   }
 
@@ -180,6 +183,9 @@ export class CloudService {
   }
 
   async testConnection(cancellation?: CancellationToken): Promise<CloudConfigValidation> {
+    // F-03 two-layer semantics (DES-B §8.1.7/§8.3.1): the persistent layer
+    // (cloud_config + token) is never written here; only the in-process
+    // transient health layer is updated from the probe result.
     let config: CloudConfig | undefined = undefined;
     try {
       config = await this.configs.load();
@@ -193,11 +199,40 @@ export class CloudService {
     if (!validation.valid) {
       return validation;
     }
+    let tokenPresent = false;
+    try {
+      tokenPresent = await this.credentials.hasToken();
+    } catch (error) {
+      return new CloudConfigValidation(false, [CloudService.asAppError(error)]);
+    }
+    if (!tokenPresent) {
+      return new CloudConfigValidation(false, [AppErrors.of('CLOUD_TOKEN_MISSING', [])]);
+    }
+    let previousState: CloudTransportState;
+    try {
+      previousState = (await this.getState()).state;
+    } catch (error) {
+      previousState = CloudTransportState.UNAVAILABLE;
+    }
     try {
       await this.shadows.read(config.deviceId, cancellation);
+      this.recordNetworkSuccess();
+      if ((await this.getState()).state !== previousState) {
+        await this.notify();
+      }
       return validation;
     } catch (error) {
       const appError = CloudService.asAppError(error);
+      if (CloudErrors.tokenState(appError.code)) {
+        // 401/403: record the transient token failure (no token rewrite, no
+        // automatic retry) and notify subscribers.
+        this.recordFailure(appError);
+        await this.notify();
+      } else {
+        // A manual probe failure is not a persistent network failure: keep
+        // the failure counter/UNAVAILABLE flag untouched (F-03).
+        this.lastError = appError;
+      }
       return new CloudConfigValidation(false, [appError], validation.commandEndpoint,
         validation.shadowEndpoint);
     }

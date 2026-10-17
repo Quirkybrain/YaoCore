@@ -32,7 +32,11 @@ import type { HttpTransport } from '../gateway/GatewayTransportPorts';
 import { CanonicalBuilder, CloudCanonicalFields } from '../security/CanonicalBuilder';
 import { CloudCommandSerializer } from '../protocol/CloudCommandSerializer';
 import type { CloudCommandDto } from '../protocol/dto/CloudDto';
-import type { CloudConfigStore, CloudCredentialPort } from './CloudPorts';
+import type {
+  CloudActiveScopePort,
+  CloudConfigStore,
+  CloudCredentialPort
+} from './CloudPorts';
 import {
   CloudCommandReceipt,
   CloudCommandResponseDto
@@ -73,11 +77,13 @@ export class CloudCommandClient {
   private readonly random: RandomPort;
   private readonly logger: LoggerPort;
   private readonly retryPolicy: CloudSendRetryPolicy;
+  private readonly scope: CloudActiveScopePort | undefined;
 
   constructor(transport: HttpTransport, configs: CloudConfigStore,
     credentials: CloudCredentialPort, gatewayCredentials: GatewayCredentialPort,
     sequences: GatewaySequencePort, crypto: CryptoPort, clock: ClockPort, random: RandomPort,
-    logger: LoggerPort, retryPolicy: CloudSendRetryPolicy = CloudSendRetryPolicy.defaults()) {
+    logger: LoggerPort, retryPolicy: CloudSendRetryPolicy = CloudSendRetryPolicy.defaults(),
+    scope?: CloudActiveScopePort) {
     this.transport = transport;
     this.configs = configs;
     this.credentials = credentials;
@@ -88,6 +94,7 @@ export class CloudCommandClient {
     this.random = random;
     this.logger = logger;
     this.retryPolicy = retryPolicy;
+    this.scope = scope;
   }
 
   async send(command: DeviceControlCommand,
@@ -107,6 +114,7 @@ export class CloudCommandClient {
     if (commandEndpoint === undefined) {
       throw AppErrors.of('CLOUD_ENDPOINT_INVALID', []);
     }
+    await this.assertActiveGateway(command.gatewayId);
     if (!(await this.credentials.hasToken())) {
       throw AppErrors.of('CLOUD_TOKEN_MISSING', []);
     }
@@ -135,7 +143,7 @@ export class CloudCommandClient {
       ProtocolConstants.CMD_ID_CLOUD, seq, command.target, command.action, valueText, timestamp,
       nonce, ProtocolConstants.ALG_HMAC_SHA256, ProtocolConstants.KEY_ID_V1));
     return this.credentials.withToken(async (token: string): Promise<CloudCommandReceipt> => {
-      return this.gatewayCredentials.withCommandSecret(command.gatewayId,
+      return this.withBoundSecret(command.gatewayId,
         async (secret: Uint8Array): Promise<CloudCommandReceipt> => {
           const signBytes = await this.crypto.hmacSha256(secret, Utf8.encode(canonical));
           const sign = BytesUtil.hexLower(signBytes);
@@ -168,6 +176,49 @@ export class CloudCommandClient {
           return this.sendWithRetry(request, requestId, seq, command.gatewayId, command.target);
         });
     });
+  }
+
+  /**
+   * v1 single-active-scope fail-closed gate (DES-B §8.1.4; F-06 ruling).
+   * Runs before `nextSequence`, secret access, signing and HTTP. When C-28
+   * supplies an active scope, the command gateway must equal it and be bound.
+   * Without a scope seam, at least the bound-credential precondition is
+   * asserted through the credential port (a lookup, not a signature).
+   */
+  private async assertActiveGateway(gatewayId: string): Promise<void> {
+    if (this.scope !== undefined) {
+      const active = await this.scope.activeGatewayId();
+      if (active !== gatewayId) {
+        throw AppErrors.of('CLOUD_NOT_CONFIGURED', []);
+      }
+      if (!(await this.scope.isGatewayBound(gatewayId))) {
+        throw AppErrors.of('CLOUD_NOT_CONFIGURED', []);
+      }
+      return;
+    }
+    try {
+      await this.gatewayCredentials.withCommandSecret(gatewayId,
+        async (): Promise<boolean> => true);
+    } catch (error) {
+      throw CloudCommandClient.bindingError(error);
+    }
+  }
+
+  private async withBoundSecret<T>(gatewayId: string,
+    fn: (secret: Uint8Array) => Promise<T>): Promise<T> {
+    try {
+      return await this.gatewayCredentials.withCommandSecret(gatewayId, fn);
+    } catch (error) {
+      throw CloudCommandClient.bindingError(error);
+    }
+  }
+
+  private static bindingError(error: Object): AppError {
+    if (error instanceof AppError &&
+      (error.code === 'GATEWAY_NOT_BOUND' || error.code === 'ASSET_NOT_FOUND')) {
+      return AppErrors.of('CLOUD_NOT_CONFIGURED', []);
+    }
+    return error instanceof AppError ? error : AppErrors.of('INTERNAL_ERROR', []);
   }
 
   private async sendWithRetry(request: HttpRequest, requestId: string, seq: number,
