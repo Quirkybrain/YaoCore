@@ -1,0 +1,7 @@
+{
+  "common": {
+    "ok": "确定",
+    "empty": "",
+    "param": "你好 {name}"
+  }
+}

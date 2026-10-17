@@ -9,6 +9,7 @@
  */
 import baselineTest from './Baseline.test';
 import foundationDeviceTest from './foundation/FoundationDevice.test';
+import i18nDeviceTest from './i18n/I18nDevice.test';
 import securityDeviceTest from './security/SecurityDevice.test';
 import storageDeviceTest from './storage/StorageDevice.test';
 
@@ -17,4 +18,5 @@ export default function testsuite() {
   foundationDeviceTest();
   securityDeviceTest();
   storageDeviceTest();
+  i18nDeviceTest();
 }

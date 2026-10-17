@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-17T11:21:34Z",
+  "root": "/home/quirkybrain/code/harmony-projects/YaoCore",
+  "locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "checks": [
+    {
+      "id": "CHK-01",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-02",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-03",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-04",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-05",
+      "status": "PASS",
+      "blocking": false,
+      "findings": []
+    },
+    {
+      "id": "CHK-06",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-07",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-08",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-09",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    }
+  ],
+  "summary": {
+    "blockingFailures": 0,
+    "warnings": 0,
+    "missingKeys": 0,
+    "hardcoded": 0
+  },
+  "allowlist": {
+    "path": "/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/test/i18n/allowlist.json",
+    "entries": 15
+  }
+}

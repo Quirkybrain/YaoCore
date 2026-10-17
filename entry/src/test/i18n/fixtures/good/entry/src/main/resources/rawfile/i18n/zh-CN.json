@@ -1,0 +1,8 @@
+{
+  "common": {
+    "ok": "确定"
+  },
+  "device": {
+    "count": "{count} 个设备"
+  }
+}

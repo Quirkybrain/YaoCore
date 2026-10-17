@@ -1,0 +1,306 @@
+{
+  "errors": {
+    "app": {
+      "ack_correlation_mismatch": "ACK 关联信息不匹配，请重试。",
+      "ack_protocol_violation": "网关 ACK 不符合协议，未确认执行。",
+      "ack_state_mismatch": "设备回报状态与指令不一致，请重试。",
+      "asset_access_denied": "无权限访问本机安全存储。",
+      "asset_io_failed": "本机安全存储读写失败，请重试。",
+      "asset_not_found": "未找到本机安全凭据，请重新绑定。",
+      "asset_unavailable": "本机安全存储不可用。",
+      "auth_kdf_failed": "密码密钥派生失败，请重试。",
+      "auth_password_invalid": "密码不正确。",
+      "auth_profile_exists": "该家庭已存在本机使用档案。",
+      "auth_profile_not_found": "未找到本机使用档案。",
+      "auth_rbac_denied": "当前身份无权执行此操作。",
+      "auth_session_expired": "登录会话已过期，请重新登录。",
+      "auth_session_invalid": "登录会话无效，请重新登录。",
+      "configuration_error": "应用配置无效，请检查设置。",
+      "control_response_auth_failed": "控制响应验签失败，未确认执行。",
+      "crypto_invalid_key": "密钥无效，请重新配置。",
+      "crypto_operation_failed": "本机安全操作失败，请重试。",
+      "crypto_tag_mismatch": "安全校验失败，数据可能已被篡改。",
+      "crypto_unavailable": "本机安全组件不可用。",
+      "device_disabled": "该设备已停用，无法控制。",
+      "device_dismissed": "设备已删除，无法再控制。",
+      "device_name_invalid": "设备名称不符合要求。",
+      "device_not_found": "未找到设备。",
+      "device_unassigned": "该设备尚未分配房间。",
+      "discovery_invalid_response": "网关发现响应无效。",
+      "gateway_id_mismatch": "网关身份不一致，已停止绑定。",
+      "gateway_not_bound": "尚未绑定网关。",
+      "gateway_profile_blocked": "网关安全配置受阻，请重新配网。",
+      "internal_error": "操作失败，请重试。",
+      "invite_expired": "邀请已过期。",
+      "invite_invalid": "邀请无效。",
+      "invite_key_missing": "缺少邀请密钥，无法加入家庭。",
+      "invite_max_uses": "邀请使用次数已达上限。",
+      "invite_receipt_invalid": "邀请回执无效。",
+      "invite_revoked": "邀请已被撤销。",
+      "manual_address_not_bound": "手动地址尚未绑定网关。",
+      "manual_address_rejected": "手动填写的网关地址被拒绝。",
+      "protocol_invalid_identifier": "协议标识无效。",
+      "protocol_invalid_json": "协议数据格式无效。",
+      "protocol_invalid_timestamp": "协议时间戳无效。",
+      "protocol_unsupported_version": "协议版本不受支持。",
+      "room_delete_not_confirmed": "房间删除未确认。",
+      "room_name_invalid": "房间名称不符合要求。",
+      "room_not_found": "未找到房间。",
+      "scene_cancelled": "场景执行已取消。",
+      "scene_disabled": "场景已停用。",
+      "scene_empty": "场景没有可执行的步骤。",
+      "scene_name_invalid": "场景名称不符合要求。",
+      "scene_not_found": "未找到场景。",
+      "scene_preflight_failed": "场景预检失败。",
+      "scene_reference_invalid": "场景引用的设备已失效。",
+      "scene_run_in_progress": "场景正在运行，请稍后再试。",
+      "scene_step_failed": "场景中有步骤执行失败。",
+      "secret_alias_invalid": "安全凭据别名无效。",
+      "secret_destroyed": "安全凭据已销毁。",
+      "secret_encoding_invalid": "安全凭据编码无效。",
+      "signature_invalid": "签名校验失败。",
+      "storage_error": "本机存储操作失败，请重试。",
+      "storage_migration_failed": "本机数据迁移失败。",
+      "storage_not_initialized": "本机存储尚未初始化。",
+      "tls_pin_config_invalid": "TLS 固定证书配置无效。",
+      "tls_profile_inconsistent": "TLS 安全档案不一致，请重新配网。",
+      "i18n_resource_load_failed": "语言资源加载失败。",
+      "i18n_bundle_invalid": "语言资源格式无效。",
+      "i18n_locale_unsupported": "不支持所选语言。",
+      "i18n_platform_locale_failed": "系统语言切换失败，部分文案需重启后生效。",
+      "nonce_reused": "请求重放被拒绝。",
+      "timestamp_out_of_window": "手机与网关时间偏差过大，请校准时间。",
+      "http_error": "网络请求失败（HTTP {status}）。",
+      "local_request_failed": "局域网请求失败，请检查网络。",
+      "dev_simulator_rejected": "正式版不允许连接开发协议模拟器。",
+      "gateway_unreachable": "网关不可达，请检查网络。",
+      "gateway_timeout": "网关响应超时。",
+      "discovery_no_candidates": "未发现可用网关。",
+      "discovery_transport_unavailable": "网关发现所需的网络能力不可用。",
+      "tls_pin_mismatch": "网关证书与固定指纹不一致，已拒绝连接。",
+      "tls_handshake_failed": "与网关的 TLS 握手失败。",
+      "tls_unavailable_advertised": "网关声明了不可用的 TLS 配置。",
+      "tls_verifier_unavailable": "TLS 校验组件不可用，已拒绝连接。",
+      "invite_code_invalid": "邀请码无效。",
+      "invite_version_unsupported": "邀请版本不受支持。",
+      "invite_aead_failed": "邀请凭据解密失败。"
+    },
+    "gateway": {
+      "success": "成功",
+      "invalid_request": "请求格式无效。",
+      "unsupported_security": "网关不支持当前安全配置。",
+      "timestamp_rejected": "网关拒绝了请求时间，请校准时间。",
+      "bad_signature": "请求签名无效。",
+      "replay": "请求重放被拒绝。",
+      "unsupported_command": "网关不支持该指令。",
+      "unknown_device": "网关未找到目标设备。",
+      "unsupported_action": "设备不支持该动作。",
+      "unsupported_gateway_action": "网关不支持该动作。",
+      "device_offline": "设备离线。",
+      "hardware_timeout": "设备未在时限内确认执行。",
+      "unknown": "网关返回未知错误（{code}）。"
+    },
+    "cloud": {
+      "device_not_found": "云端未找到该设备。",
+      "endpoint_invalid": "云端 Endpoint 无效，必须使用 HTTPS。",
+      "inventory_unsupported": "设备清单不支持该云命令。",
+      "not_configured": "尚未配置云端连接。",
+      "rate_limited": "云端请求过于频繁，请稍后重试。",
+      "request_failed": "云端请求失败。",
+      "response_invalid": "云端响应格式无效。",
+      "sequence_unavailable": "无法获取云端命令序号。",
+      "service_unavailable": "云端服务不可用。",
+      "shadow_invalid": "设备影子数据无效。",
+      "token_expired": "云端访问令牌已过期，请更新。",
+      "token_invalid": "云端访问令牌无效。",
+      "token_missing": "缺少云端访问令牌。"
+    },
+    "scene": {
+      "run_in_progress": "场景正在运行，请稍后再试。"
+    }
+  },
+  "provisioning": {
+    "error": {
+      "credential_missing": "缺少配网凭据。",
+      "identity_invalid": "网关身份无效，已停止配网。",
+      "auth_error": "Wi-Fi 认证失败，请检查密码。",
+      "network_not_found": "未找到指定 Wi-Fi 网络。",
+      "bluetooth_off": "蓝牙未开启。",
+      "device_not_found": "未找到配网设备。",
+      "connect_failed": "连接配网设备失败。",
+      "gatt_busy": "蓝牙通道忙，请稍后重试。",
+      "gatt_incomplete": "蓝牙连接不完整，请重试。",
+      "mtu_too_small": "蓝牙数据包过小，无法完成配网。",
+      "multiple_devices": "发现多个配网设备，请靠近目标设备后重试。",
+      "permission_denied": "缺少配网所需权限。",
+      "pop_invalid": "配网码无效，请检查网关 PoP。",
+      "security_handshake_failed": "配网安全握手失败。",
+      "wifi_scan_failed": "网关扫描 Wi-Fi 失败。",
+      "wifi_timeout": "Wi-Fi 连接超时。",
+      "done_rejected": "网关拒绝了配网完成请求。",
+      "binding_probe_failed": "绑定探测失败。",
+      "binding_identity_mismatch": "绑定时网关身份不一致，已停止。",
+      "capability_unsupported": "配网设备不支持所需能力。",
+      "board_led_unconfirmed": "未能确认开发板指示灯状态。",
+      "cancelled": "配网已取消。",
+      "unknown": "配网失败（{code}）。"
+    }
+  },
+  "cloud": {
+    "token": {
+      "expired": "云端访问令牌已过期，请更新。",
+      "missing": "尚未配置云端访问令牌。"
+    },
+    "command": {
+      "accepted_not_confirmed": "云端已接受命令，但设备尚未确认执行。"
+    },
+    "completion": {
+      "unsupported": "当前网关不支持云端执行确认。"
+    }
+  },
+  "stateSource": {
+    "sensor_physical": "传感器实测",
+    "device_feedback": "设备反馈",
+    "automation_local": "本地自动化",
+    "app_lan": "手机局域网控制",
+    "app_cloud": "手机云端控制",
+    "unknown": "未知来源（{value}）"
+  },
+  "ac": {
+    "mode": {
+      "auto": "自动",
+      "cool": "制冷",
+      "heat": "制热",
+      "dry": "除湿",
+      "fan": "送风",
+      "eco": "节能",
+      "sleep": "睡眠",
+      "unknown": "非标准模式（{mode}）"
+    }
+  },
+  "door": {
+    "state": {
+      "secured": "已上锁",
+      "unconfirmed": "未确认",
+      "unknown": "未知"
+    },
+    "alert": {
+      "unconfirmed": "门锁状态未确认，请检查。"
+    },
+    "link": {
+      "unverified": "门磁联动未验证。"
+    }
+  },
+  "gateway": {
+    "security": {
+      "hmac_only": "仅 HMAC（无机密性）",
+      "tls_pinned": "TLS 固定证书",
+      "pin_mismatch": "网关证书指纹不一致",
+      "handshake_failed": "网关 TLS 握手失败",
+      "state_inconsistent": "网关安全状态不一致",
+      "unavailable": "网关安全通道不可用"
+    }
+  },
+  "invite": {
+    "mode": {
+      "key_wrap": "密钥封装",
+      "code_kek": "邀请码 + KEK"
+    },
+    "security": {
+      "weak_mode_warning": "当前邀请模式安全性较弱。",
+      "guest_scope_not_crypto": "访客的房间范围限制是应用策略，不是密码学边界。"
+    },
+    "receipt": {
+      "pending": "邀请回执待确认。"
+    },
+    "status": {
+      "pending": "待处理",
+      "accepted": "已接受",
+      "expired": "已过期",
+      "revoked": "已撤销"
+    }
+  },
+  "member": {
+    "role": {
+      "admin": "管理员",
+      "member": "成员",
+      "guest": "访客"
+    },
+    "status": {
+      "active": "活跃",
+      "invited": "已邀请",
+      "disabled": "已禁用",
+      "expired": "已过期"
+    },
+    "sync": {
+      "last_at": "上次同步：{time}",
+      "never": "尚未同步"
+    }
+  },
+  "device": {
+    "type": {
+      "door": "门锁",
+      "light": "灯光",
+      "sensor": "传感器",
+      "ac": "空调",
+      "switch": "开关",
+      "camera": "摄像头",
+      "curtain": "窗帘",
+      "fan": "风扇",
+      "speaker": "音箱",
+      "unknown": "未知设备"
+    },
+    "state": {
+      "online": "在线",
+      "offline": "离线"
+    },
+    "unsupported": {
+      "read_only": "该设备类型暂不支持控制，仅显示状态。"
+    },
+    "disabled": {
+      "unassigned": "设备未分配房间，已停用。"
+    },
+    "count": "{count} 个设备"
+  },
+  "scene": {
+    "run": "执行",
+    "running": "执行中",
+    "partial_failed": "部分步骤失败",
+    "no_rollback": "已执行步骤不会回滚。",
+    "step": {
+      "failed": "步骤执行失败。"
+    }
+  },
+  "room": {
+    "unassigned": {
+      "title": "未分配设备"
+    },
+    "delete": {
+      "title": "删除房间",
+      "warning": "房间内设备将移入未分配池并停用。"
+    },
+    "assign": {
+      "title": "分配房间"
+    }
+  },
+  "family": {
+    "switch": "切换家庭",
+    "create": "创建家庭",
+    "member": {
+      "remove": "移除成员"
+    },
+    "last_admin": "不能移除最后一位管理员。"
+  },
+  "home": {
+    "gateway": {
+      "online": "网关在线",
+      "offline": "网关离线"
+    },
+    "metric": {
+      "rtt_ms": "往返时延 {value} ms"
+    },
+    "room": {
+      "all": "全部房间"
+    }
+  }
+}

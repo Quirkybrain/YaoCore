@@ -2,15 +2,103 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "module description"
+      "value": "YaoCore 智能家居应用"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "description"
+      "value": "YaoCore 主界面"
     },
     {
       "name": "EntryAbility_label",
-      "value": "label"
+      "value": "YaoCore"
+    },
+    {
+      "name": "common_confirm",
+      "value": "确认"
+    },
+    {
+      "name": "common_cancel",
+      "value": "取消"
+    },
+    {
+      "name": "common_retry",
+      "value": "重试"
+    },
+    {
+      "name": "common_save",
+      "value": "保存"
+    },
+    {
+      "name": "common_delete",
+      "value": "删除"
+    },
+    {
+      "name": "common_close",
+      "value": "关闭"
+    },
+    {
+      "name": "common_back",
+      "value": "返回"
+    },
+    {
+      "name": "common_refresh",
+      "value": "刷新"
+    },
+    {
+      "name": "common_edit",
+      "value": "编辑"
+    },
+    {
+      "name": "common_view",
+      "value": "查看"
+    },
+    {
+      "name": "common_success",
+      "value": "成功"
+    },
+    {
+      "name": "common_failed",
+      "value": "失败"
+    },
+    {
+      "name": "common_loading",
+      "value": "加载中…"
+    },
+    {
+      "name": "common_unknown",
+      "value": "未知"
+    },
+    {
+      "name": "common_yes",
+      "value": "是"
+    },
+    {
+      "name": "common_no",
+      "value": "否"
+    },
+    {
+      "name": "common_refresh_failed",
+      "value": "刷新失败，请重试。"
+    },
+    {
+      "name": "common_save_failed",
+      "value": "保存失败，请重试。"
+    },
+    {
+      "name": "settings_language_title",
+      "value": "语言"
+    },
+    {
+      "name": "settings_language_auto",
+      "value": "跟随系统"
+    },
+    {
+      "name": "settings_language_zh_cn",
+      "value": "简体中文"
+    },
+    {
+      "name": "settings_language_en_us",
+      "value": "English"
     }
   ]
 }
