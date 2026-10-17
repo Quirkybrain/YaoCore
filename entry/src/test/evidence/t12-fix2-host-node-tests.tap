@@ -1,0 +1,2716 @@
+TAP version 13
+# Subtest: C19_ProtocommCodec_step0MatchesFrozenVector
+ok 1 - C19_ProtocommCodec_step0MatchesFrozenVector
+  ---
+  duration_ms: 1.859388
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_wifiConfigAndScanFramesMatchFrozenVectors
+ok 2 - C19_ProtocommCodec_wifiConfigAndScanFramesMatchFrozenVectors
+  ---
+  duration_ms: 0.457095
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_negativeRssiUsesTenByteTwosComplement
+ok 3 - C19_ProtocommCodec_negativeRssiUsesTenByteTwosComplement
+  ---
+  duration_ms: 0.45976
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_scanResultDecodesNegativeRssiAndBssid
+ok 4 - C19_ProtocommCodec_scanResultDecodesNegativeRssiAndBssid
+  ---
+  duration_ms: 2.330049
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_setConfigRoundTripsSsidAndPassphrase
+ok 5 - C19_ProtocommCodec_setConfigRoundTripsSsidAndPassphrase
+  ---
+  duration_ms: 0.861563
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_sessionStep0ResponseDecodesRawKeys
+ok 6 - C19_ProtocommCodec_sessionStep0ResponseDecodesRawKeys
+  ---
+  duration_ms: 0.671272
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_sessionStep1ResponseDecodesVerifyData
+ok 7 - C19_ProtocommCodec_sessionStep1ResponseDecodesVerifyData
+  ---
+  duration_ms: 0.754064
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_sessionRejectsWrongStatusAndLengths
+ok 8 - C19_ProtocommCodec_sessionRejectsWrongStatusAndLengths
+  ---
+  duration_ms: 2.100825
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_scanStatusAndResultsAreStrict
+ok 9 - C19_ProtocommCodec_scanStatusAndResultsAreStrict
+  ---
+  duration_ms: 0.689665
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_wifiStatusClassifiesEveryTerminalState
+ok 10 - C19_ProtocommCodec_wifiStatusClassifiesEveryTerminalState
+  ---
+  duration_ms: 1.140188
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_wifiStatusRejectsInvalidAddressAndState
+ok 11 - C19_ProtocommCodec_wifiStatusRejectsInvalidAddressAndState
+  ---
+  duration_ms: 0.468908
+  type: 'test'
+  ...
+# Subtest: C19_ProtobufReader_rejectsTruncationOverlongAndBadWireTypes
+ok 12 - C19_ProtobufReader_rejectsTruncationOverlongAndBadWireTypes
+  ---
+  duration_ms: 0.504563
+  type: 'test'
+  ...
+# Subtest: C19_ProtobufReader_rejectsLengthVarintAbove32Bits
+ok 13 - C19_ProtobufReader_rejectsLengthVarintAbove32Bits
+  ---
+  duration_ms: 0.388368
+  type: 'test'
+  ...
+# Subtest: C19_ProtobufReader_rejectsNonCanonicalLengthVarint
+ok 14 - C19_ProtobufReader_rejectsNonCanonicalLengthVarint
+  ---
+  duration_ms: 0.279086
+  type: 'test'
+  ...
+# Subtest: C19_ProtocommCodec_customJsonHasNoFrameHeader
+ok 15 - C19_ProtocommCodec_customJsonHasNoFrameHeader
+  ---
+  duration_ms: 0.274968
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_buildsEndpointMapFrom2901Descriptions
+ok 16 - C19_GattEndpointMap_buildsEndpointMapFrom2901Descriptions
+  ---
+  duration_ms: 12.334809
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_missingRequiredEndpointFailsClosed
+ok 17 - C19_GattEndpointMap_missingRequiredEndpointFailsClosed
+  ---
+  duration_ms: 2.575372
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_duplicateEndpointFailsClosed
+ok 18 - C19_GattEndpointMap_duplicateEndpointFailsClosed
+  ---
+  duration_ms: 2.015317
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_unreadableDescriptorFailsClosed
+ok 19 - C19_GattEndpointMap_unreadableDescriptorFailsClosed
+  ---
+  duration_ms: 3.049689
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_characteristicWithoutWriteFailsClosed
+ok 20 - C19_GattEndpointMap_characteristicWithoutWriteFailsClosed
+  ---
+  duration_ms: 1.058147
+  type: 'test'
+  ...
+# Subtest: C19_GattEndpointMap_unknownEndpointIsIgnoredAndDoneIsOptional
+ok 21 - C19_GattEndpointMap_unknownEndpointIsIgnoredAndDoneIsOptional
+  ---
+  duration_ms: 1.201963
+  type: 'test'
+  ...
+# Subtest: C19_ProtoVerParser_validCapabilityGate
+ok 22 - C19_ProtoVerParser_validCapabilityGate
+  ---
+  duration_ms: 2.281119
+  type: 'test'
+  ...
+# Subtest: C19_ProtoVerParser_acceptsTopLevelSecVerAndStringYaoCore
+ok 23 - C19_ProtoVerParser_acceptsTopLevelSecVerAndStringYaoCore
+  ---
+  duration_ms: 0.685949
+  type: 'test'
+  ...
+# Subtest: C19_ProtoVerParser_missingProvVerAndShapeFailCapabilityGate
+ok 24 - C19_ProtoVerParser_missingProvVerAndShapeFailCapabilityGate
+  ---
+  duration_ms: 1.707658
+  type: 'test'
+  ...
+# Subtest: C19_ProtoVerParser_downgradeAndMissingCapabilitiesFailClosed
+ok 25 - C19_ProtoVerParser_downgradeAndMissingCapabilitiesFailClosed
+  ---
+  duration_ms: 3.03392
+  type: 'test'
+  ...
+# Subtest: C19_GattRequestQueue_serializesWriteReadPairs
+ok 26 - C19_GattRequestQueue_serializesWriteReadPairs
+  ---
+  duration_ms: 21.55004
+  type: 'test'
+  ...
+# Subtest: C19_GattRequestQueue_timeoutAndDestroyFailClosed
+ok 27 - C19_GattRequestQueue_timeoutAndDestroyFailClosed
+  ---
+  duration_ms: 10.407465
+  type: 'test'
+  ...
+# Subtest: C19_GattRequestQueue_timeoutNeverStartsConcurrentOperation
+ok 28 - C19_GattRequestQueue_timeoutNeverStartsConcurrentOperation
+  ---
+  duration_ms: 75.191922
+  type: 'test'
+  ...
+# Subtest: C19_GattChannel_writeBusyRetriesOnceWithSameBytes
+ok 29 - C19_GattChannel_writeBusyRetriesOnceWithSameBytes
+  ---
+  duration_ms: 5.58105
+  type: 'test'
+  ...
+# Subtest: C19_GattChannel_readBusyIsTerminalWithoutResend
+ok 30 - C19_GattChannel_readBusyIsTerminalWithoutResend
+  ---
+  duration_ms: 4.735367
+  type: 'test'
+  ...
+# Subtest: C19_GattChannel_ambiguousWriteFailureIsNotRetried
+ok 31 - C19_GattChannel_ambiguousWriteFailureIsNotRetried
+  ---
+  duration_ms: 7.148519
+  type: 'test'
+  ...
+# Subtest: C19_GattChannel_writeBusyRetryPreservesCtrStream
+ok 32 - C19_GattChannel_writeBusyRetryPreservesCtrStream
+  ---
+  duration_ms: 21.266876
+  type: 'test'
+  ...
+# Subtest: C19_ProvisioningStateMachine_forwardPathAndReset
+ok 33 - C19_ProvisioningStateMachine_forwardPathAndReset
+  ---
+  duration_ms: 1.630325
+  type: 'test'
+  ...
+# Subtest: C19_ProvisioningStateMachine_cancelAndFailFromNonTerminalStates
+ok 34 - C19_ProvisioningStateMachine_cancelAndFailFromNonTerminalStates
+  ---
+  duration_ms: 0.47609
+  type: 'test'
+  ...
+# Subtest: C19_ProvisioningStateMachine_terminalStatesRejectCancel
+ok 35 - C19_ProvisioningStateMachine_terminalStatesRejectCancel
+  ---
+  duration_ms: 0.252828
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_scanPaginatesFourPerPage
+ok 36 - C19_WifiProvisioningFlow_scanPaginatesFourPerPage
+  ---
+  duration_ms: 9.249935
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_scanTimeoutAndInvalidStartFailClosed
+ok 37 - C19_WifiProvisioningFlow_scanTimeoutAndInvalidStartFailClosed
+  ---
+  duration_ms: 7.79257
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_scanPagesShareFifteenSecondDeadline
+ok 38 - C19_WifiProvisioningFlow_scanPagesShareFifteenSecondDeadline
+  ---
+  duration_ms: 0.653198
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_applySendsSetThenApply
+ok 39 - C19_WifiProvisioningFlow_applySendsSetThenApply
+  ---
+  duration_ms: 0.577027
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_waitForConnectionAndTerminalClassification
+ok 40 - C19_WifiProvisioningFlow_waitForConnectionAndTerminalClassification
+  ---
+  duration_ms: 4.175661
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_waitForConnectionTimesOutAtThirtySeconds
+ok 41 - C19_WifiProvisioningFlow_waitForConnectionTimesOutAtThirtySeconds
+  ---
+  duration_ms: 1.27087
+  type: 'test'
+  ...
+# Subtest: C19_WifiProvisioningFlow_finishAckSemantics
+ok 42 - C19_WifiProvisioningFlow_finishAckSemantics
+  ---
+  duration_ms: 0.960536
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_hmacProbeAndBoardLedConfirmation
+ok 43 - C19_BindingProber_hmacProbeAndBoardLedConfirmation
+  ---
+  duration_ms: 5.545334
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_tlsProfileCarriesPins
+ok 44 - C19_BindingProber_tlsProfileCarriesPins
+  ---
+  duration_ms: 0.748314
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_identityMismatchIsTerminal
+ok 45 - C19_BindingProber_identityMismatchIsTerminal
+  ---
+  duration_ms: 0.444902
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_snapshotMismatchAndProfileMismatchAreTerminal
+ok 46 - C19_BindingProber_snapshotMismatchAndProfileMismatchAreTerminal
+  ---
+  duration_ms: 0.623503
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_tlsPinMismatchExhaustsFiniteRetries
+ok 47 - C19_BindingProber_tlsPinMismatchExhaustsFiniteRetries
+  ---
+  duration_ms: 0.901768
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_transientProbeFailuresRetryThenSucceed
+ok 48 - C19_BindingProber_transientProbeFailuresRetryThenSucceed
+  ---
+  duration_ms: 2.531
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_firstRetryWaits500msAndExhausts7500ms
+ok 49 - C19_BindingProber_firstRetryWaits500msAndExhausts7500ms
+  ---
+  duration_ms: 0.926614
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_enforcesThirtySecondTotalBudget
+ok 50 - C19_BindingProber_enforcesThirtySecondTotalBudget
+  ---
+  duration_ms: 0.723288
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_boardLedFailuresNeverBind
+ok 51 - C19_BindingProber_boardLedFailuresNeverBind
+  ---
+  duration_ms: 1.217862
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_ledResetFailureDoesNotInvalidateBinding
+ok 52 - C19_BindingProber_ledResetFailureDoesNotInvalidateBinding
+  ---
+  duration_ms: 0.359966
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_draftIsReissuedOnlyOnSuccess
+ok 53 - C19_BindingProber_draftIsReissuedOnlyOnSuccess
+  ---
+  duration_ms: 1.230555
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_draftIsDestroyedOnFailure
+ok 54 - C19_BindingProber_draftIsDestroyedOnFailure
+  ---
+  duration_ms: 0.567018
+  type: 'test'
+  ...
+# Subtest: C19_BindingProber_missingDraftAndFamilyFailClosed
+ok 55 - C19_BindingProber_missingDraftAndFamilyFailClosed
+  ---
+  duration_ms: 0.424745
+  type: 'test'
+  ...
+# Subtest: C19_Security1_rfc7748Vector
+ok 56 - C19_Security1_rfc7748Vector
+  ---
+  duration_ms: 4.220114
+  type: 'test'
+  ...
+# Subtest: C19_Security1_handshakeAndContinuousCtrStream
+ok 57 - C19_Security1_handshakeAndContinuousCtrStream
+  ---
+  duration_ms: 7.714505
+  type: 'test'
+  ...
+# Subtest: C19_Security1_wrongPopFailsClosedAndDestroysSession
+ok 58 - C19_Security1_wrongPopFailsClosedAndDestroysSession
+  ---
+  duration_ms: 4.116251
+  type: 'test'
+  ...
+# Subtest: C19_Security1_tamperedDeviceVerifyFailsClosed
+ok 59 - C19_Security1_tamperedDeviceVerifyFailsClosed
+  ---
+  duration_ms: 3.619142
+  type: 'test'
+  ...
+# Subtest: C19_Security1_stateGuardsAndStep0Vector
+ok 60 - C19_Security1_stateGuardsAndStep0Vector
+  ---
+  duration_ms: 2.043659
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v21TlsSuccess
+ok 61 - C19_IdentityNegotiator_v21TlsSuccess
+  ---
+  duration_ms: 2.578107
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v21WithoutSecurityIsHmacOnly
+ok 62 - C19_IdentityNegotiator_v21WithoutSecurityIsHmacOnly
+  ---
+  duration_ms: 1.051194
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v21TlsFalseIsHmacOnly
+ok 63 - C19_IdentityNegotiator_v21TlsFalseIsHmacOnly
+  ---
+  duration_ms: 0.969092
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v21InvalidRetriesV20Once
+ok 64 - C19_IdentityNegotiator_v21InvalidRetriesV20Once
+  ---
+  duration_ms: 1.934076
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v20OnlyFirmwareFallsBack
+ok 65 - C19_IdentityNegotiator_v20OnlyFirmwareFallsBack
+  ---
+  duration_ms: 1.50327
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_bothResponsesInvalidFailsClosed
+ok 66 - C19_IdentityNegotiator_bothResponsesInvalidFailsClosed
+  ---
+  duration_ms: 1.031417
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v20ExtraFieldFailsClosed
+ok 67 - C19_IdentityNegotiator_v20ExtraFieldFailsClosed
+  ---
+  duration_ms: 0.396063
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_v20ConstantsAndBoundsAreStrict
+ok 68 - C19_IdentityNegotiator_v20ConstantsAndBoundsAreStrict
+  ---
+  duration_ms: 2.924598
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_gatewayNameUsesCharacterLength
+ok 69 - C19_IdentityNegotiator_gatewayNameUsesCharacterLength
+  ---
+  duration_ms: 1.212933
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_pinValidationIsFailClosed
+ok 70 - C19_IdentityNegotiator_pinValidationIsFailClosed
+  ---
+  duration_ms: 1.364733
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_multiplePinsAreAccepted
+ok 71 - C19_IdentityNegotiator_multiplePinsAreAccepted
+  ---
+  duration_ms: 0.407814
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_expectedGatewayIdMismatchIsTerminal
+ok 72 - C19_IdentityNegotiator_expectedGatewayIdMismatchIsTerminal
+  ---
+  duration_ms: 0.547933
+  type: 'test'
+  ...
+# Subtest: C19_IdentityNegotiator_requiresEstablishedSession
+ok 73 - C19_IdentityNegotiator_requiresEstablishedSession
+  ---
+  duration_ms: 0.220378
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_happyPathV21
+ok 74 - C19_BleProvisioningService_happyPathV21
+  ---
+  duration_ms: 28.438518
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_v20FallbackUsesHmacProfile
+ok 75 - C19_BleProvisioningService_v20FallbackUsesHmacProfile
+  ---
+  duration_ms: 8.363295
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_publicScanDedupesAndStops
+ok 76 - C19_BleProvisioningService_publicScanDedupesAndStops
+  ---
+  duration_ms: 0.760276
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_scanPermissionAndBluetoothFailClosed
+ok 77 - C19_BleProvisioningService_scanPermissionAndBluetoothFailClosed
+  ---
+  duration_ms: 1.489714
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_deviceSelection
+ok 78 - C19_BleProvisioningService_deviceSelection
+  ---
+  duration_ms: 5.293008
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_permissionAndBluetoothProvisionFailClosed
+ok 79 - C19_BleProvisioningService_permissionAndBluetoothProvisionFailClosed
+  ---
+  duration_ms: 1.062335
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_connectAndMtuFailuresCleanUp
+ok 80 - C19_BleProvisioningService_connectAndMtuFailuresCleanUp
+  ---
+  duration_ms: 0.984371
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_gattIncompleteFailures
+ok 81 - C19_BleProvisioningService_gattIncompleteFailures
+  ---
+  duration_ms: 1.165295
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_capabilityAndPopFailures
+ok 82 - C19_BleProvisioningService_capabilityAndPopFailures
+  ---
+  duration_ms: 2.166566
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_identityAndExpectedIdFailures
+ok 83 - C19_BleProvisioningService_identityAndExpectedIdFailures
+  ---
+  duration_ms: 5.773787
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_wifiAuthNetworkAndTimeoutClassification
+ok 84 - C19_BleProvisioningService_wifiAuthNetworkAndTimeoutClassification
+  ---
+  duration_ms: 20.280352
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_scanAndDoneFailures
+ok 85 - C19_BleProvisioningService_scanAndDoneFailures
+  ---
+  duration_ms: 21.071595
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_cancelIsTerminalAndCleansUp
+ok 86 - C19_BleProvisioningService_cancelIsTerminalAndCleansUp
+  ---
+  duration_ms: 0.976736
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_preCancelledTokenRejectsBeforeConnect
+ok 87 - C19_BleProvisioningService_preCancelledTokenRejectsBeforeConnect
+  ---
+  duration_ms: 0.646305
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_probeFailuresNeverBind
+ok 88 - C19_BleProvisioningService_probeFailuresNeverBind
+  ---
+  duration_ms: 11.576216
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_tlsPinMismatchNeverBinds
+ok 89 - C19_BleProvisioningService_tlsPinMismatchNeverBinds
+  ---
+  duration_ms: 6.337639
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_draftLifecycleOnSuccessAndFailure
+ok 90 - C19_BleProvisioningService_draftLifecycleOnSuccessAndFailure
+  ---
+  duration_ms: 13.286098
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_missingExistingCredentialFailsClosed
+ok 91 - C19_BleProvisioningService_missingExistingCredentialFailsClosed
+  ---
+  duration_ms: 5.539142
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_latestScanWinsWhenDeviceOmitted
+ok 92 - C19_BleProvisioningService_latestScanWinsWhenDeviceOmitted
+  ---
+  duration_ms: 4.659436
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_emptyDraftRequiresExpectedGatewayId
+ok 93 - C19_BleProvisioningService_emptyDraftRequiresExpectedGatewayId
+  ---
+  duration_ms: 5.138552
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_postProbeListenerFailureDestroysReissuedDraft
+ok 94 - C19_BleProvisioningService_postProbeListenerFailureDestroysReissuedDraft
+  ---
+  duration_ms: 4.0933
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_listenerExceptionsDoNotLockRunning
+ok 95 - C19_BleProvisioningService_listenerExceptionsDoNotLockRunning
+  ---
+  duration_ms: 4.639138
+  type: 'test'
+  ...
+# Subtest: C19_BleProvisioningService_retryUsesNewSessionAndKeypair
+ok 96 - C19_BleProvisioningService_retryUsesNewSessionAndKeypair
+  ---
+  duration_ms: 6.71643
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_sha256MatchesNodeOracle
+ok 97 - C04_CryptoService_sha256MatchesNodeOracle
+  ---
+  duration_ms: 6.598401
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_hmacSha256MatchesNodeOracle
+ok 98 - C04_CryptoService_hmacSha256MatchesNodeOracle
+  ---
+  duration_ms: 1.917305
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_hkdfSha256MatchesRfc5869Case1
+ok 99 - C04_CryptoService_hkdfSha256MatchesRfc5869Case1
+  ---
+  duration_ms: 2.547992
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_pbkdf2Sha256MatchesNodeOracleAtContractMinimum
+ok 100 - C04_CryptoService_pbkdf2Sha256MatchesNodeOracleAtContractMinimum
+  ---
+  duration_ms: 1560.376633
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_kdfParametersFailClosed
+ok 101 - C04_CryptoService_kdfParametersFailClosed
+  ---
+  duration_ms: 1.131793
+  type: 'test'
+  ...
+# Subtest: C04_X25519KeyCodec_wrapsRfc7748RawKeysAsValidDer
+ok 102 - C04_X25519KeyCodec_wrapsRfc7748RawKeysAsValidDer
+  ---
+  duration_ms: 1.443269
+  type: 'test'
+  ...
+# Subtest: C04_X25519KeyCodec_rejectsLengthPrefixAndTrailingData
+ok 103 - C04_X25519KeyCodec_rejectsLengthPrefixAndTrailingData
+  ---
+  duration_ms: 0.361909
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_x25519InputsAndZeroSharedSecretFailClosed
+ok 104 - C04_CryptoService_x25519InputsAndZeroSharedSecretFailClosed
+  ---
+  duration_ms: 0.824555
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_constantTimeEqualHandlesEveryShape
+ok 105 - C04_CryptoService_constantTimeEqualHandlesEveryShape
+  ---
+  duration_ms: 0.230236
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_ctrStreamIsContinuousAndTerminalOnFailure
+ok 106 - C04_CryptoService_ctrStreamIsContinuousAndTerminalOnFailure
+  ---
+  duration_ms: 1.381164
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_ctrRejectsOutputLengthMismatch
+ok 107 - C04_CryptoService_ctrRejectsOutputLengthMismatch
+  ---
+  duration_ms: 0.224495
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_gcmValidationAndTagMismatchFailClosed
+ok 108 - C04_CryptoService_gcmValidationAndTagMismatchFailClosed
+  ---
+  duration_ms: 0.514772
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_randomBytesContractIsExactAndNonZero
+ok 109 - C04_CryptoService_randomBytesContractIsExactAndNonZero
+  ---
+  duration_ms: 0.415468
+  type: 'test'
+  ...
+# Subtest: C04_CryptoErrorClassifier_mapsDesAErrorTable
+ok 110 - C04_CryptoErrorClassifier_mapsDesAErrorTable
+  ---
+  duration_ms: 0.212293
+  type: 'test'
+  ...
+# Subtest: C04_CryptoErrorClassifier_preservesExplicitProviderKind
+ok 111 - C04_CryptoErrorClassifier_preservesExplicitProviderKind
+  ---
+  duration_ms: 0.130802
+  type: 'test'
+  ...
+# Subtest: C04_X25519KeyCodec_prefixesAreDefensiveCopies
+ok 112 - C04_X25519KeyCodec_prefixesAreDefensiveCopies
+  ---
+  duration_ms: 0.180363
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_gcmOperationFailureIsNotTagMismatch
+ok 113 - C04_CryptoService_gcmOperationFailureIsNotTagMismatch
+  ---
+  duration_ms: 0.162561
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_inputLengthMismatchFromProviderFailsClosed
+ok 114 - C04_CryptoService_inputLengthMismatchFromProviderFailsClosed
+  ---
+  duration_ms: 0.279146
+  type: 'test'
+  ...
+# Subtest: T09_C10_newDiscoverAddsUnassignedProtectivelyDisabledDevice
+ok 115 - T09_C10_newDiscoverAddsUnassignedProtectivelyDisabledDevice
+  ---
+  duration_ms: 20.610272
+  type: 'test'
+  ...
+# Subtest: T09_C10_staleSnapshotIsDroppedWhole
+ok 116 - T09_C10_staleSnapshotIsDroppedWhole
+  ---
+  duration_ms: 7.960881
+  type: 'test'
+  ...
+# Subtest: T09_C10_sameEpochOverwriteIsAppliedAndDiagnosed
+ok 117 - T09_C10_sameEpochOverwriteIsAppliedAndDiagnosed
+  ---
+  duration_ms: 5.755263
+  type: 'test'
+  ...
+# Subtest: T09_C10_missingFieldsPreserveOldAndOfflineDoesNotErase
+ok 118 - T09_C10_missingFieldsPreserveOldAndOfflineDoesNotErase
+  ---
+  duration_ms: 3.023931
+  type: 'test'
+  ...
+# Subtest: T09_C10_partialSnapshotNeverMarksGatewayRemoved
+ok 119 - T09_C10_partialSnapshotNeverMarksGatewayRemoved
+  ---
+  duration_ms: 3.616687
+  type: 'test'
+  ...
+# Subtest: T09_C10_fullSnapshotMarksMissingAndReappearanceClearsHint
+ok 120 - T09_C10_fullSnapshotMarksMissingAndReappearanceClearsHint
+  ---
+  duration_ms: 8.629347
+  type: 'test'
+  ...
+# Subtest: T09_C10_aliasUsedIsDiagnosticAndNotPartial
+ok 121 - T09_C10_aliasUsedIsDiagnosticAndNotPartial
+  ---
+  duration_ms: 5.476617
+  type: 'test'
+  ...
+# Subtest: T09_C10_unknownTypeIsReadOnlyAndRunnerRejectsWithZeroCommands
+ok 122 - T09_C10_unknownTypeIsReadOnlyAndRunnerRejectsWithZeroCommands
+  ---
+  duration_ms: 12.931373
+  type: 'test'
+  ...
+# Subtest: T09_C10_tombstoneSurvivesRediscoverAndRestoreReaddsFresh
+ok 123 - T09_C10_tombstoneSurvivesRediscoverAndRestoreReaddsFresh
+  ---
+  duration_ms: 5.587793
+  type: 'test'
+  ...
+# Subtest: T09_C10_removeDeviceCleansSceneReferences
+ok 124 - T09_C10_removeDeviceCleansSceneReferences
+  ---
+  duration_ms: 6.0946
+  type: 'test'
+  ...
+# Subtest: T09_C10_removeDeviceRollsBackWhenSceneCleanupFails
+ok 125 - T09_C10_removeDeviceRollsBackWhenSceneCleanupFails
+  ---
+  duration_ms: 3.359984
+  type: 'test'
+  ...
+# Subtest: T09_C10_ackAppliesStateAndPreservesExecutionOnStaleState
+ok 126 - T09_C10_ackAppliesStateAndPreservesExecutionOnStaleState
+  ---
+  duration_ms: 4.909348
+  type: 'test'
+  ...
+# Subtest: T09_C10_ackMismatchReplayAndNoReportedState
+ok 127 - T09_C10_ackMismatchReplayAndNoReportedState
+  ---
+  duration_ms: 4.29366
+  type: 'test'
+  ...
+# Subtest: T09_C10_applyCloudStateRespectsAcceptedBoundary
+ok 128 - T09_C10_applyCloudStateRespectsAcceptedBoundary
+  ---
+  duration_ms: 2.16876
+  type: 'test'
+  ...
+# Subtest: T09_C10_commandRunnerPrechecksAndControlFlow
+ok 129 - T09_C10_commandRunnerPrechecksAndControlFlow
+  ---
+  duration_ms: 4.198384
+  type: 'test'
+  ...
+# Subtest: T09_C10_commandRunnerEnforcesActionDeviceTypeMatrix
+ok 130 - T09_C10_commandRunnerEnforcesActionDeviceTypeMatrix
+  ---
+  duration_ms: 7.201427
+  type: 'test'
+  ...
+# Subtest: T09_C10_renameAndAssignNeverTouchTheNetwork
+ok 131 - T09_C10_renameAndAssignNeverTouchTheNetwork
+  ---
+  duration_ms: 5.78646
+  type: 'test'
+  ...
+# Subtest: T09_O1_gateSerializesOperations
+ok 132 - T09_O1_gateSerializesOperations
+  ---
+  duration_ms: 17.797961
+  type: 'test'
+  ...
+# Subtest: T09_O1_gateAllowsLegitQueueWithinTimeout
+ok 133 - T09_O1_gateAllowsLegitQueueWithinTimeout
+  ---
+  duration_ms: 20.91193
+  type: 'test'
+  ...
+# Subtest: T09_C10_assignRoomRejectsRoomFromAnotherFamily
+ok 134 - T09_C10_assignRoomRejectsRoomFromAnotherFamily
+  ---
+  duration_ms: 2.169973
+  type: 'test'
+  ...
+# Subtest: T09_C10_unboundGatewayAndFamilyMismatchIgnoreWholeDiscover
+ok 135 - T09_C10_unboundGatewayAndFamilyMismatchIgnoreWholeDiscover
+  ---
+  duration_ms: 4.345596
+  type: 'test'
+  ...
+# Subtest: T09_C10_duplicateAndFamilyMismatchDevicesSetPartial
+ok 136 - T09_C10_duplicateAndFamilyMismatchDevicesSetPartial
+  ---
+  duration_ms: 2.601892
+  type: 'test'
+  ...
+# Subtest: T09_C10_throwingListenerDoesNotAbortDiscover
+ok 137 - T09_C10_throwingListenerDoesNotAbortDiscover
+  ---
+  duration_ms: 1.344046
+  type: 'test'
+  ...
+# Subtest: T09_C10_commitFailureEmitsNoDeviceEvent
+ok 138 - T09_C10_commitFailureEmitsNoDeviceEvent
+  ---
+  duration_ms: 4.170171
+  type: 'test'
+  ...
+# Subtest: T09_C10_commitFailureRollsBackDiagnostics
+ok 139 - T09_C10_commitFailureRollsBackDiagnostics
+  ---
+  duration_ms: 1.591923
+  type: 'test'
+  ...
+# Subtest: T09_C10_removeDevicesForGatewayReadsRouteOutsideTransaction
+ok 140 - T09_C10_removeDevicesForGatewayReadsRouteOutsideTransaction
+  ---
+  duration_ms: 2.298701
+  type: 'test'
+  ...
+# Subtest: T09_C10_commandRunnerRejectsUnassignedDeviceWithZeroCommands
+ok 141 - T09_C10_commandRunnerRejectsUnassignedDeviceWithZeroCommands
+  ---
+  duration_ms: 1.15204
+  type: 'test'
+  ...
+# Subtest: T09_O1_gateRejectsSynchronousNestedRun
+ok 142 - T09_O1_gateRejectsSynchronousNestedRun
+  ---
+  duration_ms: 0.448219
+  type: 'test'
+  ...
+# Subtest: T09_O1_gateRejectsAsyncReentrantCallInsteadOfHanging
+ok 143 - T09_O1_gateRejectsAsyncReentrantCallInsteadOfHanging
+  ---
+  duration_ms: 55.857139
+  type: 'test'
+  ...
+# Subtest: T09_O1_nestedFakeTransactionFailsFast
+ok 144 - T09_O1_nestedFakeTransactionFailsFast
+  ---
+  duration_ms: 1.010669
+  type: 'test'
+  ...
+# Subtest: T09_C09_v4StaticRegistrationIsDelegatedAndIdempotent
+ok 145 - T09_C09_v4StaticRegistrationIsDelegatedAndIdempotent
+  ---
+  duration_ms: 1.069447
+  type: 'test'
+  ...
+# Subtest: T09_C08_createFamilyCreatesAdminAndActivatesFirstFamily
+ok 146 - T09_C08_createFamilyCreatesAdminAndActivatesFirstFamily
+  ---
+  duration_ms: 26.618552
+  type: 'test'
+  ...
+# Subtest: T09_C08_switchFamilyLocksSessionAndRequiresTargetProfile
+ok 147 - T09_C08_switchFamilyLocksSessionAndRequiresTargetProfile
+  ---
+  duration_ms: 6.594805
+  type: 'test'
+  ...
+# Subtest: T09_C08_rbacMatrixAndActorEnforcement
+ok 148 - T09_C08_rbacMatrixAndActorEnforcement
+  ---
+  duration_ms: 7.878969
+  type: 'test'
+  ...
+# Subtest: T09_C08_lastAdminCannotBeRemovedDemotedOrLeave
+ok 149 - T09_C08_lastAdminCannotBeRemovedDemotedOrLeave
+  ---
+  duration_ms: 6.261418
+  type: 'test'
+  ...
+# Subtest: T09_C08_transferAdminUpdatesOwnerAndInvalidatesBothSessions
+ok 150 - T09_C08_transferAdminUpdatesOwnerAndInvalidatesBothSessions
+  ---
+  duration_ms: 3.399717
+  type: 'test'
+  ...
+# Subtest: T09_C08_guestExpiryFreezesAndExplicitExtendReactivates
+ok 151 - T09_C08_guestExpiryFreezesAndExplicitExtendReactivates
+  ---
+  duration_ms: 5.998963
+  type: 'test'
+  ...
+# Subtest: T09_C08_invitationReceiptStateMachineAndWeakModeView
+ok 152 - T09_C08_invitationReceiptStateMachineAndWeakModeView
+  ---
+  duration_ms: 6.220763
+  type: 'test'
+  ...
+# Subtest: T09_C08_revokeAndExpireInvitations
+ok 153 - T09_C08_revokeAndExpireInvitations
+  ---
+  duration_ms: 4.228469
+  type: 'test'
+  ...
+# Subtest: T09_C08_invitationValidationNegativeCases
+ok 154 - T09_C08_invitationValidationNegativeCases
+  ---
+  duration_ms: 2.72557
+  type: 'test'
+  ...
+# Subtest: T09_C08_revokedReceiptLeavesNoActiveMember
+ok 155 - T09_C08_revokedReceiptLeavesNoActiveMember
+  ---
+  duration_ms: 1.448518
+  type: 'test'
+  ...
+# Subtest: T09_C08_expiredReceiptLeavesNoActiveMember
+ok 156 - T09_C08_expiredReceiptLeavesNoActiveMember
+  ---
+  duration_ms: 1.928326
+  type: 'test'
+  ...
+# Subtest: T09_C08_receiptInviteMismatchIsRejectedBeforeMemberWrite
+ok 157 - T09_C08_receiptInviteMismatchIsRejectedBeforeMemberWrite
+  ---
+  duration_ms: 0.945418
+  type: 'test'
+  ...
+# Subtest: T09_C08_codeKekMultipleReceiptsFollowD022
+ok 158 - T09_C08_codeKekMultipleReceiptsFollowD022
+  ---
+  duration_ms: 3.108818
+  type: 'test'
+  ...
+# Subtest: T09_C08_sameReceiptReplayDoesNotConsumeUse
+ok 159 - T09_C08_sameReceiptReplayDoesNotConsumeUse
+  ---
+  duration_ms: 5.68915
+  type: 'test'
+  ...
+# Subtest: T09_C08_keyWrapReceiptReplayIsRejectedWithoutExtraConsumption
+ok 160 - T09_C08_keyWrapReceiptReplayIsRejectedWithoutExtraConsumption
+  ---
+  duration_ms: 2.616418
+  type: 'test'
+  ...
+# Subtest: T09_C08_acceptedCodeKekCanStillBeRevokedWhileUsesRemain
+ok 161 - T09_C08_acceptedCodeKekCanStillBeRevokedWhileUsesRemain
+  ---
+  duration_ms: 4.004835
+  type: 'test'
+  ...
+# Subtest: T09_C08_joinSessionKeyWrapCompletesAndWritesMember
+ok 162 - T09_C08_joinSessionKeyWrapCompletesAndWritesMember
+  ---
+  duration_ms: 2.422179
+  type: 'test'
+  ...
+# Subtest: T09_C08_joinSessionCodeKekWithoutCodeRequiresCodeAndCancelCleansUp
+ok 163 - T09_C08_joinSessionCodeKekWithoutCodeRequiresCodeAndCancelCleansUp
+  ---
+  duration_ms: 1.547542
+  type: 'test'
+  ...
+# Subtest: T09_C08_markContactSyncIsConvergenceOnly
+ok 164 - T09_C08_markContactSyncIsConvergenceOnly
+  ---
+  duration_ms: 5.409503
+  type: 'test'
+  ...
+# Subtest: T09_C08_leaveFamilyRemovesMemberAndProfileOnly
+ok 165 - T09_C08_leaveFamilyRemovesMemberAndProfileOnly
+  ---
+  duration_ms: 2.671931
+  type: 'test'
+  ...
+# Subtest: T09_C08_dissolveFamilyRemovesLocalDataProfilesAndClearsActive
+ok 166 - T09_C08_dissolveFamilyRemovesLocalDataProfilesAndClearsActive
+  ---
+  duration_ms: 3.796751
+  type: 'test'
+  ...
+# Subtest: T09_C08_dissolveReportsProfileCleanupFailureButKeepsLocalDeletion
+ok 167 - T09_C08_dissolveReportsProfileCleanupFailureButKeepsLocalDeletion
+  ---
+  duration_ms: 2.097509
+  type: 'test'
+  ...
+# Subtest: T09_C08_dissolveUsesRouteAuthorityAndReturnsEveryGateway
+ok 168 - T09_C08_dissolveUsesRouteAuthorityAndReturnsEveryGateway
+  ---
+  duration_ms: 1.73024
+  type: 'test'
+  ...
+# Subtest: T09_C08_leaveFamilyReturnsEveryBoundGatewayAndRemovesProfile
+ok 169 - T09_C08_leaveFamilyReturnsEveryBoundGatewayAndRemovesProfile
+  ---
+  duration_ms: 1.758953
+  type: 'test'
+  ...
+# Subtest: T09_C08_removeMemberSuccessInvalidatesSessionsAndGuidesRotation
+ok 170 - T09_C08_removeMemberSuccessInvalidatesSessionsAndGuidesRotation
+  ---
+  duration_ms: 2.271129
+  type: 'test'
+  ...
+# Subtest: T09_C08_changeMemberRoleSuccessInvalidatesSessions
+ok 171 - T09_C08_changeMemberRoleSuccessInvalidatesSessions
+  ---
+  duration_ms: 3.110142
+  type: 'test'
+  ...
+# Subtest: T09_C08_ownerCannotBeDemotedOrRemovedAndTransferRemainsPossible
+ok 172 - T09_C08_ownerCannotBeDemotedOrRemovedAndTransferRemainsPossible
+  ---
+  duration_ms: 4.842294
+  type: 'test'
+  ...
+# Subtest: C02_DeviceKey_derivesGlobalIdAndNeverParsesIt
+ok 173 - C02_DeviceKey_derivesGlobalIdAndNeverParsesIt
+  ---
+  duration_ms: 6.385478
+  type: 'test'
+  ...
+# Subtest: C02_DeviceSnapshot_derivesStateEpochAndValidatesRanges
+ok 174 - C02_DeviceSnapshot_derivesStateEpochAndValidatesRanges
+  ---
+  duration_ms: 2.121624
+  type: 'test'
+  ...
+# Subtest: C02_DeviceState_separatesLocalAndGatewayAuthority
+ok 175 - C02_DeviceState_separatesLocalAndGatewayAuthority
+  ---
+  duration_ms: 0.96811
+  type: 'test'
+  ...
+# Subtest: C02_DeviceStatePatch_acceptsAckFieldsWithoutDeviceMetadata
+ok 176 - C02_DeviceStatePatch_acceptsAckFieldsWithoutDeviceMetadata
+  ---
+  duration_ms: 0.619095
+  type: 'test'
+  ...
+# Subtest: C02_GatewayRoute_enforcesHmacAndTlsProfiles
+ok 177 - C02_GatewayRoute_enforcesHmacAndTlsProfiles
+  ---
+  duration_ms: 1.39571
+  type: 'test'
+  ...
+# Subtest: C02_ControlOutcome_refusesOptimisticSuccess
+ok 178 - C02_ControlOutcome_refusesOptimisticSuccess
+  ---
+  duration_ms: 1.063156
+  type: 'test'
+  ...
+# Subtest: C02_DiscoverySnapshot_enforcesWireConstants
+ok 179 - C02_DiscoverySnapshot_enforcesWireConstants
+  ---
+  duration_ms: 0.667605
+  type: 'test'
+  ...
+# Subtest: C02_ProvisioningIdentity_andResultRespectTlsPorts
+ok 180 - C02_ProvisioningIdentity_andResultRespectTlsPorts
+  ---
+  duration_ms: 0.855582
+  type: 'test'
+  ...
+# Subtest: C02_FamilyModels_enforceGuestAndInviteInvariants
+ok 181 - C02_FamilyModels_enforceGuestAndInviteInvariants
+  ---
+  duration_ms: 2.873103
+  type: 'test'
+  ...
+# Subtest: C02_RoomSceneCloudConfig_shapesAreUsable
+ok 182 - C02_RoomSceneCloudConfig_shapesAreUsable
+  ---
+  duration_ms: 1.882851
+  type: 'test'
+  ...
+# Subtest: T09_C09_roomCreateRenameKeepsIdAndDefaultOrder
+ok 183 - T09_C09_roomCreateRenameKeepsIdAndDefaultOrder
+  ---
+  duration_ms: 12.290828
+  type: 'test'
+  ...
+# Subtest: T09_C09_roomNameValidationAndNotFound
+ok 184 - T09_C09_roomNameValidationAndNotFound
+  ---
+  duration_ms: 5.188234
+  type: 'test'
+  ...
+# Subtest: T09_C09_reorderRequiresExactSet
+ok 185 - T09_C09_reorderRequiresExactSet
+  ---
+  duration_ms: 6.524565
+  type: 'test'
+  ...
+# Subtest: T09_C09_assignMoveAndUnassignFollowPoolSemantics
+ok 186 - T09_C09_assignMoveAndUnassignFollowPoolSemantics
+  ---
+  duration_ms: 8.747365
+  type: 'test'
+  ...
+# Subtest: T09_C09_previewDeleteReportsDevicesAndRejectsStaleConfirmation
+ok 187 - T09_C09_previewDeleteReportsDevicesAndRejectsStaleConfirmation
+  ---
+  duration_ms: 6.513775
+  type: 'test'
+  ...
+# Subtest: T09_C09_deleteRoomIsOneTransactionDevicesUnassignedGrantsRemoved
+ok 188 - T09_C09_deleteRoomIsOneTransactionDevicesUnassignedGrantsRemoved
+  ---
+  duration_ms: 7.86829
+  type: 'test'
+  ...
+# Subtest: T09_C09_deleteRoomRollsBackRoomDeviceAndGrantOnFailure
+ok 189 - T09_C09_deleteRoomRollsBackRoomDeviceAndGrantOnFailure
+  ---
+  duration_ms: 6.044367
+  type: 'test'
+  ...
+# Subtest: T09_C09_deleteEmptyAndLastRoomSucceeds
+ok 190 - T09_C09_deleteEmptyAndLastRoomSucceeds
+  ---
+  duration_ms: 8.683487
+  type: 'test'
+  ...
+# Subtest: T09_C09_throwingListenerDoesNotFailRoomDeletion
+ok 191 - T09_C09_throwingListenerDoesNotFailRoomDeletion
+  ---
+  duration_ms: 2.179641
+  type: 'test'
+  ...
+# Subtest: T09_C11_sceneCrudAndValidation
+ok 192 - T09_C11_sceneCrudAndValidation
+  ---
+  duration_ms: 29.782373
+  type: 'test'
+  ...
+# Subtest: T09_C11_runSucceedsSeriallyAndEmitsEvents
+ok 193 - T09_C11_runSucceedsSeriallyAndEmitsEvents
+  ---
+  duration_ms: 11.693032
+  type: 'test'
+  ...
+# Subtest: T09_C11_preflightFailureSendsZeroCommands
+ok 194 - T09_C11_preflightFailureSendsZeroCommands
+  ---
+  duration_ms: 11.284096
+  type: 'test'
+  ...
+# Subtest: T09_C11_firstStepFailureMarksRestSkipped
+ok 195 - T09_C11_firstStepFailureMarksRestSkipped
+  ---
+  duration_ms: 4.268834
+  type: 'test'
+  ...
+# Subtest: T09_C11_secondStepFailureIsPartialFailedWithoutRollback
+ok 196 - T09_C11_secondStepFailureIsPartialFailedWithoutRollback
+  ---
+  duration_ms: 7.103105
+  type: 'test'
+  ...
+# Subtest: T09_C11_mismatchFailsUnverifiedSucceeds
+ok 197 - T09_C11_mismatchFailsUnverifiedSucceeds
+  ---
+  duration_ms: 5.182052
+  type: 'test'
+  ...
+# Subtest: T09_C11_delayMsWaitsForTimerBeforeCommand
+ok 198 - T09_C11_delayMsWaitsForTimerBeforeCommand
+  ---
+  duration_ms: 18.118384
+  type: 'test'
+  ...
+# Subtest: T09_C11_cancelDuringDelayLeavesExecutedStepsAndSkipsRest
+ok 199 - T09_C11_cancelDuringDelayLeavesExecutedStepsAndSkipsRest
+  ---
+  duration_ms: 8.508284
+  type: 'test'
+  ...
+# Subtest: T09_C11_roomDeletionMakesScenePreflightUnassigned
+ok 200 - T09_C11_roomDeletionMakesScenePreflightUnassigned
+  ---
+  duration_ms: 8.443834
+  type: 'test'
+  ...
+# Subtest: T09_C11_disabledAndEmptyScenesAreRejected
+ok 201 - T09_C11_disabledAndEmptyScenesAreRejected
+  ---
+  duration_ms: 6.390858
+  type: 'test'
+  ...
+# Subtest: T09_C11_sameSceneConcurrentRunIsRejectedAndNeverDoubleDispatches
+ok 202 - T09_C11_sameSceneConcurrentRunIsRejectedAndNeverDoubleDispatches
+  ---
+  duration_ms: 8.033185
+  type: 'test'
+  ...
+# Subtest: T09_C11_mismatchWritesGatewayTruthToSsot
+ok 203 - T09_C11_mismatchWritesGatewayTruthToSsot
+  ---
+  duration_ms: 5.059065
+  type: 'test'
+  ...
+# Subtest: T09_C11_totalTimeoutMarksTheBlockedStepFailedNotPending
+ok 204 - T09_C11_totalTimeoutMarksTheBlockedStepFailedNotPending
+  ---
+  duration_ms: 13.23325
+  type: 'test'
+  ...
+# Subtest: T09_C11_stepTimeoutFailsStepAndIgnoresLateOutcome
+ok 205 - T09_C11_stepTimeoutFailsStepAndIgnoresLateOutcome
+  ---
+  duration_ms: 4.599505
+  type: 'test'
+  ...
+# Subtest: T09_C11_throwingProgressAndEventListenersDoNotFailRun
+ok 206 - T09_C11_throwingProgressAndEventListenersDoNotFailRun
+  ---
+  duration_ms: 4.029041
+  type: 'test'
+  ...
+# Subtest: C01_AppError_catalogCarriesCategoryRetryableAndI18nKey
+ok 207 - C01_AppError_catalogCarriesCategoryRetryableAndI18nKey
+  ---
+  duration_ms: 6.480523
+  type: 'test'
+  ...
+# Subtest: C01_Result_neverSwallowsAppError
+ok 208 - C01_Result_neverSwallowsAppError
+  ---
+  duration_ms: 0.363802
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_roundTripsSecondsAndValidatesCalendar
+ok 209 - C01_DateTimeUtil_roundTripsSecondsAndValidatesCalendar
+  ---
+  duration_ms: 1.385052
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_windowIsInclusiveAt120000ms
+ok 210 - C01_DateTimeUtil_windowIsInclusiveAt120000ms
+  ---
+  duration_ms: 0.267064
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_requestIdUsesMillisAndSeq
+ok 211 - C01_DateTimeUtil_requestIdUsesMillisAndSeq
+  ---
+  duration_ms: 1.075759
+  type: 'test'
+  ...
+# Subtest: C01_BytesUtil_hexRoundTripsAndStrictLowerRejectsUppercase
+ok 212 - C01_BytesUtil_hexRoundTripsAndStrictLowerRejectsUppercase
+  ---
+  duration_ms: 1.259599
+  type: 'test'
+  ...
+# Subtest: C01_Utf8_isStrictAndRoundTripsUnicode
+ok 213 - C01_Utf8_isStrictAndRoundTripsUnicode
+  ---
+  duration_ms: 1.262705
+  type: 'test'
+  ...
+# Subtest: C01_Base64Url_isUnpaddedAndStrict
+ok 214 - C01_Base64Url_isUnpaddedAndStrict
+  ---
+  duration_ms: 1.3681
+  type: 'test'
+  ...
+# Subtest: C01_JsonAtom_matchesCanonicalValueRules
+ok 215 - C01_JsonAtom_matchesCanonicalValueRules
+  ---
+  duration_ms: 1.008825
+  type: 'test'
+  ...
+# Subtest: C01_JsonParser_rejectsMalformedOrAmbiguousInput
+ok 216 - C01_JsonParser_rejectsMalformedOrAmbiguousInput
+  ---
+  duration_ms: 3.205408
+  type: 'test'
+  ...
+# Subtest: C01_JsonCanonicalizer_isCompactAndSupportsSortedKeys
+ok 217 - C01_JsonCanonicalizer_isCompactAndSupportsSortedKeys
+  ---
+  duration_ms: 0.766267
+  type: 'test'
+  ...
+# Subtest: C01_HttpHeaders_areCaseInsensitiveAndLastWins
+ok 218 - C01_HttpHeaders_areCaseInsensitiveAndLastWins
+  ---
+  duration_ms: 0.439603
+  type: 'test'
+  ...
+# Subtest: C01_GatewayResultClassifier_separatesGatewayNamespace
+ok 219 - C01_GatewayResultClassifier_separatesGatewayNamespace
+  ---
+  duration_ms: 0.321214
+  type: 'test'
+  ...
+# Subtest: C01_IpAddressUtil_validatesLanAddresses
+ok 220 - C01_IpAddressUtil_validatesLanAddresses
+  ---
+  duration_ms: 1.426067
+  type: 'test'
+  ...
+# Subtest: C01_SecureBytes_zeroizesAndRejectsUseAfterDestroy
+ok 221 - C01_SecureBytes_zeroizesAndRejectsUseAfterDestroy
+  ---
+  duration_ms: 0.644101
+  type: 'test'
+  ...
+# Subtest: C01_UuidUtil_usesInjectedIdPort
+ok 222 - C01_UuidUtil_usesInjectedIdPort
+  ---
+  duration_ms: 0.800921
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_probeVerifiesBoundRoute
+ok 223 - C18_lastKnown_probeVerifiesBoundRoute
+  ---
+  duration_ms: 4.258966
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_failureDoesNotBlockOtherRoutes
+ok 224 - C18_lastKnown_failureDoesNotBlockOtherRoutes
+  ---
+  duration_ms: 1.41681
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_identityMismatchNeverVerifies
+ok 225 - C18_lastKnown_identityMismatchNeverVerifies
+  ---
+  duration_ms: 0.777418
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_profileMismatchIsPBlockedEvidence
+ok 226 - C18_lastKnown_profileMismatchIsPBlockedEvidence
+  ---
+  duration_ms: 0.73
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_tlsRouteWithoutPinEvidenceIsNotVerified
+ok 227 - C18_lastKnown_tlsRouteWithoutPinEvidenceIsNotVerified
+  ---
+  duration_ms: 0.639903
+  type: 'test'
+  ...
+# Subtest: C18_lastKnown_tlsRouteWithPinOutsidePinsIsNotVerified
+ok 228 - C18_lastKnown_tlsRouteWithPinOutsidePinsIsNotVerified
+  ---
+  duration_ms: 1.180212
+  type: 'test'
+  ...
+# Subtest: C18_candidates_areDedupedAndLatencyOrdered
+ok 229 - C18_candidates_areDedupedAndLatencyOrdered
+  ---
+  duration_ms: 1.837218
+  type: 'test'
+  ...
+# Subtest: C18_mdns_withoutHintIsLocatorOnly
+ok 230 - C18_mdns_withoutHintIsLocatorOnly
+  ---
+  duration_ms: 1.455571
+  type: 'test'
+  ...
+# Subtest: C18_mdns_hintMatchingBoundRouteUsesSignedProbe
+ok 231 - C18_mdns_hintMatchingBoundRouteUsesSignedProbe
+  ---
+  duration_ms: 2.111384
+  type: 'test'
+  ...
+# Subtest: C18_mdns_scanFailureIsWarningOnly
+ok 232 - C18_mdns_scanFailureIsWarningOnly
+  ---
+  duration_ms: 1.035424
+  type: 'test'
+  ...
+# Subtest: C18_mdns_profileMismatchIsTlsProfileInconsistent
+ok 233 - C18_mdns_profileMismatchIsTlsProfileInconsistent
+  ---
+  duration_ms: 0.923318
+  type: 'test'
+  ...
+# Subtest: C18_beacon_rejectsNonLanAddresses
+ok 234 - C18_beacon_rejectsNonLanAddresses
+  ---
+  duration_ms: 0.738154
+  type: 'test'
+  ...
+# Subtest: C18_udp_unresolvedPB01_isWarningWhenRequested
+ok 235 - C18_udp_unresolvedPB01_isWarningWhenRequested
+  ---
+  duration_ms: 0.214687
+  type: 'test'
+  ...
+# Subtest: C18_udp_injectedBeaconsRemainUnverifiedLocators
+ok 236 - C18_udp_injectedBeaconsRemainUnverifiedLocators
+  ---
+  duration_ms: 0.414066
+  type: 'test'
+  ...
+# Subtest: C18_manual_requiresBoundGatewayAndUpdatesAddressOnSuccess
+ok 237 - C18_manual_requiresBoundGatewayAndUpdatesAddressOnSuccess
+  ---
+  duration_ms: 0.626208
+  type: 'test'
+  ...
+# Subtest: C18_manual_rejectsUnboundAndInvalidAddresses
+ok 238 - C18_manual_rejectsUnboundAndInvalidAddresses
+  ---
+  duration_ms: 0.446767
+  type: 'test'
+  ...
+# Subtest: C18_manual_identityMismatchDoesNotUpdateAddress
+ok 239 - C18_manual_identityMismatchDoesNotUpdateAddress
+  ---
+  duration_ms: 0.307459
+  type: 'test'
+  ...
+# Subtest: C18_manual_rateLimitAndFailureBudget
+ok 240 - C18_manual_rateLimitAndFailureBudget
+  ---
+  duration_ms: 2.571675
+  type: 'test'
+  ...
+# Subtest: C18_manual_explicitResetClearsFailureBudgetAndInterval
+ok 241 - C18_manual_explicitResetClearsFailureBudgetAndInterval
+  ---
+  duration_ms: 1.727535
+  type: 'test'
+  ...
+# Subtest: C18_probeLastKnown_returnsUndefinedWithoutAddress
+ok 242 - C18_probeLastKnown_returnsUndefinedWithoutAddress
+  ---
+  duration_ms: 0.541992
+  type: 'test'
+  ...
+# Subtest: C18_probeLastKnown_transportFailureReturnsUnverifiedCandidate
+ok 243 - C18_probeLastKnown_transportFailureReturnsUnverifiedCandidate
+  ---
+  duration_ms: 0.352683
+  type: 'test'
+  ...
+# Subtest: C18_probeTimeoutIsClassifiedAndDoesNotHang
+ok 244 - C18_probeTimeoutIsClassifiedAndDoesNotHang
+  ---
+  duration_ms: 21.110266
+  type: 'test'
+  ...
+# Subtest: C18_cancellationStopsDiscovery
+ok 245 - C18_cancellationStopsDiscovery
+  ---
+  duration_ms: 0.457196
+  type: 'test'
+  ...
+# Subtest: C18_probeBackoffSequenceMatchesBindingProbeBudget
+ok 246 - C18_probeBackoffSequenceMatchesBindingProbeBudget
+  ---
+  duration_ms: 1.107978
+  type: 'test'
+  ...
+# Subtest: C17_discover_pipeline_signsAndVerifiesResponse
+ok 247 - C17_discover_pipeline_signsAndVerifiesResponse
+  ---
+  duration_ms: 14.436796
+  type: 'test'
+  ...
+# Subtest: C17_discover_gatewayIdMismatchRejected
+ok 248 - C17_discover_gatewayIdMismatchRejected
+  ---
+  duration_ms: 7.224459
+  type: 'test'
+  ...
+# Subtest: C17_control_success_appliesAckChain
+ok 249 - C17_control_success_appliesAckChain
+  ---
+  duration_ms: 6.893547
+  type: 'test'
+  ...
+# Subtest: C17_control_retriesExactBytesOnTimeout
+ok 250 - C17_control_retriesExactBytesOnTimeout
+  ---
+  duration_ms: 5.370161
+  type: 'test'
+  ...
+# Subtest: C17_control_retriesHttp500WithoutSignedAck
+ok 251 - C17_control_retriesHttp500WithoutSignedAck
+  ---
+  duration_ms: 5.333413
+  type: 'test'
+  ...
+# Subtest: C17_control_exhaustsThreeAttemptsOnUnsignedHttp500
+ok 252 - C17_control_exhaustsThreeAttemptsOnUnsignedHttp500
+  ---
+  duration_ms: 2.214906
+  type: 'test'
+  ...
+# Subtest: C17_control_http500WithBadSignatureFailsClosedWithoutRetry
+ok 253 - C17_control_http500WithBadSignatureFailsClosedWithoutRetry
+  ---
+  duration_ms: 1.46575
+  type: 'test'
+  ...
+# Subtest: C17_control_http500WithBadCorrelationFailsClosedWithoutRetry
+ok 254 - C17_control_http500WithBadCorrelationFailsClosedWithoutRetry
+  ---
+  duration_ms: 1.082001
+  type: 'test'
+  ...
+# Subtest: C17_control_http500WithSignedMalformedAckIsProtocolViolation
+ok 255 - C17_control_http500WithSignedMalformedAckIsProtocolViolation
+  ---
+  duration_ms: 2.818803
+  type: 'test'
+  ...
+# Subtest: C17_control_http422WithBadSignatureFailsClosedWithoutRetry
+ok 256 - C17_control_http422WithBadSignatureFailsClosedWithoutRetry
+  ---
+  duration_ms: 3.250791
+  type: 'test'
+  ...
+# Subtest: C17_control_http4xxWithoutAckMaterialDoesNotRetry
+ok 257 - C17_control_http4xxWithoutAckMaterialDoesNotRetry
+  ---
+  duration_ms: 5.128834
+  type: 'test'
+  ...
+# Subtest: C17_control_doesNotRetrySignedGatewayError
+ok 258 - C17_control_doesNotRetrySignedGatewayError
+  ---
+  duration_ms: 2.319849
+  type: 'test'
+  ...
+# Subtest: C17_control_exhaustsThreeAttemptsOnTransportFailure
+ok 259 - C17_control_exhaustsThreeAttemptsOnTransportFailure
+  ---
+  duration_ms: 0.921113
+  type: 'test'
+  ...
+# Subtest: C17_controlNormalizesAcModeBeforeSigning
+ok 260 - C17_controlNormalizesAcModeBeforeSigning
+  ---
+  duration_ms: 6.312342
+  type: 'test'
+  ...
+# Subtest: C17_control_badSignatureFailsClosedWithoutRetry
+ok 261 - C17_control_badSignatureFailsClosedWithoutRetry
+  ---
+  duration_ms: 1.894413
+  type: 'test'
+  ...
+# Subtest: C17_control_badCorrelationFailsClosedWithoutRetry
+ok 262 - C17_control_badCorrelationFailsClosedWithoutRetry
+  ---
+  duration_ms: 3.078683
+  type: 'test'
+  ...
+# Subtest: C17_control_successWithoutReportedStateIsProtocolViolation
+ok 263 - C17_control_successWithoutReportedStateIsProtocolViolation
+  ---
+  duration_ms: 2.232919
+  type: 'test'
+  ...
+# Subtest: C17_control_stateTargetMismatchIsRejected
+ok 264 - C17_control_stateTargetMismatchIsRejected
+  ---
+  duration_ms: 1.340869
+  type: 'test'
+  ...
+# Subtest: C17_devOnlyResponseRejectedBeforeVerification
+ok 265 - C17_devOnlyResponseRejectedBeforeVerification
+  ---
+  duration_ms: 5.403903
+  type: 'test'
+  ...
+# Subtest: C17_pBlockedSendsNoRequest
+ok 266 - C17_pBlockedSendsNoRequest
+  ---
+  duration_ms: 0.861974
+  type: 'test'
+  ...
+# Subtest: C17_tlsProfileWithMissingPinsSendsNoRequest
+ok 267 - C17_tlsProfileWithMissingPinsSendsNoRequest
+  ---
+  duration_ms: 0.370666
+  type: 'test'
+  ...
+# Subtest: C17_tlsPinMismatchNeverFallsBackToCleartext
+ok 268 - C17_tlsPinMismatchNeverFallsBackToCleartext
+  ---
+  duration_ms: 1.212913
+  type: 'test'
+  ...
+# Subtest: C17_tlsHandshakeFailureIsLoggedWithoutSecret
+ok 269 - C17_tlsHandshakeFailureIsLoggedWithoutSecret
+  ---
+  duration_ms: 0.667244
+  type: 'test'
+  ...
+# Subtest: C17_tlsProbeReturnsMatchedPinAndRuntimeProfile
+ok 270 - C17_tlsProbeReturnsMatchedPinAndRuntimeProfile
+  ---
+  duration_ms: 0.88151
+  type: 'test'
+  ...
+# Subtest: C17_tlsProbeWithoutVerificationEvidenceFailsClosed
+ok 271 - C17_tlsProbeWithoutVerificationEvidenceFailsClosed
+  ---
+  duration_ms: 0.817422
+  type: 'test'
+  ...
+# Subtest: C17_tlsProbeWithPinOutsideRouteFailsClosed
+ok 272 - C17_tlsProbeWithPinOutsideRouteFailsClosed
+  ---
+  duration_ms: 0.593167
+  type: 'test'
+  ...
+# Subtest: C17_tlsProbeWithInconsistentPeerSpkiFailsClosed
+ok 273 - C17_tlsProbeWithInconsistentPeerSpkiFailsClosed
+  ---
+  duration_ms: 0.518349
+  type: 'test'
+  ...
+# Subtest: C17_tlsControlWithMatchingEvidenceSucceeds
+ok 274 - C17_tlsControlWithMatchingEvidenceSucceeds
+  ---
+  duration_ms: 4.618801
+  type: 'test'
+  ...
+# Subtest: C17_cleartextDisabledRefusesHmacWithoutFallback
+ok 275 - C17_cleartextDisabledRefusesHmacWithoutFallback
+  ---
+  duration_ms: 0.463086
+  type: 'test'
+  ...
+# Subtest: C17_sendUsesBoundRouteAndRejectsUnboundGateway
+ok 276 - C17_sendUsesBoundRouteAndRejectsUnboundGateway
+  ---
+  duration_ms: 2.638429
+  type: 'test'
+  ...
+# Subtest: C17_commandGatewayIdentityMustMatchTarget
+ok 277 - C17_commandGatewayIdentityMustMatchTarget
+  ---
+  duration_ms: 0.418083
+  type: 'test'
+  ...
+# Subtest: C17_controlPolicyRejectsLocalUnsupportedAndOutOfRangeActions
+ok 278 - C17_controlPolicyRejectsLocalUnsupportedAndOutOfRangeActions
+  ---
+  duration_ms: 0.718609
+  type: 'test'
+  ...
+# Subtest: C17_controlPolicyNormalizesColorAndAcceptsMatrix
+ok 279 - C17_controlPolicyNormalizesColorAndAcceptsMatrix
+  ---
+  duration_ms: 0.343365
+  type: 'test'
+  ...
+# Subtest: C17_controlPolicyRequiresValueForSetActions
+ok 280 - C17_controlPolicyRequiresValueForSetActions
+  ---
+  duration_ms: 0.495096
+  type: 'test'
+  ...
+# Subtest: C17_controlPolicyNormalizesAcModeCase
+ok 281 - C17_controlPolicyNormalizesAcModeCase
+  ---
+  duration_ms: 0.188048
+  type: 'test'
+  ...
+# Subtest: C20_normal_discoverIsDeterministic
+ok 282 - C20_normal_discoverIsDeterministic
+  ---
+  duration_ms: 4.485714
+  type: 'test'
+  ...
+# Subtest: C20_offline_throwsUnreachable
+ok 283 - C20_offline_throwsUnreachable
+  ---
+  duration_ms: 1.792004
+  type: 'test'
+  ...
+# Subtest: C20_timeout_usesInjectedDelayAndClassifiesTimeout
+ok 284 - C20_timeout_usesInjectedDelayAndClassifiesTimeout
+  ---
+  duration_ms: 1.22736
+  type: 'test'
+  ...
+# Subtest: C20_devOnly_isRejected
+ok 285 - C20_devOnly_isRejected
+  ---
+  duration_ms: 1.118819
+  type: 'test'
+  ...
+# Subtest: C20_tlsPinMatch_probeReturnsMatchedPin
+ok 286 - C20_tlsPinMatch_probeReturnsMatchedPin
+  ---
+  duration_ms: 0.80575
+  type: 'test'
+  ...
+# Subtest: C20_tlsPinMismatchAndHandshakeFail_areHardFailures
+ok 287 - C20_tlsPinMismatchAndHandshakeFail_areHardFailures
+  ---
+  duration_ms: 0.691709
+  type: 'test'
+  ...
+# Subtest: C20_normal_controlRunsProductionAckChain
+ok 288 - C20_normal_controlRunsProductionAckChain
+  ---
+  duration_ms: 9.990193
+  type: 'test'
+  ...
+# Subtest: C20_ackLost_firstAttemptTimedOutThenOriginalAckIsReturned
+ok 289 - C20_ackLost_firstAttemptTimedOutThenOriginalAckIsReturned
+  ---
+  duration_ms: 4.282769
+  type: 'test'
+  ...
+# Subtest: C20_replay_sameCommandReplaysAndDifferentCommandReturns1005
+ok 290 - C20_replay_sameCommandReplaysAndDifferentCommandReturns1005
+  ---
+  duration_ms: 5.903807
+  type: 'test'
+  ...
+# Subtest: C20_resultCodeOverride_returnsSignedGatewayErrorWithoutThrowing
+ok 291 - C20_resultCodeOverride_returnsSignedGatewayErrorWithoutThrowing
+  ---
+  duration_ms: 3.545276
+  type: 'test'
+  ...
+# Subtest: C20_omitReportedState_isProtocolViolation
+ok 292 - C20_omitReportedState_isProtocolViolation
+  ---
+  duration_ms: 1.84941
+  type: 'test'
+  ...
+# Subtest: C20_badSignatureAndCorrelation_failClosed
+ok 293 - C20_badSignatureAndCorrelation_failClosed
+  ---
+  duration_ms: 0.806251
+  type: 'test'
+  ...
+# Subtest: C20_failAtAttempt_onlyThatRequestFails
+ok 294 - C20_failAtAttempt_onlyThatRequestFails
+  ---
+  duration_ms: 0.404979
+  type: 'test'
+  ...
+# Subtest: C20_deviceControlPortSendUsesMockGateway
+ok 295 - C20_deviceControlPortSendUsesMockGateway
+  ---
+  duration_ms: 0.634804
+  type: 'test'
+  ...
+# Subtest: C20_mockBle_normalScanAndProvisionV20
+ok 296 - C20_mockBle_normalScanAndProvisionV20
+  ---
+  duration_ms: 3.45593
+  type: 'test'
+  ...
+# Subtest: C20_mockBle_tlsModeReturnsV21PinsAndOfflineFails
+ok 297 - C20_mockBle_tlsModeReturnsV21PinsAndOfflineFails
+  ---
+  duration_ms: 0.720993
+  type: 'test'
+  ...
+# Subtest: C20_mockBle_cancelIsObservedBetweenStages
+ok 298 - C20_mockBle_cancelIsObservedBetweenStages
+  ---
+  duration_ms: 0.335851
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_hmacPersistsRouteAndOneShotSecret
+ok 299 - C07_commitBinding_hmacPersistsRouteAndOneShotSecret
+  ---
+  duration_ms: 12.477152
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_tlsPersistsPinsPortAndMaterial
+ok 300 - C07_commitBinding_tlsPersistsPinsPortAndMaterial
+  ---
+  duration_ms: 5.110851
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_rejectsDraftMismatchBeforeConsumingDraft
+ok 301 - C07_commitBinding_rejectsDraftMismatchBeforeConsumingDraft
+  ---
+  duration_ms: 0.971556
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_rejectsSilentFamilyMigration
+ok 302 - C07_commitBinding_rejectsSilentFamilyMigration
+  ---
+  duration_ms: 2.086729
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_routeWriteFails_restoresPreviousSecret
+ok 303 - C07_commitBinding_routeWriteFails_restoresPreviousSecret
+  ---
+  duration_ms: 2.477501
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_rollbackRestoreFailureDeletesUnverifiedSecret
+ok 304 - C07_commitBinding_rollbackRestoreFailureDeletesUnverifiedSecret
+  ---
+  duration_ms: 2.487329
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_freshRouteWriteFails_removesNewSecret
+ok 305 - C07_commitBinding_freshRouteWriteFails_removesNewSecret
+  ---
+  duration_ms: 1.421278
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_secretWriteFails_writesNoRoute
+ok 306 - C07_commitBinding_secretWriteFails_writesNoRoute
+  ---
+  duration_ms: 1.266001
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_rejectsShortAndOversizedDraftSecretsBeforePersisting
+ok 307 - C07_commitBinding_rejectsShortAndOversizedDraftSecretsBeforePersisting
+  ---
+  duration_ms: 18.285793
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_withoutDraftReusesSecretAndRequiresExistingBinding
+ok 308 - C07_commitBinding_withoutDraftReusesSecretAndRequiresExistingBinding
+  ---
+  duration_ms: 13.5847
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_markSeenFailureStillReportsCommittedBinding
+ok 309 - C07_commitBinding_markSeenFailureStillReportsCommittedBinding
+  ---
+  duration_ms: 0.949086
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_reusePath_markSeenFailureStillReportsCommittedBinding
+ok 310 - C07_commitBinding_reusePath_markSeenFailureStillReportsCommittedBinding
+  ---
+  duration_ms: 1.366587
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_readBackFailureReturnsCommittedSnapshot
+ok 311 - C07_commitBinding_readBackFailureReturnsCommittedSnapshot
+  ---
+  duration_ms: 0.929348
+  type: 'test'
+  ...
+# Subtest: C07_commitBinding_missingDraftMeansExpired
+ok 312 - C07_commitBinding_missingDraftMeansExpired
+  ---
+  duration_ms: 0.417572
+  type: 'test'
+  ...
+# Subtest: C07_applyInvitedGateway_isIdempotentAndPreservesCreatedAt
+ok 313 - C07_applyInvitedGateway_isIdempotentAndPreservesCreatedAt
+  ---
+  duration_ms: 3.105002
+  type: 'test'
+  ...
+# Subtest: C07_applyInvitedGateway_secretWriteFailureWritesNoRoute
+ok 314 - C07_applyInvitedGateway_secretWriteFailureWritesNoRoute
+  ---
+  duration_ms: 0.67058
+  type: 'test'
+  ...
+# Subtest: C07_setPersistentProfile_rejectsBlockedAndMigratesHmacTls
+ok 315 - C07_setPersistentProfile_rejectsBlockedAndMigratesHmacTls
+  ---
+  duration_ms: 2.567718
+  type: 'test'
+  ...
+# Subtest: C07_pinVerified_shrinksMultiPinSetAndFailsClosedOnUnknownPin
+ok 316 - C07_pinVerified_shrinksMultiPinSetAndFailsClosedOnUnknownPin
+  ---
+  duration_ms: 6.448885
+  type: 'test'
+  ...
+# Subtest: C07_rotateSecret_successPromotesActiveAndRemovesPending
+ok 317 - C07_rotateSecret_successPromotesActiveAndRemovesPending
+  ---
+  duration_ms: 3.656722
+  type: 'test'
+  ...
+# Subtest: C07_rotateSecret_verificationFailureKeepsActiveAndRemovesPending
+ok 318 - C07_rotateSecret_verificationFailureKeepsActiveAndRemovesPending
+  ---
+  duration_ms: 5.249056
+  type: 'test'
+  ...
+# Subtest: C07_rotateSecret_verifierThrowKeepsActiveAndRemovesPending
+ok 319 - C07_rotateSecret_verifierThrowKeepsActiveAndRemovesPending
+  ---
+  duration_ms: 2.876559
+  type: 'test'
+  ...
+# Subtest: C07_initialize_cleansLeftoverPendingRotationAliases
+ok 320 - C07_initialize_cleansLeftoverPendingRotationAliases
+  ---
+  duration_ms: 0.363182
+  type: 'test'
+  ...
+# Subtest: C07_removeLocalBinding_deletesRouteSecretsAndSequenceWithoutNetwork
+ok 321 - C07_removeLocalBinding_deletesRouteSecretsAndSequenceWithoutNetwork
+  ---
+  duration_ms: 2.27099
+  type: 'test'
+  ...
+# Subtest: C07_sequence_nextPeekResetAndSaturation
+ok 322 - C07_sequence_nextPeekResetAndSaturation
+  ---
+  duration_ms: 2.15238
+  type: 'test'
+  ...
+# Subtest: C07_sequence_concurrentNextCallsAreSerialized
+ok 323 - C07_sequence_concurrentNextCallsAreSerialized
+  ---
+  duration_ms: 14.515582
+  type: 'test'
+  ...
+# Subtest: C07_routes_listByFamilyIsBoundAndAddressUpdates
+ok 324 - C07_routes_listByFamilyIsBoundAndAddressUpdates
+  ---
+  duration_ms: 4.059166
+  type: 'test'
+  ...
+# Subtest: C07_credentials_unboundAndTlsOnlySemantics
+ok 325 - C07_credentials_unboundAndTlsOnlySemantics
+  ---
+  duration_ms: 0.554135
+  type: 'test'
+  ...
+# Subtest: C07_initialize_requiresTablesAndInitializeState
+ok 326 - C07_initialize_requiresTablesAndInitializeState
+  ---
+  duration_ms: 0.40574
+  type: 'test'
+  ...
+# Subtest: C07_secretDiscipline_noPlaintextInPreferencesRdbOrErrors
+ok 327 - C07_secretDiscipline_noPlaintextInPreferencesRdbOrErrors
+  ---
+  duration_ms: 2.404356
+  type: 'test'
+  ...
+# Subtest: host runner baseline: arithmetic
+ok 328 - host runner baseline: arithmetic
+  ---
+  duration_ms: 4.341007
+  type: 'test'
+  ...
+# Subtest: host runner baseline: strings
+ok 329 - host runner baseline: strings
+  ---
+  duration_ms: 0.357251
+  type: 'test'
+  ...
+# Subtest: host runner executes pure arithmetic and assertions
+ok 330 - host runner executes pure arithmetic and assertions
+  ---
+  duration_ms: 1.752581
+  type: 'test'
+  ...
+# Subtest: valueAtom follows the protocol README
+ok 331 - valueAtom follows the protocol README
+  ---
+  duration_ms: 0.665681
+  type: 'test'
+  ...
+# Subtest: all 4 control HMAC vectors reproduce canonical and signature
+ok 332 - all 4 control HMAC vectors reproduce canonical and signature
+  ---
+  duration_ms: 1.493292
+  type: 'test'
+  ...
+# Subtest: response-auth vector reproduces body hash, canonical and signature
+ok 333 - response-auth vector reproduces body hash, canonical and signature
+  ---
+  duration_ms: 0.90865
+  type: 'test'
+  ...
+# Subtest: discovery-request vector reproduces canonical and signature
+ok 334 - discovery-request vector reproduces canonical and signature
+  ---
+  duration_ms: 3.139055
+  type: 'test'
+  ...
+# Subtest: golden discover response is schema-shaped and uses wire field names
+ok 335 - golden discover response is schema-shaped and uses wire field names
+  ---
+  duration_ms: 1.673194
+  type: 'test'
+  ...
+# Subtest: golden ACK satisfies execution-confirmation fields
+ok 336 - golden ACK satisfies execution-confirmation fields
+  ---
+  duration_ms: 0.89765
+  type: 'test'
+  ...
+# Subtest: golden replay ACK only adds idempotent_replay
+ok 337 - golden replay ACK only adds idempotent_replay
+  ---
+  duration_ms: 0.444973
+  type: 'test'
+  ...
+# Subtest: test certificate SPKI matches the Python simulator pin
+ok 338 - test certificate SPKI matches the Python simulator pin
+  ---
+  duration_ms: 4.058154
+  type: 'test'
+  ...
+# Subtest: T10_C14_t_beforeInitialize_returnsKeyAndNeverThrows
+ok 339 - T10_C14_t_beforeInitialize_returnsKeyAndNeverThrows
+  ---
+  duration_ms: 3.839349
+  type: 'test'
+  ...
+# Subtest: T10_C14_autoResolution_zh_en_other_and_readFailure
+ok 340 - T10_C14_autoResolution_zh_en_other_and_readFailure
+  ---
+  duration_ms: 4.774389
+  type: 'test'
+  ...
+# Subtest: T10_C14_explicitPreference_loadsWithoutSystemRead
+ok 341 - T10_C14_explicitPreference_loadsWithoutSystemRead
+  ---
+  duration_ms: 1.813183
+  type: 'test'
+  ...
+# Subtest: T10_C14_invalidPreference_fallsBackToAutoWithWarning
+ok 342 - T10_C14_invalidPreference_fallsBackToAutoWithWarning
+  ---
+  duration_ms: 1.116685
+  type: 'test'
+  ...
+# Subtest: T10_C14_fallbackChain_current_base_key_and_missingDiagnostics
+ok 343 - T10_C14_fallbackChain_current_base_key_and_missingDiagnostics
+  ---
+  duration_ms: 1.202413
+  type: 'test'
+  ...
+# Subtest: T10_C14_interpolation_hit_missing_and_onePass
+ok 344 - T10_C14_interpolation_hit_missing_and_onePass
+  ---
+  duration_ms: 1.077963
+  type: 'test'
+  ...
+# Subtest: T10_C14_pluralVariants_and_missingVariantFallback
+ok 345 - T10_C14_pluralVariants_and_missingVariantFallback
+  ---
+  duration_ms: 1.366507
+  type: 'test'
+  ...
+# Subtest: T10_C14_setLocaleMode_persistsReloadsAndNotifies
+ok 346 - T10_C14_setLocaleMode_persistsReloadsAndNotifies
+  ---
+  duration_ms: 0.948805
+  type: 'test'
+  ...
+# Subtest: T10_C14_applyFailure_switchesRawfileButReportsPlatformFalse
+ok 347 - T10_C14_applyFailure_switchesRawfileButReportsPlatformFalse
+  ---
+  duration_ms: 1.140689
+  type: 'test'
+  ...
+# Subtest: T10_C14_setLocaleMode_loadFailure_rollsBackLocaleAndPreference
+ok 348 - T10_C14_setLocaleMode_loadFailure_rollsBackLocaleAndPreference
+  ---
+  duration_ms: 1.948954
+  type: 'test'
+  ...
+# Subtest: T10_C14_setLocaleMode_preferencesFailure_propagatesStorageError
+ok 349 - T10_C14_setLocaleMode_preferencesFailure_propagatesStorageError
+  ---
+  duration_ms: 1.177628
+  type: 'test'
+  ...
+# Subtest: T10_C14_reload_autoReResolvesSystemLocale_andNotifies
+ok 350 - T10_C14_reload_autoReResolvesSystemLocale_andNotifies
+  ---
+  duration_ms: 0.727546
+  type: 'test'
+  ...
+# Subtest: T10_C14_listener_unsubscribe_and_isolation
+ok 351 - T10_C14_listener_unsubscribe_and_isolation
+  ---
+  duration_ms: 0.601132
+  type: 'test'
+  ...
+# Subtest: T10_C14_dispose_returnsKeysAndDropsListeners
+ok 352 - T10_C14_dispose_returnsKeysAndDropsListeners
+  ---
+  duration_ms: 3.033199
+  type: 'test'
+  ...
+# Subtest: T10_C14_has_and_tKey
+ok 353 - T10_C14_has_and_tKey
+  ---
+  duration_ms: 0.709412
+  type: 'test'
+  ...
+# Subtest: T10_C14_bundleCodec_rejectsDuplicateEmptyAndMalformedBundles
+ok 354 - T10_C14_bundleCodec_rejectsDuplicateEmptyAndMalformedBundles
+  ---
+  duration_ms: 1.950697
+  type: 'test'
+  ...
+# Subtest: T10_C14_keyBuilders
+ok 355 - T10_C14_keyBuilders
+  ---
+  duration_ms: 0.756248
+  type: 'test'
+  ...
+# Subtest: T10_C14_errorMapper
+ok 356 - T10_C14_errorMapper
+  ---
+  duration_ms: 0.92462
+  type: 'test'
+  ...
+# Subtest: T10_C14_productionResources_parity
+ok 357 - T10_C14_productionResources_parity
+  ---
+  duration_ms: 2.629342
+  type: 'test'
+  ...
+# Subtest: T10_C14_authoritativeCatalog_everyDeclaredCodeHasBothLocaleKeys
+ok 358 - T10_C14_authoritativeCatalog_everyDeclaredCodeHasBothLocaleKeys
+  ---
+  duration_ms: 24.798156
+  type: 'test'
+  ...
+# Subtest: T10_C14_reachableDynamicErrorCodes_renderBothLocales
+ok 359 - T10_C14_reachableDynamicErrorCodes_renderBothLocales
+  ---
+  duration_ms: 17.846271
+  type: 'test'
+  ...
+# Subtest: T10_C14_checker_goodFixturePasses
+ok 360 - T10_C14_checker_goodFixturePasses
+  ---
+  duration_ms: 112.59689
+  type: 'test'
+  ...
+# Subtest: T10_C14_checker_badFixtureBlocksEveryDesignedCheck
+ok 361 - T10_C14_checker_badFixtureBlocksEveryDesignedCheck
+  ---
+  duration_ms: 78.487226
+  type: 'test'
+  ...
+# Subtest: T10_C14_checker_rejectsMalformedAllowlistAndMissingInputsWithExitTwo
+ok 362 - T10_C14_checker_rejectsMalformedAllowlistAndMissingInputsWithExitTwo
+  ---
+  duration_ms: 111.406028
+  type: 'test'
+  ...
+# Subtest: T10_C14_baseBundleFailure_stillServesCurrentLocaleAndReturnsKeyForBaseOnly
+ok 363 - T10_C14_baseBundleFailure_stillServesCurrentLocaleAndReturnsKeyForBaseOnly
+  ---
+  duration_ms: 0.533637
+  type: 'test'
+  ...
+# Subtest: T10_C14_currentBundleFailure_fallsBackToBaseLocaleWithoutApplyingFailedLocale
+ok 364 - T10_C14_currentBundleFailure_fallsBackToBaseLocaleWithoutApplyingFailedLocale
+  ---
+  duration_ms: 0.407554
+  type: 'test'
+  ...
+# Subtest: T10_C14_bothBundlesMissing_returnsLoadedFalseAndKeys
+ok 365 - T10_C14_bothBundlesMissing_returnsLoadedFalseAndKeys
+  ---
+  duration_ms: 0.418203
+  type: 'test'
+  ...
+# Subtest: T10_C14_preferencesReadFailure_stillInitializes
+ok 366 - T10_C14_preferencesReadFailure_stillInitializes
+  ---
+  duration_ms: 0.357781
+  type: 'test'
+  ...
+# Subtest: percentile uses nearest-rank and handles p50/p95
+ok 367 - percentile uses nearest-rank and handles p50/p95
+  ---
+  duration_ms: 1.542192
+  type: 'test'
+  ...
+# Subtest: summarizeSamples reports count/min/p50/p95/max
+ok 368 - summarizeSamples reports count/min/p50/p95/max
+  ---
+  duration_ms: 0.922415
+  type: 'test'
+  ...
+# Subtest: measureOperation discards warmup and collects N samples
+ok 369 - measureOperation discards warmup and collects N samples
+  ---
+  duration_ms: 0.822431
+  type: 'test'
+  ...
+# Subtest: buildPerfReport rejects invented result classes
+ok 370 - buildPerfReport rejects invented result classes
+  ---
+  duration_ms: 1.432959
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_goldenACKMatchesExpectedCommand
+ok 371 - C03_ControlAckMapper_goldenACKMatchesExpectedCommand
+  ---
+  duration_ms: 5.811377
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_replayDoesNotDuplicateAlreadyAppliedState
+ok 372 - C03_ControlAckMapper_replayDoesNotDuplicateAlreadyAppliedState
+  ---
+  duration_ms: 2.603805
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_correlationMismatchFailsClosed
+ok 373 - C03_ControlAckMapper_correlationMismatchFailsClosed
+  ---
+  duration_ms: 1.584691
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonZeroResultNeverClaimsSuccess
+ok 374 - C03_ControlAckMapper_nonZeroResultNeverClaimsSuccess
+  ---
+  duration_ms: 1.632088
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_zeroWithoutReportedStateIsProtocolViolation
+ok 375 - C03_ControlAckMapper_zeroWithoutReportedStateIsProtocolViolation
+  ---
+  duration_ms: 0.399068
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_reportedStateMustHaveExactlyOneShape
+ok 376 - C03_ControlAckMapper_reportedStateMustHaveExactlyOneShape
+  ---
+  duration_ms: 0.499684
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_targetMismatchThrowsStateMismatch
+ok 377 - C03_ControlAckMapper_targetMismatchThrowsStateMismatch
+  ---
+  duration_ms: 0.832269
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_stateVerificationDistinguishesMatchMismatchUnverified
+ok 378 - C03_ControlAckMapper_stateVerificationDistinguishesMatchMismatchUnverified
+  ---
+  duration_ms: 0.684315
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_gatewayBoardStateIsExposedButNotApplied
+ok 379 - C03_ControlAckMapper_gatewayBoardStateIsExposedButNotApplied
+  ---
+  duration_ms: 0.808585
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_successFieldIsAlwaysIgnoredAndCounted
+ok 380 - C03_ControlAckMapper_successFieldIsAlwaysIgnoredAndCounted
+  ---
+  duration_ms: 0.772438
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_errorCodeOnSuccessIsDiagnosticOnly
+ok 381 - C03_ControlAckMapper_errorCodeOnSuccessIsDiagnosticOnly
+  ---
+  duration_ms: 0.455202
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes
+ok 382 - C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes
+  ---
+  duration_ms: 0.670821
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_unknownFieldsUseAckProtocolViolationInAllShapes
+ok 383 - C03_ControlAckMapper_unknownFieldsUseAckProtocolViolationInAllShapes
+  ---
+  duration_ms: 0.41587
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonZeroResultStillValidatesReportedStateSchema
+ok 384 - C03_ControlAckMapper_nonZeroResultStillValidatesReportedStateSchema
+  ---
+  duration_ms: 0.618754
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonStandardModeComparesRawValue
+ok 385 - C03_ControlAckMapper_nonStandardModeComparesRawValue
+  ---
+  duration_ms: 0.451575
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_lowercaseColorIsNormalizedForComparison
+ok 386 - C03_ControlAckMapper_lowercaseColorIsNormalizedForComparison
+  ---
+  duration_ms: 0.419225
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_emitsExactEnvelopeOrder
+ok 387 - C03_CloudCommandSerializer_emitsExactEnvelopeOrder
+  ---
+  duration_ms: 4.461621
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_valueIsCompactAtomText
+ok 388 - C03_CloudCommandSerializer_valueIsCompactAtomText
+  ---
+  duration_ms: 4.7694
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_rejectsNonCanonicalValueAndFields
+ok 389 - C03_CloudCommandSerializer_rejectsNonCanonicalValueAndFields
+  ---
+  duration_ms: 2.808223
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_servicesShapeMapsFixedPropertyPaths
+ok 390 - C03_StateReportMapper_servicesShapeMapsFixedPropertyPaths
+  ---
+  duration_ms: 5.457812
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_shadowShapeAndDevicesShapeAreAccepted
+ok 391 - C03_StateReportMapper_shadowShapeAndDevicesShapeAreAccepted
+  ---
+  duration_ms: 4.392011
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_servicesShapeIsStrictPerSchema
+ok 392 - C03_StateReportMapper_servicesShapeIsStrictPerSchema
+  ---
+  duration_ms: 4.386642
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_rejectsUnknownShapesAndInvalidProperties
+ok 393 - C03_StateReportMapper_rejectsUnknownShapesAndInvalidProperties
+  ---
+  duration_ms: 1.278093
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_DeviceInventoryJsonIsPreservedButNotParsedYet
+ok 394 - C03_StateReportMapper_DeviceInventoryJsonIsPreservedButNotParsedYet
+  ---
+  duration_ms: 0.583399
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder
+ok 395 - C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder
+  ---
+  duration_ms: 13.306436
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_fixtureNoncesAreOutsideOutboundContract
+ok 396 - C03_ControlRequestSerializer_fixtureNoncesAreOutsideOutboundContract
+  ---
+  duration_ms: 1.447878
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_roundTripsValueTypes
+ok 397 - C03_ControlRequestSerializer_roundTripsValueTypes
+  ---
+  duration_ms: 0.969042
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_rejectsFieldViolations
+ok 398 - C03_ControlRequestSerializer_rejectsFieldViolations
+  ---
+  duration_ms: 1.231357
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesActionValueKind
+ok 399 - C03_ControlRequestSerializer_enforcesActionValueKind
+  ---
+  duration_ms: 0.482252
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesHexLower32Nonce
+ok 400 - C03_ControlRequestSerializer_enforcesHexLower32Nonce
+  ---
+  duration_ms: 0.345669
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesOutboundValueBounds
+ok 401 - C03_ControlRequestSerializer_enforcesOutboundValueBounds
+  ---
+  duration_ms: 0.653578
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_producesNoTrailingNewlineAndUtf8
+ok 402 - C03_ControlRequestSerializer_producesNoTrailingNewlineAndUtf8
+  ---
+  duration_ms: 0.225867
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_goldenMapsAllFourDevicesWithoutDeviations
+ok 403 - C03_DiscoverMapper_goldenMapsAllFourDevicesWithoutDeviations
+  ---
+  duration_ms: 7.984104
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_readsKnownAliasesOnlyWhenCanonicalIsAbsent
+ok 404 - C03_DiscoverMapper_readsKnownAliasesOnlyWhenCanonicalIsAbsent
+  ---
+  duration_ms: 0.971637
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_aliasAndPartialAreIndependentDiagnostics
+ok 405 - C03_DiscoverMapper_aliasAndPartialAreIndependentDiagnostics
+  ---
+  duration_ms: 2.16311
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_canonicalWinsAliasConflict
+ok 406 - C03_DiscoverMapper_canonicalWinsAliasConflict
+  ---
+  duration_ms: 0.66526
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated
+ok 407 - C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated
+  ---
+  duration_ms: 0.981615
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_acceptsOversizeInboundIdAndSkipsInvalidDevices
+ok 408 - C03_DiscoverMapper_acceptsOversizeInboundIdAndSkipsInvalidDevices
+  ---
+  duration_ms: 0.668115
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_readOnlyTypeIsKeptButNotSupported
+ok 409 - C03_DiscoverMapper_readOnlyTypeIsKeptButNotSupported
+  ---
+  duration_ms: 0.402845
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_topLevelFailuresAreFailClosed
+ok 410 - C03_DiscoverMapper_topLevelFailuresAreFailClosed
+  ---
+  duration_ms: 1.604557
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_emptyDeviceListIsAValidEnvelope
+ok 411 - C03_DiscoverMapper_emptyDeviceListIsAValidEnvelope
+  ---
+  duration_ms: 0.471893
+  type: 'test'
+  ...
+# Subtest: C03_DeviationCounter_resetsAndCopiesCounts
+ok 412 - C03_DeviationCounter_resetsAndCopiesCounts
+  ---
+  duration_ms: 0.444562
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v20StrictFourFieldEnvelope
+ok 413 - C03_IdentityParser_v20StrictFourFieldEnvelope
+  ---
+  duration_ms: 4.531169
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21AcceptsKnownSecurityLanOnly
+ok 414 - C03_IdentityParser_v21AcceptsKnownSecurityLanOnly
+  ---
+  duration_ms: 1.537062
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21FailsClosedOnUnknownOrInconsistentFields
+ok 415 - C03_IdentityParser_v21FailsClosedOnUnknownOrInconsistentFields
+  ---
+  duration_ms: 2.593606
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21ValidatesPortPinsAndPinAlg
+ok 416 - C03_IdentityParser_v21ValidatesPortPinsAndPinAlg
+  ---
+  duration_ms: 1.504722
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_serializesGetIdentityRequest
+ok 417 - C03_IdentityParser_serializesGetIdentityRequest
+  ---
+  duration_ms: 0.205731
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_reproducesAllFourV01CanonicalAndHmacVectors
+ok 418 - C05_CanonicalBuilder_reproducesAllFourV01CanonicalAndHmacVectors
+  ---
+  duration_ms: 2.92595
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_reproducesDiscoveryRequestVector
+ok 419 - C05_CanonicalBuilder_reproducesDiscoveryRequestVector
+  ---
+  duration_ms: 0.700045
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_acceptsResponseAuthVectorAndComputesBodySha
+ok 420 - C05_ResponseVerifier_acceptsResponseAuthVectorAndComputesBodySha
+  ---
+  duration_ms: 1.443529
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_headerLookupIsCaseInsensitiveAndTimeAgnostic
+ok 421 - C05_ResponseVerifier_headerLookupIsCaseInsensitiveAndTimeAgnostic
+  ---
+  duration_ms: 0.351871
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_negativePathsUseContractErrorCodes
+ok 422 - C05_ResponseVerifier_negativePathsUseContractErrorCodes
+  ---
+  duration_ms: 2.35831
+  type: 'test'
+  ...
+# Subtest: C05_ExpectedResponse_controlCorrelationIsRequestIdColonSeq
+ok 423 - C05_ExpectedResponse_controlCorrelationIsRequestIdColonSeq
+  ---
+  duration_ms: 0.399519
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_signControlUsesOneClockSnapshotAndContractNonce
+ok 424 - C05_RequestSigner_signControlUsesOneClockSnapshotAndContractNonce
+  ---
+  duration_ms: 1.220387
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_encodesEveryValueKindAndAbsentValue
+ok 425 - C05_RequestSigner_encodesEveryValueKindAndAbsentValue
+  ---
+  duration_ms: 1.073045
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_signDiscoverUsesIndependent32HexChallengeAndNonce
+ok 426 - C05_RequestSigner_signDiscoverUsesIndependent32HexChallengeAndNonce
+  ---
+  duration_ms: 0.77311
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_rejectsRepeatedNonceAndBadSecrets
+ok 427 - C05_RequestSigner_rejectsRepeatedNonceAndBadSecrets
+  ---
+  duration_ms: 1.389209
+  type: 'test'
+  ...
+# Subtest: C05_NonceCache_ttlBoundaryAndCapacityEviction
+ok 428 - C05_NonceCache_ttlBoundaryAndCapacityEviction
+  ---
+  duration_ms: 0.295537
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_rejectsLineInjectionAndBadAtoms
+ok 429 - C05_CanonicalBuilder_rejectsLineInjectionAndBadAtoms
+  ---
+  duration_ms: 0.674367
+  type: 'test'
+  ...
+# Subtest: C05_timeWindowBoundaryIsInclusiveAt120Seconds
+ok 430 - C05_timeWindowBoundaryIsInclusiveAt120Seconds
+  ---
+  duration_ms: 0.34044
+  type: 'test'
+  ...
+# Subtest: C05_ClockSkewTracker_hintsWithoutChangingAcceptance
+ok 431 - C05_ClockSkewTracker_hintsWithoutChangingAcceptance
+  ---
+  duration_ms: 0.255062
+  type: 'test'
+  ...
+# Subtest: C05_ACKChain_verifiedResponseFeedsC03MapperWithoutReinterpretation
+ok 432 - C05_ACKChain_verifiedResponseFeedsC03MapperWithoutReinterpretation
+  ---
+  duration_ms: 2.748002
+  type: 'test'
+  ...
+# Subtest: C05_CorrelationIsExactAndNonceGenerationIs32LowerHex
+ok 433 - C05_CorrelationIsExactAndNonceGenerationIs32LowerHex
+  ---
+  duration_ms: 0.385994
+  type: 'test'
+  ...
+# Subtest: C06_SecretDraftStore_putTakeIsOneShotAndSurvivesSourceDestroy
+ok 434 - C06_SecretDraftStore_putTakeIsOneShotAndSurvivesSourceDestroy
+  ---
+  duration_ms: 2.081348
+  type: 'test'
+  ...
+# Subtest: C06_SecretDraftStore_ttlBoundaryAndExpiryZeroize
+ok 435 - C06_SecretDraftStore_ttlBoundaryAndExpiryZeroize
+  ---
+  duration_ms: 0.273185
+  type: 'test'
+  ...
+# Subtest: C06_SecretDraftStore_clearAllAndDestroyClearBuffers
+ok 436 - C06_SecretDraftStore_clearAllAndDestroyClearBuffers
+  ---
+  duration_ms: 0.236287
+  type: 'test'
+  ...
+# Subtest: C06_SecretDraftStore_rejectsDestroyedSecretAndInvalidTtl
+ok 437 - C06_SecretDraftStore_rejectsDestroyedSecretAndInvalidTtl
+  ---
+  duration_ms: 0.210279
+  type: 'test'
+  ...
+# Subtest: C06_MigrationRegistry_appliesContiguousVersionsAndIsIdempotent
+ok 438 - C06_MigrationRegistry_appliesContiguousVersionsAndIsIdempotent
+  ---
+  duration_ms: 1.900905
+  type: 'test'
+  ...
+# Subtest: C06_MigrationRegistry_rejectsDuplicateRegistrationAndVersionGap
+ok 439 - C06_MigrationRegistry_rejectsDuplicateRegistrationAndVersionGap
+  ---
+  duration_ms: 0.546731
+  type: 'test'
+  ...
+# Subtest: C06_MigrationRegistry_failedStatementRollsBackVersionAndTables
+ok 440 - C06_MigrationRegistry_failedStatementRollsBackVersionAndTables
+  ---
+  duration_ms: 0.550358
+  type: 'test'
+  ...
+# Subtest: C06_MigrationRegistry_refusesNewerSchemaWithoutDowngrade
+ok 441 - C06_MigrationRegistry_refusesNewerSchemaWithoutDowngrade
+  ---
+  duration_ms: 0.230746
+  type: 'test'
+  ...
+# Subtest: C06_StorageService_initializeRegistersV1AndIsIdempotent
+ok 442 - C06_StorageService_initializeRegistersV1AndIsIdempotent
+  ---
+  duration_ms: 1.250102
+  type: 'test'
+  ...
+# Subtest: C06_StorageService_getVersionFailureSurfacesStorageRdbError
+ok 443 - C06_StorageService_getVersionFailureSurfacesStorageRdbError
+  ---
+  duration_ms: 0.396423
+  type: 'test'
+  ...
+# Subtest: C06_StorageService_closeDoesNotClearDataAndBlocksReinitialize
+ok 444 - C06_StorageService_closeDoesNotClearDataAndBlocksReinitialize
+  ---
+  duration_ms: 0.835024
+  type: 'test'
+  ...
+# Subtest: C06_InMemorySecretStore_withSecretZeroizesViewOnSuccessAndFailure
+ok 445 - C06_InMemorySecretStore_withSecretZeroizesViewOnSuccessAndFailure
+  ---
+  duration_ms: 0.41675
+  type: 'test'
+  ...
+# Subtest: C06_InMemorySecretStore_aliasGrammarAndListingHaveNoSecretValues
+ok 446 - C06_InMemorySecretStore_aliasGrammarAndListingHaveNoSecretValues
+  ---
+  duration_ms: 0.374272
+  type: 'test'
+  ...
+# Subtest: C06_RdbTransactionRunner_beginFailureMapsAndRecovers
+ok 447 - C06_RdbTransactionRunner_beginFailureMapsAndRecovers
+  ---
+  duration_ms: 0.568541
+  type: 'test'
+  ...
+# Subtest: C06_SecretDraftStore_multipleDraftsAreIndependentAndUniqueIds
+ok 448 - C06_SecretDraftStore_multipleDraftsAreIndependentAndUniqueIds
+  ---
+  duration_ms: 0.211161
+  type: 'test'
+  ...
+# Subtest: T11_noProductionFileImportsC20MockOrOhosTest
+ok 449 - T11_noProductionFileImportsC20MockOrOhosTest
+  ---
+  duration_ms: 19.366772
+  type: 'test'
+  ...
+# Subtest: T11_mockFilesDeclareTestOnlyBoundary
+ok 450 - T11_mockFilesDeclareTestOnlyBoundary
+  ---
+  duration_ms: 0.561488
+  type: 'test'
+  ...
+# Subtest: T11_pureGatewayLogicHasNoPlatformImport
+ok 451 - T11_pureGatewayLogicHasNoPlatformImport
+  ---
+  duration_ms: 2.228511
+  type: 'test'
+  ...
+1..451
+# tests 451
+# suites 0
+# pass 451
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2071.201149

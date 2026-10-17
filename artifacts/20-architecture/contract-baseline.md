@@ -5,6 +5,7 @@
 - **Type**: Architecture / Interface Contract Baseline（规范性）
 - **Status**: Proposed（待 G-004 门禁批准；批准后为实现与评审的约束基线）
 - **Date**: 2026-10-17
+- **Revision（T-12 裁定同步，2026-10-17）**: §4.5 增补响应验签/相关性错误码唯一命名与 protocomm 非零 `Status` 裁定；不改变 §4.1 网关结果码、§4.3 双轨判定或 G-004 安全语义。依据 REV-T12-001/002/003（`artifacts/70-review/t12-review*.md`）。
 - **Task**: `wp-004-contracts`（task 分支 `task/wp-004-contracts`，父分支 `feat/yaocore-app`，base commit `54c1d786`）
 - **Workflow**: STANDARD / GATED_AUTO
 - **决议引用**: D-011（Q1）、D-012（Q2）、D-014（Q3）；见文末「决议（RESOLVED，2026-10-17）」
@@ -181,7 +182,7 @@
 
 ### 4.2 App 自有错误编码（不复用网关码）
 
-传输/校验/环境失败使用 App 命名空间（字符串编码，参考归档做法）：`LOCAL_REQUEST_FAILED`、`HTTP_<code>`、`CONTROL_RESPONSE_AUTH_FAILED`、`DEV_SIMULATOR_REJECTED`、`TLS_PIN_MISMATCH`、`TLS_HANDSHAKE_FAILED`、`TLS_UNAVAILABLE_ADVERTISED`、`ACK_CORRELATION_MISMATCH`、`INVITE_INVALID/EXPIRED/REVOKED` 等（详表归 DES-001；命名规范 `SCREAMING_SNAKE`）。
+传输/校验/环境/安全失败使用 App 命名空间（字符串编码，参考归档做法）：`LOCAL_REQUEST_FAILED`、`HTTP_<code>`、`RESPONSE_AUTH_FAILED`、`RESPONSE_CORRELATION_MISMATCH`、`DEV_SIMULATOR_REJECTED`、`TLS_PIN_MISMATCH`、`TLS_HANDSHAKE_FAILED`、`TLS_UNAVAILABLE_ADVERTISED`、`ACK_CORRELATION_MISMATCH`（仅 ACK body）、`INVITE_INVALID/EXPIRED/REVOKED` 等（详表归 DES-001；命名规范 `SCREAMING_SNAKE`）。`CONTROL_RESPONSE_AUTH_FAILED` 为已退役别名（见 §4.5），仅兼容读取，禁止新发。
 
 ### 4.3 双轨判定策略
 
@@ -194,6 +195,38 @@
 - 门锁/门磁专项键：`door.state.secured/unconfirmed/unknown`、`door.alert.unconfirmed`（ADR-004 §6.4）；
 - 通行键：`common.retry`、`common.cancel`、`common.confirm`（`docs/internationalization.md` L39-42）；
 - 键位规范与 key parity 门禁见 `i18n-resource-design.md`。
+
+### 4.5 T-12 裁定同步（2026-10-17）：响应验签/相关性错误码唯一命名
+
+> **裁定任务**：`wp-046-t12-rulings`（solution-architect）。**输入**：REV-T12-001/002/003（`artifacts/70-review/t12-review.md`、`t12-review-b.md`、`t12-review-c.md`）、`artifacts/50-implementation/t12-fix-report.md`、`t12-fix2-report.md`。**边界**：本节不改变 §4.1 网关结果码、§4.3 双轨判定或任何安全/重试语义；只消除 App 命名空间内的重复/歧义 code，并固定实现对齐口径。
+
+**唯一映射（按语义，不按组件）**：
+
+| 语义 | 唯一 code | 类别 | 可重试 | i18n 键 | 说明 |
+|---|---|---|---|---|---|
+| 响应头验签失败（alg/keyId/sign 缺失或不符） | `RESPONSE_AUTH_FAILED` | SECURITY | 否 | `errors.app.control_response_auth_failed` | C-05 `ResponseVerifier`；C-17/C-18 原样传播；fail-closed，不应用状态 |
+| 响应头 correlation 不等 | `RESPONSE_CORRELATION_MISMATCH` | SECURITY | 否 | `errors.app.ack_correlation_mismatch` | C-05；C-17/C-18 原样传播；不解析 body |
+| ACK body `request_id`/`seq` 不等 | `ACK_CORRELATION_MISMATCH` | GATEWAY | 否 | `errors.app.ack_correlation_mismatch` | C-03 `ControlAckMapper`；仅 body 语义，不得用于 header correlation |
+| ACK schema/`reported_state` 非法 | `ACK_PROTOCOL_VIOLATION` | GATEWAY | 否 | `errors.app.ack_protocol_violation` | 不变 |
+| protocomm 非零 `Status`（session 0/1、config、status） | `PROVISIONING_SECURITY_HANDSHAKE_FAILED` | PROVISIONING | 是 | `provisioning.error.security_handshake_failed` | 统一保留，不新增细分 code；恢复动作=销毁会话、断开、从 step0 重来；`details.field` 标阶段；Wi-Fi AuthError/NetworkNotFound/超时仍用各自专用 code |
+
+**退役与兼容**：
+
+| 旧 code | 处置 | 映射 |
+|---|---|---|
+| `CONTROL_RESPONSE_AUTH_FAILED` | **DEPRECATED / 退役**；不再新增产生点 | 语义等同 `RESPONSE_AUTH_FAILED`；兼容读取保留（i18n 同键） |
+| `ACK_CORRELATION_MISMATCH`（用于 header 的历史写法） | **禁止**用于 header；保留给 ACK body | header → `RESPONSE_CORRELATION_MISMATCH`；body → `ACK_CORRELATION_MISMATCH` |
+
+> 注意：`ACK_CORRELATION_MISMATCH` **不退役**；退役的只是它在响应头 correlation 语境中的历史用法。C-03 对 ACK body 的 `request_id`/`seq` 校验继续使用该 code。
+
+**实现对齐状态（2026-10-17，基于 `d9d868a` 工作树）**：
+
+- **已符合**：`ResponseVerifier`（C-05）产生 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`；C-17 生产路径原样传播；C-03 对 ACK body 使用 `ACK_CORRELATION_MISMATCH`；C-19 对 protocomm 非零 `Status` 使用 `PROVISIONING_SECURITY_HANDSHAKE_FAILED`。
+- **待对齐（不在本裁定轮改代码）**：`MockGatewayService`（C-20）仍把 header 验签失败转换为 `CONTROL_RESPONSE_AUTH_FAILED`、把 header correlation 失败转换为 `ACK_CORRELATION_MISMATCH`（`entry/src/main/ets/service/mock/MockGatewayService.ets:302-306`）。目标行为：mock 与生产一致，header 失败分别产出 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`；ACK body 语义由 `ControlAckMapper` 的期望校验覆盖。该对齐应作为后续实现任务（建议并入下一维护轮或独立小任务）执行并重跑 host 测试。
+- **兼容期**：保留 `CONTROL_RESPONSE_AUTH_FAILED` 的 `AppError`/i18n 映射，避免旧测试/旧调用点崩溃；新代码不得产生该 code。删除旧 code 需另行走 Change Impact。
+- **下游文档同步（不在本轮修改，仅记录）**：`artifacts/40-detailed-design/des-001b-domain-presentation.md` §10.2 仍列 `CONTROL_RESPONSE_AUTH_FAILED`；其 C-23 配网流（约 L3867-3869）仍把原始 `draftId` 传给 `commitBinding`，并写“`result.credentialDraftId` 必须等于 `draftId`”。按 R-1，必须改为 `commitBinding(result, result.credentialDraftId, familyId)`，并在失败清理中销毁重签后的新 id。DES-B 的这两处应作为 Change Impact 后续同步项；`artifacts/50-implementation/t11-transport.md` 的旧映射作为历史证据保留。
+
+**理由**：C-05 是通用响应验签组件，`RESPONSE_*` 是安全层语义；ACK body 的 `request_id`/`seq` 是网关 ACK 语义，二者的恢复动作不同（前者 fail-closed、不解析/不应用；后者属协议缺陷）。若统一成一个 code，会丢失“header 验签失败”与“ACK body 不一致”的区分，违反 DES-A §3.2.1 的“同一语义不得多 code、不同语义不得共 code”。DES-A §18.7 的步骤 2..5 与 6..7 已是该分层；§14.4 原表将两步混写，本次修正。
 
 ---
 
@@ -386,6 +419,7 @@
 | R-29 | WP2-F04 补建+降级（§7.2） | `WP2` §3.3-A | 测试计划；`WP3` §5-P2-15 |
 | R-30 | v1 范围与修订机制（§8） | `WP3` §2.1-C003/C013/C014、§5 | wp-005 规划 |
 | R-31 | `state-report` 固定属性一等公民；其他设备走 `DeviceInventoryJson`（D-014） | SR L37-51；§7.1 | FR-SET-003；云命令完成判定；无协议变更 |
+| R-32 | T-12 裁定同步：草稿重签、错误码唯一命名、歧义写失败码（§4.5；DES-A §16.8/§16.10） | REV-T12-001/002/003；`t12-fix2-report.md`；`wp-046-t12-rulings` | FR-GW-003；C-05/C-07/C-17/C-19/C-20/C-23；DES-001B §10.2/C-23 流；TEST-001/CQG-T12；后续 mock 对齐任务 |
 
 ---
 
@@ -420,6 +454,7 @@
 | FC-03 | key_id 版本滚动窗口（app-key-v1→v2） | v1 不滚动；材料轮换走 BLE | ADR-002 §8.4 |
 | FC-04 | 控制密钥轮换固件流程 | BLE 重配为唯一路径 | ADR-002 §8.4 |
 | FC-05 | （未来）`EXT-LAN-STATE-001`：position/speed/volume；`EXT-ROOM-STATE-001`；`EXT-FAMILY-COORD-001`；`EXT-ACL-001` | v1 不做；v1 范围声明 §6.2/§8.1 | §6.2；ADR-003 §13；ADR-004 §1.3 |
+| FC-06 | protocomm 非零 `Status` 的细分语义（session 0/1、config、status） | 统一 fail-closed 映射 `PROVISIONING_SECURITY_HANDSHAKE_FAILED`，不新增细分 stable code；T-19 设备验证后再议 | §4.5；DES-A §16.4 |
 
 ---
 

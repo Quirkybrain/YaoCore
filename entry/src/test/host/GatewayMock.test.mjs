@@ -30,6 +30,7 @@ import {
   BleProvisioningStage,
   BleScanFilter,
 } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
+import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
 import { FakeTransportClock, SequenceRandom } from './TransportFakes.ets';
 import { TestCryptoProvider } from './TestCryptoProvider.ets';
 
@@ -202,7 +203,7 @@ test('C20_mockBle_normalScanAndProvisionV20', async () => {
     new SequenceRandom(new Uint8Array(4).fill(3)));
   const devices = [];
   let finished = false;
-  await client.startScan(new BleScanFilter('YaoCore-GW-'), {
+  await client.startScan(new BleScanFilter(GattEndpointMap.SERVICE_UUID, 'YaoCore-GW-'), {
     onDeviceFound: (device) => devices.push(device),
     onScanFinished: () => { finished = true; },
   });
@@ -232,7 +233,7 @@ test('C20_mockBle_tlsModeReturnsV21PinsAndOfflineFails', async () => {
   assert.equal(result.port, 9200);
   const offline = new MockBleProvisioningClient(MockScenario.offline(), clock,
     new SequenceRandom(new Uint8Array(4).fill(3)));
-  await expectCode(() => offline.startScan(new BleScanFilter(), {
+  await expectCode(() => offline.startScan(new BleScanFilter(GattEndpointMap.SERVICE_UUID), {
     onDeviceFound: () => {},
     onScanFinished: () => {},
   }), 'PROVISIONING_DEVICE_NOT_FOUND');
