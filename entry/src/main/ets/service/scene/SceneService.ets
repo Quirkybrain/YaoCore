@@ -65,6 +65,7 @@ export class SceneService {
   private readonly executor: SceneExecutor;
   private readonly listeners: Array<(event: SceneExecutionEvent) => void> = [];
   private readonly runs: Map<string, RunCancellation> = new Map<string, RunCancellation>();
+  private readonly activeSceneRuns: Map<string, string> = new Map<string, string>();
 
   constructor(scenes: SceneRepository, devices: DeviceRepository, control: DeviceControlPort,
     routes: GatewayRoutePort, clock: ClockPort, timer: SceneTimerPort, ids: IdPort,
@@ -149,6 +150,11 @@ export class SceneService {
     if (scene.actions.length === 0) {
       throw AppErrors.of('SCENE_EMPTY', []);
     }
+    if (this.activeSceneRuns.has(scene.sceneId)) {
+      // DES-B §6.1.4 rule 7: one run per scene at a time. A second call must
+      // never duplicate commands (wp-026 R-02).
+      throw AppErrors.of('SCENE_RUN_IN_PROGRESS', [new NameValue('sceneId', scene.sceneId)]);
+    }
     const runId = this.ids.newId();
     const runCancellation = new RunCancellation();
     if (cancellation !== undefined) {
@@ -160,6 +166,7 @@ export class SceneService {
       }
     }
     this.runs.set(runId, runCancellation);
+    this.activeSceneRuns.set(scene.sceneId, runId);
     this.logger.debug('SceneService', 'scene_run_started',
       [new NameValue('sceneId', scene.sceneId), new NameValue('runId', runId)]);
     const policy = SceneExecutionPolicy.defaults();
@@ -174,7 +181,13 @@ export class SceneService {
     const stepStates: Map<number, SceneStepState> = new Map<number, SceneStepState>();
     const wrapped = (progress: SceneExecutionProgress): void => {
       if (listener !== undefined) {
-        listener(progress);
+        try {
+          listener(progress);
+        } catch (error) {
+          // Progress observers are notifications; they cannot fail a run.
+          this.logger.warn('SceneService', 'progress_listener_failed',
+            [new NameValue('sceneId', scene.sceneId)]);
+        }
       }
       this.emitProgressEvents(progress, stepStates);
     };
@@ -186,6 +199,9 @@ export class SceneService {
       return result;
     } finally {
       this.runs.delete(runId);
+      if (this.activeSceneRuns.get(scene.sceneId) === runId) {
+        this.activeSceneRuns.delete(scene.sceneId);
+      }
     }
   }
 
@@ -212,6 +228,7 @@ export class SceneService {
       run.cancel();
     });
     this.runs.clear();
+    this.activeSceneRuns.clear();
   }
 
   // ---- Internals ----------------------------------------------------------
@@ -262,8 +279,14 @@ export class SceneService {
   }
 
   private emit(event: SceneExecutionEvent): void {
-    for (let index = 0; index < this.listeners.length; index++) {
-      this.listeners[index](event);
+    const snapshot = this.listeners.slice(0);
+    for (let index = 0; index < snapshot.length; index++) {
+      try {
+        snapshot[index](event);
+      } catch (error) {
+        this.logger.warn('SceneService', 'scene_listener_failed',
+          [new NameValue('event', event.type)]);
+      }
     }
   }
 

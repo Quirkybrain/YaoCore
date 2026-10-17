@@ -160,3 +160,15 @@ test('T09_C09_deleteEmptyAndLastRoomSucceeds', async () => {
   assert.equal((await service.listRooms(familyId)).length, 0);
   assert.equal(h.control.commands.length, 0);
 });
+
+test('T09_C09_throwingListenerDoesNotFailRoomDeletion', async () => {
+  const { h, familyId, service } = await setup();
+  const room = await service.createRoom(familyId, 'Living');
+  service.subscribe(() => {
+    throw new Error('listener boom');
+  });
+  const result = await service.deleteRoom(room.roomId, new RoomDeletionConfirmation(true, 0));
+  assert.equal(result.deleted, true);
+  assert.equal(await h.rooms.exists(room.roomId), false);
+  assert.ok(h.logger.entries.includes('W RoomService room_listener_failed'));
+});

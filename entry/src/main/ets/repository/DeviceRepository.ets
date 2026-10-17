@@ -27,6 +27,8 @@ import { ControlOutcome, StateVerification } from '../model/ControlModels';
 import type { DiscoverySnapshot } from '../model/DiscoveryModels';
 import type { GatewayRoutePort } from './GatewayPorts';
 import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
+import type { MigrationSink } from '../service/storage/MigrationPort';
+import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
 import { DeviceSnapshotCodec } from './DeviceSnapshotCodec';
 import { SqlCells } from './SqlCells';
@@ -82,6 +84,11 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     this.routes = routes;
   }
 
+  /** DES-B §5.1.3: v4 device_state table (shared v4 registration is idempotent). */
+  static registerMigrations(registry: MigrationSink): void {
+    DomainMigrations.register(registry);
+  }
+
   async initialize(): Promise<void> {
     try {
       await this.rdb.query('SELECT gateway_id FROM device_state LIMIT 0');
@@ -111,15 +118,21 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
           return DeviceRepository.emptyResult(false, ['GATEWAY_FAMILY_MISMATCH']);
         }
       }
-      return this.rdb.transaction<DiscoverApplyResult>(
+      const events: DeviceChangeEvent[] = [];
+      const result = await this.rdb.transaction<DiscoverApplyResult>(
         async (tx: RdbTransaction): Promise<DiscoverApplyResult> => {
-          return this.applyDiscoverInTransaction(tx, snapshot, familyId, options);
+          return this.applyDiscoverInTransaction(tx, snapshot, familyId, options, events);
         });
+      // Events are notifications, never a fact source: dispatch only after the
+      // transaction committed (wp-026 R-12).
+      this.dispatchEvents(events);
+      return result;
     });
   }
 
   private async applyDiscoverInTransaction(tx: RdbTransaction, snapshot: DiscoverySnapshot,
-    familyId: string, options: DiscoverApplyOptions): Promise<DiscoverApplyResult> {
+    familyId: string, options: DiscoverApplyOptions,
+    events: DeviceChangeEvent[]): Promise<DiscoverApplyResult> {
     const existingRows = await tx.query('SELECT ' + DEVICE_COLUMNS +
       ' FROM device_state WHERE gateway_id = ?', [snapshot.gatewayId]);
     const existing: Map<string, RdbRow> = new Map<string, RdbRow>();
@@ -188,7 +201,7 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
           if (snapshot.isPartial) {
             this.partialKeys.set(key.globalId(), true);
           }
-          this.emit(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_ADDED, key));
+          events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_ADDED, key));
           continue;
         }
 
@@ -247,7 +260,7 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
         } else {
           this.partialKeys.delete(key.globalId());
         }
-        this.emit(new DeviceChangeEvent(wasGatewayRemoved ?
+        events.push(new DeviceChangeEvent(wasGatewayRemoved ?
           DeviceChangeEventType.DEVICE_RESTORED : DeviceChangeEventType.DEVICE_UPDATED, key));
       } catch (error) {
         if (error instanceof AppError && error.code.startsWith('STORAGE_')) {
@@ -261,7 +274,7 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     }
 
     let gatewayRemovedMarked = 0;
-    if (!snapshot.isPartial && options.markMissingAsGatewayRemoved) {
+    if (!snapshot.isPartial && invalidDropped === 0 && options.markMissingAsGatewayRemoved) {
       const missing: DeviceKey[] = [];
       existing.forEach((row: RdbRow, deviceId: string): void => {
         if (present.has(snapshot.gatewayId + ':' + deviceId)) {
@@ -282,12 +295,13 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
         await tx.execute('UPDATE device_state SET gateway_removed = ? ' +
           'WHERE gateway_id = ? AND device_id = ?', [1, key.gatewayId, key.deviceId]);
         gatewayRemovedMarked++;
-        this.emit(new DeviceChangeEvent(DeviceChangeEventType.GATEWAY_REMOVED, key));
+        events.push(new DeviceChangeEvent(DeviceChangeEventType.GATEWAY_REMOVED, key));
       }
     }
 
     return new DiscoverApplyResult(added, updated, unchanged, staleDropped, tombstonedSkipped,
-      invalidDropped, gatewayRemovedMarked, snapshot.isPartial, deviations, affectedKeys);
+      invalidDropped, gatewayRemovedMarked, snapshot.isPartial || invalidDropped > 0,
+      deviations, affectedKeys);
   }
 
   // ---- Control / cloud state application ---------------------------------
@@ -296,12 +310,15 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     outcome: ControlOutcome): Promise<ControlApplyResult> {
     this.ensureInitialized();
     return this.gate.run(async (): Promise<ControlApplyResult> => {
-      return this.rdb.transaction<ControlApplyResult>(
+      const events: DeviceChangeEvent[] = [];
+      const result = await this.rdb.transaction<ControlApplyResult>(
         async (tx: RdbTransaction): Promise<ControlApplyResult> => {
           return this.applyStateInTransaction(tx, context, outcome.reportedState,
             outcome.stateVerification, outcome.ackAccepted, outcome.shouldApplyState,
-            outcome.idempotentReplay, outcome.requestId, outcome.seq);
+            outcome.idempotentReplay, outcome.requestId, outcome.seq, events);
         });
+      this.dispatchEvents(events);
+      return result;
     });
   }
 
@@ -310,11 +327,14 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     requestId: string, seq: number, accepted: boolean): Promise<ControlApplyResult> {
     this.ensureInitialized();
     return this.gate.run(async (): Promise<ControlApplyResult> => {
-      return this.rdb.transaction<ControlApplyResult>(
+      const events: DeviceChangeEvent[] = [];
+      const result = await this.rdb.transaction<ControlApplyResult>(
         async (tx: RdbTransaction): Promise<ControlApplyResult> => {
           return this.applyStateInTransaction(tx, context, reportedState, verification, accepted,
-            accepted, false, requestId, seq);
+            accepted, false, requestId, seq, events);
         });
+      this.dispatchEvents(events);
+      return result;
     });
   }
 
@@ -322,7 +342,8 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     patch: DeviceStatePatch | undefined,
     verification: StateVerification,
     ackAccepted: boolean, shouldApply: boolean, idempotentReplay: boolean,
-    requestId: string, seq: number): Promise<ControlApplyResult> {
+    requestId: string, seq: number,
+    events: DeviceChangeEvent[]): Promise<ControlApplyResult> {
     const key = new DeviceKey(context.gatewayId, context.deviceId);
     const row = await this.readRow(tx, key);
     if (row === undefined) {
@@ -366,7 +387,7 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
       key.gatewayId, key.deviceId]);
     const refreshed = await this.readRow(tx, key);
     const record = refreshed === undefined ? undefined : this.recordFromRow(refreshed);
-    this.emit(new DeviceChangeEvent(DeviceChangeEventType.STATE_APPLIED, key));
+    events.push(new DeviceChangeEvent(DeviceChangeEventType.STATE_APPLIED, key));
     return new ControlApplyResult(true, true, verification, ControlApplyReason.APPLIED, record);
   }
 
@@ -521,7 +542,9 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     return this.gate.run(async (): Promise<DeviceState> => {
       return this.rdb.transaction<DeviceState>(async (tx: RdbTransaction): Promise<DeviceState> => {
         const room = await this.rooms.readRoomInTransaction(tx, checkedRoom);
-        if (room === undefined) {
+        if (room === undefined || room.familyId !== checkedFamily) {
+          // The port itself enforces the family boundary; RoomService's
+          // pre-check alone cannot protect other callers (wp-026 R-07).
           throw AppErrors.of('ROOM_NOT_FOUND', []);
         }
         await this.requireWritableDevice(tx, checkedFamily, key);
@@ -568,7 +591,8 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     const nowMs = options === undefined ? this.clock.nowMs() : options.nowMs;
     const removeSceneReferences = options === undefined ? true : options.removeSceneReferences;
     return this.gate.run(async (): Promise<DeviceRemovalResult> => {
-      return this.rdb.transaction<DeviceRemovalResult>(
+      const events: DeviceChangeEvent[] = [];
+      const result = await this.rdb.transaction<DeviceRemovalResult>(
         async (tx: RdbTransaction): Promise<DeviceRemovalResult> => {
           const row = await this.readRow(tx, key);
           if (row === undefined ||
@@ -586,9 +610,11 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
           [key.gatewayId, key.deviceId, DateTimeUtil.formatUtcCompact(nowMs)]);
           this.mergeStates.delete(key.globalId());
           this.partialKeys.delete(key.globalId());
-          this.emit(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_DISMISSED, key));
+          events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_DISMISSED, key));
           return new DeviceRemovalResult(true, key, true, cleanup);
         });
+      this.dispatchEvents(events);
+      return result;
     });
   }
 
@@ -596,23 +622,27 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     this.ensureInitialized();
     const key = new DeviceKey(DeviceRepository.requireGatewayId(gatewayId), deviceId);
     return this.gate.run(async (): Promise<boolean> => {
-      return this.rdb.transaction<boolean>(async (tx: RdbTransaction): Promise<boolean> => {
-        const rows = await tx.query('SELECT device_id FROM gw_dismissed_device ' +
-          'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
-        if (rows.length === 0) {
-          return false;
-        }
-        await tx.execute('DELETE FROM gw_dismissed_device ' +
-          'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
-        // Old snapshot is deliberately not restored: the next discover re-adds
-        // the device in the unassigned/disabled pool (DES-B §5.3.4).
-        await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
-          [key.gatewayId, key.deviceId]);
-        this.mergeStates.delete(key.globalId());
-        this.partialKeys.delete(key.globalId());
-        this.emit(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_RESTORED, key));
-        return true;
-      });
+      const events: DeviceChangeEvent[] = [];
+      const restored = await this.rdb.transaction<boolean>(
+        async (tx: RdbTransaction): Promise<boolean> => {
+          const rows = await tx.query('SELECT device_id FROM gw_dismissed_device ' +
+            'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
+          if (rows.length === 0) {
+            return false;
+          }
+          await tx.execute('DELETE FROM gw_dismissed_device ' +
+            'WHERE gateway_id = ? AND device_id = ?', [key.gatewayId, key.deviceId]);
+          // Old snapshot is deliberately not restored: the next discover re-adds
+          // the device in the unassigned/disabled pool (DES-B §5.3.4).
+          await tx.execute('DELETE FROM device_state WHERE gateway_id = ? AND device_id = ?',
+            [key.gatewayId, key.deviceId]);
+          this.mergeStates.delete(key.globalId());
+          this.partialKeys.delete(key.globalId());
+          events.push(new DeviceChangeEvent(DeviceChangeEventType.DEVICE_RESTORED, key));
+          return true;
+        });
+      this.dispatchEvents(events);
+      return restored;
     });
   }
 
@@ -620,17 +650,23 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
     this.ensureInitialized();
     const checked = DeviceRepository.requireGatewayId(gatewayId);
     return this.gate.run(async (): Promise<number> => {
+      // GatewayRoutePort is not transaction-context; read the route before the
+      // transaction opens so the tx callback only touches `tx` (wp-026 R-13).
+      let routeFamilyId: string | undefined = undefined;
+      if (this.routes !== undefined) {
+        const route = await this.routes.getRoute(checked);
+        if (route !== undefined) {
+          routeFamilyId = route.familyId;
+        }
+      }
       return this.rdb.transaction<number>(async (tx: RdbTransaction): Promise<number> => {
         const rows = await tx.query('SELECT ' + DEVICE_COLUMNS +
           ' FROM device_state WHERE gateway_id = ?', [checked]);
         const families: string[] = [];
         const seenFamilies: Map<string, boolean> = new Map<string, boolean>();
-        if (this.routes !== undefined) {
-          const route = await this.routes.getRoute(checked);
-          if (route !== undefined) {
-            seenFamilies.set(route.familyId, true);
-            families.push(route.familyId);
-          }
+        if (routeFamilyId !== undefined) {
+          seenFamilies.set(routeFamilyId, true);
+          families.push(routeFamilyId);
         }
         let removed = 0;
         for (let index = 0; index < rows.length; index++) {
@@ -903,9 +939,23 @@ export class DeviceRepository implements DeviceStatePort, DeviceAssignmentPort, 
       new DeviceMergeState(atMs, epochMs, result, deviation));
   }
 
+  private dispatchEvents(events: ReadonlyArray<DeviceChangeEvent>): void {
+    for (let index = 0; index < events.length; index++) {
+      this.emit(events[index]);
+    }
+  }
+
   private emit(event: DeviceChangeEvent): void {
-    for (let index = 0; index < this.listeners.length; index++) {
-      this.listeners[index](event);
+    // A subscriber is a notification consumer, never a participant in the
+    // committed fact. A throwing listener is isolated and diagnosed.
+    const snapshot = this.listeners.slice(0);
+    for (let index = 0; index < snapshot.length; index++) {
+      try {
+        snapshot[index](event);
+      } catch (error) {
+        this.logger.warn('DeviceRepository', 'device_listener_failed',
+          [new NameValue('event', event.type)]);
+      }
     }
   }
 

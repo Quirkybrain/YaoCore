@@ -31,9 +31,9 @@ export function DomainHostSuite() {
       expect(DomainOperationGate !== undefined).assertTrue();
       expect(DomainMigrations !== undefined).assertTrue();
       expect(FamilyRepository.registerMigrations !== undefined).assertTrue();
-      expect(RoomRepository !== undefined).assertTrue();
-      expect(DeviceRepository !== undefined).assertTrue();
-      expect(SceneRepository !== undefined).assertTrue();
+      expect(RoomRepository.registerMigrations !== undefined).assertTrue();
+      expect(DeviceRepository.registerMigrations !== undefined).assertTrue();
+      expect(SceneRepository.registerMigrations !== undefined).assertTrue();
       expect(DeviceSnapshotCodec !== undefined).assertTrue();
       expect(FamilyService !== undefined).assertTrue();
       expect(FamilyJoinSession !== undefined).assertTrue();

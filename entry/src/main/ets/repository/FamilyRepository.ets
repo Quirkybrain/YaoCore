@@ -354,6 +354,10 @@ export class FamilyRepository implements MemberRoomGrantPort {
     const checkedMember = FamilyRepository.requireIdentifier(memberId, 'memberId');
     return this.gate.run(async (): Promise<void> => {
       await this.rdb.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
+        const family = await this.readFamily(tx, checkedFamily);
+        if (family === undefined) {
+          throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'familyId')]);
+        }
         const member = await this.readMember(tx, checkedFamily, checkedMember);
         if (member === undefined) {
           throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'memberId')]);
@@ -364,6 +368,11 @@ export class FamilyRepository implements MemberRoomGrantPort {
         if (role === MemberRole.GUEST && member.expiresAt === undefined) {
           // A GUEST needs an expiry; role-only promotion is invalid (DES-A §5.1.7).
           throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'expiresAt');
+        }
+        if (family.ownerMemberId === checkedMember && role !== MemberRole.ADMIN) {
+          // The owner pointer must never dangle. Transfer ownership explicitly
+          // first (DES-B §3.3.1/§3.3.6; wp-026 R-09).
+          throw AppErrors.of('AUTH_RBAC_DENIED', []);
         }
         if (member.role === MemberRole.ADMIN && role !== MemberRole.ADMIN) {
           await FamilyRepository.requireAnotherAdmin(tx, checkedFamily, checkedMember);
@@ -381,9 +390,17 @@ export class FamilyRepository implements MemberRoomGrantPort {
     const checkedMember = FamilyRepository.requireIdentifier(memberId, 'memberId');
     return this.gate.run(async (): Promise<void> => {
       await this.rdb.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
+        const family = await this.readFamily(tx, checkedFamily);
+        if (family === undefined) {
+          throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'familyId')]);
+        }
         const member = await this.readMember(tx, checkedFamily, checkedMember);
         if (member === undefined) {
           throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'memberId')]);
+        }
+        if (family.ownerMemberId === checkedMember && status !== MemberStatus.ACTIVE) {
+          // The owner must stay an ACTIVE ADMIN until transferAdmin runs.
+          throw AppErrors.of('AUTH_RBAC_DENIED', []);
         }
         await tx.execute('UPDATE family_member SET status = ? WHERE member_id = ?',
           [status, checkedMember]);
@@ -510,6 +527,33 @@ export class FamilyRepository implements MemberRoomGrantPort {
     return this.gate.run(async (): Promise<void> => {
       await this.rdb.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
         await this.applyReceiptInTransaction(tx, checked, patch);
+      });
+    });
+  }
+
+  /**
+   * Validates the invitation state and applies the receipt + member activation
+   * in ONE transaction. A REVOKED/EXPIRED/exhausted invitation never leaves a
+   * new ACTIVE member behind (wp-026 R-01).
+   */
+  async applyReceiptAndEnsureMember(inviteId: string, newMember: FamilyMember,
+    patch: InvitationPatch): Promise<void> {
+    this.ensureInitialized();
+    const checked = FamilyRepository.requireIdentifier(inviteId, 'inviteId');
+    return this.gate.run(async (): Promise<void> => {
+      await this.rdb.transaction<void>(async (tx: RdbTransaction): Promise<void> => {
+        // Receipt validation runs first; a failure rolls back everything below.
+        await this.applyReceiptInTransaction(tx, checked, patch);
+        const existing = await this.readMember(tx, newMember.familyId, newMember.memberId);
+        if (existing === undefined) {
+          await this.upsertMemberInTransaction(tx, newMember);
+        } else if (existing.status !== MemberStatus.ACTIVE) {
+          await this.upsertMemberInTransaction(tx, new FamilyMember(existing.memberId,
+            existing.familyId, existing.userId, existing.displayName, existing.role,
+            MemberStatus.ACTIVE, existing.joinedAt, existing.allowedRoomIds,
+            existing.expiresAt, existing.memberDeviceId, existing.joinedVia,
+            existing.secretsVersion, existing.lastSyncedAt));
+        }
       });
     });
   }
@@ -680,6 +724,12 @@ export class FamilyRepository implements MemberRoomGrantPort {
     }
     const existingRows = await tx.query('SELECT ' + MEMBER_COLUMNS +
       ' FROM family_member WHERE member_id = ?', [member.memberId]);
+    if (family.ownerMemberId === member.memberId &&
+      (member.role !== MemberRole.ADMIN || member.status !== MemberStatus.ACTIVE)) {
+      // Never let an upsert demote or deactivate the owner pointer target
+      // until transferAdmin runs (wp-026 R-09).
+      throw AppErrors.of('AUTH_RBAC_DENIED', []);
+    }
     if (existingRows.length > 0) {
       const existing = FamilyRepository.memberFromRow(existingRows[0]);
       if (existing.familyId !== member.familyId) {
@@ -693,21 +743,22 @@ export class FamilyRepository implements MemberRoomGrantPort {
   }
 
   async applyReceiptInTransaction(tx: RdbTransaction, inviteId: string,
-    patch: InvitationPatch): Promise<void> {
+    patch: InvitationPatch, nowMs?: number): Promise<void> {
     const record = await this.readInvitation(tx, inviteId);
     if (record === undefined) {
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'inviteId')]);
     }
-    if (record.status === InvitationStatus.EXPIRED) {
-      throw AppErrors.of('INVITE_EXPIRED', []);
-    }
     if (record.status === InvitationStatus.REVOKED) {
       throw AppErrors.of('INVITE_REVOKED', []);
     }
-    if (record.status === InvitationStatus.ACCEPTED) {
-      // Receipts are single-use for KEY_WRAP and bounded by used_count for
-      // CODE_KEK (ADR-003 §5.4). A duplicate receipt is never accepted twice.
-      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'receipt')]);
+    if (record.status === InvitationStatus.EXPIRED) {
+      throw AppErrors.of('INVITE_EXPIRED', []);
+    }
+    const now = nowMs === undefined ? this.clock.nowMs() : nowMs;
+    if (DateTimeUtil.parseUtcCompact(record.expireAt) <= now) {
+      // ADR-003 §5.2 clock trust boundary: an Admin receipt import after expiry
+      // is rejected before any member or invitation write (wp-026 R-01/R-10).
+      throw AppErrors.of('INVITE_EXPIRED', []);
     }
     if (record.usedCount >= record.maxUses) {
       throw AppErrors.of('INVITE_MAX_USES', []);
@@ -717,6 +768,8 @@ export class FamilyRepository implements MemberRoomGrantPort {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
     DateTimeUtil.parseUtcCompact(patch.acceptedAt);
+    // D-022: ACCEPTED records each receipt and is not a terminal state. The
+    // invitation stays usable while usedCount < maxUses and not expired.
     await tx.execute('UPDATE invitation SET status = ?, accepted_at = ?, ' +
       'accepted_by_member_id = ?, receipt = ?, used_count = ? WHERE invite_id = ?',
     [InvitationStatus.ACCEPTED, patch.acceptedAt, patch.acceptedByMemberId, patch.receipt,
@@ -746,9 +799,18 @@ export class FamilyRepository implements MemberRoomGrantPort {
 
   private async removeMemberInTransaction(tx: RdbTransaction, familyId: string,
     memberId: string): Promise<void> {
+    const family = await this.readFamily(tx, familyId);
+    if (family === undefined) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'familyId')]);
+    }
     const member = await this.readMember(tx, familyId, memberId);
     if (member === undefined) {
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'memberId')]);
+    }
+    if (family.ownerMemberId === memberId) {
+      // The owner pointer must never dangle. transferAdmin must run first
+      // (DES-B §3.3.1/§3.3.6; wp-026 R-09).
+      throw AppErrors.of('AUTH_RBAC_DENIED', []);
     }
     if (member.role === MemberRole.ADMIN) {
       await FamilyRepository.requireAnotherAdmin(tx, familyId, memberId);
@@ -812,7 +874,11 @@ export class FamilyRepository implements MemberRoomGrantPort {
     if (record.status === status) {
       return;
     }
-    if (record.status !== InvitationStatus.PENDING) {
+    if (record.status === InvitationStatus.REVOKED ||
+      record.status === InvitationStatus.EXPIRED) {
+      // REVOKED/EXPIRED are terminal; ACCEPTED is a receipt record, not a
+      // terminal state (D-022), so an accepted invitation may still be revoked
+      // or expired while uses remain.
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'status')]);
     }
     if (status === InvitationStatus.ACCEPTED) {

@@ -171,6 +171,12 @@ export class SceneExecutor {
         steps[index] = steps[index].withState(SceneStepState.FAILED,
           undefined, this.clock.nowMs(), outcome, outcome === undefined ? undefined :
             outcome.stateVerification, failure);
+        if (outcome !== undefined && outcome.ackAccepted) {
+          // MISMATCH is still gateway truth: write reportedState back to the
+          // SSOT before reporting the step as failed (DES-B §5.3.2 rule 6;
+          // wp-026 R-03).
+          await this.applyAckBestEffort(scene, action, command, outcome);
+        }
         return this.failAt(runId, scene, steps, index, startedAt, executed, succeeded,
           failure, listener);
       }
@@ -196,6 +202,13 @@ export class SceneExecutor {
   private failAt(runId: string, scene: Scene, steps: SceneStepResult[], failedIndex: number,
     startedAt: number, executed: number, succeeded: number, error: AppError,
     listener?: (progress: SceneExecutionProgress) => void): SceneExecutionResult {
+    if (failedIndex >= 0 && failedIndex < steps.length &&
+      steps[failedIndex].state === SceneStepState.PENDING) {
+      // A total-timeout failure happens before the step is marked RUNNING;
+      // it must still surface as FAILED, never PENDING (wp-026 R-05).
+      steps[failedIndex] = steps[failedIndex].withState(SceneStepState.FAILED,
+        undefined, this.clock.nowMs(), undefined, undefined, error);
+    }
     for (let index = failedIndex + 1; index < steps.length; index++) {
       steps[index] = steps[index].withState(SceneStepState.SKIPPED);
     }
@@ -277,7 +290,14 @@ export class SceneExecutor {
     if (listener === undefined) {
       return;
     }
-    listener(new SceneExecutionProgress(runId, scene.sceneId, state, currentIndex,
-      steps.slice(0), executed, succeeded));
+    try {
+      listener(new SceneExecutionProgress(runId, scene.sceneId, state, currentIndex,
+        steps.slice(0), executed, succeeded));
+    } catch (error) {
+      // Progress observers are notifications and must not abort the run
+      // (wp-026 R-12).
+      this.logger.warn('SceneExecutor', 'progress_listener_failed',
+        [new NameValue('sceneId', scene.sceneId)]);
+    }
   }
 }

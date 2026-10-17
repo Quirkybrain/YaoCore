@@ -23,6 +23,8 @@ import type { ClockPort, IdPort } from '../common/types/Ports';
 import { Scene, SceneAction } from '../model/FamilyModels';
 import { DeviceKey } from '../model/DeviceKey';
 import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
+import type { MigrationSink } from '../service/storage/MigrationPort';
+import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
 import type { SceneReferencePort } from './DomainPorts';
 import { SceneCleanupSummary } from './DomainModels';
@@ -43,6 +45,11 @@ export class SceneRepository implements SceneReferencePort {
     this.clock = clock;
     this.ids = ids;
     this.gate = gate === undefined ? new DomainOperationGate() : gate;
+  }
+
+  /** DES-B §6.1.3: v4 scene table (shared v4 registration is idempotent). */
+  static registerMigrations(registry: MigrationSink): void {
+    DomainMigrations.register(registry);
   }
 
   async initialize(): Promise<void> {

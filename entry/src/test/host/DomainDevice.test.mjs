@@ -22,6 +22,10 @@ import { DeviceAction, DeviceType } from '../../main/ets/common/constants/Device
 import { StateVerification } from '../../main/ets/model/ControlModels.ets';
 import { DeviceCommandRunner } from '../../main/ets/service/device/DeviceCommandRunner.ets';
 import { Scene, SceneAction } from '../../main/ets/model/FamilyModels.ets';
+import { MigrationRegistry } from '../../main/ets/service/storage/MigrationRegistry.ets';
+import { DomainMigrations } from '../../main/ets/repository/DomainMigrations.ets';
+import { RoomRepository } from '../../main/ets/repository/RoomRepository.ets';
+import { SceneRepository } from '../../main/ets/repository/SceneRepository.ets';
 import {
   FAMILY_ID,
   GATEWAY_ID,
@@ -48,6 +52,18 @@ async function setup() {
 
 function options(h, familyId) {
   return new DiscoverApplyOptions(familyId, h.clock.nowMs());
+}
+
+async function withTimeout(promise, ms) {
+  let timer;
+  const timeout = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('operation hung')), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 test('T09_C10_newDiscoverAddsUnassignedProtectivelyDisabledDevice', async () => {
@@ -387,4 +403,188 @@ test('T09_O1_gateSerializesOperations', async () => {
   await first;
   await second;
   assert.deepEqual(order, ['first-start', 'first-end', 'second']);
+});
+
+test('T09_C10_assignRoomRejectsRoomFromAnotherFamily', async () => {
+  const { h, familyId } = await setup();
+  const otherFamily = await h.families.createFamily('Other', 'Bob');
+  const foreignRoom = await h.rooms.createRoom(otherFamily.familyId, 'Foreign');
+  await h.devices.applyDiscoverSnapshot(discovery([snapshotDevice('Light_01')]),
+    options(h, familyId));
+  const key = new DeviceKey(GATEWAY_ID, 'Light_01');
+  await assert.rejects(h.devices.assignRoom(familyId, key, foreignRoom.roomId),
+    (error) => error.code === 'ROOM_NOT_FOUND');
+  const record = await h.devices.getRecord(key);
+  assert.equal(record.state.roomId, '');
+  assert.equal(record.state.isUnassigned, true);
+});
+
+test('T09_C10_unboundGatewayAndFamilyMismatchIgnoreWholeDiscover', async () => {
+  const { h, familyId } = await setup();
+  const unbound = await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Ghost_01')], { gatewayId: 'gw-unbound' }),
+    options(h, familyId));
+  assert.equal(unbound.added, 0);
+  assert.deepEqual(unbound.deviations, ['GATEWAY_NOT_BOUND']);
+  assert.equal((await h.devices.listRecords(familyId)).length, 0);
+
+  const otherFamily = await h.families.createFamily('Other', 'Bob');
+  h.routes.add(GATEWAY_ID, otherFamily.familyId);
+  const mismatch = await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01')]), options(h, familyId));
+  assert.equal(mismatch.added, 0);
+  assert.deepEqual(mismatch.deviations, ['GATEWAY_FAMILY_MISMATCH']);
+  assert.equal((await h.devices.listRecords(familyId)).length, 0);
+});
+
+test('T09_C10_duplicateAndFamilyMismatchDevicesSetPartial', async () => {
+  const { h, familyId } = await setup();
+  await h.devices.applyDiscoverSnapshot(discovery([snapshotDevice('Light_02')]),
+    options(h, familyId));
+  const duplicate = await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01'), snapshotDevice('Light_01')]),
+    options(h, familyId));
+  assert.equal(duplicate.added, 1);
+  assert.equal(duplicate.invalidDropped, 1);
+  assert.equal(duplicate.partial, true);
+  assert.ok(duplicate.deviations.includes('DUPLICATE_DEVICE'));
+  // A partially invalid snapshot must not infer gateway removal for others.
+  assert.equal(duplicate.gatewayRemovedMarked, 0);
+  assert.equal((await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_02'))).gatewayRemoved,
+    false);
+
+  const otherFamily = await h.families.createFamily('Other', 'Bob');
+  h.routes.add(GATEWAY_ID, otherFamily.familyId);
+  const mismatch = await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01', { updatedAt: T1, powerStatus: true })]),
+    options(h, otherFamily.familyId));
+  assert.equal(mismatch.invalidDropped, 1);
+  assert.equal(mismatch.partial, true);
+  assert.ok(mismatch.deviations.includes('FAMILY_MISMATCH'));
+  const record = await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01'));
+  assert.equal(record.state.familyId, familyId);
+});
+
+test('T09_C10_throwingListenerDoesNotAbortDiscover', async () => {
+  const { h, familyId } = await setup();
+  let calls = 0;
+  h.devices.subscribe(() => {
+    calls++;
+    throw new Error('listener boom');
+  });
+  const result = await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01')]), options(h, familyId));
+  assert.equal(result.added, 1);
+  assert.equal(calls, 1);
+  assert.ok(await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01')));
+  assert.ok(h.logger.entries.includes('W DeviceRepository device_listener_failed'));
+});
+
+test('T09_C10_commitFailureEmitsNoDeviceEvent', async () => {
+  const { h, familyId } = await setup();
+  let events = 0;
+  h.devices.subscribe(() => {
+    events++;
+  });
+  h.rdb.failCommit = true;
+  await assert.rejects(h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01')]), options(h, familyId)),
+  (error) => error.code === 'STORAGE_RDB_ERROR');
+  assert.equal(events, 0);
+  assert.equal(await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01')), undefined);
+});
+
+test('T09_C10_removeDevicesForGatewayReadsRouteOutsideTransaction', async () => {
+  const { h, familyId } = await setup();
+  await h.devices.applyDiscoverSnapshot(
+    discovery([snapshotDevice('Light_01'), snapshotDevice('Light_02')]),
+    options(h, familyId));
+  const sceneId = '123e4567-e89b-12d3-a456-000000000099';
+  await h.scenes.putScene(new Scene(sceneId, familyId, 'Movie', 'scene.movie',
+    [new SceneAction(GATEWAY_ID, 'Light_01', DeviceAction.TURN_ON, true)], true));
+  let readInsideTransaction = false;
+  const wrappedRoutes = {
+    listRoutes: () => h.routes.listRoutes(),
+    listRoutesByFamily: (id) => h.routes.listRoutesByFamily(id),
+    getRoute: async (gatewayId) => {
+      if (h.rdb.isInTransactionForTest()) {
+        readInsideTransaction = true;
+      }
+      return h.routes.getRoute(gatewayId);
+    },
+    isBound: (gatewayId) => h.routes.isBound(gatewayId)
+  };
+  const devices = new DeviceRepository(h.rdb, h.rooms, h.scenes, h.clock, h.logger, h.gate,
+    wrappedRoutes);
+  await devices.initialize();
+  const removed = await devices.removeDevicesForGateway(GATEWAY_ID);
+  assert.equal(removed, 2);
+  assert.equal(readInsideTransaction, false);
+  assert.equal((await h.scenes.getScene(sceneId)).actions.length, 0);
+});
+
+test('T09_C10_commandRunnerRejectsUnassignedDeviceWithZeroCommands', async () => {
+  const { h, familyId } = await setup();
+  await h.devices.applyDiscoverSnapshot(discovery([snapshotDevice('Light_01')]),
+    options(h, familyId));
+  await h.rdb.execute('UPDATE device_state SET is_enabled = ?, is_unassigned = ? ' +
+    'WHERE gateway_id = ? AND device_id = ?', [1, 1, GATEWAY_ID, 'Light_01']);
+  const runner = new DeviceCommandRunner(h.control, h.devices, h.clock, h.logger, h.metrics);
+  const execution = await runner.run(
+    command(GATEWAY_ID, 'Light_01', DeviceAction.TURN_ON, 1700000000000, true),
+    { familyId, precheck: true });
+  expectCode(execution.error, 'DEVICE_UNASSIGNED');
+  assert.equal(h.control.commands.length, 0);
+});
+
+test('T09_O1_gateRejectsSynchronousNestedRun', async () => {
+  const gate = new DomainOperationGate();
+  let innerRan = false;
+  await assert.rejects(withTimeout(gate.run(async () => {
+    await gate.run(async () => {
+      innerRan = true;
+    });
+  }), 500), (error) => error.code === 'CONFIGURATION_ERROR');
+  assert.equal(innerRan, false);
+  // The gate remains usable after the rejected reentrant call.
+  await gate.run(async () => {
+  });
+});
+
+test('T09_O1_gateRejectsAsyncReentrantCallInsteadOfHanging', async () => {
+  const gate = new DomainOperationGate(50);
+  let innerRan = false;
+  await assert.rejects(withTimeout(gate.run(async () => {
+    await Promise.resolve();
+    await gate.run(async () => {
+      innerRan = true;
+    });
+  }), 500), (error) => error.code === 'CONFIGURATION_ERROR' &&
+    error.details.some((detail) => detail.name === 'field' &&
+      detail.value === 'nestedOperationOrQueueTimeout'));
+  assert.equal(innerRan, false);
+});
+
+test('T09_O1_nestedFakeTransactionFailsFast', async () => {
+  const h = await newDomainHarness();
+  await assert.rejects(withTimeout(h.rdb.transaction(async () => {
+    await h.rdb.transaction(async () => {
+    });
+  }), 500), (error) => error.code === 'STORAGE_RDB_ERROR');
+});
+
+test('T09_C09_v4StaticRegistrationIsDelegatedAndIdempotent', async () => {
+  const { h } = await setup();
+  // The harness already registered v4 through the three component statics.
+  RoomRepository.registerMigrations(h.registry);
+  DeviceRepository.registerMigrations(h.registry);
+  SceneRepository.registerMigrations(h.registry);
+  DomainMigrations.register(h.registry);
+  assert.ok(h.rdb.tableNamesForTest().includes('room'));
+  assert.ok(h.rdb.tableNamesForTest().includes('device_state'));
+  assert.ok(h.rdb.tableNamesForTest().includes('scene'));
+  assert.ok(h.rdb.tableNamesForTest().includes('cloud_config'));
+  // A genuinely different duplicate version registration is still rejected.
+  assert.throws(() => h.registry.register(4, ['SELECT 1']),
+    (error) => error.code === 'CONFIGURATION_ERROR');
 });

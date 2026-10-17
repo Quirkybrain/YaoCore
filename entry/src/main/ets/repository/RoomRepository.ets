@@ -16,6 +16,8 @@ import { UuidUtil } from '../common/utils/UuidUtil';
 import type { ClockPort, IdPort } from '../common/types/Ports';
 import { Room } from '../model/FamilyModels';
 import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
+import type { MigrationSink } from '../service/storage/MigrationPort';
+import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
 import type { RoomLookupPort } from './DomainPorts';
 import { SqlCells } from './SqlCells';
@@ -35,6 +37,11 @@ export class RoomRepository implements RoomLookupPort {
     this.clock = clock;
     this.ids = ids;
     this.gate = gate === undefined ? new DomainOperationGate() : gate;
+  }
+
+  /** DES-B §4.1.2: v4 room table (shared v4 registration is idempotent). */
+  static registerMigrations(registry: MigrationSink): void {
+    DomainMigrations.register(registry);
   }
 
   async initialize(): Promise<void> {

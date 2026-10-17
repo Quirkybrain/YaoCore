@@ -122,6 +122,7 @@ export class InMemoryRdbStore implements RdbStore {
   failGetVersion: boolean = false;
   failSetVersion: boolean = false;
   failTransaction: boolean = false;
+  failCommit: boolean = false;
   executeCalls: number = 0;
 
   async execute(sql: string, args?: ReadonlyArray<RdbValue>): Promise<void> {
@@ -162,6 +163,11 @@ export class InMemoryRdbStore implements RdbStore {
     if (this.failTransaction) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
+    // Check BEFORE queueing: an `inTransaction` check inside the chain is
+    // unreachable for a nested call and would deadlock instead (wp-026 R-04).
+    if (this.inTransaction) {
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
     const run: Promise<T> = this.chain.then((): Promise<T> => {
       return this.runTransaction(fn);
     });
@@ -169,6 +175,11 @@ export class InMemoryRdbStore implements RdbStore {
     }, (): void => {
     });
     return run;
+  }
+
+  /** Test-only: true while a transaction callback is executing. */
+  isInTransactionForTest(): boolean {
+    return this.inTransaction;
   }
 
   async getVersion(): Promise<number> {
@@ -197,6 +208,10 @@ export class InMemoryRdbStore implements RdbStore {
     this.inTransaction = true;
     try {
       const result = await fn(this);
+      if (this.failCommit) {
+        this.failCommit = false;
+        throw AppErrors.of('STORAGE_RDB_ERROR', []);
+      }
       return result;
     } catch (error) {
       this.tables = snapshot;

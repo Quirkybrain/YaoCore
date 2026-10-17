@@ -12,7 +12,6 @@ import { FamilyRepository } from '../../main/ets/repository/FamilyRepository';
 import { RoomRepository } from '../../main/ets/repository/RoomRepository';
 import { DeviceRepository } from '../../main/ets/repository/DeviceRepository';
 import { SceneRepository } from '../../main/ets/repository/SceneRepository';
-import { DomainMigrations } from '../../main/ets/repository/DomainMigrations';
 import { FakeDeviceControlPort, FakeFamilyAuth, FakeInviteService, FakeLogger, FakeMetrics, FakeRoutePort, ManualSceneTimer } from './DomainFakes';
 
 const V1_PROBE: ReadonlyArray<string> = [
@@ -73,7 +72,11 @@ export class DomainHarness {
     this.registry.register(1, V1_PROBE);
     FamilyRepository.registerMigrations(this.registry);
     this.registry.register(3, V3_PROBE);
-    DomainMigrations.register(this.registry);
+    // All three v4 components expose the DES-B static registration; the
+    // shared v4 registration is idempotent (wp-026 R-06).
+    RoomRepository.registerMigrations(this.registry);
+    DeviceRepository.registerMigrations(this.registry);
+    SceneRepository.registerMigrations(this.registry);
     this.families = new FamilyRepository(this.rdb, this.preferences, this.clock, this.ids,
       this.gate);
     this.rooms = new RoomRepository(this.rdb, this.clock, this.ids, this.gate);

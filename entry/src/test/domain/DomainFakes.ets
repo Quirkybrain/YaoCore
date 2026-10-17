@@ -197,6 +197,7 @@ export class FakeInviteService implements InviteServicePort {
   receiptValid: boolean = true;
   receiptMemberId: string = 'member-1';
   receiptAcceptedAt: string = FIXED_UTC;
+  receiptInviteId?: string = undefined;
   acceptedFamilyId: string = 'family-1';
   acceptedFamilyName: string = 'Test Family';
   acceptedMemberId: string = 'member-1';
@@ -255,7 +256,8 @@ export class FakeInviteService implements InviteServicePort {
     if (this.failVerify !== undefined) {
       throw this.failVerify;
     }
-    return new ReceiptVerification(this.receiptValid, inviteId, this.receiptMemberId,
+    const verifiedInviteId = this.receiptInviteId === undefined ? inviteId : this.receiptInviteId;
+    return new ReceiptVerification(this.receiptValid, verifiedInviteId, this.receiptMemberId,
       this.receiptAcceptedAt);
   }
 
@@ -278,6 +280,8 @@ export class FakeInviteService implements InviteServicePort {
 export class FakeFamilyAuth implements FamilyAuthPort {
   readonly profiles: FamilyProfileRef[] = [];
   readonly invalidated: string[] = [];
+  readonly removedFamilyProfiles: string[] = [];
+  readonly removedMemberProfiles: string[] = [];
   lockAllCalls: number = 0;
   failRemoveFamily: boolean = false;
   failRemoveMember: boolean = false;
@@ -294,12 +298,14 @@ export class FakeFamilyAuth implements FamilyAuthPort {
     if (this.failRemoveFamily) {
       throw AppErrors.of('ASSET_IO_FAILED', []);
     }
+    this.removedFamilyProfiles.push(familyId);
   }
 
   async removeProfilesForMember(familyId: string, memberId: string): Promise<void> {
     if (this.failRemoveMember) {
       throw AppErrors.of('ASSET_IO_FAILED', []);
     }
+    this.removedMemberProfiles.push(familyId + ':' + memberId);
   }
 
   async listProfiles(familyId: string): Promise<ReadonlyArray<FamilyProfileRef>> {

@@ -181,7 +181,8 @@ test('T09_C08_invitationReceiptStateMachineAndWeakModeView', async () => {
   const member = await h.families.getMember(family.familyId, 'member-9');
   assert.equal(member.status, MemberStatus.ACTIVE);
   await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-again'),
-    (error) => error.code === 'CONFIGURATION_ERROR');
+    (error) => error.code === 'INVITE_MAX_USES');
+  assert.equal((await h.families.listMembers(family.familyId)).length, 2);
 
   const weak = await service.createCodeInvitation(new CreateInvitationInput(
     family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 2, 86400000));
@@ -206,29 +207,127 @@ test('T09_C08_revokeAndExpireInvitations', async () => {
   stored = await h.families.getInvitation(created.record.inviteId);
   assert.equal(stored.status, InvitationStatus.REVOKED);
 
-  const expired = await service.createCodeInvitation(new CreateInvitationInput(
-    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 1, -1000));
-  const count = await service.expireInvitations(family.familyId, NOW);
+  const expiring = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 1, 1000));
+  const count = await service.expireInvitations(family.familyId, NOW + 2000);
   assert.equal(count, 1);
-  stored = await h.families.getInvitation(expired.record.inviteId);
+  stored = await h.families.getInvitation(expiring.record.inviteId);
   assert.equal(stored.status, InvitationStatus.EXPIRED);
 });
 
 test('T09_C08_invitationValidationNegativeCases', async () => {
-  const { service } = await setup();
+  const { h, service } = await setup();
   const family = await createFamily(service);
+  const before = h.invites.createRequests.length;
   await assert.rejects(service.createInvitationForJoinRequest('not-ycr1',
     new CreateInvitationInput(family.familyId, MemberRole.MEMBER, [], InviteMode.KEY_WRAP)),
   (error) => error.code === 'INVITE_JOIN_REQUEST_INVALID');
   await assert.rejects(service.createInvitationForJoinRequest('YCR1.fake',
     new CreateInvitationInput(family.familyId, MemberRole.ADMIN, [], InviteMode.KEY_WRAP)),
-  (error) => error.code === 'CONFIGURATION_ERROR');
+  (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
   await assert.rejects(service.createCodeInvitation(new CreateInvitationInput(
     family.familyId, MemberRole.GUEST, [], InviteMode.CODE_KEK)),
-  (error) => error.code === 'CONFIGURATION_ERROR');
+  (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
   await assert.rejects(service.createInvitationForJoinRequest('YCR1.fake',
     new CreateInvitationInput(family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK)),
   (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  await assert.rejects(service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 0)),
+  (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  await assert.rejects(service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 1, 0)),
+  (error) => error.code === 'PROTOCOL_VALUE_OUT_OF_RANGE');
+  await assert.rejects(service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.GUEST, ['not-a-uuid'], InviteMode.CODE_KEK, 1, 1000)),
+  (error) => error.code === 'PROTOCOL_INVALID_IDENTIFIER');
+  // No C-13 side effect (seed alias/creation) may happen before validation.
+  assert.equal(h.invites.createRequests.length, before);
+});
+
+test('T09_C08_revokedReceiptLeavesNoActiveMember', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createInvitationForJoinRequest('YCR1.fake.join',
+    new CreateInvitationInput(family.familyId, MemberRole.MEMBER, [], InviteMode.KEY_WRAP));
+  await service.revokeInvitation(created.record.inviteId);
+  h.invites.receiptMemberId = 'member-revoked';
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-revoked'),
+    (error) => error.code === 'INVITE_REVOKED');
+  assert.equal(await h.families.getMember(family.familyId, 'member-revoked'), undefined);
+  const stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.status, InvitationStatus.REVOKED);
+  assert.equal(stored.usedCount, 0);
+});
+
+test('T09_C08_expiredReceiptLeavesNoActiveMember', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 1, 1000));
+  h.clock.value += 2000;
+  h.invites.receiptMemberId = 'member-expired';
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-expired'),
+    (error) => error.code === 'INVITE_EXPIRED');
+  assert.equal(await h.families.getMember(family.familyId, 'member-expired'), undefined);
+  assert.equal(h.invites.verifyCalls, 0);
+  const stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 0);
+});
+
+test('T09_C08_receiptInviteMismatchIsRejectedBeforeMemberWrite', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 1, 10000));
+  h.invites.receiptMemberId = 'member-mismatch';
+  h.invites.receiptInviteId = 'other-invite';
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-mismatch'),
+    (error) => error.code === 'INVITE_RECEIPT_INVALID');
+  assert.equal(await h.families.getMember(family.familyId, 'member-mismatch'), undefined);
+});
+
+test('T09_C08_codeKekMultipleReceiptsFollowD022', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 2, 86400000));
+  h.invites.receiptMemberId = 'member-a';
+  const first = await service.importReceipt(created.record.inviteId, 'receipt-a');
+  assert.equal(first.memberId, 'member-a');
+  let stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.status, InvitationStatus.ACCEPTED);
+  assert.equal(stored.usedCount, 1);
+  // D-022: ACCEPTED is a receipt record, not a terminal state.
+  h.invites.receiptMemberId = 'member-b';
+  const second = await service.importReceipt(created.record.inviteId, 'receipt-b');
+  assert.equal(second.memberId, 'member-b');
+  stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.usedCount, 2);
+  assert.equal(stored.acceptedByMemberId, 'member-b');
+  const memberA = await h.families.getMember(family.familyId, 'member-a');
+  const memberB = await h.families.getMember(family.familyId, 'member-b');
+  assert.equal(memberA.status, MemberStatus.ACTIVE);
+  assert.equal(memberB.status, MemberStatus.ACTIVE);
+  h.invites.receiptMemberId = 'member-c';
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-c'),
+    (error) => error.code === 'INVITE_MAX_USES');
+  assert.equal(await h.families.getMember(family.familyId, 'member-c'), undefined);
+});
+
+test('T09_C08_acceptedCodeKekCanStillBeRevokedWhileUsesRemain', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const created = await service.createCodeInvitation(new CreateInvitationInput(
+    family.familyId, MemberRole.MEMBER, [], InviteMode.CODE_KEK, 2, 86400000));
+  h.invites.receiptMemberId = 'member-a';
+  await service.importReceipt(created.record.inviteId, 'receipt-a');
+  await service.revokeInvitation(created.record.inviteId);
+  const stored = await h.families.getInvitation(created.record.inviteId);
+  assert.equal(stored.status, InvitationStatus.REVOKED);
+  h.invites.receiptMemberId = 'member-b';
+  await assert.rejects(service.importReceipt(created.record.inviteId, 'receipt-b'),
+    (error) => error.code === 'INVITE_REVOKED');
+  assert.equal(await h.families.getMember(family.familyId, 'member-b'), undefined);
 });
 
 test('T09_C08_joinSessionKeyWrapCompletesAndWritesMember', async () => {
@@ -308,4 +407,88 @@ test('T09_C08_dissolveReportsProfileCleanupFailureButKeepsLocalDeletion', async 
   await assert.rejects(service.dissolveFamily(family.familyId, family.ownerMemberId),
     (error) => error.code === 'CONFIGURATION_ERROR');
   assert.equal(await h.families.getFamily(family.familyId), undefined);
+});
+
+test('T09_C08_dissolveUsesRouteAuthorityAndReturnsEveryGateway', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const secondGateway = 'gw-2';
+  h.routes.add(GATEWAY_ID, family.familyId);
+  h.routes.add(secondGateway, family.familyId);
+  // Family row deliberately lists only one gateway (stale local projection).
+  await h.families.addGatewayToFamily(family.familyId, GATEWAY_ID);
+  const plan = await service.dissolveFamily(family.familyId, family.ownerMemberId);
+  assert.deepEqual(plan.gatewayIds.slice(0).sort(), [GATEWAY_ID, secondGateway].sort());
+  assert.equal(plan.requiresRotation, true);
+  assert.equal(plan.requiresGatewayUnbind, true);
+  assert.ok(h.auth.removedFamilyProfiles.includes(family.familyId));
+  assert.equal(await h.families.getFamily(family.familyId), undefined);
+});
+
+test('T09_C08_leaveFamilyReturnsEveryBoundGatewayAndRemovesProfile', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const member = await addMember(h, family.familyId, 'member-2', MemberRole.MEMBER, 'Bob');
+  h.routes.add(GATEWAY_ID, family.familyId);
+  h.routes.add('gw-2', family.familyId);
+  const plan = await service.leaveFamily(family.familyId, member.memberId, member.memberId);
+  assert.deepEqual(plan.gatewayIds.slice(0).sort(), [GATEWAY_ID, 'gw-2'].sort());
+  assert.equal(plan.requiresRotation, true);
+  assert.ok(h.auth.removedMemberProfiles.includes(family.familyId + ':' + member.memberId));
+});
+
+test('T09_C08_removeMemberSuccessInvalidatesSessionsAndGuidesRotation', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const member = await addMember(h, family.familyId, 'member-2', MemberRole.MEMBER, 'Bob');
+  h.routes.add(GATEWAY_ID, family.familyId);
+  const result = await service.removeMember(family.familyId, member.memberId,
+    family.ownerMemberId);
+  assert.equal(result.removed, true);
+  assert.equal(result.requiresRotation, true);
+  assert.equal(result.rotationPlan.gatewayId, GATEWAY_ID);
+  assert.ok(h.auth.invalidated.includes(member.memberId));
+  assert.equal(await h.families.getMember(family.familyId, member.memberId), undefined);
+});
+
+test('T09_C08_changeMemberRoleSuccessInvalidatesSessions', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const member = await addMember(h, family.familyId, 'member-2', MemberRole.MEMBER, 'Bob');
+  const promoted = await service.changeMemberRole(family.familyId, member.memberId,
+    MemberRole.ADMIN, family.ownerMemberId);
+  assert.equal(promoted.changed, true);
+  assert.equal((await h.families.getMember(family.familyId, member.memberId)).role,
+    MemberRole.ADMIN);
+  assert.ok(h.auth.invalidated.includes(member.memberId));
+  await service.changeMemberRole(family.familyId, member.memberId, MemberRole.MEMBER,
+    family.ownerMemberId);
+  assert.equal((await h.families.getMember(family.familyId, member.memberId)).role,
+    MemberRole.MEMBER);
+});
+
+test('T09_C08_ownerCannotBeDemotedOrRemovedAndTransferRemainsPossible', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  const second = await addMember(h, family.familyId, 'member-2', MemberRole.ADMIN, 'Bob');
+  await assert.rejects(service.changeMemberRole(family.familyId, family.ownerMemberId,
+    MemberRole.MEMBER, second.memberId), (error) => error.code === 'AUTH_RBAC_DENIED');
+  await assert.rejects(service.removeMember(family.familyId, family.ownerMemberId,
+    second.memberId), (error) => error.code === 'AUTH_RBAC_DENIED');
+  await assert.rejects(h.families.updateMemberStatus(family.familyId, family.ownerMemberId,
+    MemberStatus.DISABLED), (error) => error.code === 'AUTH_RBAC_DENIED');
+  let storedFamily = await h.families.getFamily(family.familyId);
+  let owner = await h.families.getMember(family.familyId, family.ownerMemberId);
+  assert.equal(storedFamily.ownerMemberId, family.ownerMemberId);
+  assert.equal(owner.role, MemberRole.ADMIN);
+  // The family is not wedged: an explicit transfer still works and the old
+  // owner can then be demoted/removed normally.
+  await service.transferAdmin(family.familyId, family.ownerMemberId, second.memberId,
+    family.ownerMemberId);
+  storedFamily = await h.families.getFamily(family.familyId);
+  owner = await h.families.getMember(family.familyId, family.ownerMemberId);
+  assert.equal(storedFamily.ownerMemberId, second.memberId);
+  assert.equal(owner.role, MemberRole.MEMBER);
+  await service.removeMember(family.familyId, family.ownerMemberId, second.memberId);
+  assert.equal(await h.families.getMember(family.familyId, family.ownerMemberId), undefined);
 });

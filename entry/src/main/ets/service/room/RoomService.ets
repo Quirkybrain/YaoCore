@@ -241,8 +241,16 @@ export class RoomService {
   }
 
   private emit(event: RoomChangeEvent): void {
-    for (let index = 0; index < this.listeners.length; index++) {
-      this.listeners[index](event);
+    // Listeners are notification consumers; a throwing subscriber must not
+    // turn a committed room change into a caller-visible failure (wp-026 R-12).
+    const snapshot = this.listeners.slice(0);
+    for (let index = 0; index < snapshot.length; index++) {
+      try {
+        snapshot[index](event);
+      } catch (error) {
+        this.logger.warn('RoomService', 'room_listener_failed',
+          [new NameValue('event', event.type)]);
+      }
     }
   }
 }

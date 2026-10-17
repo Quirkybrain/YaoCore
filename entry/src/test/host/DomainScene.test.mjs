@@ -19,7 +19,8 @@ import {
   snapshotDevice,
   sceneAction,
   acceptedOutcome,
-  rejectedOutcome
+  rejectedOutcome,
+  stateOutcome
 } from './domain-helpers.mjs';
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
@@ -236,4 +237,128 @@ test('T09_C11_disabledAndEmptyScenesAreRejected', async () => {
   await assert.rejects(service.run(disabled.sceneId), (error) => error.code === 'SCENE_DISABLED');
   await assert.rejects(service.run('123e4567-e89b-12d3-a456-000000000099'),
     (error) => error.code === 'SCENE_NOT_FOUND');
+});
+
+test('T09_C11_sameSceneConcurrentRunIsRejectedAndNeverDoubleDispatches', async () => {
+  const { h, familyId, service } = await setup();
+  const scene = await createLightScene(service, familyId, {
+    actions: [
+      sceneAction(GATEWAY_ID, 'Light_01', DeviceAction.TURN_ON, true),
+      sceneAction(GATEWAY_ID, 'AC_01', DeviceAction.TURN_ON, true)
+    ]
+  });
+  const originalSend = h.control.send.bind(h.control);
+  let release;
+  let sendCalled = false;
+  const blocked = new Promise((resolve) => {
+    release = resolve;
+  });
+  h.control.send = async (command) => {
+    sendCalled = true;
+    await blocked;
+    return originalSend(command);
+  };
+  const first = service.run(scene.sceneId);
+  for (let index = 0; index < 50 && !sendCalled; index++) {
+    await tick();
+  }
+  assert.equal(sendCalled, true);
+  await assert.rejects(service.run(scene.sceneId),
+    (error) => error.code === 'SCENE_RUN_IN_PROGRESS');
+  assert.equal(h.control.commands.length, 0);
+  release();
+  const result = await first;
+  assert.equal(result.state, 'SUCCEEDED');
+  assert.equal(h.control.commands.length, 2);
+  // The single-flight guard is released after completion.
+  h.control.send = originalSend;
+  const again = await service.run(scene.sceneId);
+  assert.equal(again.state, 'SUCCEEDED');
+  assert.equal(h.control.commands.length, 4);
+});
+
+test('T09_C11_mismatchWritesGatewayTruthToSsot', async () => {
+  const { h, familyId, service } = await setup();
+  h.control.outcomes.push(stateOutcome('Light_01', GATEWAY_ID, {
+    updatedAt: '20261017T080001Z',
+    verification: StateVerification.MISMATCH,
+    fields: { powerStatus: true }
+  }));
+  const scene = await createLightScene(service, familyId);
+  const result = await service.run(scene.sceneId);
+  assert.equal(result.state, 'FAILED');
+  assert.equal(result.steps[0].state, 'FAILED');
+  assert.equal(result.steps[0].stateVerification, StateVerification.MISMATCH);
+  const record = await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01'));
+  // MISMATCH is still gateway truth and must be written back (DES-B §5.3.2-6).
+  assert.equal(record.state.snapshot.powerStatus, true);
+  assert.equal(h.control.commands.length, 1);
+});
+
+test('T09_C11_totalTimeoutMarksTheBlockedStepFailedNotPending', async () => {
+  const { h, familyId, service } = await setup();
+  const scene = await createLightScene(service, familyId, {
+    actions: [
+      sceneAction(GATEWAY_ID, 'Light_01', DeviceAction.TURN_ON, true, 60001),
+      sceneAction(GATEWAY_ID, 'AC_01', DeviceAction.TURN_ON, true)
+    ]
+  });
+  const running = service.run(scene.sceneId);
+  for (let index = 0; index < 5; index++) {
+    await tick();
+  }
+  h.advance(60001);
+  const result = await running;
+  assert.equal(result.state, 'PARTIAL_FAILED');
+  assert.equal(result.steps[0].state, 'SUCCEEDED');
+  assert.equal(result.steps[1].state, 'FAILED');
+  assert.equal(result.failedStepIndex, 1);
+  assert.equal(h.control.commands.length, 1);
+});
+
+test('T09_C11_stepTimeoutFailsStepAndIgnoresLateOutcome', async () => {
+  const { h, familyId, service } = await setup();
+  const scene = await createLightScene(service, familyId);
+  const originalSend = h.control.send.bind(h.control);
+  let release;
+  let sendCalled = false;
+  const held = new Promise((resolve) => {
+    release = resolve;
+  });
+  h.control.send = async (command) => {
+    sendCalled = true;
+    await held;
+    return originalSend(command);
+  };
+  const running = service.run(scene.sceneId);
+  for (let index = 0; index < 50 && !sendCalled; index++) {
+    await tick();
+  }
+  assert.equal(sendCalled, true);
+  h.timer.advance(8000);
+  const result = await running;
+  assert.equal(result.state, 'FAILED');
+  assert.equal(result.steps[0].state, 'FAILED');
+  assert.equal(result.executedCount, 1);
+  release();
+  for (let index = 0; index < 5; index++) {
+    await tick();
+  }
+  // The late ACK is discarded and cannot rewrite the finished step.
+  const record = await h.devices.getRecord(new DeviceKey(GATEWAY_ID, 'Light_01'));
+  assert.equal(record.state.snapshot.powerStatus, false);
+});
+
+test('T09_C11_throwingProgressAndEventListenersDoNotFailRun', async () => {
+  const { h, familyId, service } = await setup();
+  const scene = await createLightScene(service, familyId);
+  service.subscribe(() => {
+    throw new Error('listener boom');
+  });
+  const result = await service.run(scene.sceneId, () => {
+    throw new Error('progress boom');
+  });
+  assert.equal(result.state, 'SUCCEEDED');
+  assert.equal(h.control.commands.length, 1);
+  assert.ok(h.logger.entries.includes('W SceneService scene_listener_failed'));
 });

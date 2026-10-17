@@ -57,7 +57,20 @@ const V4_STATEMENTS: ReadonlyArray<string> = [
 ];
 
 export class DomainMigrations {
+  /**
+   * v4 is one schema version shared by C-09/C-10/C-11. Each component exposes
+   * its own static `registerMigrations` (DES-B §2.5/§4.1.2/§5.1.3/§6.1.3) and
+   * delegates here; registration is idempotent per sink so a composition root
+   * may call any or all of them without a duplicate-version failure.
+   */
   static register(registry: MigrationSink): void {
+    if (DomainMigrations.registeredSinks.has(registry)) {
+      return;
+    }
     registry.register(4, V4_STATEMENTS);
+    DomainMigrations.registeredSinks.set(registry, true);
   }
+
+  private static registeredSinks: Map<MigrationSink, boolean> =
+    new Map<MigrationSink, boolean>();
 }

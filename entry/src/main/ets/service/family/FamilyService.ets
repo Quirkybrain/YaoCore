@@ -142,11 +142,16 @@ export class FamilyService {
     if (this.rdb === undefined) {
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'rdb')]);
     }
+    // DES-B §3.1.3: route bindings are authoritative for the rotation/unbind
+    // guidance. The family row is merged in as a fallback because it may be
+    // stale after a crash (wp-026 R-08).
+    const routeGatewayIds = await this.gatewayIdsForFamily(familyId);
     const active = await this.families.getActiveFamily();
-    let gatewayIds: ReadonlyArray<string> = [];
+    let familyRowGatewayIds: ReadonlyArray<string> = [];
     await this.runTopLevelTransaction<void>(async (tx: RdbTransaction): Promise<void> => {
-      gatewayIds = await this.families.removeFamilyLocal(tx, familyId);
+      familyRowGatewayIds = await this.families.removeFamilyLocal(tx, familyId);
     });
+    const gatewayIds = FamilyService.mergeGatewayIds(routeGatewayIds, familyRowGatewayIds);
     let cleanupError: AppError | undefined = undefined;
     try {
       await this.auth.removeProfilesForFamily(familyId);
@@ -162,7 +167,8 @@ export class FamilyService {
     if (cleanupError !== undefined) {
       throw cleanupError;
     }
-    return new FamilyDissolutionPlan(familyId, gatewayIds, true, true);
+    return new FamilyDissolutionPlan(familyId, gatewayIds, gatewayIds.length > 0,
+      gatewayIds.length > 0);
   }
 
   async leaveFamily(familyId: string, memberId: string,
@@ -181,12 +187,11 @@ export class FamilyService {
       await this.families.removeMemberLocal(tx, familyId, memberId);
     });
     await this.auth.removeProfilesForMember(familyId, memberId);
-    const plan = await this.rotationPlanForFamily(familyId);
-    const gatewayIds: string[] = [];
-    if (plan !== undefined) {
-      gatewayIds.push(plan.gatewayId);
-    }
-    return new FamilyDissolutionPlan(familyId, gatewayIds, plan !== undefined, false);
+    const routeGatewayIds = await this.gatewayIdsForFamily(familyId);
+    const family = await this.families.getFamily(familyId);
+    const gatewayIds = FamilyService.mergeGatewayIds(routeGatewayIds,
+      family === undefined ? [] : family.gatewayIds);
+    return new FamilyDissolutionPlan(familyId, gatewayIds, gatewayIds.length > 0, false);
   }
 
   // ---- Members ------------------------------------------------------------
@@ -322,6 +327,9 @@ export class FamilyService {
     if (input.mode !== InviteMode.KEY_WRAP) {
       throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'mode');
     }
+    // Validate every C-08 input before calling C-13 so an invalid request never
+    // creates a seed alias or other cross-store side effect (wp-026 R-11).
+    FamilyService.validateInvitationInput(input, false);
     const family = await this.requireFamily(input.familyId);
     const request = new InviteCreateRequest(input.familyId, input.targetRole,
       input.allowedRoomIds, 1, input.ttlMs, InviteMode.KEY_WRAP, joinRequestText,
@@ -334,10 +342,13 @@ export class FamilyService {
   async createCodeInvitation(input: CreateInvitationInput,
     actorMemberId?: string): Promise<InviteCreation> {
     await this.requireAdmin(input.familyId, actorMemberId);
+    if (input.mode !== InviteMode.CODE_KEK) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'mode');
+    }
+    FamilyService.validateInvitationInput(input, true);
     const family = await this.requireFamily(input.familyId);
-    const maxUses = input.maxUses < 1 ? 1 : input.maxUses;
     const request = new InviteCreateRequest(input.familyId, input.targetRole,
-      input.allowedRoomIds, maxUses, input.ttlMs, InviteMode.CODE_KEK, undefined,
+      input.allowedRoomIds, input.maxUses, input.ttlMs, InviteMode.CODE_KEK, undefined,
       family.familyName);
     const creation = await this.invites.createInvitation(request);
     await this.families.putInvitation(creation.record);
@@ -368,7 +379,8 @@ export class FamilyService {
     if (record.status === InvitationStatus.REVOKED) {
       return;
     }
-    if (record.status !== InvitationStatus.PENDING) {
+    if (record.status === InvitationStatus.EXPIRED || record.usedCount >= record.maxUses) {
+      // EXPIRED and use-exhausted invitations are terminal (D-022).
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'status')]);
     }
     await this.invites.revokeInvitation(inviteId);
@@ -381,27 +393,27 @@ export class FamilyService {
     actorMemberId?: string): Promise<AcceptedInvitation> {
     const record = await this.requireInvitation(inviteId);
     await this.requireAdmin(record.familyId, actorMemberId);
+    // Validate the invitation state before verifying or touching any member
+    // row (wp-026 R-01). A failed import must leave no ACTIVE member behind.
+    FamilyService.requireUsableInvitation(record, this.clock.nowMs());
     const verification = await this.invites.verifyReceipt(receiptText, inviteId);
-    if (!verification.valid || verification.memberId === undefined) {
+    if (!verification.valid || verification.memberId === undefined ||
+      (verification.inviteId !== undefined && verification.inviteId !== inviteId)) {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
     const memberId = verification.memberId;
-    const existing = await this.families.getMember(record.familyId, memberId);
-    if (existing === undefined) {
-      const expiresAt = record.targetRole === MemberRole.GUEST ? record.expireAt : undefined;
-      const member = new FamilyMember(memberId, record.familyId, memberId, memberId,
-        record.targetRole, MemberStatus.ACTIVE, DateTimeUtil.nowUtcCompact(this.clock),
-        record.allowedRoomIds, expiresAt, undefined,
-        record.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' : 'INVITE_CODE_KEK');
-      await this.families.upsertMember(member);
-    } else if (existing.status !== MemberStatus.ACTIVE) {
-      await this.families.updateMemberStatus(record.familyId, memberId, MemberStatus.ACTIVE);
-    }
+    const family = await this.requireFamily(record.familyId);
+    const expiresAt = record.targetRole === MemberRole.GUEST ? record.expireAt : undefined;
+    const member = new FamilyMember(memberId, record.familyId, memberId, memberId,
+      record.targetRole, MemberStatus.ACTIVE, DateTimeUtil.nowUtcCompact(this.clock),
+      record.allowedRoomIds, expiresAt, undefined,
+      record.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' : 'INVITE_CODE_KEK');
     const acceptedAt = verification.acceptedAt === undefined ?
       DateTimeUtil.nowUtcCompact(this.clock) : verification.acceptedAt;
-    await this.families.applyReceipt(inviteId,
+    // Single repository transaction: receipt validation, usedCount++, optional
+    // member activation. applyReceiptInTransaction re-checks under the tx.
+    await this.families.applyReceiptAndEnsureMember(inviteId, member,
       new InvitationPatch(acceptedAt, memberId, receiptText));
-    const family = await this.requireFamily(record.familyId);
     return new AcceptedInvitation(record.familyId, record.familyName, memberId,
       record.targetRole, record.allowedRoomIds, family.gatewayIds, receiptText);
   }
@@ -413,7 +425,9 @@ export class FamilyService {
     let expired = 0;
     for (let index = 0; index < records.length; index++) {
       const record = records[index];
-      if (record.status === InvitationStatus.PENDING &&
+      if ((record.status === InvitationStatus.PENDING ||
+        record.status === InvitationStatus.ACCEPTED) &&
+        record.usedCount < record.maxUses &&
         DateTimeUtil.parseUtcCompact(record.expireAt) <= nowMs) {
         await this.families.markInvitationStatus(record.inviteId, InvitationStatus.EXPIRED);
         expired++;
@@ -477,13 +491,94 @@ export class FamilyService {
       if (routes.length === 0) {
         return undefined;
       }
-      return new RotationPlan(routes[0].gatewayId, [ROTATION_STEP]);
+      // RotationPlan carries a single gateway (DES-B §3.1.3 type); pick a
+      // stable order so multi-gateway families get deterministic guidance.
+      // FamilyDissolutionPlan.gatewayIds returns the complete list (wp-026 R-08).
+      const sorted = routes.slice(0).sort((left, right): number => {
+        if (left.gatewayId < right.gatewayId) {
+          return -1;
+        }
+        return left.gatewayId > right.gatewayId ? 1 : 0;
+      });
+      return new RotationPlan(sorted[0].gatewayId, [ROTATION_STEP]);
     } catch (error) {
       // Rotation guidance is advisory; never turn a successful local change
       // into a failure just because route listing failed.
       this.logger.warn('FamilyService', 'rotation_plan_unavailable',
         [new NameValue('familyId', familyId)]);
       return undefined;
+    }
+  }
+
+  /** Route bindings are the authority; read failures degrade to the family row. */
+  private async gatewayIdsForFamily(familyId: string): Promise<string[]> {
+    const ids: string[] = [];
+    try {
+      const routes = await this.routes.listRoutesByFamily(familyId);
+      for (let index = 0; index < routes.length; index++) {
+        ids.push(routes[index].gatewayId);
+      }
+    } catch (error) {
+      this.logger.warn('FamilyService', 'family_routes_unavailable',
+        [new NameValue('familyId', familyId)]);
+    }
+    return ids;
+  }
+
+  private static mergeGatewayIds(primary: ReadonlyArray<string>,
+    fallback: ReadonlyArray<string>): ReadonlyArray<string> {
+    const merged: string[] = [];
+    const seen: Map<string, boolean> = new Map<string, boolean>();
+    for (let index = 0; index < primary.length; index++) {
+      if (!seen.has(primary[index])) {
+        seen.set(primary[index], true);
+        merged.push(primary[index]);
+      }
+    }
+    for (let index = 0; index < fallback.length; index++) {
+      if (!seen.has(fallback[index])) {
+        seen.set(fallback[index], true);
+        merged.push(fallback[index]);
+      }
+    }
+    return merged;
+  }
+
+  private static requireUsableInvitation(record: InvitationRecord, nowMs: number): void {
+    if (record.status === InvitationStatus.REVOKED) {
+      throw AppErrors.of('INVITE_REVOKED', []);
+    }
+    if (record.status === InvitationStatus.EXPIRED) {
+      throw AppErrors.of('INVITE_EXPIRED', []);
+    }
+    if (record.usedCount >= record.maxUses) {
+      throw AppErrors.of('INVITE_MAX_USES', []);
+    }
+    if (DateTimeUtil.parseUtcCompact(record.expireAt) <= nowMs) {
+      throw AppErrors.of('INVITE_EXPIRED', []);
+    }
+  }
+
+  private static validateInvitationInput(input: CreateInvitationInput,
+    codeMode: boolean): void {
+    if (input.targetRole !== MemberRole.MEMBER && input.targetRole !== MemberRole.GUEST) {
+      // DES-B §3.2: ADMIN invitations are rejected with the protocol code.
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'targetRole');
+    }
+    for (let index = 0; index < input.allowedRoomIds.length; index++) {
+      if (!UuidUtil.isValidUuid(input.allowedRoomIds[index])) {
+        throw AppErrors.protocol('PROTOCOL_INVALID_IDENTIFIER', 'allowedRoomIds');
+      }
+    }
+    if (input.targetRole === MemberRole.GUEST && input.allowedRoomIds.length < 1) {
+      // DES-A §11.2: a GUEST needs at least one allowed room.
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'allowedRoomIds');
+    }
+    if (!Number.isInteger(input.ttlMs) || input.ttlMs <= 0) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'ttlMs');
+    }
+    if (codeMode && (!Number.isInteger(input.maxUses) || input.maxUses < 1)) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'maxUses');
     }
   }
 
