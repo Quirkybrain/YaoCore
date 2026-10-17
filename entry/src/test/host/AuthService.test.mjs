@@ -177,7 +177,10 @@ test('C12_rbacMatrix_adminMemberGuestAndDeviceStates', async () => {
   assert.equal(auth.canInvite(admin).allowed, true);
   assert.equal(auth.canInvite(guestSession).allowed, false);
   assert.equal(auth.canExecuteScene(memberSession).allowed, true);
-  assert.equal(auth.canExecuteScene(guestSession).allowed, false);
+  const guestScene = auth.canExecuteScene(guestSession);
+  assert.equal(guestScene.allowed, false);
+  // DES-A §12.1 (T-13 ruling F-08): GUEST scene execution is v1 fail-closed.
+  assert.equal(guestScene.reason, 'RBAC_DENIED');
   assert.equal(auth.isAdmin(admin), true);
   assert.equal(auth.isAdmin(memberSession), false);
 
@@ -209,6 +212,47 @@ test('C12_backoffAfterFiveFailuresAndProfileCleanup', async () => {
   assert.equal(await auth.getProfile(profile.profileId), undefined);
   assert.equal(harness.secrets.has(profile.hashAlias), false);
   assert.equal(auth.getSession(session.sessionId), undefined);
+});
+
+test('C12_changePassword_rdbFailureRestoresOldHash', async () => {
+  const { harness, auth, family } = await setup();
+  const profile = await profileFor(auth, harness, family.familyId, family.ownerMemberId,
+    MemberRole.ADMIN);
+  harness.rdb.failNextExecuteContaining = 'UPDATE auth_profile';
+  await expectRejectCode(auth.changePassword(profile.profileId, PASSWORD, 'brand-new-pass-2'),
+    'STORAGE_RDB_ERROR');
+  assert.equal(await auth.verifyPassword(profile.profileId, PASSWORD), true);
+  assert.equal(await auth.verifyPassword(profile.profileId, 'brand-new-pass-2'), false);
+  // The stored metadata still matches the restored hash.
+  const rows = await harness.rdb.query('SELECT salt_hex, iterations FROM auth_profile ' +
+    'WHERE profile_id = ?', [profile.profileId]);
+  assert.equal(rows[0].get('salt_hex'), profile.saltHex);
+});
+
+test('C12_createProfile_concurrentSameAliasKeepsWinnerHash', async () => {
+  const { harness, auth, family } = await setup();
+  const profileId = harness.ids.newId();
+  const first = auth.createProfile(new CreateProfileInput(profileId, family.familyId,
+    family.ownerMemberId, 'Alice', 'concurrent-pass-1', MemberRole.ADMIN));
+  const second = auth.createProfile(new CreateProfileInput(profileId, family.familyId,
+    family.ownerMemberId, 'Alice', 'concurrent-pass-2', MemberRole.ADMIN));
+  const results = await Promise.allSettled([first, second]);
+  const fulfilled = results.filter((result) => result.status === 'fulfilled');
+  const rejected = results.filter((result) => result.status === 'rejected');
+  assert.equal(fulfilled.length, 1);
+  assert.equal(rejected.length, 1);
+  assert.equal(rejected[0].reason.code, 'AUTH_PROFILE_EXISTS');
+  const winner = fulfilled[0].value;
+  assert.equal((await auth.listProfiles(family.familyId)).length, 1);
+  const firstMatches = await auth.verifyPassword(winner.profileId, 'concurrent-pass-1');
+  const secondMatches = await auth.verifyPassword(winner.profileId, 'concurrent-pass-2');
+  // Exactly one credential remains valid and the winner's Asset hash was not
+  // deleted by the loser's rollback.
+  assert.equal(firstMatches !== secondMatches, true);
+  assert.equal(harness.secrets.has(winner.hashAlias), true);
+  const secretLength = await harness.secrets.withSecret(winner.hashAlias,
+    async (secret) => secret.length);
+  assert.equal(secretLength, 32);
 });
 
 test('C12_multiFamilyProfilesStayScoped', async () => {

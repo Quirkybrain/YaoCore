@@ -373,6 +373,9 @@ export class InviteCodec {
     }
     const bytes = InviteCodec.decodeBase64Url(text.substring(RECEIPT_PREFIX.length),
       'INVITE_RECEIPT_INVALID');
+    if (bytes.length > MAX_HEADER_BYTES) {
+      throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+    }
     const node = InviteCodec.parseObject(bytes, MAX_HEADER_BYTES, 'INVITE_RECEIPT_INVALID');
     InviteCodec.requireKeys(node, ['acceptedAt', 'inviteId', 'mac', 'memberId', 'v'],
       'INVITE_RECEIPT_INVALID');
@@ -388,7 +391,15 @@ export class InviteCodec {
     if (mac.length !== 64 || !LOWER_HEX_PATTERN.test(mac)) {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
-    return new ReceiptPayload(1, inviteId, memberId, acceptedAt, mac);
+    const payload = new ReceiptPayload(1, inviteId, memberId, acceptedAt, mac);
+    // DES-A §13.2/§13.2.1: the receipt identity is the canonical YCP1 bytes.
+    // Re-encoding must reproduce the input exactly; key order, whitespace,
+    // escapes, extra fields, duplicate keys, non-canonical b64url and unknown
+    // versions are rejected before any ledger or C-08 state is touched.
+    if (InviteCodec.encodeReceipt(payload) !== text) {
+      throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+    }
+    return payload;
   }
 
   static receiptSigningText(inviteId: string, memberId: string, acceptedAt: string): string {

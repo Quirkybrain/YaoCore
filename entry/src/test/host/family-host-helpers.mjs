@@ -109,6 +109,18 @@ export async function inviteSetup(harness, options = {}) {
   return { family, credentials, applications, service, adapter };
 }
 
+/**
+ * Member-device service on its own harness. The harness has migrations only;
+ * no family/member rows are pre-seeded (F-02 new-device path).
+ */
+export function newMemberInvite(harness) {
+  const credentials = new FakeGatewayCredentials();
+  const applications = new FakeInvitationApplications();
+  const service = new InviteService(new HostCrypto(), harness.secrets, harness.families,
+    harness.routes, credentials, applications, harness.clock, harness.random, harness.ids);
+  return { service, adapter: new InviteServiceAdapter(service), credentials, applications };
+}
+
 export function nowCompact(harness) {
   return DateTimeUtil.formatUtcCompact(harness.clock.nowMs());
 }

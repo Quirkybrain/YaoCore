@@ -316,7 +316,19 @@ export interface InviteServicePort {
   createInvitation(input: InviteCreateRequest): Promise<InviteCreation>;
   acceptInvitation(containerText: string,
     options: AcceptInviteOptions): Promise<AcceptedInvitation>;
+  /**
+   * DES-A §13.2.1 / DES-B §23.6: receiptText must be a canonical
+   * `YCP1.<b64url(canonical JSON)>` envelope; inviteId must equal the payload
+   * value. Raw hex and non-canonical envelopes (key order, whitespace, extra
+   * fields, duplicate keys, non-canonical b64url, unknown v) are rejected as
+   * INVITE_RECEIPT_INVALID before any ledger write. On success the canonical
+   * bytes are recorded once per (inviteId, receiptHash) in the single-process
+   * ledger. F-05 compensation: C-08 calls releaseReceipt if its transaction
+   * fails after this method returned.
+   */
   verifyReceipt(receiptText: string, inviteId: string): Promise<ReceiptVerification>;
+  /** F-05: remove the ledger entry written by verifyReceipt after a failed C-08 import. */
+  releaseReceipt(receiptText: string, inviteId: string): Promise<void>;
   revokeInvitation(inviteId: string): Promise<void>;
   rotateGatewaySecret(gatewayId: string): Promise<RotationPlan>;
   discardJoinRequest(memberId: string): Promise<void>;

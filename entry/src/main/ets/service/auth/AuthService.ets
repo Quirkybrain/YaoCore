@@ -33,6 +33,7 @@ import type { RdbRow, RdbTransaction } from '../storage/RdbStore';
 import { StorageService } from '../storage/StorageService';
 import { SqlCells } from '../../repository/SqlCells';
 import { FamilyRepository } from '../../repository/FamilyRepository';
+import { DomainOperationGate } from '../../repository/DomainOperationGate';
 import type { FamilyAuthPort } from '../family/FamilyModels';
 import type { CryptoPort } from '../crypto/CryptoPort';
 import {
@@ -96,6 +97,13 @@ export class AuthService implements FamilyAuthPort {
   private readonly random: RandomPort;
   private readonly ids: IdPort;
   private readonly policy: AuthPolicy;
+  /**
+   * F-12: serialize the profile-claim critical section across all AuthService
+   * instances in this process. The asset `put` is an upsert, so without this
+   * gate two concurrent creates for the same profileId could overwrite the
+   * winner's hash and the loser's rollback could delete it.
+   */
+  private static readonly PROFILE_GATE: DomainOperationGate = new DomainOperationGate();
   private readonly sessions: Map<string, SessionRecord> = new Map<string, SessionRecord>();
   private readonly failures: Map<string, FailureState> = new Map<string, FailureState>();
   private activeSessionId?: string = undefined;
@@ -156,42 +164,61 @@ export class AuthService implements FamilyAuthPort {
     const saltHex = BytesUtil.hexLower(salt);
     const hashAlias = StorageConstants.authHashAlias(profileId);
     const hash = await this.deriveHash(input.password, salt, AUTH_ITERATIONS);
-    let stored = false;
     try {
-      const secret = SecureBytes.from(hash);
-      try {
-        await this.storage.secrets.put(hashAlias, secret);
-        stored = true;
-      } finally {
-        secret.destroy();
-      }
+      return await AuthService.PROFILE_GATE.run(async (): Promise<LocalProfile> => {
+        // Re-check under the process gate: the asset write is an upsert, so
+        // concurrent creates for the same profileId/member must not both
+        // reach the store. The loser never touches the winner's hash alias.
+        const existingAgain = await this.readProfile(profileId);
+        if (existingAgain !== undefined) {
+          throw AppErrors.of('AUTH_PROFILE_EXISTS', []);
+        }
+        const familyProfilesAgain = await this.listProfiles(familyId);
+        for (let index = 0; index < familyProfilesAgain.length; index++) {
+          if (familyProfilesAgain[index].memberId === memberId) {
+            throw AppErrors.of('AUTH_PROFILE_EXISTS', []);
+          }
+        }
+        let stored = false;
+        try {
+          const secret = SecureBytes.from(hash);
+          try {
+            await this.storage.secrets.put(hashAlias, secret);
+            stored = true;
+          } finally {
+            secret.destroy();
+          }
+        } catch (error) {
+          throw error as Error;
+        }
+        const now = DateTimeUtil.nowUtcCompact(this.clock);
+        try {
+          await this.storage.rdb.transaction<void>(
+            async (tx: RdbTransaction): Promise<void> => {
+              const rows = await tx.query(
+                'SELECT profile_id FROM auth_profile WHERE profile_id = ?', [profileId]);
+              if (rows.length > 0) {
+                throw AppErrors.of('AUTH_PROFILE_EXISTS', []);
+              }
+              await tx.execute('INSERT INTO auth_profile (profile_id, family_id, member_id, ' +
+                'display_name, hash_alias, salt_hex, iterations, created_at, updated_at) ' +
+                'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [profileId, familyId, memberId, displayName, hashAlias, saltHex, AUTH_ITERATIONS,
+                now, now]);
+            });
+        } catch (error) {
+          if (stored) {
+            await this.removeSecretQuietly(hashAlias);
+          }
+          throw error as Error;
+        }
+        return new LocalProfile(profileId, familyId, memberId, displayName, hashAlias,
+          saltHex, AUTH_ITERATIONS, now, now);
+      });
     } finally {
       BytesUtil.zeroize(hash);
       BytesUtil.zeroize(salt);
     }
-    const now = DateTimeUtil.nowUtcCompact(this.clock);
-    try {
-      await this.storage.rdb.transaction<void>(
-        async (tx: RdbTransaction): Promise<void> => {
-          const rows = await tx.query('SELECT profile_id FROM auth_profile WHERE profile_id = ?',
-            [profileId]);
-          if (rows.length > 0) {
-            throw AppErrors.of('AUTH_PROFILE_EXISTS', []);
-          }
-          await tx.execute('INSERT INTO auth_profile (profile_id, family_id, member_id, ' +
-            'display_name, hash_alias, salt_hex, iterations, created_at, updated_at) ' +
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          [profileId, familyId, memberId, displayName, hashAlias, saltHex, AUTH_ITERATIONS,
-            now, now]);
-        });
-    } catch (error) {
-      if (stored) {
-        await this.removeSecretQuietly(hashAlias);
-      }
-      throw error as Error;
-    }
-    return new LocalProfile(profileId, familyId, memberId, displayName, hashAlias, saltHex,
-      AUTH_ITERATIONS, now, now);
   }
 
   async getProfile(profileId: string): Promise<LocalProfile | undefined> {
@@ -474,6 +501,10 @@ export class AuthService implements FamilyAuthPort {
     if (record.info.role === MemberRole.ADMIN || record.info.role === MemberRole.MEMBER) {
       return PolicyDecision.allow();
     }
+    // DES-A §12.1 (T-13 ruling, F-08): v1 fail-closed. The frozen signature has
+    // no Scene/action/room context, so a GUEST cannot be proven to stay inside
+    // allowedRoomIds for every action. GUEST device control is still handled
+    // per device by canControl; UI must hide scene execution too.
     return PolicyDecision.deny('RBAC_DENIED');
   }
 

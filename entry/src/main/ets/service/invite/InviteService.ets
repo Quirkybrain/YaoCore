@@ -10,10 +10,22 @@
  * receipts with the persistent (inviteId, receiptHash) ledger.
  *
  * Ledger storage: Asset Store alias yaocore.invite.receipt.<receiptHash>.
- * `receiptHash` is SHA-256 over the domain string plus inviteId and the full
- * receipt text, so plaintext receipts never reach storage. Alias uniqueness is
- * the store-level unique constraint; in-process verification is serialized by
- * a local DomainOperationGate.
+ * `receiptHash` is SHA-256 over the domain string plus inviteId and the
+ * canonical YCP1 text (encodeReceipt(decodeReceipt(text))), so plaintext
+ * receipts never reach storage and a semantically equal re-encoding cannot
+ * create a second entry. Alias uniqueness is only a final-row uniqueness
+ * property of the upsert-based store. The ledger is single-process: the static
+ * DomainOperationGate serializes check-then-put and the (inviteId, receiptHash)
+ * key design keeps one entry per receipt. This is NOT a cross-process CAS
+ * (DES-B §23.6; F-04); multi-process use requires an RDB unique constraint or
+ * an inter-process mutex.
+ *
+ * Device-level acceptance: a persistent Asset Store marker
+ * yaocore.invite.accepted.<inviteId> records that this member device already
+ * accepted the invitation (DES-A §13.4.7; F-03). The marker survives service
+ * restarts. If a later side effect fails, the marker is removed so a valid
+ * retry is possible; a crash between the marker write and completion leaves a
+ * marker that blocks retry (documented residual).
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
@@ -66,6 +78,7 @@ import { ContainerEnvelope, InviteCodec } from './InviteCodec';
 const HKDF_INFO: string = 'yaocore-family-invite-v1';
 const RECEIPT_HASH_DOMAIN: string = 'YAOCORE-INVITE-RECEIPT-HASH-V1';
 const LEDGER_PREFIX: string = 'yaocore.invite.receipt.';
+const ACCEPTED_PREFIX: string = 'yaocore.invite.accepted.';
 const CODE_ALPHABET: string = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const CODE_LENGTH: number = 6;
 const MAX_BUNDLE_PLAINTEXT: number = 32768;
@@ -116,6 +129,7 @@ export class InviteService {
   private readonly random: RandomPort;
   private readonly ids: IdPort;
   private static readonly LEDGER_GATE: DomainOperationGate = new DomainOperationGate();
+  private static readonly ACCEPT_GATE: DomainOperationGate = new DomainOperationGate();
   private readonly joinDisplayNames: Map<string, string> = new Map<string, string>();
 
   constructor(crypto: CryptoPort, secrets: SecretStore, families: FamilyRepository,
@@ -282,32 +296,48 @@ export class InviteService {
         bundle.v !== 1) {
         throw AppErrors.of('INVITE_INVALID', []);
       }
-      if (await this.families.getFamily(header.familyId) === undefined) {
-        throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'familyId')]);
-      }
-      const appliedGatewayIds: string[] = [];
-      for (let index = 0; index < bundle.gateways.length; index++) {
-        const entry = bundle.gateways[index];
-        await this.applyGateway(header.familyId, entry);
-        appliedGatewayIds.push(entry.gatewayId);
-      }
       const nowText = DateTimeUtil.formatUtcCompact(options.nowMs);
-      const expiresAt = header.targetRole === MemberRole.GUEST ? header.expireAt : undefined;
-      const member = new FamilyMember(memberId, header.familyId, memberId, displayName,
-        header.targetRole, MemberStatus.ACTIVE, nowText, header.allowedRoomIds, expiresAt,
-        memberId, header.kdf.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' :
-          'INVITE_CODE_KEK');
-      await this.families.upsertMember(member);
-      const receipt = await this.buildReceipt(header.inviteId, memberId, nowText,
-        bundle.seedHex);
-      if (joinAlias.length > 0) {
-        // One-time member key. A failure to delete is non-fatal after the join
-        // succeeded; the alias stays protected by the Asset Store access policy.
-        await InviteService.removeQuietly(this.secrets, joinAlias);
-        this.joinDisplayNames.delete(memberId);
+      // DES-A §13.4.7: one acceptance per member device and inviteId. The
+      // marker is written only after the container is authenticated and is
+      // removed if any later step fails, so a legitimate retry can succeed.
+      let claimed = false;
+      try {
+        await this.claimAcceptance(header.inviteId, memberId, nowText);
+        claimed = true;
+        // F-02 / DES-A §13.4.10: an authenticated container creates/ensures
+        // the local family row with the invitation's fixed familyId. A brand
+        // new member device must not require a pre-seeded family row.
+        await this.families.importFamily(header.familyId, header.familyName);
+        const appliedGatewayIds: string[] = [];
+        for (let index = 0; index < bundle.gateways.length; index++) {
+          const entry = bundle.gateways[index];
+          await this.applyGateway(header.familyId, entry);
+          appliedGatewayIds.push(entry.gatewayId);
+        }
+        const expiresAt = header.targetRole === MemberRole.GUEST ? header.expireAt : undefined;
+        const member = new FamilyMember(memberId, header.familyId, memberId, displayName,
+          header.targetRole, MemberStatus.ACTIVE, nowText, header.allowedRoomIds, expiresAt,
+          memberId, header.kdf.mode === InviteMode.KEY_WRAP ? 'INVITE_KEY_WRAP' :
+            'INVITE_CODE_KEK');
+        await this.families.upsertMember(member);
+        const receipt = await this.buildReceipt(header.inviteId, memberId, nowText,
+          bundle.seedHex);
+        if (joinAlias.length > 0) {
+          // One-time member key. A failure to delete is non-fatal after the
+          // join succeeded; the accepted marker still prevents reuse on this
+          // device (F-10 best-effort deletion; residual in the fix report).
+          await InviteService.removeQuietly(this.secrets, joinAlias);
+          this.joinDisplayNames.delete(memberId);
+        }
+        return new AcceptedInvitation(header.familyId, header.familyName, memberId,
+          header.targetRole, header.allowedRoomIds, appliedGatewayIds, receipt);
+      } catch (error) {
+        if (claimed) {
+          await InviteService.removeQuietly(this.secrets,
+            ACCEPTED_PREFIX + header.inviteId);
+        }
+        throw error as Error;
       }
-      return new AcceptedInvitation(header.familyId, header.familyName, memberId,
-        header.targetRole, header.allowedRoomIds, appliedGatewayIds, receipt);
     } finally {
       if (plaintext !== undefined) {
         BytesUtil.zeroize(plaintext);
@@ -371,10 +401,12 @@ export class InviteService {
     if (!matches) {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
-    const receiptHashBytes = await this.crypto.sha256(BytesUtil.utf8(RECEIPT_HASH_DOMAIN +
-      '\n' + inviteId + '\n' + receiptText));
-    const receiptHash = BytesUtil.hexLower(receiptHashBytes);
-    BytesUtil.zeroize(receiptHashBytes);
+    // F-01 / DES-A §13.2.1: hash the canonical bytes produced by re-encoding
+    // the decoded payload, never the raw input text. decodeReceipt already
+    // rejects non-canonical text, so equal-semantics variants cannot mint a
+    // second receiptHash.
+    const canonicalReceipt = InviteCodec.encodeReceipt(payload);
+    const receiptHash = await this.receiptHash(inviteId, canonicalReceipt);
     const recorded = await InviteService.LEDGER_GATE.run(async (): Promise<boolean> => {
       return this.recordLedger(receiptHash, inviteId, payload.memberId, payload.acceptedAt);
     });
@@ -382,6 +414,29 @@ export class InviteService {
       throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
     }
     return new ReceiptVerification(true, inviteId, payload.memberId, payload.acceptedAt);
+  }
+
+  /**
+   * F-05 compensation for the non-atomic Asset-ledger + RDB write. C-08 calls
+   * this only when its receipt transaction fails after verifyReceipt returned
+   * success. It removes the canonical ledger entry so the same valid receipt
+   * can be retried. Missing entries are a no-op.
+   */
+  async releaseReceipt(receiptText: string, inviteId: string): Promise<void> {
+    const payload = InviteCodec.decodeReceipt(receiptText);
+    if (payload.inviteId !== inviteId) {
+      throw AppErrors.of('INVITE_RECEIPT_INVALID', []);
+    }
+    const canonicalReceipt = InviteCodec.encodeReceipt(payload);
+    const receiptHash = await this.receiptHash(inviteId, canonicalReceipt);
+    try {
+      await this.secrets.remove(LEDGER_PREFIX + receiptHash);
+    } catch (error) {
+      if (error instanceof AppError && error.code === 'ASSET_NOT_FOUND') {
+        return;
+      }
+      throw error as Error;
+    }
   }
 
   // ---- Lifecycle ----------------------------------------------------------
@@ -403,6 +458,11 @@ export class InviteService {
     const now = DateTimeUtil.nowUtcCompact(this.clock);
     await this.families.markInvitationStatus(inviteId, InvitationStatus.REVOKED,
       new InvitationPatch(undefined, undefined, undefined, now, 'USER_REVOKED'));
+    // F-13: a revoked invitation is terminal. Drop the Admin seed from Asset
+    // Store instead of retaining it until app-data wipe. Best effort: the
+    // status is already terminal and receipt verification rejects REVOKED
+    // before reading the seed.
+    await InviteService.removeQuietly(this.secrets, record.seedAlias);
   }
 
   async rotateGatewaySecret(gatewayId: string): Promise<RotationPlan> {
@@ -683,6 +743,48 @@ export class InviteService {
       }
       throw error as Error;
     }
+  }
+
+  private async receiptHash(inviteId: string, canonicalReceipt: string): Promise<string> {
+    const receiptHashBytes = await this.crypto.sha256(BytesUtil.utf8(RECEIPT_HASH_DOMAIN +
+      '\n' + inviteId + '\n' + canonicalReceipt));
+    const receiptHash = BytesUtil.hexLower(receiptHashBytes);
+    BytesUtil.zeroize(receiptHashBytes);
+    return receiptHash;
+  }
+
+  private async claimAcceptance(inviteId: string, memberId: string,
+    acceptedAt: string): Promise<void> {
+    const alias = ACCEPTED_PREFIX + inviteId;
+    await InviteService.ACCEPT_GATE.run(async (): Promise<void> => {
+      let exists = true;
+      try {
+        await this.secrets.withSecret(alias,
+          async (stored: Uint8Array): Promise<boolean> => true);
+      } catch (error) {
+        if (error instanceof AppError && error.code === 'ASSET_NOT_FOUND') {
+          exists = false;
+        } else {
+          throw error as Error;
+        }
+      }
+      if (exists) {
+        // DES-A §13.4.7: this member device already accepted this inviteId.
+        throw AppErrors.of('INVITE_INVALID', []);
+      }
+      const metadata = '{"acceptedAt":' + JSON.stringify(acceptedAt) +
+        ',"inviteId":' + JSON.stringify(inviteId) +
+        ',"memberId":' + JSON.stringify(memberId) +
+        ',"v":1}';
+      const bytes = BytesUtil.utf8(metadata);
+      const secret = SecureBytes.from(bytes);
+      try {
+        await this.secrets.put(alias, secret);
+      } finally {
+        secret.destroy();
+        BytesUtil.zeroize(bytes);
+      }
+    });
   }
 
   private async recordLedger(receiptHash: string, inviteId: string, memberId: string,

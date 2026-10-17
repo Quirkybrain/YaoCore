@@ -187,6 +187,7 @@ export class FakeInviteService implements InviteServicePort {
   readonly createRequests: InviteCreateRequest[] = [];
   readonly revoked: string[] = [];
   readonly discarded: string[] = [];
+  readonly releasedReceipts: string[] = [];
   createJoinCalls: number = 0;
   acceptCalls: number = 0;
   verifyCalls: number = 0;
@@ -194,6 +195,7 @@ export class FakeInviteService implements InviteServicePort {
   failAccept?: AppError = undefined;
   failVerify?: AppError = undefined;
   failRevoke?: AppError = undefined;
+  failRelease: boolean = false;
   receiptValid: boolean = true;
   receiptMemberId: string = 'member-1';
   receiptAcceptedAt: string = FIXED_UTC;
@@ -259,6 +261,13 @@ export class FakeInviteService implements InviteServicePort {
     const verifiedInviteId = this.receiptInviteId === undefined ? inviteId : this.receiptInviteId;
     return new ReceiptVerification(this.receiptValid, verifiedInviteId, this.receiptMemberId,
       this.receiptAcceptedAt);
+  }
+
+  async releaseReceipt(receiptText: string, inviteId: string): Promise<void> {
+    if (this.failRelease) {
+      throw AppErrors.of('ASSET_IO_FAILED', []);
+    }
+    this.releasedReceipts.push(inviteId + ':' + receiptText);
   }
 
   async revokeInvitation(inviteId: string): Promise<void> {

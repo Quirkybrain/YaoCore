@@ -65,6 +65,10 @@ export class InviteServiceAdapter implements InviteServicePort {
       verification.memberId, verification.acceptedAt);
   }
 
+  async releaseReceipt(receiptText: string, inviteId: string): Promise<void> {
+    await this.service.releaseReceipt(receiptText, inviteId);
+  }
+
   async revokeInvitation(inviteId: string): Promise<void> {
     await this.service.revokeInvitation(inviteId);
   }

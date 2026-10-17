@@ -2,7 +2,7 @@
 
 - **Producer**: `agent:implementation-engineer`
 - **Task**: `T-13` / handoff `wp-049-family`
-- **Status**: `UNVERIFIED`（实现与本地验证完成，等待独立 CQG-T13 / SEC 评审）
+- **Status**: `UNVERIFIED`（T-13 修复已应用；等待独立复审）
 - **Contracts**: DES-A §12、§13、§3.2/§3.5；DES-B §3.1.2/§3.1.3/§3.3.3/§23.6；ADR-003 §3–§6、§9；D-009/D-013/D-019/D-022/D-023
 - **Write scope used**: `entry/src/main/ets/service/{auth,invite}/`、`entry/src/test/`、`entry/src/ohosTest/ets/test/`、`artifacts/50-implementation/`
 - **G-004 semantics**: unchanged. No new LAN cryptography, no server, no cross-device online state.
@@ -58,9 +58,9 @@
 ### 2.1 账本存储
 
 - **介质**：平台 `SecretStore`（Asset Store）。DES-B §23.6 明确“存储介质/schema 由 T-13 实现”；C-13 冻结构造器没有 `RdbStore`，因此不新增 RDB 迁移。
-- **唯一键**：`receiptHash = SHA-256("YAOCORE-INVITE-RECEIPT-HASH-V1\n" + inviteId + "\n" + receiptText)`；别名 `yaocore.invite.receipt.<receiptHash>`。因 `receiptHash` 已域分离绑定 `inviteId`，别名唯一性等价于 `(inviteId, receiptHash)` 唯一。
+- **唯一键（F-01/F-07 修复）**：`receiptHash = SHA-256("YAOCORE-INVITE-RECEIPT-HASH-V1\n" + inviteId + "\n" + canonicalReceiptText)`，其中 `canonicalReceiptText = encodeReceipt(decodeReceipt(receiptText))`；`decodeReceipt` 强制 `encodeReceipt(payload) === text`，非规范键序/空白/额外字段/重复键/非 canonical b64url/裸 hex/未知 `v` 一律 `INVITE_RECEIPT_INVALID`。别名 `yaocore.invite.receipt.<receiptHash>` 对 canonical 字节唯一。
 - **最小记录**：别名对应 JSON 元数据 `{v, inviteId, memberId, acceptedAt, receiptHash, recordedAt}`；**不存明文回执**。
-- **并发**：`InviteService.LEDGER_GATE`（静态 `DomainOperationGate`）串行化“检查存在 + 写入”；单进程内无 check-then-put 竞态。跨进程单设备由 Asset Store 别名唯一性约束；不声称多进程并发 CAS。
+- **并发（F-04 修复）**：`SecretStore.put` 是 **upsert**，不提供 conditional-add/CAS，也不向调用方暴露“已存在”；存在性检查与写入是两次独立操作。`InviteService.LEDGER_GATE`（静态 `DomainOperationGate`）只串行化**同一进程**内的“检查存在 + 写入”，配合 `(inviteId, receiptHash)` 键设计保证单进程内同一回执只记一次。**多进程/多 VM 不保证**：两个进程可同时判定不存在并都写入；Asset 别名唯一只保证最终一行，不等于“只有一个接受者”。v1 明确为单进程语义；多进程需 RDB `UNIQUE(invite_id, receipt_hash)` 或进程互斥（见 DES-B §23.6）。
 - **验证**：`verifyReceipt` 在 HMAC 通过后检查别名；已存在 → `INVITE_RECEIPT_INVALID`，不写库、不递增 `usedCount`。
 
 ### 2.2 行为（与 §23.6 / D-022 对齐）
@@ -72,15 +72,20 @@
 5. `ACCEPTED` 非终态：C-08 保持 `PENDING/ACCEPTED` 多用途语义；C-13 不把 `ACCEPTED` 当作拒绝条件。
 6. 同一成员再次接受：沿用 C-08 `acceptedByMemberId` 即时防御（§23.6 明确不新增 `(inviteId,memberId)` 唯一约束）。
 
+### 2.3 修复补充（T-13 修复，2026-10-17；F-03/F-05）
+
+- **设备级单次接受（F-03）**：成员设备在认证/解封成功后写持久标记 `yaocore.invite.accepted.<inviteId>`（Asset Store）；同一设备对同一 `inviteId` 的后续接受在写成员/路由前以 `INVITE_INVALID` 拒绝，跨服务重启有效。KEY_WRAP 仍删除一次性 join 私钥；删除失败时标记仍阻止重复接受（best-effort，见 F-10 残余）。后续步骤失败会删除标记，允许合法重试；写标记后进程崩溃的窗口登记为残余。
+- **C-08 补偿（F-05）**：`verifyReceipt` 先写账本，C-08 随后在 RDB 单事务中应用回执。C-08 事务失败时调用 `InviteServicePort.releaseReceipt(receiptText, inviteId)` 删除本次 canonical 账本条目，使同一合法回执可重试；补偿失败仅记录稳定原因码，不掩盖原始 C-08 错误。
+
 **R3-01 证据**：`C13_receiptLedger_replayAcrossRestart_d022`（`maxUses=3`：a→b→重放 a 拒绝且 `usedCount` 不变→重启服务再重放 a 拒绝→c 成功→用尽 `INVITE_MAX_USES`）。
 
 ---
 
 ## 3. 测试
 
-### 3.1 新增 host 测试（18 项）
+### 3.1 新增 host 测试（T-13 实现 18 项 + T-13 修复 10 项）
 
-**C-12（7）** — `entry/src/test/host/AuthService.test.mjs`
+**C-12（原 7 + 修复 2）** — `entry/src/test/host/AuthService.test.mjs`
 1. `C12_profile_pbkdf2ParamsAndUnifiedPasswordErrors`
 2. `C12_changePassword_restoresOnWrongOldAndLocksAll`
 3. `C12_sessions_idleAndAbsoluteTimeout`
@@ -102,6 +107,18 @@
 17. `C13_rotationGuidanceAndDiscardAreLocalOnly`
 18. `C13_ledgerStoresOnlyDomainSeparatedHash`
 
+**T-13 修复新增（10）**
+- `C12_changePassword_rdbFailureRestoresOldHash`（F-11）
+- `C12_createProfile_concurrentSameAliasKeepsWinnerHash`（F-12）
+- `C13_accept_newDevice_importsFamilyWithoutPreSeededRow`（F-02，KEY_WRAP 端到端）
+- `C13_importFamily_idempotentAndKeepsNameOnSameIdOnly`（F-02）
+- `C13_codeKek_sameDeviceAcceptsInviteOnlyOnceAcrossRestart`（F-03）
+- `C13_keyWrap_joinKeyDeleteFailureStillCannotBeAcceptedTwice`（F-10）
+- `C13_receipt_variantReplayIsRejectedWithoutConsumingUse`（F-01）
+- `C13_receipt_negativeMatrixDoesNotWriteLedger`（F-01/F-06）
+- `C13_receiptLedger_c08FailureCompensatesAndRetrySucceeds`（F-05）
+- `C13_revoke_removesAdminSeedAlias`（F-13）
+
 支撑文件：
 - `family-host-helpers.mjs`：家庭/成员、fake credentials/application、错误断言。
 - `host-crypto.mjs`：Node `crypto` 独立 oracle 的 `CryptoPort`（SHA/HMAC/HKDF/PBKDF2/X25519/AES-256-GCM），仅测试使用。
@@ -115,7 +132,7 @@
 | `ohpm install` | `install completed in 0s 48ms` | `artifacts/50-implementation/evidence/t13-family/ohpm-install.log` |
 | `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL`（35 tasks；未配置签名 WARN，预期；见日志） | `.../hvigor-assemble-hap.log` |
 | `codelinter -c code-linter.json5 -p default .` | `No defects found in your code.` | `.../codelinter.log` |
-| `entry/src/test/run-host-tests.sh` | **469 tests / 469 pass / 0 fail**（含本次新增 18） | `.../host-tests.log` |
+| `entry/src/test/run-host-tests.sh` | **479 tests / 479 pass / 0 fail**（T-13 实现 469 + 修复新增 10） | `.../host-tests.log`；修复轮证据见 `artifacts/50-implementation/evidence/t13-fix/host-tests.log` |
 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon` | `BUILD SUCCESSFUL`（仅编译，不执行；见日志） | `.../ohostest-compile.log` |
 
 设备侧 `ohosTest` **未执行**：本环境无设备/模拟器/签名配置；`AuthInviteDevice.test.ets` 仅编译（已由上述 ohosTest HAP 编译验证 `List.test.ets` 注册），不得报告为 PASS。设备骨架覆盖真实平台 PBKDF2/X25519/AES-256-GCM + `AuthService.registerMigrations`；C-13 容器 codec 的严格路径由 host 套件覆盖（若在 ohosTest 直接 import `InviteCodec`，会触发 `common/utils/Base64Url.ets` 既有的 ArkTS 严格编译问题，该文件不在 T-13 写范围，见 T13-R-10）。
@@ -124,7 +141,8 @@
 
 ## 4. 安全性
 
-- **秘密清零**：密码 UTF-8 字节、PBKDF2 输出、HKDF 输出、X25519 shared、KEK、seed、命令 secret 的临时 `Uint8Array`/`SecureBytes` 在成功/失败/取消路径 `zeroize`/`destroy`；join 私钥仅存 Asset Store，KEY_WRAP 接受成功后删除别名。
+- **秘密清零**：密码 UTF-8 字节、PBKDF2 输出、HKDF 输出、X25519 shared、KEK、seed、命令 secret 的临时 `Uint8Array`/`SecureBytes` 在成功/失败/取消路径 `zeroize`/`destroy`；join 私钥仅存 Asset Store，KEY_WRAP 接受成功后删除别名（**best-effort**；失败不影响已完成接受，设备级 marker 仍阻止重复接受）。
+- **不可清零残余（F-09）**：bundle JSON、`seedHex`/`commandSecretHex` 是 ArkTS 不可变字符串，无法原地擦除；Admin 临时 X25519 私钥 handle 在 `CryptoPort` 没有显式 destroy 入口。其驻留时间取决于 GC；不得声称“全部秘密均已清零”。后续若需要更强保证，应改为字节化 bundle 编码或在 C-04 增加 key handle 销毁。
 - **无日志泄漏**：C-12/C-13 不引入 `LoggerPort` 调用；错误 details 只含字段名，不含秘密/回执明文/码。
 - **AEAD fail-closed**：header 原始字节作 AAD；任何 header/iv/ciphertext/tag 改动 → `INVITE_INVALID`；未知版本拒绝。
 - **防 oracle**：解封失败统一 `INVITE_INVALID`；码格式错误才是 `INVITE_CODE_INVALID`；常量时间比较回执。
@@ -136,17 +154,14 @@
 
 ## 5. 偏离 / 契约备注（需独立评审）
 
-1. **回执文本封装（CONTRACT-NOTE，需上游确认）**
-   DES-A §13.2 将 `receipt` 定义为裸 `hex_lower(HMAC(...))`，但冻结签名 `verifyReceipt(receiptText, inviteId)` 无法从裸 HMAC 恢复 HMAC 预image 中的 `memberId`/`acceptedAt`（CODE_KEK 尤其没有 `record.memberId`）。实现保留**完全相同的 HMAC 公式**，外层增加自描述信封：
-   `YCP1.<b64url(sorted JSON {v,inviteId,memberId,acceptedAt,mac})>`。
-   `mac` 仍是 `HMAC-SHA256(seed, "YAOCORE-INVITE-RECEIPT-V1\n"+inviteId+"\n"+memberId+"\n"+acceptedAt)`；账本仍只存 hash。
-   **建议**：DES-A §13.2 增补该封装或另给 `verifyReceipt` 明确的 `memberId/acceptedAt` 输入。未改变 G-004/D-022 语义，但属于对“回执文本形态”的边界扩展。
+1. **回执文本封装（已由 T-13 裁定同步，2026-10-17）**
+   DES-A §13.2 已正式定义 canonical `YCP1.<b64url(canonical JSON)>` 信封（字段集 `{acceptedAt,inviteId,mac,memberId,v}`，键名字典序、无空白、`v=1`）；HMAC 公式不变，`verifyReceipt` 只接受 canonical 信封并拒绝裸 hex/非规范输入。实现已按 `encodeReceipt(decodeReceipt(text)) === text` 强制规范化，账本哈希对 canonical 字节计算。不声称与旧裸 hex 互操作。
 2. **退避错误码**：连续失败 5 次后使用本机内存 30s 拒绝窗口，返回 `AUTH_PASSWORD_INVALID`；未发 `AUTH_LOCKED_OUT`（DES-A 标为预留，错误目录/ i18n 键尚未登记）。这是有意的错误空间控制；若上游要求 `AUTH_LOCKED_OUT`，需先登记 code/i18n。
 3. **账本介质**：使用 Asset Store 别名而非 RDB v5。原因：C-13 冻结构造器无 `RdbStore`；§23.6 允许 T-13 选择介质。若后续要求 SQL 可查询审计，需 Change Impact 增加 `RdbStore` 注入与 v5 迁移。
-4. **C-13 写成员前置条件**：`acceptInvitation` 需要本地已有 `family` 行（`FamilyRepository` 没有由 C-13 调用的“仅建家庭行”API）。Host 集成在共享 harness 中验证；新成员设备的 family 元数据同步/建行仍属 C-08/C-22 组合根职责。
+4. **C-13 写成员前置条件（已修复，F-02）**：C-13 在 YCI1 解封且 `bundle.familyId === header.familyId` 后调用 `FamilyRepository.importFamily(header.familyId, header.familyName)`（`EXT-DES-B-25`）：固定邀请 `familyId`、幂等、owner 占位、不创建成员/档案/ADMIN。全新成员设备无需预置 `family` 行；新设备主流程由 `C13_accept_newDevice_importsFamilyWithoutPreSeededRow` 覆盖。
 5. **seed 补偿**：`createInvitation` 在返回前写 seed 别名；若 C-08 `putInvitation` 随后失败，别名可能残留。现有 `InviteServicePort` 无 `discardInvitation` 回滚入口，登记为残余风险（`T09-RV-03` 的 C-13 侧未完全闭合）。
 6. **密码最短长度 8**：沿用既有 App 约定；DES-A 只要求“非空/长度合法”。无最大长度限制（移除任意上限）。
-7. **GUEST `canExecuteScene` 拒绝**：场景可跨房间且接口无场景上下文；与 `FamilyCapabilities.canControlAll=ADMIN/MEMBER` 一致。若产品要求 GUEST 场景，需 C-08/C-22 提供房间级预检。
+7. **GUEST `canExecuteScene` 拒绝（已由 T-13 裁定，F-08）**：v1 对 GUEST 一律 `RBAC_DENIED`（DES-A §12.1）。冻结签名没有场景/动作/房间上下文，无法证明场景内每个动作都在 `allowedRoomIds` 内；GUEST 设备控制仍由 `canControl` 逐设备判定，C-22/UI 必须隐藏场景入口。若未来支持，需新增带上下文的 API 并走 Change Impact。
 8. **CODE_KEK 显示名**：无 YCR1 时成员 `displayName` 回退为随机 `memberId`；DES-A 未在 YCI1 头中携带显示名。
 
 ---
@@ -155,16 +170,20 @@
 
 | ID | 风险 | 级别 | 处理 |
 |---|---|---|---|
-| T13-R-01 | 回执封装需上游确认与跨版本互操作 | Medium | 评审 CQG-T13；建议 DES-A §13.2 补文 |
-| T13-R-02 | 账本跨进程并发无 CAS（单设备常规路径单实例） | Low/Medium | 已用静态门串行化；如需多进程需 RDB 唯一约束 |
-| T13-R-03 | C-08 `putInvitation` 失败导致 seed 别名残留 | Low | 增加 `discardInvitation` 或 C-08 补偿事务（Change Impact） |
-| T13-R-04 | 成员设备无 family 行时接受失败 | Medium | 组合根/加入同步设计确认 |
+| T13-R-01 | 回执封装需上游确认与跨版本互操作 | Medium | **已关闭**：DES-A §13.2/§13.2.1 已定义 canonical `YCP1`；实现强制规范化并拒绝裸 hex。 |
+| T13-R-02 | 账本跨进程并发无 CAS（单设备常规路径单实例） | Low/Medium | **措辞已修正（F-04）**：仅单进程 `LEDGER_GATE` 语义；多进程需 RDB 唯一约束/互斥；不以别名唯一性论证多进程安全。 |
+| T13-R-03 | C-08 `putInvitation` 失败导致 seed 别名残留 | Low | 增加 `discardInvitation` 或 C-08 补偿事务（Change Impact）；撤销路径已删除 seed（F-13）。 |
+| T13-R-04 | 成员设备无 family 行时接受失败 | Medium | **已关闭（F-02）**：`importFamily` + C-13 调用；新设备 KEY_WRAP 端到端用例通过。 |
 | T13-R-05 | 平台 PBKDF2/X25519/GCM/Asset 未在真机验证 | High（证据） | `BLOCKED_ON_DEVICE_RUNNER`；设备套件已注册 |
 | T13-R-06 | Asset hash 缺失被当作密码错误（防枚举） | Low | 设计选择；运维需区分存储告警 |
-| T13-R-07 | 字符串密码/PBKDF2 输入无法原地擦除 | Low | 记录为 DES-A §26 残留；调用方及时清空输入 |
+| T13-R-07 | 字符串密码/PBKDF2 输入无法原地擦除 | Low | 记录为 DES-A §26 残留；调用方及时清空输入；bundle JSON/seedHex/commandSecretHex/X25519 handle 同样不可清零（F-09） |
 | T13-R-08 | 未接入组合根（C-28）注册 v3/构造服务 | Medium | T-17 组合根任务消费本报告 |
 | T13-R-09 | 未实现真实 BLE 轮换/网关撤绑 | 范围外 | D-013 只要求引导；C-23 执行 |
 | T13-R-10 | `InviteCodec` 进入 ohosTest 编译会触发 `common/utils/Base64Url.ets` 的既有 ArkTS 严格问题（`AppError` 类型引用/`throw` 限制） | Low（证据面） | 已从设备骨架移除该 import；主 HAP 编译与 host codec 测试通过；需 C-01 维护者在后续任务修复 Base64Url 后恢复设备 codec 用例 |
+| T13-R-11 | 设备级 accepted marker 写后崩溃窗口 | Low | 异常路径删除标记；崩溃时同一设备需清除 App 数据才能重试；登记残余（F-03） |
+| T13-R-12 | 解散/过期未清理 Admin seed 别名；账本无保留策略 | Low/Medium | 撤销已清理；解散/过期需 C-08/C-13 cleanup 契约（Change Impact）；账本仅存 hash/公开元数据，按每邀请 `maxUses` 有界，随 App 数据清除 |
+| T13-R-13 | `changePassword` 双存储（Asset hash + RDB salt）非原子 | Low | 异常路径恢复旧 hash 已测；进程崩溃窗口仍在，用户需恢复/重建档案（F-11） |
+| T13-R-14 | `createProfile` 同进程并发已串行化；多进程仍无唯一索引 | Low | `PROFILE_GATE` + RDB 主键；多进程需 `(family_id, member_id)` 唯一索引（F-12） |
 
 ---
 
@@ -194,14 +213,19 @@ entry/src/main/ets/service/invite/InviteModels.ets          (new)
 entry/src/main/ets/service/invite/InviteCodec.ets           (new)
 entry/src/main/ets/service/invite/InviteService.ets         (new)
 entry/src/main/ets/service/invite/InviteServiceAdapter.ets  (new)
-entry/src/test/host/AuthService.test.mjs                    (new)
-entry/src/test/host/InviteService.test.mjs                  (new)
-entry/src/test/host/family-host-helpers.mjs                 (new)
+entry/src/main/ets/service/family/FamilyModels.ets          (modified: verifyReceipt JSDoc/releaseReceipt port)
+entry/src/main/ets/service/family/FamilyService.ets         (modified: F-05 ledger compensation)
+entry/src/main/ets/repository/FamilyRepository.ets          (modified: EXT-DES-B-25 importFamily; F-02)
+entry/src/test/host/AuthService.test.mjs                    (new + F-11/F-12)
+entry/src/test/host/InviteService.test.mjs                  (new + F-01/F-02/F-03/F-05/F-06/F-10/F-13)
+entry/src/test/host/family-host-helpers.mjs                 (new + member-device helper)
 entry/src/test/host/host-crypto.mjs                         (new)
 entry/src/test/domain/DomainHarness.ets                     (modified: v3 via AuthService; secrets/random seams)
+entry/src/test/domain/DomainFakes.ets                       (modified: releaseReceipt port fake)
 entry/src/ohosTest/ets/test/family/AuthInviteDevice.test.ets (new, COMPILED_ONLY)
 entry/src/ohosTest/ets/test/List.test.ets                   (modified: register device skeleton)
 artifacts/50-implementation/evidence/t13-family/*.log       (new evidence; includes ohosTest compile)
+artifacts/50-implementation/t13-fix-report.md               (new: T-13 review-fix disposition)
 ```
 
-**未改动**：`entry/src/main/ets/repository/**`、`model/**`、`contracts/**`、组合根、i18n 资源、DES/ADR 文档。
+**未改动**：`entry/src/main/ets/model/**`、`contracts/**`、组合根、i18n 资源、DES/ADR 文档（T-13 修复仅按已同步的 DES-A/DES-B 裁定实现）。
