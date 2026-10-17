@@ -153,6 +153,8 @@ export enum FamilyJoinPhase {
   CODE_REQUIRED = 'CODE_REQUIRED',
   VALIDATING = 'VALIDATING',
   APPLYING = 'APPLYING',
+  /** T-15 ruling (F-06): C-08 finished (family row + ACTIVE member); C-22 owns profile. */
+  MEMBER_BOUND = 'MEMBER_BOUND',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED'
@@ -339,10 +341,13 @@ export interface InviteServicePort {
 export class FamilyProfileRef {
   readonly profileId: string;
   readonly familyId: string;
+  /** EXT-DES-B-27 seam increment: needed by markProfileBound's exact-member check. */
+  readonly memberId: string;
 
-  constructor(profileId: string, familyId: string) {
+  constructor(profileId: string, familyId: string, memberId: string) {
     this.profileId = profileId;
     this.familyId = familyId;
+    this.memberId = memberId;
   }
 }
 

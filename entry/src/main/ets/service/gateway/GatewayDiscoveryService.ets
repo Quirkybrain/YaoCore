@@ -321,9 +321,15 @@ export class GatewayDiscoveryService {
       errorCode);
   }
 
+  /**
+   * U-01 / T-15 fix: the executor reject parameter is typed as AppError. ArkTS
+   * rejects passing an AppError to a callback declared as `(reason: Error)`
+   * (arkts-no-structural-typing); callers still receive the exact AppError code
+   * instead of a generic Error wrapper.
+   */
   private withProbeTimeout(promise: Promise<ProbeResult>): Promise<ProbeResult> {
     return new Promise<ProbeResult>((resolve: (value: ProbeResult) => void,
-      reject: (reason: Error) => void): void => {
+      reject: (reason: AppError) => void): void => {
       let settled = false;
       const timer = setTimeout(() => {
         if (!settled) {
