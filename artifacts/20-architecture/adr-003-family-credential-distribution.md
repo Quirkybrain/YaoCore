@@ -5,6 +5,7 @@
 - **Type**: Architecture Decision Record
 - **Status**: Proposed（待 G-004 门禁批准）
 - **Date**: 2026-10-17
+- **Revision（T-13 复审收尾，2026-10-17）**: §5.4 回执正文同步为 canonical `YCP1` 信封（DES-A §13.2/§13.2.1；HMAC 公式不变、canonical 编码、不兼容裸 hex）；原裸 hex 定义保留为历史存档。依据 `artifacts/70-review/t13-review-b.md` R2-02；不改变 G-004 语义、MAC 覆盖范围或本 ADR 其它裁定。
 - **Task**: `wp-004-contracts`（task 分支 `task/wp-004-contracts`，父分支 `feat/yaocore-app`，base commit `54c1d786`）
 - **Workflow**: STANDARD / GATED_AUTO
 - **决议引用**: D-009（Q1）、D-010（Q2）、D-013（Q3）；见文末「决议（RESOLVED，2026-10-17）」
@@ -213,10 +214,31 @@ joinReq = { "v":1, "memberId":"<16B 随机 hex 安装标识>",
 
 ### 5.4 接受回执（离线可校验的"已使用"证据）
 
+> **T-13 复审收尾（2026-10-17；R2-02）**：回执文本形态已同步为 DES-A §13.2/§13.2.1 的 canonical `YCP1` 信封。本节原裸 hex 公式仅保留为历史存档（见下方“历史定义”），**实现与消费方不得按裸 hex 实现**；`YCP1` 不改变 HMAC 覆盖范围与 `seed` 语义，也不改变 G-004。
+
+**正式形态（canonical `YCP1`；T-13 裁定，2026-10-17）**：
+
+```text
+receipt = "YCP1." + b64url(canonical JSON)
+canonical JSON = {"acceptedAt":"<UTC compact>","inviteId":"<uuid>","mac":"<64 lower hex>","memberId":"<16B hex>","v":1}
+mac = hex_lower(HMAC-SHA256(bundle.seed,
+  "YAOCORE-INVITE-RECEIPT-V1\n" + inviteId + "\n" + memberId + "\n" + acceptedAt))
+```
+
+- **HMAC 公式不变**：信封只承载 `inviteId/memberId/acceptedAt/v` 等验证输入，`mac` 的覆盖范围与本 ADR 原定义一致；`seed` 仍为 32B bundle seed。
+- **canonical 编码**：键名严格字典序（`acceptedAt` → `inviteId` → `mac` → `memberId` → `v`）、无空白、UTF-8、精确字段集（缺字段/额外字段/重复键拒绝）、`v=1`；`acceptedAt` 为 UTC 紧凑秒 `YYYYMMDDTHHMMSSZ`；`memberId` 16B hex；`mac` 64 位小写 hex；`b64url` 无 padding 且解码后重编码必须逐字节一致。
+- **不兼容裸 hex**：旧定义 `hex_lower(HMAC(...))` 不再作为回执输入。冻结签名 `verifyReceipt(receiptText, inviteId)` 无法从裸 HMAC 恢复 `memberId/acceptedAt`，因此不存在“裸 hex 回退”；非规范信封/裸 hex 按 `INVITE_RECEIPT_INVALID` 拒绝。**不声称与裸 hex 互操作。**
+- **与 §5.4 历史定义的关系**：下方“历史定义”即本 ADR 初稿（T-13 前）的 §5.4 原文；`YCP1` 在其外增加版本前缀与 canonical JSON 载体，未改变 MAC 覆盖范围。冲突以 DES-A §13.2.1 为准；本 ADR 已完成同步，不再保留“ADR 文本待同步”的上游冲突。
+- **校验与账本**：Admin 侧 `seed` 存 Asset Store；回执的账本去重、`(inviteId, receiptHash)` 身份与单进程/多进程边界由 DES-B §23.6 定义；本节只定义“已使用”证据的密码学形态。
+
+**历史定义（T-13 前；仅存档，不作为实现依据）**：
+
 ```text
 receipt = hex_lower(HMAC-SHA256(bundle.seed,
   "YAOCORE-INVITE-RECEIPT-V1\n" + inviteId + "\n" + memberId + "\n" + acceptedAt))
 ```
+
+**接受/导入行为（仍然适用；回执文本按正式形态 `YCP1`）**：
 
 - 成员设备在 UI 显示回执二维码/6 位确认码；**Admin 设备在双方再次接触时（现场扫码、或同一局域网用户触发的直接交换）导入回执** → `usedCount++`、`status=ACCEPTED`、记录 `acceptedByMemberId/acceptedAt`；
 - Admin 可校验回执（持有 `seed` 副本，保存于 Asset Store 的邀请记录中）；

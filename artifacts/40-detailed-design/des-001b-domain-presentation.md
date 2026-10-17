@@ -3,8 +3,8 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。
 - **Date**: 2026-10-17
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
@@ -94,6 +94,15 @@
 | **F-04 账本并发** | Asset `put` 是 upsert；单进程 `DomainOperationGate` + `(inviteId, receiptHash)` 键设计保证唯一；多进程无 CAS，需 RDB 唯一约束/互斥（后续）；不得以别名唯一性论证多进程安全。 | §23.6 |
 | **F-08 GUEST 场景** | v1 `canExecuteScene` 对 GUEST fail-closed；GUEST 仅 `canControl` 授权房间内设备；UI 能力与 RBAC 矩阵同步修订。 | §11.1.1、§11.3.1；DES-A §12.1 |
 | **F-07 回执端口** | `InviteServicePort.verifyReceipt` 只接受 canonical `YCP1`；裸 hex/非规范信封拒绝；账本哈希对 canonical 字节计算。 | §23.6；DES-A §13.2.1 |
+
+### 0.5 T-13 复审收尾（2026-10-17）
+
+> **依据**：`artifacts/70-review/t13-review-b.md`（复审 revision `69d5374`，代码级条件式 PASS）§3 R2-01/R2-02 与 §6 建议记录。**边界**：仅登记/同步契约文本，不改变 DES-A 冻结签名、`verifyReceipt` 签名与语义、账本 `(inviteId, receiptHash)` 规则或 G-004 语义；不宣告 C-12/C-13 `STABLE`（CQG 与 `STABLE` 由 Orchestrator 记录）。
+
+| 项 | 结论 | 落点 |
+|---|---|---|
+| **R2-01** `releaseReceipt` 契约登记（Medium） | 登记 `InviteServicePort.releaseReceipt(receiptText, inviteId)`（`EXT-DES-B-26`）：新增方法，`verifyReceipt` 签名不变；**仅** C-08 在 `importReceipt` 的 RDB 单事务失败后调用，删除本次 canonical 账本条目以便重试；不是通用账本删除 API，不得暴露给 C-22/UI。失败处理与补偿失败残留（R2-04；建议跟踪项 `T13-R-15`）见 §23.6。 | §3.3.4、§23.3、§23.6 |
+| **R2-02** ADR-003 §5.4 回执形态（Low/Medium） | ADR-003 §5.4 同步为 canonical `YCP1` 正式形态（HMAC 公式不变、canonical 编码、不兼容裸 hex），原裸 hex 定义标注为历史存档；DES-A §13.2.1 仍为实现口径。 | ADR-003 §5.4（跨文件同步；见其 Revision） |
 
 ---
 
@@ -881,6 +890,7 @@ export class FamilyService {
   - **`ACCEPTED` 不是邀请终态**：`usedCount < maxUses` 且 `expireAt > now` 时，后续**不同**回执继续被接受并递增 `usedCount`；C-08 单收据列记录本次 `acceptedAt/acceptedByMemberId/receipt`（覆盖上一次），历史回执由 C-13 持久账本判定（§23.6）。仅 `usedCount == maxUses`、`REVOKED` 或 `EXPIRED` 终止。
   - **过期回执**：`expireAt <= now` 的邀请（含此前已 ACCEPTED、未达 `maxUses` 的多用途邀请）在导入回执时 → `INVITE_EXPIRED`，不得递增 `usedCount`（ADR-003 §5.2 时钟信任边界）。
   - **回执重放**：同一 `(inviteId, receiptHash)` 的历史重放由 C-13 持久账本拒绝（§23.6；R3-01）；C-08 的即时重复检查保留为轻量防御，不替代账本。
+  - **F-05 补偿（R2-01 / `EXT-DES-B-26`）**：`verifyReceipt` 成功后若 C-08 单事务失败，`importReceipt` 必须调用 `invites.releaseReceipt(receiptText, inviteId)` 删除本次 canonical 账本条目并重抛原始错误；补偿自身的失败只记录稳定原因码（`invite_receipt_ledger_release_failed`），不得覆盖原始错误。该端口仅限本方法调用，访问边界与残留见 §23.6。
 - `createInvitationForJoinRequest`：`joinRequestText` 必须是 `YCR1`；调用 `invites.createInvitation({ mode: KEY_WRAP, joinRequest })`；`putInvitation(record)`；`seedAlias` 已由 C-13 写入 Asset Store。
 - `createCodeInvitation`：强制 `mode=CODE_KEK`；`maxUses` 默认 1（可显式 >1，UI 必须标弱模式）；返回 `code` 仅本次展示；不持久化明文码。
 - `expireInvitations`（**D-022**）：`PENDING` 或 `ACCEPTED`（`usedCount < maxUses`）且 `expireAt <= now` → `EXPIRED`（含已记录过 ACCEPTED、仍有剩余次数的多用途邀请）；`usedCount == maxUses` 的 `ACCEPTED` 保持终态（用尽语义仍为 `INVITE_MAX_USES`）；`REVOKED` 不变；已 `EXPIRED` 幂等。
@@ -5685,6 +5695,7 @@ export interface DeviceStatePort {
 | `EXT-DES-B-21` | `AuthService` | 多家庭实现 | 每家庭一个 `LocalProfile`（§3.3.1）；不新增 `rebindProfile` |
 | `EXT-DES-B-24` | `InviteServicePort`（C-13） | `verifyReceipt`（签名不变） | 增加持久账本去重语义：唯一 `(inviteId, receiptHash)`；历史回执重放拒绝且不递增 `usedCount`；回执输入为 canonical `YCP1`（§23.6；R3-01/F-07） |
 | `EXT-DES-B-25` | `FamilyRepository` | `importFamily(familyId, familyName): Promise<Family>` | F-02/T-13 裁定：按邀请固定 `familyId` 创建/确保本地 `family` 行；幂等；owner 占位；不创建成员/档案；见 §3.1.2 |
+| `EXT-DES-B-26` | `InviteServicePort`（C-13） | `releaseReceipt(receiptText: string, inviteId: string): Promise<void>` | **F-05 补偿专用（R2-01 / T-13 复审收尾）**：新增方法，`verifyReceipt` 签名不变；仅 C-08 在 `importReceipt` 的 RDB 事务失败后调用，删除本次 canonical `(inviteId, receiptHash)` 账本条目以允许同一合法回执重试；入参必须为 canonical `YCP1` 且 `inviteId` 等于载荷值；条目缺失 no-op；其它失败原样抛出。**非通用 API**：不得暴露给 C-22/UI，不得用于撤销/清理；失败处理与残留见 §23.6 |
 
 > `AuthService` 不新增 `rebindProfile`：v1 每家庭一个档案，避免修改冻结的 `LocalProfile.familyId` 语义。加入家庭后由 C-22 调用既有 `createProfile`。该选择登记为 `RISK-MULTIFAMILY-PROFILE`。
 
@@ -5753,7 +5764,7 @@ export interface DeviceStatePort {
 
 ### 23.6 C-13 回执去重账本（`G-007 扩展 / T-09 复审同步`，2026-10-17；R3-01）
 
-> **性质**：上游契约语义要求，**不新增/修改 DES-A §13.1 已冻结方法签名**，不改变 G-004 语义；C-08 现有 `isDuplicateReceipt` 保留为即时防御，正式修复落在 C-13/T-13。**T-13 裁定同步（2026-10-17；F-04/F-07）** 见下方“回执规范信封”与“并发与介质边界”。
+> **性质**：上游契约语义要求，**不新增/修改 DES-A §13.1 已冻结方法签名**，不改变 G-004 语义；C-08 现有 `isDuplicateReceipt` 保留为即时防御，正式修复落在 C-13/T-13。**T-13 裁定同步（2026-10-17；F-04/F-07）** 见下方“回执规范信封”与“并发与介质边界”。**T-13 复审收尾（2026-10-17；R2-01）** 的补偿端口登记见下方“补偿端口 `releaseReceipt`”；`verifyReceipt` 签名与语义不变。
 
 - **适用方法**：`InviteServicePort.verifyReceipt(receiptText, inviteId)`（T-09 消费端口，`entry/src/main/ets/service/family/FamilyModels.ets`；与 DES-A §13.1 `InviteService.verifyReceipt` 同语义）。端口 JSDoc 必须复述 DES-A §13.2.1：`receiptText` 为 canonical `YCP1`；`inviteId` 必须等于载荷值；裸 hex/非规范信封拒绝；失败不写账本。建议注释：
   ```ts
@@ -5773,6 +5784,12 @@ export interface DeviceStatePort {
   2. **单进程**：`InviteService.LEDGER_GATE`（静态 `DomainOperationGate`）串行化“检查存在 + 写入”；配合 `(inviteId, receiptHash)` 键设计，保证同一进程内同一回执只记一次。
   3. **多进程/多 VM**：**不保证**。两个进程可同时判定不存在并都写入并都返回 `valid=true`；Asset 别名唯一只保证最终一行，**不等于“只有一个接受者”**。v1 明确为单进程语义；若多进程可达，必须改用 RDB `UNIQUE(invite_id, receipt_hash)` + 条件插入/事务，或进程互斥（后续可选），走 Change Impact。
   4. 不得以“Asset 别名唯一性约束”作为多进程安全论证；`InviteService.ets` 顶部及实现报告中的相关措辞必须随 F-04 修复更正。
+- **补偿端口 `releaseReceipt`（R2-01；T-13 复审收尾，2026-10-17）**：`InviteServicePort.releaseReceipt(receiptText, inviteId)` 是为 F-05 新增的**专用账本删除入口**（当前实现中唯一），实现于 `InviteService`/`InviteServiceAdapter`；DES-A §13.1 的 `verifyReceipt` 冻结签名与语义不变。
+  1. **访问边界**：仅 C-08 `FamilyService.importReceipt` 在 `verifyReceipt` 已成功写账本、而其 RDB 单事务（成员/邀请/`usedCount`）失败后的 catch 中调用；**不得**暴露给 C-22/UI、VM、组合根，也不得作为通用“删除账本/管理账本”API，或用于撤销、解散、过期清理、跨邀请批量删除。该方法能删除 `(inviteId, receiptHash)` 条目；扩大调用面会重新打开历史回执重放面（R3-01），故调用方白名单仅 C-08。
+  2. **输入与行为**：`receiptText` 必须是 canonical `YCP1`（与 `verifyReceipt` 同一解码/规范化检查）；`inviteId` 必须等于载荷值，否则 `INVITE_RECEIPT_INVALID` 且不改账本；`receiptHash` 按本节公式对 canonical 字节计算；删除别名 `yaocore.invite.receipt.<receiptHash>`；条目不存在（`ASSET_NOT_FOUND`）为 no-op，保证重复补偿幂等；其它存储错误原样抛出。
+  3. **失败处理**：C-08 必须捕获补偿自身的失败，记录稳定原因码（`invite_receipt_ledger_release_failed`，字段 `inviteId`/`reason`），并**重抛原始 C-08 错误**；不得用补偿错误覆盖原始失败，也不得把补偿失败报告为成功。
+  4. **补偿失败残留（R2-04；建议跟踪项 `T13-R-15`，Low）**：若 `releaseReceipt` 自身失败，本次 canonical 账本条目保留 → 该合法回执被“烧毁”，重试同一回执仍按 `INVITE_RECEIPT_INVALID` 拒绝，需新邀请或运维清理。此为已接受的残余；host 证据覆盖补偿成功路径，补偿失败注入标 `NOT_RUN`，由后续失败注入/清理任务跟踪，并建议由实现报告残余表接收 `T13-R-15`。
+  5. **并发与介质**：该方法继承本节的单进程语义；与 `verifyReceipt` 的并发窗口不由 `releaseReceipt` 消除。多进程/多 VM 仍需 RDB 唯一约束或互斥（见本节“并发与介质边界”）。
 - **行为要求**：
   1. 首次回执：正常验证并写入账本；`ReceiptVerification.valid=true`。
   2. **历史回执重放**：同 `(inviteId, receiptHash)` 再次导入（即使该邀请后来由其他成员接受、`receipt/acceptedByMemberId` 已被覆盖）→ 拒绝；映射 `INVITE_RECEIPT_INVALID`（若邀请已用尽，按既有错误优先级为 `INVITE_MAX_USES`；无论返回哪个码，均**不得递增** C-08 `usedCount`、不得创建/更新成员）。
@@ -5781,8 +5798,8 @@ export interface DeviceStatePort {
 - **责任划分（R3-01）**：C-08 单收据列模型只覆盖“最后一次回执/成员”的即时重放（**轻量缓解**）；C-13 账本负责**历史回执重放**（**正式修复**）。在 T-13 落地前，任何报告不得声称“历史回执重放已完全拒绝”。
 - **验证（归 T-13）**：`maxUses=3`：member-a 接受 → member-b 接受 → 重放 member-a 被拒且 `usedCount` 不变 → member-c 成功；覆盖跨重启与“不同回执正常消耗”（D-022）。另需覆盖 canonical `YCP1` 往返、非规范编码/裸 hex/错误 MAC/错误 `inviteId` 负例，以及单进程 gate 串行化；多进程 CAS 不在 host 证据面，标 `NOT_RUN`。T-09 仅验证 C-08 即时防御。
 - **不做的事**：本修订不新增 `(inviteId, memberId)` 唯一约束；同成员再次接受沿用既有 C-08 防御（`artifacts/70-review/t09-review-c.md` §4.1）。如需改为“每成员一次”账本语义，走 Clarification / Change Impact。
-- **状态**：`IMPLEMENTED-CHANGES_REQUIRED`（T-13 @ `1c832e5` 已实现账本；`artifacts/70-review/t13-review.md` F-01/F-04/F-07 要求 canonical 解码、单进程措辞与注释修正；CQG-T13 仍为 CHANGES_REQUIRED，修复并复审后关闭）。
-- **Change Impact（T-13 裁定同步，2026-10-17）**：F-02/F-07 需要 C-13 实现调用 `importFamily` 并按 canonical 字节记账；C-08 需落地 `EXT-DES-B-25`。这两项在修复并复审前，C-08/C-13 的实现证据为 `UNVERIFIED`；不得把旧 host 469/469 当作本裁定的闭合证据。F-04 仅为措辞/注释修正；F-08 的 C-12 当前实现已 fail-closed，C-22/UI 按 §11.3.1 派生能力。其余组件不受影响；不使无关组件 `STALE`。
+- **状态**：`IMPLEMENTED / REVIEWED（条件式）`（T-13 @ `69d5374`；`artifacts/70-review/t13-review-b.md` 给出代码级条件式 PASS；R2-01 已按 `EXT-DES-B-26` 登记，R2-02 已同步 ADR-003 §5.4；其余 R2-03..R2-05/F-14..F-18 与设备项仍按原报告跟踪。CQG-T13 记录、C-12/C-13 `STABLE`、Integration/Stage Gate 与设备 PASS 不由本文宣告）。
+- **Change Impact（T-13 裁定同步，2026-10-17）**：F-02/F-07 需要 C-13 实现调用 `importFamily` 并按 canonical 字节记账；C-08 需落地 `EXT-DES-B-25`。这两项在修复并复审前，C-08/C-13 的实现证据为 `UNVERIFIED`；不得把旧 host 469/469 当作本裁定的闭合证据。F-04 仅为措辞/注释修正；F-08 的 C-12 当前实现已 fail-closed，C-22/UI 按 §11.3.1 派生能力。其余组件不受影响；不使无关组件 `STALE`。**T-13 复审收尾（2026-10-17）**：修复与复审已完成（`t13-review-b.md`），上述“修复并复审前”的 `UNVERIFIED` 仅指裁定当时的旧证据；本轮不改变该裁定的组件影响面。
 
 ---
 
