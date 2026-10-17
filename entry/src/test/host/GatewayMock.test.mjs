@@ -172,15 +172,17 @@ test('C20_omitReportedState_isProtocolViolation', async () => {
   await expectCode(() => ctx.service.control(target(), command()), 'ACK_PROTOCOL_VIOLATION');
 });
 
-test('C20_badSignatureAndCorrelation_failClosed', async () => {
+test('C20_headerAuthAndCorrelation_failClosedWithProductionCodes', async () => {
+  // contract-baseline §4.5: header failures use the C-05 codes; only an ACK
+  // body request_id/seq mismatch may use ACK_CORRELATION_MISMATCH.
   const badSignature = new MockScenario(MockMode.NORMAL, MockTlsMode.DISABLED, 1, 0, 0,
     undefined, undefined, false, false, true);
   await expectCode(() => setup(badSignature).service.control(target(), command()),
-    'CONTROL_RESPONSE_AUTH_FAILED');
+    'RESPONSE_AUTH_FAILED');
   const badCorrelation = new MockScenario(MockMode.NORMAL, MockTlsMode.DISABLED, 1, 0, 0,
     undefined, undefined, false, false, false, true);
   await expectCode(() => setup(badCorrelation).service.control(target(), command()),
-    'ACK_CORRELATION_MISMATCH');
+    'RESPONSE_CORRELATION_MISMATCH');
 });
 
 test('C20_failAtAttempt_onlyThatRequestFails', async () => {

@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:test-engineer",
+  "task": "T-20 / wp-085-tooling fixture",
+  "policy": "Fixture only: exact paths, symbol subsets, status enforced.",
+  "entries": [],
+  "port_location_exceptions": [
+    {
+      "id": "PORT-LOC-03",
+      "path": "entry/src/main/ets/service/storage/RdbStore.ets",
+      "symbols": [
+        "RdbStore",
+        "RdbTransaction"
+      ],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "fixture",
+      "reason": "fixture",
+      "close_condition": "fixture close",
+      "evidence": "fixture"
+    },
+    {
+      "id": "PORT-LOC-08",
+      "path": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+      "symbols": [
+        "IBleProvisioningClient",
+        "ProvisioningState"
+      ],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "fixture",
+      "reason": "fixture",
+      "close_condition": "fixture close",
+      "evidence": "fixture"
+    },
+    {
+      "id": "PORT-LOC-09",
+      "path": "entry/src/main/ets/service/ble/GattEndpointMap.ets",
+      "symbols": [
+        "GattEndpointMap"
+      ],
+      "kind": "pure-seam",
+      "status": "accepted-location-exception",
+      "owner": "fixture",
+      "reason": "fixture",
+      "close_condition": "fixture close",
+      "evidence": "fixture"
+    }
+  ]
+}

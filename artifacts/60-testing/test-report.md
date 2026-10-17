@@ -12,6 +12,8 @@
 - **写范围**: `artifacts/60-testing/`、`entry/src/test/`、`tools/contract/`；未修改产品代码、构建配置或 `input/`。
 
 > **结论先行**：在 base `4f7c26b` 的集成候选上，host 纯逻辑 **696/696 PASS**（新增 2 条 R3-01 并发/失败隔离用例），契约 crosscheck **66/66 PASS**，仿真器套件 **20/20 PASS**（需 `no_proxy=127.0.0.1` 绕过本机代理；默认环境首跑为 `FAIL_ENV`，已保留证据），i18n **CHK-01..09 全 PASS / 0 blocking / 0 missing**，分层检查器 **0 violation（13 条 R3-01 pending-T-20 例外可见）**，构建 **BUILD SUCCESSFUL**，`codelinter` **0 error / 25 warning**。设备/模拟器/真实 BLE/LAN/TLS/云/视觉/fps 仍 **BLOCKED/UNAVAILABLE**；ACK p95 仅有 **MOCK_ONLY** 值，不能作为 NFR 4.3 验收证据。
+>
+> **T-20 修订（2026-10-18）**：ACK p95 三项数字已按证据文件 `t19-ack-p95-mock.json` 更正为 p50 **0.536 ms** / p95 **0.598 ms** / max **0.684 ms**（原 0.526/0.601/0.647 为笔误，见 F-03）；i18n `--strict-ui` 在 T-20 真正生效，CHK-07 不再把 `LOADING`/`RECONFIGURE` 等状态常量计为短 UI 文案，重跑为 **0 blocking / 55 warnings / hardcoded 16**（T-19 的 121/82 是旧 checker 计数）。分层检查器已读取 `port_location_exceptions` 并把 13 条 D-12 例外定为 `accepted`；T-20 证据见 `tooling-cleanup-report.md`。
 
 ---
 
@@ -62,11 +64,11 @@
 | 7a | 同上，默认代理环境 | `python3 -m unittest ...`（无 `no_proxy`） | 1 ERROR：`KeyError: 'X-YaoCore-Simulator'`；代理把 header 改写为 `X-Yaocore-Simulator` | **FAIL_ENV**（受控重跑转为 #7 PASS） | `t19-simulator-contract-proxy-fail.log` |
 | 8 | 仿真器 HTTP 实启 | `gateway_contract_server.py --port 9388` + `curl --noproxy '*' /discover` | 200；4 devices；`X-YaoCore-Simulator: DEV-ONLY` | **PASS（MOCK_ONLY）** | `t19-http-simulator.log` |
 | 9 | 仿真器 TLS 实启 | `--tls --cert ... --key ...` + `curl --noproxy '*' -k /health` | 200；SPKI `63f928c4…3243`；DEV-ONLY | **PASS（MOCK_ONLY）** | `t19-tls-simulator.log` |
-| 10 | i18n CHK-01..09 | `python3 entry/src/test/i18n/check_i18n.py --root . --report ... --allowlist ... --strict-ui` | exit 0；blocking **0**；missing **0**；warnings 121；hardcoded 82（均非阻断） | **PASS** | `t19-i18n-checker.log`、`t19-i18n-report.json` |
+| 10 | i18n CHK-01..09 | `python3 entry/src/test/i18n/check_i18n.py --root . --report ... --allowlist ... --strict-ui` | exit 0；blocking **0**；missing **0**；warnings 121；hardcoded 82（均非阻断；T-20 重跑计数见修订说明） | **PASS** | `t19-i18n-checker.log`、`t19-i18n-report.json` |
 | 11 | 分层静态扫描（C-29） | `python3 tools/contract/check_layering.py --root . --report ...` | 209 files；**0 violation**；13 条 `pending-T-20` R3-01 例外 | **PASS（含可见例外）** | `t19-layering.log`、`t19-layering.json` |
 | 12 | 检查器 fixture 自测 | `python3 -m unittest tools.contract.test_check_layering -v` | 4/4 PASS（合法树通过；违规树覆盖 D-01/02/06/08/09/11/12/13/17；仓库树 0 违规；缺失根 exit 2） | **PASS** | `t19-layering-fixture-tests.log` |
 | 13 | 安全负例聚焦 | Node runner + `--test-name-pattern`（9 文件） | 19/19 PASS | **PASS（host/仿真）** | `t19-security-negative.tap` |
-| 14 | ACK p95（mock） | `python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5` | p50 0.526 ms / p95 **0.601 ms** / max 0.647 ms；0 failures | **MOCK_ONLY（非产品验收）** | `t19-ack-p95-mock.json` |
+| 14 | ACK p95（mock） | `python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5` | p50 0.536 ms / p95 **0.598 ms** / max 0.684 ms；0 failures | **MOCK_ONLY（非产品验收）** | `t19-ack-p95-mock.json` |
 | 15 | 设备/UI/BLE/LAN/真实云/视觉/fps | `onDeviceTest`；真实环境 | 无设备/签名/真实网关 | **BLOCKED / UNAVAILABLE** | 见 §7 |
 
 ### 2.1 Host 用例分层（696）
@@ -171,7 +173,7 @@
 | FR-SET-003 云/国际化 | C-15/C-14 | `CloudService` 18、`I18n` 28、`T16_Settings_*` 11；CHK-01..09 PASS | **covered (host)** | 真实 IoTDA UNAVAILABLE |
 | NFR 4.1 传输安全 | C-04/C-05/C-17 | HMAC/±120s/nonce/replay/TLS pin 全链（host+sim） | **partial**：完整性/防重放 covered；P-HMAC 无机密性；真实 TLS BLOCKED | BLOCKED |
 | NFR 4.2 存储安全 | C-06/C-12/C-13 | PBKDF2 120k、SecretStore/SecretDraft zeroize、邀请过期/账本；host PASS | **partial**：设备 Asset Store/RDB 未执行 | BLOCKED |
-| NFR 4.3 性能 | C-17/C-21/C-25 | 55ms 7 条 PASS；ACK p95 **MOCK_ONLY 0.601 ms**；harness 4 条 PASS | **partial**：真实 p95 与 60/120fps UNAVAILABLE | UNAVAILABLE |
+| NFR 4.3 性能 | C-17/C-21/C-25 | 55ms 7 条 PASS；ACK p95 **MOCK_ONLY 0.598 ms**；harness 4 条 PASS | **partial**：真实 p95 与 60/120fps UNAVAILABLE | UNAVAILABLE |
 
 **统计**：26 FR 中 **24 covered (host)**、**2 partial**（FR-HOME-003 真实传感器、FR-SET-002 机密性/真实 TLS）、**0 gap**；NFR 4.1/4.2/4.3 均 **partial**（缺设备/真实环境证据）。所有 UI/设备格均为 `BLOCKED`/`UNAVAILABLE`，不计入 covered。
 
@@ -180,7 +182,7 @@
 | 指标 | 结果 | 分类 | 口径/限制 |
 |---|---|---|---|
 | 55ms 节流 | **PASS** | host | `T15_Throttle_*` 7 条 + Device/Climate 连续控制；fake timer 精确推进 54/55ms、1 在途、latest 保留、TouchUp 强同步 |
-| ACK p95 | **0.601 ms**（N=100，warmup=5，p50 0.526，max 0.647，0 fail） | **MOCK_ONLY** | localhost Python HTTP 仿真器；仅 transport+JSON 解析+结构校验；**不含** ArkTS 客户端验签/状态应用/真实 LAN/TLS pin/BLE/UI |
+| ACK p95 | **0.598 ms**（N=100，warmup=5，p50 0.536，max 0.684，0 fail） | **MOCK_ONLY** | localhost Python HTTP 仿真器；仅 transport+JSON 解析+结构校验；**不含** ArkTS 客户端验签/状态应用/真实 LAN/TLS pin/BLE/UI |
 | 真实 ACK p95 ≤500ms | **UNAVAILABLE** | device/LAN | 无设备/模拟器/真实网关；不得用 mock 数字通过验收 |
 | 60/120fps | **UNAVAILABLE** | device | 无 ArkUI frame profiler/设备；仅静态审查（无同步 IO/大列表策略） |
 | 测量脚本 | `entry/src/test/host/perf-harness.mjs`（4 自测 PASS）、`tools/contract/measure_ack_latency.py`（本报告新增） | — | 结果 JSON 均带 `resultClass`/`limitations` |

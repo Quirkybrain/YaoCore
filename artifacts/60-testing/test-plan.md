@@ -615,7 +615,7 @@ python3 tools/simulator/gateway_contract_server.py --host 127.0.0.1 --port 9443 
 | i18n CHK-01..09 | NOT_APPLICABLE（资源未建） | **PASS**；blocking 0 / missing 0 / warnings 121 / hardcoded 82 | `t19-i18n-report.json` |
 | 分层检查器（C-29） | 未实现 | **PASS 0 violation**；13 条 R3-01 `pending-T-20` 例外可见；fixture 4/4 | `t19-layering.json`、`t19-layering-fixture-tests.log` |
 | 安全负例矩阵 | 部分（仿真器） | **SEC-N01..N26 均有当前证据**；设备相关项仍 BLOCKED | `t19-security-negative.tap`、`test-report.md` §4 |
-| NFR 4.3 | harness PASS / 数值 UNAVAILABLE | 55ms **PASS**；ACK p95 **MOCK_ONLY 0.601ms**；真实 p95/60/120fps **UNAVAILABLE** | `t19-ack-p95-mock.json` |
+| NFR 4.3 | harness PASS / 数值 UNAVAILABLE | 55ms **PASS**；ACK p95 **MOCK_ONLY 0.598ms**；真实 p95/60/120fps **UNAVAILABLE** | `t19-ack-p95-mock.json` |
 | 设备/UI/BLE/LAN/云 | BLOCKED/UNAVAILABLE | **不变：BLOCKED/UNAVAILABLE** | `test-report.md` §7 |
 
 ### 14.2 CQG / 阶段状态

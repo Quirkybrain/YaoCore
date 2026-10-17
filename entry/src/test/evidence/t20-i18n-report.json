@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-17T19:54:23Z",
+  "root": "/home/quirkybrain/code/harmony-projects/YaoCore",
+  "strictUi": true,
+  "locales": [
+    "zh-CN",
+    "en-US"
+  ],
+  "checks": [
+    {
+      "id": "CHK-01",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-02",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-03",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-04",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-05",
+      "status": "PASS",
+      "blocking": false,
+      "findings": [
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.add"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.all"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.create"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.disabled"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.done"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.empty"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.enabled"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.read_only"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.remove"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "common.rename"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "onboarding.join_request_hint"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step0"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step1"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step2"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step3"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step4"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "provisioning.step5"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.lock"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.locked.message"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.locked.title"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.no_profile.message"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.no_profile.title"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.password.placeholder"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.profile.prompt"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "session.unlock"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "startup.error.message"
+        },
+        {
+          "message": "rawfile key is not referenced by product code",
+          "severity": "warning",
+          "key": "startup.error.title"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "home_add_gateway"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_about"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_device_control"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_family"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_provisioning"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_room_manage"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "page_settings"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "placeholder_message"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "rooms_manage"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "route_unknown_message"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "route_unknown_title"
+        },
+        {
+          "message": "string.json key is not referenced by product code",
+          "severity": "warning",
+          "key": "session_lock"
+        }
+      ]
+    },
+    {
+      "id": "CHK-06",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-07",
+      "status": "PASS",
+      "blocking": true,
+      "findings": [
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 141
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 142
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 143
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 144
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 145
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/common/theme/AppTheme.ets",
+          "line": 146
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 36
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 36
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 39
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 39
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 42
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/AcAdapterFactory.ets",
+          "line": 42
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/GreeAcAdapter.ets",
+          "line": 16
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/HaierAcAdapter.ets",
+          "line": 16
+        },
+        {
+          "message": "hardcoded CJK text",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/ac/MideaAcAdapter.ets",
+          "line": 16
+        },
+        {
+          "message": "hardcoded English sentence",
+          "severity": "warning",
+          "file": "entry/src/main/ets/service/mock/MockGatewayService.ets",
+          "line": 280
+        }
+      ]
+    },
+    {
+      "id": "CHK-08",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    },
+    {
+      "id": "CHK-09",
+      "status": "PASS",
+      "blocking": true,
+      "findings": []
+    }
+  ],
+  "summary": {
+    "blockingFailures": 0,
+    "warnings": 55,
+    "missingKeys": 0,
+    "hardcoded": 16
+  },
+  "allowlist": {
+    "path": "/home/quirkybrain/code/harmony-projects/YaoCore/entry/src/test/i18n/allowlist.json",
+    "entries": 19
+  }
+}

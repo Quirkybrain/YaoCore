@@ -553,6 +553,29 @@ test('T10_C14_checker_goodFixturePasses', () => {
   }
 });
 
+test('T20_F05_strictUiPromotesShortUiTextToBlocking', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'yaocore-i18n-strict-'));
+  try {
+    const root = path.join(REPO_ROOT, 'entry/src/test/i18n/fixtures/short-ui');
+    const allowlist = path.join(tmp, 'allowlist.json');
+    const advisory = spawnSync('python3', [
+      CHECKER, '--root', root, '--allowlist', allowlist,
+    ], { encoding: 'utf8' });
+    assert.equal(advisory.status, 0, advisory.stdout + advisory.stderr);
+    assert.match(advisory.stdout, /warning: .*hardcoded short English UI text/);
+    assert.match(advisory.stdout, /blockingFailures=0/);
+
+    const strict = spawnSync('python3', [
+      CHECKER, '--root', root, '--allowlist', allowlist, '--strict-ui',
+    ], { encoding: 'utf8' });
+    assert.equal(strict.status, 1, strict.stdout + strict.stderr);
+    assert.match(strict.stdout, /blocking: .*hardcoded short English UI text/);
+    assert.match(strict.stdout, /blockingFailures=1/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('T10_C14_checker_badFixtureBlocksEveryDesignedCheck', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'yaocore-i18n-bad-'));
   try {

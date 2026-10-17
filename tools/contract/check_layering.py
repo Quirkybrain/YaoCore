@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """YaoCore C-29 layering checker (DES-A §2.2 D-01..D-06/D-08, DES-B §2.3 D-09..D-13/D-17).
 
-Producer: agent:test-engineer | Task: T-19 / wp-082-verify
-Contract: DES-A §2.2; DES-B §2.3, §18.1; T-18 ruling 4b99e64 (§0.8/§0.9, §18.1).
-Status: T-19 implementation candidate. T-20 must ratify or shrink the recorded
-exceptions in ``layering_allowlist.json``; this tool never silently widens a rule.
+Producer: agent:test-engineer | Task: T-20 / wp-085-tooling
+Contract: DES-A §2.2, §27.6; DES-B §2.3, §18.1; T-18 ruling 4b99e64 (§0.8/§0.9, §18.1);
+          T-20 final-system-review F-01/F-02/F-06.
+Status: T-20 implementation. D-12 entries are file/symbol-level and ``status`` is
+enforced (a used entry that is not ``accepted`` fails the gate). Port location
+exceptions are read from ``port_location_exceptions``; the two former hardcoded
+port allowlists are gone. A port path that is not registered, a symbol outside the
+registered set, or a non-accepted location status fails D-09/D-11. A port exception
+never widens D-12: both allowlists are applied independently and the stricter one wins.
 
 Usage:
   python3 tools/contract/check_layering.py --root .
@@ -47,6 +52,9 @@ from typing import Iterable, Optional
 
 MAIN_PREFIX = "entry/src/main/ets"
 ALLOWLIST_DEFAULT = "tools/contract/layering_allowlist.json"
+ACCEPTED_D12_STATUS = "accepted"
+PORT_ACCEPTED_STATUS = "accepted-location-exception"
+PORT_KINDS = {"port-only", "mixed-contract-dto", "pure-seam"}
 RULE_ORDER = [
     "D-01", "D-02", "D-03", "D-05", "D-06", "D-08", "D-09", "D-11",
     "D-12", "D-13", "D-17",
@@ -138,6 +146,7 @@ class AllowEntry:
     status: str
     reason: str
     evidence: str
+    id: str = ""
     used: int = 0
 
     def matches(self, record: ImportRecord) -> bool:
@@ -155,6 +164,30 @@ class AllowEntry:
             if not set(record.symbols).issubset(set(self.symbols)):
                 return False
         return True
+
+
+@dataclass
+class PortLocationException:
+    id: str
+    path: str
+    symbols: list[str]
+    kind: str
+    status: str
+    owner: str
+    reason: str
+    close_condition: str
+    evidence: str
+    used: int = 0
+
+    def matches_path(self, target_rel: Optional[str]) -> bool:
+        return target_rel is not None and target_rel == self.path
+
+    def symbols_cover(self, record: ImportRecord) -> bool:
+        # Empty symbol lists fail closed: a namespace/side-effect import is not
+        # evidence that only the registered port symbols crossed the layer.
+        if not self.symbols or not record.symbols:
+            return False
+        return set(record.symbols).issubset(set(self.symbols))
 
 
 def _glob_match(pattern: str, value: str) -> bool:
@@ -320,27 +353,87 @@ def collect_class_index(root: Path) -> dict[str, str]:
     return index
 
 
-def load_allowlist(root: Path, explicit: Optional[Path]) -> list[AllowEntry]:
+def _load_allowlist_payload(root: Path, explicit: Optional[Path]) -> tuple[Path, dict]:
     path = explicit if explicit is not None else root / ALLOWLIST_DEFAULT
     if path is None or not path.is_file():
-        return []
+        return path, {}
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as error:
         raise ValueError(f"invalid allowlist JSON {path}: {error}") from error
+    if not isinstance(payload, dict):
+        raise ValueError(f"allowlist must be a JSON object: {path}")
+    return path, payload
+
+
+def load_allowlist(root: Path, explicit: Optional[Path]) -> list[AllowEntry]:
+    _path, payload = _load_allowlist_payload(root, explicit)
+    raw_entries = payload.get("entries", [])
+    if not isinstance(raw_entries, list):
+        raise ValueError("allowlist 'entries' must be a list")
     entries: list[AllowEntry] = []
-    for raw in payload.get("entries", []):
+    for raw in raw_entries:
+        if not isinstance(raw, dict):
+            raise ValueError("allowlist entry must be an object")
+        status = str(raw.get("status", "pending-unregistered"))
         entries.append(AllowEntry(
             rule=str(raw.get("rule", "")),
             source=str(raw.get("from", "")),
             target=str(raw.get("import", "")),
             symbols=[str(item) for item in raw.get("symbols", [])],
             type_only=bool(raw.get("type_only", False)),
-            status=str(raw.get("status", "accepted")),
+            status=status,
             reason=str(raw.get("reason", "")),
             evidence=str(raw.get("evidence", "")),
+            id=str(raw.get("id", "")),
         ))
     return entries
+
+
+def load_port_location_exceptions(root: Path, explicit: Optional[Path]) -> list[PortLocationException]:
+    """Read the DES-A §27.6.2 / DES-B §18.1 port location registry.
+
+    Schema is intentionally strict: exact file path, non-empty symbol set,
+    declared kind, and an accepted/pending status. A wildcard path or unknown
+    kind is an input error (exit 2) rather than a silent widening.
+    """
+    _path, payload = _load_allowlist_payload(root, explicit)
+    raw_exceptions = payload.get("port_location_exceptions", [])
+    if not isinstance(raw_exceptions, list):
+        raise ValueError("allowlist 'port_location_exceptions' must be a list")
+    exceptions: list[PortLocationException] = []
+    seen_paths: set[str] = set()
+    for raw in raw_exceptions:
+        if not isinstance(raw, dict):
+            raise ValueError("port_location_exceptions entry must be an object")
+        path = str(raw.get("path", ""))
+        symbols = [str(item) for item in raw.get("symbols", [])]
+        kind = str(raw.get("kind", ""))
+        status = str(raw.get("status", ""))
+        if not path or "*" in path or "?" in path:
+            raise ValueError(f"port exception path must be exact, got {path!r}")
+        if path in seen_paths:
+            raise ValueError(f"duplicate port exception path {path!r}")
+        if not symbols:
+            raise ValueError(f"port exception {path!r} must declare symbols")
+        if kind not in PORT_KINDS:
+            raise ValueError(f"port exception {path!r} has invalid kind {kind!r}")
+        if status != PORT_ACCEPTED_STATUS and not status.startswith("pending-"):
+            raise ValueError(
+                f"port exception {path!r} has invalid status {status!r}")
+        seen_paths.add(path)
+        exceptions.append(PortLocationException(
+            id=str(raw.get("id", "")),
+            path=path,
+            symbols=symbols,
+            kind=kind,
+            status=status,
+            owner=str(raw.get("owner", "")),
+            reason=str(raw.get("reason", "")),
+            close_condition=str(raw.get("close_condition", "")),
+            evidence=str(raw.get("evidence", "")),
+        ))
+    return exceptions
 
 
 def _allowed(record: ImportRecord, allowlist: list[AllowEntry], rule: str) -> tuple[bool, Optional[AllowEntry]]:
@@ -348,15 +441,46 @@ def _allowed(record: ImportRecord, allowlist: list[AllowEntry], rule: str) -> tu
     for entry in allowlist:
         if entry.matches(record):
             entry.used += 1
+            # T-20 status enforcement: a used exception that is still pending
+            # (or missing a status) is a gate failure, never a silent pass.
+            if entry.status != ACCEPTED_D12_STATUS:
+                return False, entry
             return True, entry
     return False, None
+
+
+def _match_port_exception(
+        record: ImportRecord,
+        port_exceptions: list[PortLocationException]) -> tuple[bool, Optional[PortLocationException], str]:
+    """Return (accepted, entry, failure detail) for a D-09/D-11 import.
+
+    Only the target path is registry-keyed; the import symbols must be a
+    non-empty subset of the registered symbols. Status other than
+    accepted-location-exception fails closed. Unregistered paths fail closed.
+    """
+    for entry in port_exceptions:
+        if not entry.matches_path(record.target_rel):
+            continue
+        if not entry.symbols_cover(record):
+            return False, entry, (
+                f"symbols {sorted(record.symbols)!r} are not covered by {entry.id or entry.path}; "
+                "add a new reviewed exception instead of widening this one")
+        # Count a pending match as used so used+pending is reported honestly.
+        entry.used += 1
+        if entry.status != PORT_ACCEPTED_STATUS:
+            return False, entry, (
+                f"port exception {entry.id or entry.path} status {entry.status!r} "
+                "is not accepted-location-exception")
+        return True, entry, ""
+    return False, None, "path is not registered in port_location_exceptions"
 
 
 def _base_layer(record: ImportRecord) -> Optional[str]:
     return record.target_layer
 
 
-def evaluate(root: Path, allowlist: list[AllowEntry]) -> tuple[list[Violation], list[str]]:
+def evaluate(root: Path, allowlist: list[AllowEntry],
+             port_exceptions: list[PortLocationException]) -> tuple[list[Violation], list[str]]:
     main = root / MAIN_PREFIX
     if not main.is_dir():
         raise FileNotFoundError(
@@ -373,6 +497,9 @@ def evaluate(root: Path, allowlist: list[AllowEntry]) -> tuple[list[Violation], 
         allowed, entry = _allowed(record, allowlist, rule)
         if allowed:
             return
+        if entry is not None:
+            message = (f"{message}; exception {entry.id or entry.source} has status "
+                       f"{entry.status!r}, only {ACCEPTED_D12_STATUS!r} is accepted")
         violations.append(Violation(rule, record.source_file, record.line, record.spec, message))
 
     for record in records:
@@ -400,14 +527,19 @@ def evaluate(root: Path, allowlist: list[AllowEntry]) -> tuple[list[Violation], 
                 add("D-03", record,
                     f"contracts/** may only import common/** or model/**; got {spec!r}")
 
-        # D-05 / D-09 repository floor.
+        # D-05 / D-09 repository floor. D-09 ports come only from the
+        # versioned port_location_exceptions registry (no hardcoded paths).
         if source_layer == "repository":
             if is_platform:
                 add("D-05", record, f"repository/** must not import platform API; got {spec!r}")
             elif target_layer == "service":
-                if not _is_storage_port_path(target_rel):
-                    add("D-09", record,
-                        f"repository/** must not import service implementation; got {spec!r}")
+                port_ok, _port_entry, port_failure = _match_port_exception(
+                    record, port_exceptions)
+                if not port_ok:
+                    violations.append(Violation(
+                        "D-09", record.source_file, record.line, spec,
+                        f"repository/** must not import service implementation; "
+                        f"got {spec!r} ({port_failure})"))
             elif target_layer not in (None, "common", "model", "contracts", "repository"):
                 add("D-05", record,
                     f"repository/** may only import common/model/contracts; got {spec!r}")
@@ -433,11 +565,15 @@ def evaluate(root: Path, allowlist: list[AllowEntry]) -> tuple[list[Violation], 
                 add("D-11", record, f"viewmodel/** must not import platform API; got {spec!r}")
             elif "/adapters/" in target_rel:
                 add("D-11", record, f"viewmodel/** must not import adapters; got {spec!r}")
-            elif target_layer == "service" and _service_dir(target_rel) in ("gateway", "ble", "crypto"):
-                if not _is_viewmodel_service_port(target_rel):
-                    add("D-11", record,
-                        f"viewmodel/** must not import service/{{{_service_dir(target_rel)}}} implementation; "
-                        f"got {spec!r}")
+            elif target_layer == "service" and _service_dir(target_rel) in (
+                    "gateway", "ble", "crypto", "storage"):
+                port_ok, _port_entry, port_failure = _match_port_exception(
+                    record, port_exceptions)
+                if not port_ok:
+                    violations.append(Violation(
+                        "D-11", record.source_file, record.line, spec,
+                        f"viewmodel/** must not import service/{_service_dir(target_rel)} "
+                        f"implementation; got {spec!r} ({port_failure})"))
 
         # D-12 pages import whitelist.
         if source_layer == "pages":
@@ -529,9 +665,11 @@ def evaluate(root: Path, allowlist: list[AllowEntry]) -> tuple[list[Violation], 
                         f"{source_layer}/** must not construct service/repository/ViewModel "
                         f"({name} defined in {origin})"))
 
+    violations.extend(validate_port_location_files(root, port_exceptions))
+
     skipped.extend([
-        "D-04/D-10 host-safe imports -> check_host_safe_imports.py (T-20)",
-        "D-07/D-14 production mock exclusion -> check_production_mock_exclusion.py (T-20); "
+        "D-04/D-10 host-safe imports -> check_host_safe_imports.py (not landed)",
+        "D-07/D-14 production mock exclusion -> check_production_mock_exclusion.py (not landed); "
         "current evidence: host TransportBoundary.test.mjs",
         "D-15 cloud HTTP isolation -> review/static scan (not implemented)",
         "D-16 i18n hardcoded strings -> entry/src/test/i18n/check_i18n.py --strict-ui",
@@ -547,35 +685,39 @@ def _service_dir(target_rel: str) -> str:
     return target_rel[len(prefix):].split("/", 1)[0]
 
 
-def _is_storage_port_path(target_rel: str) -> bool:
-    prefix = MAIN_PREFIX + "/service/storage/"
-    if not target_rel.startswith(prefix):
-        return False
-    name = target_rel[len(prefix):]
-    return name in {
-        "RdbStore.ets",
-        "PreferencesStore.ets",
-        "SecretStore.ets",
-        "SecretDraftPort.ets",
-        "MigrationPort.ets",
-    }
+def validate_port_location_files(root: Path,
+                                 port_exceptions: list[PortLocationException]) -> list[Violation]:
+    """Fail closed when a registered port file drifts from its registration.
 
-
-def _is_viewmodel_service_port(target_rel: str) -> bool:
-    prefix = MAIN_PREFIX + "/service/"
-    if not target_rel.startswith(prefix):
-        return False
-    name = target_rel[len(prefix):]
-    return name in {
-        "ble/BleProvisioningPorts.ets",
-        "ble/GattEndpointMap.ets",
-        "crypto/CryptoPort.ets",
-        "gateway/GatewayTransportPorts.ets",
-        "gateway/DiscoveryModels.ets",
-        "storage/PreferencesStore.ets",
-        "storage/SecretDraftPort.ets",
-        "storage/SecretStore.ets",
-    }
+    DES-B §18.1 item 4: a registered file that adds ``@ohos.*`` / adapter /
+    unregistered repository dependencies invalidates its exception. A repository
+    import is tolerated only when the target itself has a registered location
+    exception (e.g. GatewayTransportPorts -> GatewayPorts), which preserves the
+    pre-existing physical-layout exception instead of hiding a new dependency.
+    """
+    violations: list[Violation] = []
+    registered = {entry.path for entry in port_exceptions}
+    for entry in port_exceptions:
+        path = root / entry.path
+        if not path.is_file():
+            continue
+        for record in parse_imports(root, path):
+            spec = record.spec
+            target_rel = record.target_rel or ""
+            reason = ""
+            if spec.startswith(PLATFORM_PREFIXES):
+                reason = "registered port file must not import platform API"
+            elif "/adapters/" in target_rel:
+                reason = "registered port file must not import an adapter"
+            elif (record.target_layer == "repository" and
+                  record.source_layer != "repository" and
+                  target_rel not in registered):
+                reason = "registered port file must not add an unregistered repository dependency"
+            if reason:
+                violations.append(Violation(
+                    "PORT-LOC", entry.path, record.line, spec,
+                    f"{reason}; location exception {entry.id or entry.path} is invalid"))
+    return violations
 
 
 def _is_pages_i18n(target_rel: str) -> bool:
@@ -642,12 +784,16 @@ def _is_app_vm_port_file(source_file: str) -> bool:
 
 
 def render_report(root: Path, violations: list[Violation], skipped: list[str],
-                  allowlist: list[AllowEntry]) -> dict:
+                  allowlist: list[AllowEntry],
+                  port_exceptions: list[PortLocationException]) -> dict:
     used = [entry for entry in allowlist if entry.used > 0]
+    pending = [entry for entry in allowlist if entry.status != ACCEPTED_D12_STATUS]
+    used_ports = [entry for entry in port_exceptions if entry.used > 0]
+    pending_ports = [entry for entry in port_exceptions if entry.status != PORT_ACCEPTED_STATUS]
     return {
         "tool": "check_layering.py",
         "producer": "agent:test-engineer",
-        "task": "T-19 / wp-082-verify",
+        "task": "T-20 / wp-085-tooling",
         "root": norm(root),
         "main_root": MAIN_PREFIX,
         "rules_checked": RULE_ORDER,
@@ -655,8 +801,10 @@ def render_report(root: Path, violations: list[Violation], skipped: list[str],
         "file_count": len(list((root / MAIN_PREFIX).rglob("*.ets"))),
         "violation_count": len(violations),
         "violations": [item.as_dict() for item in violations],
+        "exceptions_used_count": len(used),
         "exceptions": [
             {
+                "id": entry.id,
                 "rule": entry.rule,
                 "from": entry.source,
                 "import": entry.target,
@@ -671,11 +819,68 @@ def render_report(root: Path, violations: list[Violation], skipped: list[str],
         ],
         "unused_exceptions": [
             {
+                "id": entry.id,
                 "rule": entry.rule,
                 "from": entry.source,
                 "import": entry.target,
+                "status": entry.status,
             }
             for entry in allowlist if entry.used == 0
+        ],
+        "pending_exceptions": [
+            {
+                "id": entry.id,
+                "rule": entry.rule,
+                "from": entry.source,
+                "import": entry.target,
+                "status": entry.status,
+                "used": entry.used,
+            }
+            for entry in pending
+        ],
+        "port_exceptions_used_count": len(used_ports),
+        "port_location_exceptions": [
+            {
+                "id": entry.id,
+                "path": entry.path,
+                "symbols": entry.symbols,
+                "kind": entry.kind,
+                "status": entry.status,
+                "owner": entry.owner,
+                "reason": entry.reason,
+                "close_condition": entry.close_condition,
+                "evidence": entry.evidence,
+                "used": entry.used,
+            }
+            for entry in port_exceptions
+        ],
+        "port_exceptions_used": [
+            {
+                "id": entry.id,
+                "path": entry.path,
+                "symbols": entry.symbols,
+                "kind": entry.kind,
+                "status": entry.status,
+                "used": entry.used,
+            }
+            for entry in used_ports
+        ],
+        "port_exceptions_unused": [
+            {
+                "id": entry.id,
+                "path": entry.path,
+                "status": entry.status,
+            }
+            for entry in port_exceptions if entry.used == 0
+        ],
+        "port_pending_exceptions": [
+            {
+                "id": entry.id,
+                "path": entry.path,
+                "status": entry.status,
+                "used": entry.used,
+            }
+            for entry in pending_ports
         ],
     }
 
@@ -689,32 +894,46 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                         help="print the versioned exceptions and exit")
     args = parser.parse_args(list(argv) if argv is not None else None)
     root = Path(args.root).resolve()
+    explicit_allowlist = Path(args.allowlist) if args.allowlist else None
     try:
-        allowlist = load_allowlist(root, Path(args.allowlist) if args.allowlist else None)
+        allowlist = load_allowlist(root, explicit_allowlist)
+        port_exceptions = load_port_location_exceptions(root, explicit_allowlist)
         if args.list_exceptions:
             for entry in allowlist:
                 print(f"{entry.rule}\t{entry.source}\t{entry.target}\t{entry.status}\t{entry.reason}")
+            for entry in port_exceptions:
+                print(f"PORT\t{entry.path}\t{entry.kind}\t{entry.status}\t{entry.owner}")
             return 0
-        violations, skipped = evaluate(root, allowlist)
+        violations, skipped = evaluate(root, allowlist, port_exceptions)
     except (FileNotFoundError, ValueError, OSError) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
     except Exception as error:  # pragma: no cover - defensive input error
         print(f"ERROR: {error}", file=sys.stderr)
         return 2
-    report = render_report(root, violations, skipped, allowlist)
+    report = render_report(root, violations, skipped, allowlist, port_exceptions)
     if args.report:
         report_path = Path(args.report)
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n",
                                encoding="utf-8")
-    pending = [entry for entry in allowlist if entry.used > 0 and entry.status != "accepted"]
+    pending = [entry for entry in allowlist if entry.status != ACCEPTED_D12_STATUS]
+    pending_used = [entry for entry in pending if entry.used > 0]
+    port_pending = [entry for entry in port_exceptions
+                    if entry.status != PORT_ACCEPTED_STATUS]
+    port_pending_used = [entry for entry in port_pending if entry.used > 0]
     print(f"check_layering: files={report['file_count']} violations={len(violations)} "
-          f"exceptions_used={len(report['exceptions'])} pending={len(pending)}")
+          f"exceptions_used={report['exceptions_used_count']} pending={len(pending)} "
+          f"pending_used={len(pending_used)} "
+          f"port_exceptions_used={report['port_exceptions_used_count']} "
+          f"port_pending={len(port_pending)} port_pending_used={len(port_pending_used)}")
     for item in violations:
         print(f"  {item.rule} {item.path}:{item.line} {item.spec} -- {item.message}")
     for entry in pending:
-        print(f"  PENDING {entry.rule} {entry.source} -> {entry.target} ({entry.status})")
+        print(f"  PENDING {entry.rule} {entry.source} -> {entry.target} "
+              f"({entry.status}, used={entry.used})")
+    for entry in port_pending:
+        print(f"  PORT PENDING {entry.id or entry.path} ({entry.status}, used={entry.used})")
     if violations:
         print(f"check_layering: FAIL ({len(violations)} violation(s))")
         return 1

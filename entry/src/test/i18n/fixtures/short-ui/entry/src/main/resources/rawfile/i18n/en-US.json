@@ -1,0 +1,9 @@
+{
+  "common": {
+    "ok": "OK"
+  },
+  "device": {
+    "count_one": "{count} device",
+    "count_other": "{count} devices"
+  }
+}
