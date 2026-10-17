@@ -1,0 +1,7 @@
+{
+  "common": {
+    "extra": "Extra",
+    "empty": "",
+    "param": "Hello {user}"
+  }
+}

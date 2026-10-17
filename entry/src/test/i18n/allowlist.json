@@ -1,0 +1,66 @@
+{
+  "entries": [],
+  "keyEntries": [],
+  "keyPrefixes": [
+    {
+      "prefix": "common_",
+      "reason": "common static UI keys are reserved for T-17/T-18 pages and components"
+    },
+    {
+      "prefix": "settings_language_",
+      "reason": "Settings language entry is owned by T-18 (FR-SET-003, ADR-004 §7.2)"
+    },
+    {
+      "prefix": "home.",
+      "reason": "home labels are consumed by T-17/C-25 pages; landed now as the DES-B §7.4.2 minimum baseline"
+    },
+    {
+      "prefix": "room.",
+      "reason": "room labels are consumed by T-17/C-24 pages; landed now as the DES-B §7.4.2 minimum baseline"
+    },
+    {
+      "prefix": "family.",
+      "reason": "family labels are consumed by T-17/C-28 pages; landed now as the DES-B §7.4.2 minimum baseline"
+    },
+    {
+      "prefix": "scene.",
+      "reason": "scene labels are consumed by T-17 pages; scene errors remain checked by CHK-06"
+    },
+    {
+      "prefix": "door.",
+      "reason": "door labels are data-driven keys consumed by T-17 device pages"
+    },
+    {
+      "prefix": "invite.",
+      "reason": "invite labels are consumed by T-17/T-18 pages; security warnings are mandatory keys"
+    },
+    {
+      "prefix": "member.",
+      "reason": "member labels are consumed by T-17 family pages"
+    },
+    {
+      "prefix": "device.",
+      "reason": "device type/state labels are data-driven keys consumed by T-17 pages"
+    },
+    {
+      "prefix": "cloud.",
+      "reason": "cloud labels are consumed by T-18 remote-connection settings"
+    },
+    {
+      "prefix": "gateway.security.",
+      "reason": "security profile labels are consumed by T-17/T-18 security panels"
+    },
+    {
+      "prefix": "ac.mode.",
+      "reason": "AC mode labels are constructed by I18nKeys.acMode and consumed by T-17 device pages"
+    },
+    {
+      "prefix": "stateSource.",
+      "reason": "state-source labels are constructed by I18nKeys.stateSource and consumed by T-17 pages"
+    },
+    {
+      "prefix": "provisioning.error.",
+      "reason": "provisioning error keys are constructed by ErrorCatalog/I18nKeys and consumed by T-17 provisioning UI"
+    }
+  ]
+}

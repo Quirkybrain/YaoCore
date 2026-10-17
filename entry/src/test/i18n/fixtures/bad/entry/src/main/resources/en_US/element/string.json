@@ -1,0 +1,6 @@
+{
+  "string": [
+    { "name": "app_name", "value": "Bad fixture" },
+    { "name": "only_en", "value": "Only English" }
+  ]
+}

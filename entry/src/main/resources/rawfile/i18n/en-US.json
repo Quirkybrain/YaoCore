@@ -1,0 +1,284 @@
+{
+  "errors": {
+    "app": {
+      "ack_correlation_mismatch": "The ACK correlation does not match. Please retry.",
+      "ack_protocol_violation": "The gateway ACK violates the protocol; execution was not confirmed.",
+      "ack_state_mismatch": "The reported device state does not match the command. Please retry.",
+      "asset_not_found": "The local security credential was not found. Please bind again.",
+      "auth_profile_not_found": "The local usage profile was not found.",
+      "auth_rbac_denied": "Your current role is not allowed to perform this action.",
+      "configuration_error": "The app configuration is invalid. Check the settings.",
+      "control_response_auth_failed": "The control response signature failed; execution was not confirmed.",
+      "crypto_invalid_key": "The key is invalid. Configure it again.",
+      "crypto_operation_failed": "A local security operation failed. Please retry.",
+      "crypto_tag_mismatch": "Security verification failed; the data may have been altered.",
+      "crypto_unavailable": "The local security component is unavailable.",
+      "device_dismissed": "The device was removed and can no longer be controlled.",
+      "device_name_invalid": "The device name is not valid.",
+      "device_not_found": "The device was not found.",
+      "discovery_invalid_response": "The gateway discovery response is invalid.",
+      "gateway_id_mismatch": "The gateway identity does not match; binding stopped.",
+      "gateway_not_bound": "No gateway is bound.",
+      "gateway_profile_blocked": "The gateway security profile is blocked. Provision it again.",
+      "internal_error": "The operation failed. Please retry.",
+      "invite_expired": "The invitation has expired.",
+      "invite_invalid": "The invitation is invalid.",
+      "invite_max_uses": "The invitation has reached its usage limit.",
+      "invite_receipt_invalid": "The invitation receipt is invalid.",
+      "invite_revoked": "The invitation was revoked.",
+      "protocol_invalid_identifier": "A protocol identifier is invalid.",
+      "protocol_invalid_json": "The protocol payload is invalid.",
+      "protocol_invalid_timestamp": "The protocol timestamp is invalid.",
+      "protocol_unsupported_version": "The protocol version is not supported.",
+      "room_delete_not_confirmed": "Room deletion was not confirmed.",
+      "room_name_invalid": "The room name is not valid.",
+      "room_not_found": "The room was not found.",
+      "scene_cancelled": "Scene execution was cancelled.",
+      "scene_disabled": "The scene is disabled.",
+      "scene_empty": "The scene has no executable steps.",
+      "scene_name_invalid": "The scene name is not valid.",
+      "scene_not_found": "The scene was not found.",
+      "scene_preflight_failed": "Scene preflight failed.",
+      "scene_reference_invalid": "A device referenced by the scene is no longer valid.",
+      "scene_run_in_progress": "The scene is already running. Try again later.",
+      "scene_step_failed": "A scene step failed.",
+      "secret_alias_invalid": "The security credential alias is invalid.",
+      "secret_destroyed": "The security credential was destroyed.",
+      "secret_encoding_invalid": "The security credential encoding is invalid.",
+      "signature_invalid": "Signature verification failed.",
+      "storage_error": "A local storage operation failed. Please retry.",
+      "storage_migration_failed": "Local data migration failed.",
+      "storage_not_initialized": "Local storage is not initialized.",
+      "tls_pin_config_invalid": "The TLS pin configuration is invalid.",
+      "tls_profile_inconsistent": "The TLS security profile is inconsistent. Provision again.",
+      "i18n_resource_load_failed": "Language resources failed to load.",
+      "i18n_bundle_invalid": "The language resource format is invalid.",
+      "i18n_locale_unsupported": "The selected language is not supported.",
+      "i18n_platform_locale_failed": "The system language could not be applied; some text may need a restart.",
+      "nonce_reused": "The replayed request was rejected.",
+      "timestamp_out_of_window": "The phone and gateway clocks differ too much. Calibrate the time.",
+      "http_error": "The network request failed (HTTP {status}).",
+      "local_request_failed": "The LAN request failed. Check the network.",
+      "dev_simulator_rejected": "The production build cannot connect to a development protocol simulator.",
+      "gateway_unreachable": "The gateway is unreachable. Check the network.",
+      "gateway_timeout": "The gateway timed out.",
+      "discovery_no_candidates": "No available gateway was found.",
+      "discovery_transport_unavailable": "The network capability required for gateway discovery is unavailable.",
+      "tls_pin_mismatch": "The gateway certificate does not match the pinned fingerprint; the connection was refused.",
+      "tls_handshake_failed": "The TLS handshake with the gateway failed.",
+      "tls_unavailable_advertised": "The gateway advertised an unusable TLS configuration.",
+      "invite_code_invalid": "The invitation code is invalid.",
+      "invite_version_unsupported": "The invitation version is not supported.",
+      "invite_aead_failed": "The invitation credential could not be decrypted."
+    },
+    "gateway": {
+      "success": "Success",
+      "invalid_request": "The request is invalid.",
+      "unsupported_security": "The gateway does not support this security configuration.",
+      "timestamp_rejected": "The gateway rejected the request time. Calibrate the clock.",
+      "bad_signature": "The request signature is invalid.",
+      "replay": "The replayed request was rejected.",
+      "unsupported_command": "The gateway does not support this command.",
+      "unknown_device": "The gateway could not find the target device.",
+      "unsupported_action": "The device does not support this action.",
+      "unsupported_gateway_action": "The gateway does not support this action.",
+      "device_offline": "The device is offline.",
+      "hardware_timeout": "The device did not confirm execution in time.",
+      "unknown": "The gateway returned an unknown error ({code})."
+    },
+    "cloud": {
+      "token_expired": "The cloud access token has expired. Update it.",
+      "token_invalid": "The cloud access token is invalid.",
+      "rate_limited": "Cloud requests are too frequent. Try again later.",
+      "request_failed": "The cloud request failed.",
+      "service_unavailable": "The cloud service is unavailable.",
+      "response_invalid": "The cloud response is invalid.",
+      "shadow_invalid": "The device shadow data is invalid.",
+      "sequence_unavailable": "A cloud command sequence number is unavailable.",
+      "endpoint_invalid": "The cloud endpoint is invalid; HTTPS is required.",
+      "inventory_unsupported": "The device inventory does not support this cloud command."
+    },
+    "scene": {
+      "run_in_progress": "The scene is already running. Try again later."
+    }
+  },
+  "provisioning": {
+    "error": {
+      "credential_missing": "Provisioning credentials are missing.",
+      "identity_invalid": "The gateway identity is invalid; provisioning stopped.",
+      "auth_error": "Wi-Fi authentication failed. Check the password.",
+      "network_not_found": "The requested Wi-Fi network was not found.",
+      "bluetooth_off": "Bluetooth is off.",
+      "device_not_found": "The provisioning device was not found.",
+      "connect_failed": "Failed to connect to the provisioning device.",
+      "gatt_busy": "The Bluetooth channel is busy. Try again later.",
+      "pop_invalid": "The setup code is invalid. Check the gateway PoP.",
+      "security_handshake_failed": "The provisioning security handshake failed.",
+      "wifi_scan_failed": "The gateway failed to scan Wi-Fi.",
+      "wifi_timeout": "The Wi-Fi connection timed out.",
+      "done_rejected": "The gateway rejected the provisioning completion request.",
+      "binding_probe_failed": "The binding probe failed.",
+      "board_led_unconfirmed": "The board LED state could not be confirmed.",
+      "cancelled": "Provisioning was cancelled.",
+      "unknown": "Provisioning failed ({code})."
+    }
+  },
+  "cloud": {
+    "token": {
+      "expired": "The cloud access token has expired. Update it.",
+      "missing": "No cloud access token is configured."
+    },
+    "command": {
+      "accepted_not_confirmed": "The cloud accepted the command, but the device has not confirmed execution."
+    },
+    "completion": {
+      "unsupported": "This gateway does not support cloud completion confirmation."
+    }
+  },
+  "stateSource": {
+    "sensor_physical": "Sensor reading",
+    "device_feedback": "Device feedback",
+    "automation_local": "Local automation",
+    "app_lan": "App LAN control",
+    "app_cloud": "App cloud control",
+    "unknown": "Unknown source ({value})"
+  },
+  "ac": {
+    "mode": {
+      "auto": "Auto",
+      "cool": "Cool",
+      "heat": "Heat",
+      "dry": "Dry",
+      "fan": "Fan",
+      "eco": "Eco",
+      "sleep": "Sleep",
+      "unknown": "Non-standard mode ({mode})"
+    }
+  },
+  "door": {
+    "state": {
+      "secured": "Locked",
+      "unconfirmed": "Unconfirmed",
+      "unknown": "Unknown"
+    },
+    "alert": {
+      "unconfirmed": "The lock state is unconfirmed. Check it."
+    },
+    "link": {
+      "unverified": "The door sensor link is unverified."
+    }
+  },
+  "gateway": {
+    "security": {
+      "hmac_only": "HMAC only (no confidentiality)",
+      "tls_pinned": "TLS with pinned certificate",
+      "pin_mismatch": "Gateway certificate pin mismatch",
+      "handshake_failed": "Gateway TLS handshake failed",
+      "state_inconsistent": "Gateway security state is inconsistent",
+      "unavailable": "Gateway secure channel unavailable"
+    }
+  },
+  "invite": {
+    "mode": {
+      "key_wrap": "Key wrap",
+      "code_kek": "Code + KEK"
+    },
+    "security": {
+      "weak_mode_warning": "This invitation mode has weaker security.",
+      "guest_scope_not_crypto": "Guest room scope is an app policy, not a cryptographic boundary."
+    },
+    "receipt": {
+      "pending": "The invitation receipt is pending."
+    },
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "expired": "Expired",
+      "revoked": "Revoked"
+    }
+  },
+  "member": {
+    "role": {
+      "admin": "Administrator",
+      "member": "Member",
+      "guest": "Guest"
+    },
+    "status": {
+      "active": "Active",
+      "invited": "Invited",
+      "disabled": "Disabled",
+      "expired": "Expired"
+    },
+    "sync": {
+      "last_at": "Last synced: {time}",
+      "never": "Never synced"
+    }
+  },
+  "device": {
+    "type": {
+      "door": "Door lock",
+      "light": "Light",
+      "sensor": "Sensor",
+      "ac": "Air conditioner",
+      "switch": "Switch",
+      "camera": "Camera",
+      "curtain": "Curtain",
+      "fan": "Fan",
+      "speaker": "Speaker",
+      "unknown": "Unknown device"
+    },
+    "state": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "unsupported": {
+      "read_only": "This device type is read-only; only status is shown."
+    },
+    "disabled": {
+      "unassigned": "The device is unassigned and disabled."
+    },
+    "count_one": "{count} device",
+    "count_other": "{count} devices"
+  },
+  "scene": {
+    "run": "Run",
+    "running": "Running",
+    "partial_failed": "Some steps failed",
+    "no_rollback": "Completed steps are not rolled back.",
+    "step": {
+      "failed": "A step failed."
+    }
+  },
+  "room": {
+    "unassigned": {
+      "title": "Unassigned devices"
+    },
+    "delete": {
+      "title": "Delete room",
+      "warning": "Devices in this room will become unassigned and disabled."
+    },
+    "assign": {
+      "title": "Assign room"
+    }
+  },
+  "family": {
+    "switch": "Switch family",
+    "create": "Create family",
+    "member": {
+      "remove": "Remove member"
+    },
+    "last_admin": "The last administrator cannot be removed."
+  },
+  "home": {
+    "gateway": {
+      "online": "Gateway online",
+      "offline": "Gateway offline"
+    },
+    "metric": {
+      "rtt_ms": "Round-trip time {value} ms"
+    },
+    "room": {
+      "all": "All rooms"
+    }
+  }
+}

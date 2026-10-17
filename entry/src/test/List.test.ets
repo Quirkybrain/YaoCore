@@ -22,6 +22,7 @@ import { StateReportMapperSuite } from './protocol/StateReportMapper.test';
 import { SecurityHostSuite } from './security/SecurityHost.test';
 import { StorageHostSuite } from './storage/StorageHost.test';
 import { DomainHostSuite } from './domain/DomainHost.test';
+import { I18nHostSuite } from './i18n/I18nHost.test';
 
 export default function testsuite() {
   hostBaselineTest();
@@ -35,4 +36,5 @@ export default function testsuite() {
   SecurityHostSuite();
   StorageHostSuite();
   DomainHostSuite();
+  I18nHostSuite();
 }

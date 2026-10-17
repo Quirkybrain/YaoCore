@@ -1,0 +1,104 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "YaoCore smart home app"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "YaoCore main screen"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "YaoCore"
+    },
+    {
+      "name": "common_confirm",
+      "value": "Confirm"
+    },
+    {
+      "name": "common_cancel",
+      "value": "Cancel"
+    },
+    {
+      "name": "common_retry",
+      "value": "Retry"
+    },
+    {
+      "name": "common_save",
+      "value": "Save"
+    },
+    {
+      "name": "common_delete",
+      "value": "Delete"
+    },
+    {
+      "name": "common_close",
+      "value": "Close"
+    },
+    {
+      "name": "common_back",
+      "value": "Back"
+    },
+    {
+      "name": "common_refresh",
+      "value": "Refresh"
+    },
+    {
+      "name": "common_edit",
+      "value": "Edit"
+    },
+    {
+      "name": "common_view",
+      "value": "View"
+    },
+    {
+      "name": "common_success",
+      "value": "Success"
+    },
+    {
+      "name": "common_failed",
+      "value": "Failed"
+    },
+    {
+      "name": "common_loading",
+      "value": "Loading…"
+    },
+    {
+      "name": "common_unknown",
+      "value": "Unknown"
+    },
+    {
+      "name": "common_yes",
+      "value": "Yes"
+    },
+    {
+      "name": "common_no",
+      "value": "No"
+    },
+    {
+      "name": "common_refresh_failed",
+      "value": "Refresh failed. Please try again."
+    },
+    {
+      "name": "common_save_failed",
+      "value": "Save failed. Please try again."
+    },
+    {
+      "name": "settings_language_title",
+      "value": "Language"
+    },
+    {
+      "name": "settings_language_auto",
+      "value": "Follow system"
+    },
+    {
+      "name": "settings_language_zh_cn",
+      "value": "Simplified Chinese"
+    },
+    {
+      "name": "settings_language_en_us",
+      "value": "English"
+    }
+  ]
+}
