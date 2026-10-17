@@ -51,6 +51,14 @@ export struct ProvisioningPage {
   @Prop localeRevision: number = 0;
   @Prop motionEnabled: boolean = true;
   @State view: BleProvisioningViewState = BleProvisioningViewState.initial();
+  /**
+   * R2-05: effective permission state. The VM view keeps the permission it
+   * last observed; a mid-flow PROVISIONING_PERMISSION_DENIED /
+   * PROVISIONING_BLUETOOTH_OFF failure also implies the terminal permission
+   * state, so the page mirrors that here to expose the settings CTA on
+   * Step 2/4 without changing the frozen C-23 view-model signature.
+   */
+  @State permission: ProvisioningPermissionState = ProvisioningPermissionState.UNKNOWN;
   @State localStep: number = 0;
   @State pop: string = '';
   @State ssid: string = '';
@@ -68,6 +76,7 @@ export struct ProvisioningPage {
     this.provisioningVm = vm;
     this.unsubscribeProvisioning = vm.subscribe((state: BleProvisioningViewState): void => {
       this.view = state;
+      this.permission = state.permission;
       if (state.step === WizardStep.STEP_5_BOUND && state.result !== undefined) {
         this.localStep = 5;
         this.busy = false;
@@ -82,7 +91,20 @@ export struct ProvisioningPage {
       }
       if (state.error !== undefined) {
         this.errorKey = state.error.i18nKey;
-        this.localStep = UiMapping.provisioningErrorStep(state.error.error.code);
+        const errorCode = state.error.error.code;
+        if (errorCode === 'PROVISIONING_PERMISSION_DENIED') {
+          this.permission = ProvisioningPermissionState.DENIED;
+        } else if (errorCode === 'PROVISIONING_BLUETOOTH_OFF') {
+          this.permission = ProvisioningPermissionState.BLUETOOTH_OFF;
+        }
+        const errorStep = UiMapping.provisioningErrorStep(errorCode);
+        const permissionFailure = this.permissionNeedsSettings();
+        // R2-05: a permission/BLE loss discovered mid-flow keeps the user on
+        // the current step and surfaces the settings CTA there; the dedicated
+        // permission step remains the recovery path before the flow starts.
+        if (!(permissionFailure && errorStep === 0 && this.localStep >= 2)) {
+          this.localStep = errorStep;
+        }
         this.busy = false;
       }
     });
@@ -127,6 +149,11 @@ export struct ProvisioningPage {
     return this.params.expectedGatewayId;
   }
 
+  private permissionNeedsSettings(): boolean {
+    return this.permission === ProvisioningPermissionState.DENIED ||
+      this.permission === ProvisioningPermissionState.BLUETOOTH_OFF;
+  }
+
   private requestPermissionAndScan(): void {
     const vm = this.provisioningVm;
     if (vm === undefined || this.busy) {
@@ -135,7 +162,7 @@ export struct ProvisioningPage {
     this.busy = true;
     this.errorKey = '';
     vm.requestPermission().then((): void => {
-      if (this.view.permission !== ProvisioningPermissionState.GRANTED) {
+      if (this.permission !== ProvisioningPermissionState.GRANTED) {
         this.busy = false;
         this.localStep = 0;
         return;
@@ -229,6 +256,9 @@ export struct ProvisioningPage {
     const vm = this.provisioningVm;
     this.clearSecrets();
     this.errorKey = '';
+    // R2-02: cancellation is always available, even while prepareWifi/submit
+    // is in flight; the C-23 generation/cancelled guards drop late results.
+    this.busy = false;
     if (vm !== undefined) {
       vm.cancel().then((): void => {
         // F-20: show the explicit cancelled state instead of popping silently.
@@ -298,18 +328,17 @@ export struct ProvisioningPage {
       Text(this.i18n.t('provisioning.permission.message'))
         .fontSize(AppTypography.body)
         .fontColor(AppColors.inkSoft())
-      if (this.view.permission === ProvisioningPermissionState.DENIED) {
+      if (this.permission === ProvisioningPermissionState.DENIED) {
         Text(this.i18n.t('provisioning.error.permission_denied'))
           .fontSize(AppTypography.label)
           .fontColor(AppColors.red())
       }
-      if (this.view.permission === ProvisioningPermissionState.BLUETOOTH_OFF) {
+      if (this.permission === ProvisioningPermissionState.BLUETOOTH_OFF) {
         Text(this.i18n.t('provisioning.error.bluetooth_off'))
           .fontSize(AppTypography.label)
           .fontColor(AppColors.amber())
       }
-      if (this.view.permission === ProvisioningPermissionState.DENIED ||
-        this.view.permission === ProvisioningPermissionState.BLUETOOTH_OFF) {
+      if (this.permissionNeedsSettings()) {
         // F-08: terminal permission states need a recovery path.
         Button(this.i18n.t('profile.settings'))
           .height(44)
@@ -609,7 +638,9 @@ export struct ProvisioningPage {
                 .fontSize(AppTypography.label)
                 .fontColor(AppColors.red())
                 .backgroundColor(Color.Transparent)
-                .enabled((this.view.canCancel || this.localStep < 5) && !this.busy)
+                // R2-02: DES-B §16.3(1) — cancel must stay reachable while a
+                // scan/handshake/submit is in flight.
+                .enabled(this.view.canCancel || this.localStep < 5)
                 .onClick((): void => {
                   this.cancel();
                 })
@@ -657,13 +688,31 @@ export struct ProvisioningPage {
                 .fontColor(AppColors.amber())
             }
             if (this.errorKey.length > 0) {
-              Text(this.i18n.t(this.errorKey))
-                .fontSize(AppTypography.label)
-                .fontColor(AppColors.red())
-                .width('100%')
-                .padding(AppSpacing.sm)
-                .backgroundColor(AppColors.surface())
-                .borderRadius(AppRadius.button)
+              Column({ space: AppSpacing.xs }) {
+                Text(this.i18n.t(this.errorKey))
+                  .fontSize(AppTypography.label)
+                  .fontColor(AppColors.red())
+                  .width('100%')
+                // R2-05: if permissions/BLE fail after the wizard has advanced
+                // past Step 0, keep the current step and expose the same
+                // "open settings" recovery the permission step offers.
+                if (this.permissionNeedsSettings() && this.localStep !== 0) {
+                  Button(this.i18n.t('profile.settings'))
+                    .height(44)
+                    .fontSize(AppTypography.label)
+                    .fontColor(AppColors.primary())
+                    .backgroundColor(AppColors.field())
+                    .borderRadius(AppRadius.button)
+                    .onClick((): void => {
+                      this.openSettings();
+                    })
+                }
+              }
+              .width('100%')
+              .padding(AppSpacing.sm)
+              .backgroundColor(AppColors.surface())
+              .borderRadius(AppRadius.button)
+              .alignItems(HorizontalAlign.Start)
             }
             if (this.localStep === 0) {
               this.stepPermission()

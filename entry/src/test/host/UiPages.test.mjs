@@ -445,6 +445,75 @@ test('T18_lowRiskUiGuards_sourceLevel', async () => {
   assert.ok(door.includes('this.doorGuideDismissed = true'));
 });
 
+test('T18_R2_settingsReprovisionRequiresAdmin', async () => {
+  const source = await readUiSource('pages/SettingsPage.ets');
+  assert.ok(source.includes('session.role === MemberRole.ADMIN'));
+  const start = source.indexOf('securitySection()');
+  const end = source.indexOf('advancedSection()', start);
+  assert.ok(start >= 0 && end > start);
+  const section = source.slice(start, end);
+  const rotateAt = section.indexOf("settings.security.rotate");
+  const reprovisionAt = section.indexOf("settings.security.reprovision");
+  assert.ok(rotateAt >= 0 && reprovisionAt > rotateAt,
+    'both security actions must be present');
+  const rotateBlock = section.slice(rotateAt, reprovisionAt);
+  const reprovisionBlock = section.slice(reprovisionAt);
+  assert.ok(rotateBlock.includes('.enabled(this.isAdmin())'),
+    'ROTATE_SECRET stays ADMIN-only');
+  assert.ok(reprovisionBlock.includes('.enabled(this.isAdmin())'),
+    'R2-01: RECONFIGURE must be ADMIN-only');
+  const adminGates = section.match(/\.enabled\(this\.isAdmin\(\)\)/g) || [];
+  assert.equal(adminGates.length, 2,
+    'security matrix: both rotate and reprovision are gated for non-ADMIN');
+});
+
+test('T18_R2_provisioningCancelStaysAvailableWhileBusy', async () => {
+  const page = await readUiSource('pages/ProvisioningPage.ets');
+  const cancelAt = page.indexOf("Button(this.i18n.t('provisioning.cancel'))");
+  assert.ok(cancelAt >= 0);
+  const cancelBlock = page.slice(cancelAt, page.indexOf('.onClick', cancelAt));
+  assert.ok(cancelBlock.includes('.enabled(this.view.canCancel || this.localStep < 5)'));
+  assert.ok(!cancelBlock.includes('!this.busy'),
+    'R2-02: busy must not disable the cancel entry');
+  const cancelMethod = page.slice(page.indexOf('private cancel(): void'),
+    page.indexOf('private openSettings(): void'));
+  assert.ok(cancelMethod.includes('this.clearSecrets();'));
+  assert.ok(cancelMethod.includes('this.busy = false;'));
+  assert.ok(cancelMethod.includes('vm.cancel()'));
+});
+
+test('T18_R2_doorExplicitLinkButtonReopensGuide', async () => {
+  const door = await readUiSource('pages/DeviceControlPage.ets');
+  const start = door.indexOf('onConfigureLink:');
+  const end = door.indexOf('onDismissAlert:', start);
+  assert.ok(start >= 0 && end > start);
+  const block = door.slice(start, end);
+  assert.ok(block.includes('this.doorGuideDismissed = false;'),
+    'R2-04: explicit link button must clear the one-shot dismissal');
+  assert.ok(block.includes('this.doorGuideVisible = true;'));
+  assert.ok(!block.includes('if (!this.doorGuideDismissed)'),
+    'explicit entry must not be silently ignored');
+  const cards = await readUiSource('components/DeviceCards.ets');
+  assert.ok(cards.includes("if (this.door.link.mode === 'NONE')"),
+    'the entry is only rendered when no sensor is linked');
+});
+
+test('T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings', async () => {
+  const page = await readUiSource('pages/ProvisioningPage.ets');
+  assert.ok(page.includes("errorCode === 'PROVISIONING_PERMISSION_DENIED'"));
+  assert.ok(page.includes("errorCode === 'PROVISIONING_BLUETOOTH_OFF'"));
+  assert.ok(page.includes('this.permission = ProvisioningPermissionState.DENIED'));
+  assert.ok(page.includes('this.permission = ProvisioningPermissionState.BLUETOOTH_OFF'));
+  assert.ok(page.includes('!(permissionFailure && errorStep === 0 && this.localStep >= 2)'),
+    'mid-flow permission failure keeps the current step');
+  const banner = page.slice(page.indexOf('if (this.errorKey.length > 0)'),
+    page.indexOf('if (this.localStep === 0)'));
+  assert.ok(banner.includes('this.permissionNeedsSettings() && this.localStep !== 0'),
+    'R2-05: Step 2/4 error banner exposes the settings CTA');
+  assert.ok(banner.includes("this.i18n.t('profile.settings')"));
+  assert.ok(banner.includes('this.openSettings()'));
+});
+
 test('T18_pagesAndComponentsRespectLayeringGuards', async () => {
   return import('node:fs').then(({ readFileSync, readdirSync }) => {
     const root = new URL('../../main/ets/', import.meta.url);

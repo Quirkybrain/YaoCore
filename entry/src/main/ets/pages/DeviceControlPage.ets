@@ -386,9 +386,10 @@ export struct DeviceControlPage {
             }
           },
           onConfigureLink: (): void => {
-            if (!this.doorGuideDismissed) {
-              this.doorGuideVisible = true;
-            }
+            // R2-04: the one-shot rule only suppresses the automatic prompt.
+            // The explicit "link sensor" button must always reopen the guide.
+            this.doorGuideDismissed = false;
+            this.doorGuideVisible = true;
           },
           onDismissAlert: (): void => {
             const vm = this.doorVm;

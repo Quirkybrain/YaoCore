@@ -450,6 +450,10 @@ export struct SettingsPage {
                 .fontColor(AppColors.inkSoft())
                 .backgroundColor(AppColors.field())
                 .borderRadius(AppRadius.button)
+                // R2-01: gateway reconfiguration is an ADMIN capability, just
+                // like ROTATE_SECRET; non-admins get a disabled control and
+                // the service layer remains the authoritative check.
+                .enabled(this.isAdmin())
                 .onClick((): void => {
                   this.navigation.push(AppRoute.PROVISIONING, new AppRouteParams({
                     mode: 'RECONFIGURE', expectedGatewayId: view.gatewayId

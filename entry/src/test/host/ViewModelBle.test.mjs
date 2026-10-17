@@ -84,6 +84,25 @@ class HangingBle extends FakeBle {
   }
 }
 
+class HangingWifiBle extends FakeBle {
+  async scanWifiAccessPoints(request, listener) {
+    this.wifiRequest = request;
+    this.wifiListener = listener;
+    return new Promise((resolve, reject) => {
+      this.pendingWifiReject = reject;
+    });
+  }
+
+  async cancel() {
+    this.cancelCalls++;
+    if (this.pendingWifiReject !== undefined) {
+      const reject = this.pendingWifiReject;
+      this.pendingWifiReject = undefined;
+      reject(AppErrors.of('PROVISIONING_CANCELLED', []));
+    }
+  }
+}
+
 class FakePermissions {
   constructor(options = {}) {
     this.failure = options.failure;
@@ -168,7 +187,8 @@ class FakeFamilyGateways {
 function setup(options = {}) {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);
-  const ble = options.hanging ? new HangingBle(options) : new FakeBle(options);
+  const ble = options.hangingWifi ? new HangingWifiBle(options) :
+    options.hanging ? new HangingBle(options) : new FakeBle(options);
   const drafts = new FakeDrafts();
   const crypto = new FakeCrypto();
   const permissions = new FakePermissions(options.permission);
@@ -288,6 +308,24 @@ test('T16_Ble_cancelCallsBleCancelsAndDestroysSessionDraft', async () => {
   assert.equal(h.drafts.destroyed.indexOf(draftId) >= 0, true);
   assert.equal(state.provisioning, 'CANCELLED');
   assert.equal(state.result, undefined);
+});
+
+test('T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer', async () => {
+  const h = setup({ hangingWifi: true });
+  await readyDevice(h);
+  const preparing = h.vm.prepareWifi('12345678');
+  await waitMicrotasks();
+  assert.equal(h.vm.getState().step, 2);
+  assert.equal(h.vm.getState().provisioning, 'CONNECTING');
+  assert.equal(h.vm.getState().canCancel, true,
+    'R2-02: the wizard stays cancellable while the AP scan is in flight');
+  await h.vm.cancel();
+  await preparing;
+  const state = h.vm.getState();
+  assert.equal(h.ble.cancelCalls >= 1, true);
+  assert.equal(state.provisioning, 'CANCELLED');
+  assert.equal(state.canCancel, false);
+  assert.equal(h.timer.pending(), 0);
 });
 
 test('T16_Ble_backFromScanStopsScanAndDropsTheTenSecondTimer', async () => {

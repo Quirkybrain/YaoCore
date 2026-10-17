@@ -19,7 +19,7 @@ import {
   NavigationService
 } from '../app/NavigationService';
 import type { PageVmFactoryPort } from '../app/PageVmFactory';
-import { AppColors, AppMotionTokens, AppRadius, AppSpacing, AppTypography } from '../common/theme/AppTheme';
+import { AppColors, AppRadius, AppSpacing, AppTypography } from '../common/theme/AppTheme';
 import { ShellTheme } from '../common/theme/ShellTheme';
 import { AboutPage } from './AboutPage';
 import { DeviceControlPage } from './DeviceControlPage';
