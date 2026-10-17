@@ -3,8 +3,8 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。
 - **Date**: 2026-10-17
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
@@ -83,6 +83,17 @@
 | `RISK-UNASSIGNED-DEFAULT` | 新发现未分配设备是否禁用 | `RISK` | v1 统一“未分配 = 保护性禁用”，指派后启用（§5.3.3）；与 UIUX“安全禁用池”一致 |
 | `RISK-CLOUD-SEQ-SHARED` | 云与 LAN 共用 per-gateway `seq` | `RISK` | 复用 `GatewaySequencePort`，保证单调；若固件期望独立序列，走 Change Impact |
 | `UNRESOLVED-BLE-PERMISSIONS` | BLE 运行时权限集合/API 级别 | `UNRESOLVED`（T-17 验证） | `PermissionGate` 配置化；当前预期 `INTERNET` + `ACCESS_BLUETOOTH`；不猜测位置权限 |
+
+### 0.4 T-13 裁定同步（2026-10-17）
+
+> **裁定人**：solution-architect（任务 `wp-051-t13-contracts`）。**输入**：`artifacts/70-review/t13-review.md`（F-02/F-04/F-07/F-08）与 `artifacts/50-implementation/t13-family-auth.md`。**边界**：不重写 DES-A/DES-B 冻结签名，不改变 G-004 语义；F-01/F-03/F-05 的代码修复及其它 findings 不在本裁定内。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **F-02 家庭行导入** | 新增 `FamilyRepository.importFamily(familyId, familyName)`（`EXT-DES-B-25`）：固定邀请 `familyId`、不生成 UUID、幂等；C-13 在 AEAD/bundle 校验后调用；不创建成员/档案/ADMIN；`owner_member_id` 使用本地占位符（见 §3.1.2）。 | §3.1.2、§3.1.3、§3.1.4、§3.3.4、§3.4、§23.3 |
+| **F-04 账本并发** | Asset `put` 是 upsert；单进程 `DomainOperationGate` + `(inviteId, receiptHash)` 键设计保证唯一；多进程无 CAS，需 RDB 唯一约束/互斥（后续）；不得以别名唯一性论证多进程安全。 | §23.6 |
+| **F-08 GUEST 场景** | v1 `canExecuteScene` 对 GUEST fail-closed；GUEST 仅 `canControl` 授权房间内设备；UI 能力与 RBAC 矩阵同步修订。 | §11.1.1、§11.3.1；DES-A §12.1 |
+| **F-07 回执端口** | `InviteServicePort.verifyReceipt` 只接受 canonical `YCP1`；裸 hex/非规范信封拒绝；账本哈希对 canonical 字节计算。 | §23.6；DES-A §13.2.1 |
 
 ---
 
@@ -779,6 +790,17 @@ export class FamilyRepository implements MemberRoomGrantPort {
 
   /** 读取成员的全部本地授权房间。 */
   listMemberRoomGrants(familyId: string, memberId: string): Promise<ReadonlyArray<string>>;
+
+  /**
+   * T-13 裁定同步（2026-10-17）/ EXT-DES-B-25：
+   * 以已认证邀请中的固定 familyId/familyName 创建或确保本地 family 行。
+   * 幂等；不生成新 UUID、不创建 FamilyMember/LocalProfile/ADMIN；
+   * owner_member_id 写 IMPORTED_FAMILY_OWNER_PLACEHOLDER（见下）。
+   */
+  importFamily(familyId: string, familyName: string): Promise<Family>;
+
+  /** 导入家庭的本地 owner 占位符；不是成员 ID，不参与 RBAC。 */
+  static readonly IMPORTED_FAMILY_OWNER_PLACEHOLDER: string = '00000000-0000-0000-0000-000000000000';
 }
 ```
 
@@ -787,6 +809,16 @@ export class FamilyRepository implements MemberRoomGrantPort {
 - `removeFamilyLocal` 删除 `invitation`/`family_member`/`family` 行；不删除 `auth_profile`（C-12 负责，见 §3.3.6 退出/解散流程）。
 - `transferAdmin` 同时更新 `family.owner_member_id` 与两个成员的 `role`；失败整体回滚。
 - `switchActiveFamily` 只写 `StorageConstants.PREF_ACTIVE_FAMILY_ID`；不触碰 `auth_profile`。
+
+**`importFamily` 语义（T-13 裁定同步，2026-10-17；F-02 / `EXT-DES-B-25`）**：
+- **调用点/前置条件**：仅 C-13 `acceptInvitation` 在 YCI1 解封、`bundle.familyId === header.familyId` 校验通过后调用；未认证/解封失败不得建行。C-13 不得在认证后仍以“本地无 `family` 行”返回 `CONFIGURATION_ERROR`；该前置检查由 `importFamily` 取代。C-13 的冻结构造器不变（已注入 `FamilyRepository`），不新增对 `FamilyService` 的反向依赖。
+- **固定 ID**：使用 `header.familyId`，绝不调用 `UuidUtil.newUuid` 生成家庭 ID；`familyName` 仅作为首次导入的快照。
+- **幂等**：同 `familyId` 已存在 → 原样返回现有行，不覆盖本地 `familyName`/`owner_member_id`/时间戳；不重复建行。
+- **同名不同 id**：`familyName` 不唯一，允许并存；`familyId` 是唯一身份，禁止按名称合并/覆盖；UI 需显示足够上下文（本地档案/家庭列表）。
+- **owner 占位**：`owner_member_id = FamilyRepository.IMPORTED_FAMILY_OWNER_PLACEHOLDER = '00000000-0000-0000-0000-000000000000'`（合法标识符、保证不是本地成员）。理由：`family.owner_member_id` 为 NOT NULL，且现有仓储守卫要求 owner 目标为 ACTIVE ADMIN；接受邀请的成员角色只可能是 `MEMBER/GUEST`（DES-A §13.1），把 owner 绑定到接受者会触发 `upsertMember` 守卫并伪造所有权。占位符表示“远端 owner 尚未在本地解析”，不是 RBAC 授权，也不参与 `canControl`。
+- **本地档案边界**：`importFamily` **不创建** `LocalProfile`，不写 `activeFamilyId`，不创建成员/路由/凭据（`gateway_ids_json='[]'`）；成员由 C-13 `upsertMember(ACTIVE)` 写入，档案由 C-22 在 `AcceptedInvitation` 后调用 `AuthService.createProfile({familyId, memberId, role})` 创建（§11.1.1）。本地 profile 的 `role` 始终是 `header.targetRole`，绝不隐式 ADMIN。
+- **后续同步**：权威 owner/ADMIN 成员通过接触式收敛导入后，本契约不定义自动改写 owner 指针；`transferAdmin` 在 owner 占位未解析前保持 `AUTH_RBAC_DENIED`。该限制登记为 `RISK-IMPORTED-FAMILY-OWNER`，多设备权威收敛走后续 Change Impact。
+- **失败/半状态**：家庭行插入为单事务；若后续 gateway apply/member upsert 失败，允许保留空家庭行（无成员/档案），重试 `importFamily` 幂等；C-22 在成员行存在前不得创建档案。错误按 `DES-B-C08-ERR`（非法 id/name 为 `PROTOCOL_*`，存储失败透传 `STORAGE_*`）。
 
 #### 3.1.3 `FamilyService`（用例编排）
 
@@ -836,7 +868,7 @@ export class FamilyService {
 ```
 
 **方法语义**：
-- `createFamily`：生成 `familyId`（`UuidUtil.newUuid(ids)`），在本机事务内创建 `Family` + `ADMIN` 成员；`ownerDisplayName` 只用于本地成员 `displayName`；不创建 `LocalProfile`（C-22 在返回后调用 `AuthService.createProfile`，密码由 UI 收集）。
+- `createFamily`：生成 `familyId`（`UuidUtil.newUuid(ids)`），在本机事务内创建 `Family` + `ADMIN` 成员；`ownerDisplayName` 只用于本地成员 `displayName`；不创建 `LocalProfile`（C-22 在返回后调用 `AuthService.createProfile`，密码由 UI 收集）。**仅用于新建家庭**；接受邀请必须走 `importFamily`，不得用 `createFamily` 生成新 UUID 或伪造 ADMIN（F-02）。
 - `switchFamily`：调用 `families.switchActiveFamily`；使当前会话失效（`auth.lockAll()`），返回 `requiresUnlock=true`，并要求 `activeProfileId` 指向该家庭的本地档案；**不**在服务内自动解锁。
 - `changeMemberRole`：更新角色后调用 `auth.invalidateSessionsForMember(memberId)`；降级/升级 Admin 需满足“至少一个 ADMIN”；返回轮换引导（角色变更不强制轮换，但高风险时提示）。
 - `transferAdmin`：调用 `families.transferAdmin`；随后 `auth.invalidateSessionsForMember` 对原/新 Admin 都执行；不发送网络请求；不改变网关密钥。
@@ -878,12 +910,13 @@ export class FamilyJoinSession {
 **语义**：
 - `start` 调用 `invites.createJoinRequest(displayName)`；`memberId`/`YCR1` 文本存入 state；私钥由 C-13 存 Asset Store（`yaocore.invite.join.<memberId>`）。
 - `submitInvitation`：
-  1. 解析前缀：`YCI1` → 调用 `invites.acceptInvitation(text, { code, nowMs })`；
+  1. 解析前缀：`YCI1` → 调用 `invites.acceptInvitation(text, { code, nowMs })`；C-13 在解封/校验 `bundle.familyId` 后调用 `families.importFamily(header.familyId, header.familyName)`（`EXT-DES-B-25`），再写成员/路由/凭据；**全新成员设备无需预置家庭行**（F-02）。
   2. 若容器 `kdf.mode=CODE_KEK` 且未提供 `code` → 状态 `CODE_REQUIRED`，不尝试解封；
   3. 成功后 `families.getMember` 不存在则 `upsertMember`（C-13 正常已写入；此处幂等）；
   4. 更新 state `COMPLETED`；不创建 `LocalProfile`（C-22 负责密码与档案）。
 - `cancel`：调用 `invites.discardJoinRequest(memberId)`（§23 扩展请求）或直接删除 join 私钥别名；清空 state 中的 `joinRequestText`；状态 `CANCELLED`。
 - 同一 `inviteId` 在本地只接受一次：再次 `submitInvitation` 同一容器 → `INVITE_INVALID`/`INVITE_MAX_USES` 由 C-13 决定；session 记录已接受 ID 防止重复。
+- C-13 内的 `importFamily` 与 `upsertMember` 是两次独立事务；允许失败后保留空家庭行（幂等重试），但不得在成员行缺失时创建 `LocalProfile`。
 
 #### 3.1.5 `MemberRoomGrantPort`（由 C-08 实现，供 C-09 事务调用）
 
@@ -1004,8 +1037,9 @@ sequenceDiagram
     A-->>M: 发送 YCI1（聊天/扫码）
     M->>I: acceptInvitation(YCI1, code?)
     I->>I: 解封 Bundle / 校验 familyId/expireAt/role/rooms
+    I->>R: importFamily(header.familyId, header.familyName)（EXT-DES-B-25）
     I->>R: upsertMember(ACTIVE) + 写路由/凭据
-    I-->>M: AcceptedInvitation + receipt
+    I-->>M: AcceptedInvitation + receipt（canonical YCP1）
     M-->>A: 回执（下次接触/扫码）
     A->>I: verifyReceipt(receipt)
     I-->>A: ReceiptVerification(valid)
@@ -1014,9 +1048,10 @@ sequenceDiagram
 
 - D-009：成员**先出示** `YCR1`；Admin 默认扫码/粘贴加入请求后生成 `YCI1`。`CODE_KEK` 仅在无法回传加入请求时由 Admin 显式选择，UI 必须显示弱模式警告。
 - `submitInvitation` 在成员设备完成解封；不依赖服务器/网关家庭端点。
-- 成员设备接受后生成回执；Admin 在下次接触（扫码/同 LAN 用户触发）导入回执；未到达则保持 `PENDING` 至过期。
+- **全新成员设备（F-02）**：C-13 在认证后自动建/确保 `family` 行；不要求 Admin 预置家庭。`familyId` 来自邀请头，禁止新 UUID；`familyName` 仅作首次导入快照；同名不同 id 不合并；owner 占位见 §3.1.2。
+- 成员设备接受后生成 canonical `YCP1` 回执；Admin 在下次接触（扫码/同 LAN 用户触发）导入回执；未到达则保持 `PENDING` 至过期。
 - 加入成功后成员设备拥有 `commandSecret`/pins；无需 BLE 配网（ADR-003 §7）。
-- 任何解封失败统一 `INVITE_INVALID`，不区分“版本/码/篡改”（防 oracle）。
+- 任何解封失败统一 `INVITE_INVALID`，不区分“版本/码/篡改”（防 oracle）。回执非规范编码/裸 hex 统一 `INVITE_RECEIPT_INVALID`（DES-A §13.2.1）。
 
 #### 3.3.5 GUEST 到期与撤销（D-013）
 
@@ -1046,6 +1081,8 @@ sequenceDiagram
   - 邀请状态 PENDING→ACCEPTED/EXPIRED/REVOKED；ACCEPTED→ACCEPTED（未达 `maxUses` 且未过期，D-022）/EXPIRED/REVOKED；`usedCount` 上限；KEY_WRAP `maxUses!=1` 拒绝；
   - 回执校验成功/篡改；同回执即时重复拒绝（C-08 当前防御）；历史回执重放由 C-13 `(inviteId, receiptHash)` 账本拒绝且不递增 `usedCount`（§23.6；R3-01）；D-022 不同回执按 `usedCount < maxUses` 继续成功；
   - 加入 session：`start → submitInvitation(KEY_WRAP) → COMPLETED`；CODE_KEK 缺码 → `CODE_REQUIRED`；取消清理 join 私钥别名；
+  - **新成员设备（F-02）**：空 `family` 表 → `acceptInvitation` 经 `importFamily` 建固定 `familyId` 行 → `COMPLETED`；重复接受幂等；同名不同 id 并存；`LocalProfile` 在 C-22 前不存在；owner 占位不产生 ADMIN/RBAC 提升；
+  - **账本并发（F-04/T13-R-02）**：host 只验证单进程 `DomainOperationGate` 串行化；跨进程/多 VM 无 CAS 不在 host 证据面，标 `NOT_RUN`/未来 RDB 唯一约束；
   - removeMember 调用 `auth.invalidateSessionsForMember`（fake 记录）；
   - D-010：`markContactSync` 只写字段，不产生“在线”语义；
   - 退出/转让/解散不产生任何网络请求（fake `IGatewayClient` 记录 0 调用）。
@@ -1057,7 +1094,7 @@ sequenceDiagram
 | 需求/约束 | 映射 |
 |---|---|
 | FR-FAM-001 家庭创建/多家庭 | `FamilyService.createFamily/switchFamily`；`FamilyViewModel` |
-| FR-FAM-002 成员邀请 | `FamilyService.createInvitationForJoinRequest/createCodeInvitation/importReceipt`；`FamilyJoinSession` |
+| FR-FAM-002 成员邀请 | `FamilyService.createInvitationForJoinRequest/createCodeInvitation/importReceipt`；`FamilyJoinSession`；`FamilyRepository.importFamily`（`EXT-DES-B-25`） |
 | FR-FAM-003 权限/移除 | `removeMember/changeMemberRole`；`AuthService.invalidateSessionsForMember` |
 | FR-FAM-004 退出家庭 | `leaveFamily/transferAdmin/dissolveFamily`；§3.3.6 v1 限制声明 |
 | FR-SET-001 成员管理面板 | `listMemberViews/listInvitationViews`；C-26 |
@@ -3584,7 +3621,7 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
 
 **语义**：
 - `initialize`：加载 activeFamily、members、invitations、capabilities；`section=MEMBERS`。
-- `capabilities`：从 `AuthService.getActiveSession()` + `SessionInfo.role` 派生；`canManageFamily/canManageRooms/canInvite` 用 C-12 的 `canManageFamily/canManageRooms/canInvite`；`canControlAll` = ADMIN/MEMBER；GUEST `allowedRoomIds`。UI 用 capabilities 隐藏/禁用入口；服务层仍再次校验（不依赖 UI 隐藏）。
+- `capabilities`：从 `AuthService.getActiveSession()` + `SessionInfo.role` 派生；`canManageFamily/canManageRooms/canInvite` 用 C-12 的 `canManageFamily/canManageRooms/canInvite`；`canControlAll` = ADMIN/MEMBER；`canExecuteScene` = ADMIN/MEMBER（**GUEST 恒 false**，F-08 fail-closed）；GUEST `allowedRoomIds`。UI 用 capabilities 隐藏/禁用入口；服务层仍再次校验（不依赖 UI 隐藏）。
 - `createFamily`：`FamilyService.createFamily` → `AuthService.createProfile({familyId,memberId:owner,...})` → `setActiveFamily` → `appContext.refreshSessionGate()`；密码只在调用期间存在；成功后清空输入。
 - `switchFamily`：`FamilyService.switchFamily`；`requiresUnlock` → `appContext.lock()` + `refreshSessionGate()`，由 Index `SessionGateView` 解锁；不自动 unlock。
 - `leaveFamily`：C-08 返回 plan；UI 弹确认，展示轮换提示；成功后清空 state。
@@ -3712,9 +3749,11 @@ export class SceneViewModel implements ViewModelBase<SceneViewState> {
 
 - ADMIN：全部入口；成员管理/邀请/房间/网关/密钥/场景。
 - MEMBER：控制/场景；**不可**成员管理/邀请/房间/网关/密钥；UI 隐藏入口，服务层再次拒绝。
-- GUEST：仅 `allowedRoomIds` 内设备；只读/受限；不得管理；到期 `EXPIRED` 冻结。
+- GUEST：仅 `allowedRoomIds` 内设备控制；**不得执行场景**（`canExecuteScene` fail-closed，F-08）；只读/受限；不得管理；到期 `EXPIRED` 冻结。
 - UI 可见性 = `FamilyCapabilities`；不得仅靠隐藏（C-12 仍校验）。
 - 成员“在线状态”不显示；只显示 `lastSyncedAt`/`syncState`（D-010）。
+
+> **T-13 裁定同步（2026-10-17；F-08）**：`canExecuteScene(session)` 的冻结签名没有场景/动作/房间上下文；v1 对 GUEST 一律返回 `AUTH_RBAC_DENIED`。UI 必须隐藏/禁用 GUEST 的场景执行入口，服务层仍拒绝。若未来支持 GUEST 执行授权房间内场景，必须新增带解析后动作上下文的 API 并走 Change Impact；不得把本裁定解释为矩阵已完整实现。
 
 #### 11.3.2 邀请/加入流程
 
@@ -3758,7 +3797,7 @@ stateDiagram-v2
 
 - 依赖：`FamilyService`/`RoomService`/`SceneService`/`DeviceRepository`/`AuthService`/`InviteService`/`I18nService`/`ClockPort`/`LoggerPort`；不 import 平台 API。
 - host 测试：
-  - 角色矩阵：ADMIN/MEMBER/GUEST 可见性/操作拒绝；最后一个 ADMIN；
+  - 角色矩阵：ADMIN/MEMBER/GUEST 可见性/操作拒绝；GUEST 场景入口不可见且服务层 `canExecuteScene` 拒绝；最后一个 ADMIN；
   - 家庭切换 `requiresUnlock`；创建家庭 + profile；退出/转让/解散 plan；
   - 邀请状态/回执导入/弱模式文案键存在；`CODE_REQUIRED` 流程；
   - 房间删除预览/确认数不一致/成功刷新；未分配池；
@@ -5303,14 +5342,15 @@ sequenceDiagram
     A-->>M: 发送 YCI1
     M->>I: acceptInvitation(YCI1, code?)
     I->>I: 解封 Bundle / 校验头
+    I->>R: importFamily(header.familyId, header.familyName)（EXT-DES-B-25）
     I->>G: applyInvitedGateway(secret/pins)
     I->>R: upsertMember(ACTIVE)
-    I-->>M: AcceptedInvitation + receipt
+    I-->>M: AcceptedInvitation + receipt（canonical YCP1）
     M-->>A: 回执（下次接触）
     A->>I: verifyReceipt(receipt)
     I-->>A: valid
     A->>R: ACCEPTED + usedCount++
-    Note over M,A: CODE_KEK 仅弱路径；UI 强制弱模式警告；<br/>回执未达保持 PENDING；撤销=轮换
+    Note over M,A: CODE_KEK 仅弱路径；UI 强制弱模式警告；<br/>回执未达保持 PENDING；撤销=轮换；<br/>回执必须 canonical YCP1（非规范/裸 hex 拒绝）
 ```
 
 ### 19.4 场景串行执行（预检 → 逐步 → 局部失败不回滚）
@@ -5394,7 +5434,7 @@ sequenceDiagram
 | FR/NFR | 主责组件 | 接口/契约 | Host/CT 测试（建议命名） | Device/IT | 状态/备注 |
 |---|---|---|---|---|---|
 | FR-FAM-001 家庭创建/多家庭 | C-08, C-12, C-22, C-26 | `FamilyService.createFamily/switchFamily`；`AuthService.createProfile` | `C08_FamilyService_createFamily_adminInvariant`、`C22_FamilyViewModel_switchFamily_requiresUnlock` | RDB 持久化/重启 | 完整；每家庭一个本地档案（`RISK-MULTIFAMILY-PROFILE`） |
-| FR-FAM-002 成员邀请 | C-13, C-08, C-12, C-04, C-05, C-22, C-26 | `FamilyJoinSession`、`createInvitationForJoinRequest/createCodeInvitation/importReceipt` | `C08_JoinSession_keyWrap_completes`、`C08_Invite_codeKek_requiresCode`、`C13_Invite_*`（DES-A） | Mock/仿真器；回执导入 | 完整（D-009 主路径；CODE_KEK 弱路径） |
+| FR-FAM-002 成员邀请 | C-13, C-08, C-12, C-04, C-05, C-22, C-26 | `FamilyJoinSession`、`createInvitationForJoinRequest/createCodeInvitation/importReceipt`、`FamilyRepository.importFamily`（`EXT-DES-B-25`） | `C08_JoinSession_keyWrap_completes`、`C08_Invite_codeKek_requiresCode`、`C13_accept_newDevice_importsFamily`、`C13_receipt_nonCanonical_rejected`、`C13_Invite_*`（DES-A） | Mock/仿真器；回执导入 | 完整（D-009 主路径；CODE_KEK 弱路径；新设备导入 F-02 已裁定） |
 | FR-FAM-003 权限/移除 | C-08, C-12, C-22, C-26 | `removeMember/changeMemberRole`；`AuthService.invalidateSessionsForMember` | `C08_removeMember_lastAdmin_rejected`、`C08_removeMember_rotationPlan`、`C12_Rbac_*` | 角色变更会话失效 | 完整；撤销=轮换引导 |
 | FR-FAM-004 退出家庭 | C-08, C-12, C-22, C-26 | `leaveFamily/transferAdmin/dissolveFamily` | `C08_leaveFamily_localOnly_noNetwork`、`C08_transferAdmin_lastAdminGuard` | 无（本地） | **v1 声明性限制**：本地语义+引导，不承诺跨设备强一致（§3.3.6） |
 | FR-ROOM-001 房间创建/ID | C-09, C-22, C-26 | `RoomService.createRoom` | `C09_RoomService_create_uuid`、`C22_RoomViewModel_create` | RDB 持久化 | 完整 |
@@ -5531,7 +5571,8 @@ CQG-Txx
 | `RISK-I18N-DUAL-STORE` | 双存储文案漂移 | `RISK` | 中英混排 | 一个 key 一处；CHK-01/02/09；运行时同时切换 | T-10/T-19 |
 | `RISK-PB02-INVENTORY-PARSER` | 候选 parser 与固件不一致 | `RISK` | 外部模块误判 | fail-closed；`UNSUPPORTED`；不声明 PASS | 固件 schema |
 | `RISK-FR-FAM-004-CONSISTENCY` | 退出/解散跨设备一致性 | `RISK`（v1 声明） | 旧成员仍可控制 | 轮换引导；UI 声明；不承诺实时 | 产品/安全评审 |
-| `RISK-INVITE-RECEIPT-REPLAY` | C-08 单收据列无法识别历史回执重放（R3-01） | `RISK`（Medium） | 多用途 CODE_KEK 的 `usedCount` 可被陈旧回执消耗，后续合法成员被 `INVITE_MAX_USES` 拒绝 | C-13 `(inviteId, receiptHash)` 持久账本正式修复（§23.6）；C-08 即时防御保留；T-13 前不声称“已完全拒绝” | T-13 账本 + `maxUses=3` 用例通过 |
+| `RISK-INVITE-RECEIPT-REPLAY` | 回执账本语义重放/跨进程并发（R3-01/F-01/F-04） | `RISK`（Medium） | 多用途 CODE_KEK 的 `usedCount` 可被陈旧/变体回执消耗，后续合法成员被 `INVITE_MAX_USES` 拒绝；多进程无 CAS | C-13 canonical `YCP1` + `(inviteId, receiptHash)` 持久账本（§23.6）；非规范回执在解码阶段拒绝；单进程 gate 语义，多进程需 RDB 唯一约束；不得以别名唯一性论证 | T-13 修复（F-01/F-04/F-07）+ 复审 |
+| `RISK-IMPORTED-FAMILY-OWNER` | 导入家庭 owner 占位/权威成员收敛 | `RISK`（Low） | 本机加入设备的 owner 指针与 `transferAdmin` | `importFamily` 使用占位 owner；RBAC 仍按 `targetRole`；`transferAdmin` 在权威同步前不可用；不新增在线协议 | 接触式同步/后续 Change Impact |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
 
@@ -5642,7 +5683,8 @@ export interface DeviceStatePort {
 | `EXT-DES-B-19` | `GatewayRepository` | 无变更 | C-23 只调用既有 `commitBinding/removeLocalBinding` |
 | `EXT-DES-B-20` | `AuthService` | `removeProfilesForFamily(familyId)`、`removeProfilesForMember(familyId, memberId)` | 退出/解散时清理本地档案；新方法，不改变既有会话/RBAC 语义 |
 | `EXT-DES-B-21` | `AuthService` | 多家庭实现 | 每家庭一个 `LocalProfile`（§3.3.1）；不新增 `rebindProfile` |
-| `EXT-DES-B-24` | `InviteServicePort`（C-13） | `verifyReceipt`（签名不变） | 增加持久账本去重语义：唯一 `(inviteId, receiptHash)`；历史回执重放拒绝且不递增 `usedCount`；见 §23.6（R3-01） |
+| `EXT-DES-B-24` | `InviteServicePort`（C-13） | `verifyReceipt`（签名不变） | 增加持久账本去重语义：唯一 `(inviteId, receiptHash)`；历史回执重放拒绝且不递增 `usedCount`；回执输入为 canonical `YCP1`（§23.6；R3-01/F-07） |
+| `EXT-DES-B-25` | `FamilyRepository` | `importFamily(familyId, familyName): Promise<Family>` | F-02/T-13 裁定：按邀请固定 `familyId` 创建/确保本地 `family` 行；幂等；owner 占位；不创建成员/档案；见 §3.1.2 |
 
 > `AuthService` 不新增 `rebindProfile`：v1 每家庭一个档案，避免修改冻结的 `LocalProfile.familyId` 语义。加入家庭后由 C-22 调用既有 `createProfile`。该选择登记为 `RISK-MULTIFAMILY-PROFILE`。
 
@@ -5711,21 +5753,36 @@ export interface DeviceStatePort {
 
 ### 23.6 C-13 回执去重账本（`G-007 扩展 / T-09 复审同步`，2026-10-17；R3-01）
 
-> **性质**：上游契约语义要求，**不新增/修改 DES-A §13.1 已冻结方法签名**，不改变 G-004 语义；也**不要求 C-08/T-09 在当前任务重写**。C-08 现有 `isDuplicateReceipt` 保留为即时防御，正式修复落在 C-13/T-13。
+> **性质**：上游契约语义要求，**不新增/修改 DES-A §13.1 已冻结方法签名**，不改变 G-004 语义；C-08 现有 `isDuplicateReceipt` 保留为即时防御，正式修复落在 C-13/T-13。**T-13 裁定同步（2026-10-17；F-04/F-07）** 见下方“回执规范信封”与“并发与介质边界”。
 
-- **适用方法**：`InviteServicePort.verifyReceipt(receiptText, inviteId)`（T-09 消费端口，`entry/src/main/ets/service/family/FamilyModels.ets`；与 DES-A §13.1 `InviteService.verifyReceipt` 同语义）。
-- **持久账本**：按邀请维护已接受回执的持久化账本，逻辑唯一键 **`(inviteId, receiptHash)`**；`receiptHash` 为域分离的 SHA-256（禁止明文回执入库）。存储介质/schema 由 T-13 依 ADR-003 §5.4/§9 与 DES-A §13 实现；若落 RDB，唯一约束必须在库层生效。
+- **适用方法**：`InviteServicePort.verifyReceipt(receiptText, inviteId)`（T-09 消费端口，`entry/src/main/ets/service/family/FamilyModels.ets`；与 DES-A §13.1 `InviteService.verifyReceipt` 同语义）。端口 JSDoc 必须复述 DES-A §13.2.1：`receiptText` 为 canonical `YCP1`；`inviteId` 必须等于载荷值；裸 hex/非规范信封拒绝；失败不写账本。建议注释：
+  ```ts
+  /**
+   * DES-A §13.2.1：receiptText 必须是 canonical `YCP1.<b64url(canonical JSON)>`；
+   * inviteId 必须等于载荷值；非规范信封/裸 hex 按 INVITE_RECEIPT_INVALID 拒绝；
+   * 校验成功后按 (inviteId, receiptHash) 单进程账本去重。
+   */
+  verifyReceipt(receiptText: string, inviteId: string): Promise<ReceiptVerification>;
+  ```
+- **回执规范信封（F-07）**：`receiptText = "YCP1." + b64url(canonical JSON)`，字段集固定 `{acceptedAt,inviteId,mac,memberId,v}`（键名字典序、无空白、精确集合、`v=1`）；HMAC 公式不变；`decodeReceipt` 必须执行 `encodeReceipt(payload) === text` 规范化校验。非规范输入（键序/空白/额外字段/重复键/非 canonical b64url/裸 hex/未知 `v`）→ `INVITE_RECEIPT_INVALID`，在账本判定前拒绝。见 DES-A §13.2/§13.2.1。
+- **持久账本**：按邀请维护已接受回执的持久化账本，逻辑唯一键 **`(inviteId, receiptHash)`**；`receiptHash` 为域分离 SHA-256：
+  `receiptHash = hex_lower(SHA-256(UTF8("YAOCORE-INVITE-RECEIPT-HASH-V1\n" + inviteId + "\n" + canonicalReceiptText)))`，其中 `canonicalReceiptText = encodeReceipt(decodeReceipt(receiptText))`。**禁止**对原始输入文本计算；非规范文本在解码阶段拒绝，不能产生第二个 hash。禁止明文回执入库。T-13 实现使用 Asset Store 别名 `yaocore.invite.receipt.<receiptHash>`；若后续落 RDB，唯一约束必须在库层生效。
 - **记录字段（最小）**：`inviteId`、`receiptHash`、`memberId`、`acceptedAt`、`recordedAt`；账本跨重启有效。
+- **并发与介质边界（F-04；与 T13-R-02 对齐）**：
+  1. `SecretStore.put` 是 **upsert**（同别名覆盖；DES-A §9.1.3）；`withSecret` 存在性检查与 `put` 是两次独立操作，**不提供 conditional-add/CAS**，也不向调用方暴露“已存在”。
+  2. **单进程**：`InviteService.LEDGER_GATE`（静态 `DomainOperationGate`）串行化“检查存在 + 写入”；配合 `(inviteId, receiptHash)` 键设计，保证同一进程内同一回执只记一次。
+  3. **多进程/多 VM**：**不保证**。两个进程可同时判定不存在并都写入并都返回 `valid=true`；Asset 别名唯一只保证最终一行，**不等于“只有一个接受者”**。v1 明确为单进程语义；若多进程可达，必须改用 RDB `UNIQUE(invite_id, receipt_hash)` + 条件插入/事务，或进程互斥（后续可选），走 Change Impact。
+  4. 不得以“Asset 别名唯一性约束”作为多进程安全论证；`InviteService.ets` 顶部及实现报告中的相关措辞必须随 F-04 修复更正。
 - **行为要求**：
   1. 首次回执：正常验证并写入账本；`ReceiptVerification.valid=true`。
   2. **历史回执重放**：同 `(inviteId, receiptHash)` 再次导入（即使该邀请后来由其他成员接受、`receipt/acceptedByMemberId` 已被覆盖）→ 拒绝；映射 `INVITE_RECEIPT_INVALID`（若邀请已用尽，按既有错误优先级为 `INVITE_MAX_USES`；无论返回哪个码，均**不得递增** C-08 `usedCount`、不得创建/更新成员）。
   3. **D-022 不同回执**：`usedCount < maxUses` 且未过期时继续接受，按 `(inviteId, receiptHash)` 追加账本；达 `maxUses` 后 `INVITE_MAX_USES`。
   4. 过期/撤销的前置错误仍为 `INVITE_EXPIRED` / `INVITE_REVOKED`；错误优先级与 DES-A §13.3 一致。
 - **责任划分（R3-01）**：C-08 单收据列模型只覆盖“最后一次回执/成员”的即时重放（**轻量缓解**）；C-13 账本负责**历史回执重放**（**正式修复**）。在 T-13 落地前，任何报告不得声称“历史回执重放已完全拒绝”。
-- **验证（归 T-13）**：`maxUses=3`：member-a 接受 → member-b 接受 → 重放 member-a 被拒且 `usedCount` 不变 → member-c 成功；覆盖跨重启与“不同回执正常消耗”（D-022）。T-09 仅验证 C-08 即时防御。
+- **验证（归 T-13）**：`maxUses=3`：member-a 接受 → member-b 接受 → 重放 member-a 被拒且 `usedCount` 不变 → member-c 成功；覆盖跨重启与“不同回执正常消耗”（D-022）。另需覆盖 canonical `YCP1` 往返、非规范编码/裸 hex/错误 MAC/错误 `inviteId` 负例，以及单进程 gate 串行化；多进程 CAS 不在 host 证据面，标 `NOT_RUN`。T-09 仅验证 C-08 即时防御。
 - **不做的事**：本修订不新增 `(inviteId, memberId)` 唯一约束；同成员再次接受沿用既有 C-08 防御（`artifacts/70-review/t09-review-c.md` §4.1）。如需改为“每成员一次”账本语义，走 Clarification / Change Impact。
-- **状态**：`PENDING-C13`（T-13 实现 + 证据后关闭）；不阻塞 G-007，但 CQG 记录必须保留该跟踪项。
-- **Change Impact**：本修订为上游契约同步，不使任何已实现组件 `STALE`。C-08/T-09 的行为与 D-022 一致（R3-01 的账本缺口由本节跟踪，不要求重写 C-08）；C-11 的 `SCENE_RUN_IN_PROGRESS` 仅为契约登记（实现已有等价拒绝，见 `artifacts/70-review/t09-review-b.md` R-02）。下游按 §3.3.3/§6.2/§23.4 编码。
+- **状态**：`IMPLEMENTED-CHANGES_REQUIRED`（T-13 @ `1c832e5` 已实现账本；`artifacts/70-review/t13-review.md` F-01/F-04/F-07 要求 canonical 解码、单进程措辞与注释修正；CQG-T13 仍为 CHANGES_REQUIRED，修复并复审后关闭）。
+- **Change Impact（T-13 裁定同步，2026-10-17）**：F-02/F-07 需要 C-13 实现调用 `importFamily` 并按 canonical 字节记账；C-08 需落地 `EXT-DES-B-25`。这两项在修复并复审前，C-08/C-13 的实现证据为 `UNVERIFIED`；不得把旧 host 469/469 当作本裁定的闭合证据。F-04 仅为措辞/注释修正；F-08 的 C-12 当前实现已 fail-closed，C-22/UI 按 §11.3.1 派生能力。其余组件不受影响；不使无关组件 `STALE`。
 
 ---
 

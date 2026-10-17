@@ -3,10 +3,10 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；冻结签名未变更）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；冻结签名未变更）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
 - **Date**: 2026-10-17
-- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -109,6 +109,19 @@
 2. 同文件 §10.2（约 L3410）仍把 `CONTROL_RESPONSE_AUTH_FAILED` 作为 ACK 错误示例；按 R-2/D-4，header 失败应为 `RESPONSE_AUTH_FAILED`/`RESPONSE_CORRELATION_MISMATCH`，ACK body 失败才是 `ACK_CORRELATION_MISMATCH`。同样列入后续文档同步。
 3. `artifacts/50-implementation/t11-transport.md`（历史实现报告，约 L168/L326）记录了旧的 `CONTROL_RESPONSE_AUTH_FAILED`/mock 映射；作为历史证据保留，不回写；CQG/后续报告应以 CB §4.5 为准。
 4. DES-A §3.2.1 的 `details` 白名单原先不含 `retryable`，与 R2-01 的 `retryable=write-busy` 标记冲突；本轮已按 R3-01 边界增补 `retryable`（仅限非敏感机械标记）。
+
+### 0.6 T-13 裁定同步（2026-10-17）
+
+> **裁定人**：solution-architect（任务 `wp-051-t13-contracts`）。**输入**：REV-T13 `artifacts/70-review/t13-review.md`（F-02/F-04/F-07/F-08；复审 revision `1c832e5`）与 `artifacts/50-implementation/t13-family-auth.md`。**边界**：本节只裁定 T-13 暴露的契约缺口，不重写 DES-A/DES-B 已冻结签名，不改变 G-004 语义，不改实现代码；实现修复由后续任务按本节执行并复审。
+
+| 裁定 | 结论 | 落点 |
+|---|---|---|
+| **F-07 YCP1 回执封装** | 回执文本正式定义为 `YCP1.<b64url(canonical JSON)>`；字段集固定 `{v,inviteId,memberId,acceptedAt,mac}`，键名字典序、无空白、精确字段集；**HMAC 公式不变**；`receiptHash` 对 canonical 字节（`encodeReceipt(payload)` 的重新编码）计算，不得对原始输入文本计算；**拒绝非规范 YCP1**；**不兼容裸 hex**。`verifyReceipt(receiptText, inviteId)` 只接受 canonical `YCP1`，`inviteId` 必须等于载荷值。 | §13.1、§13.2、§13.2.1、§13.3、§13.4、§13.5；DES-B §23.6 |
+| **F-02 新设备家庭行导入** | C-08 新增 `FamilyRepository.importFamily(familyId, familyName)`（`EXT-DES-B-25`）：以已认证邀请头中的固定 `familyId/familyName` 创建/确保本地 `family` 行，不生成新 UUID、不创建成员/档案；C-13 `acceptInvitation` 在 AEAD/bundle 校验通过后调用。幂等、同名不同 id 不合并、owner 使用本地占位符。 | DES-B §3.1.2、§3.1.4、§3.3.4、§23.3；本文 §13.4/§13.5 |
+| **F-04 账本并发措辞** | Ledger 介质为 Asset Store；`put` 是 **upsert**，不提供 conditional-add/CAS；唯一性由**单进程 `DomainOperationGate` + `(inviteId, receiptHash)` 键设计**保证；多进程/多 VM 不保证，必须改用 RDB 唯一约束或进程互斥（后续可选）；不得以“Asset 别名唯一性”作为多进程安全论证（与 T13-R-02 对齐）。 | DES-B §23.6 |
+| **F-08 GUEST 场景权限** | v1 裁定：`canExecuteScene(session)` 对 GUEST 一律 fail-closed（`RBAC_DENIED`），因为冻结签名没有场景/房间上下文且场景可跨房间、可含门锁；GUEST 仅通过 `canControl(session, device, room)` 控制授权房间内设备。RBAC 矩阵据此修订；若未来支持 GUEST 场景，必须新增带动作上下文的 API 并走 Change Impact。 | §12.1、§12.3；DES-B §11.1/§11.3 |
+
+> **不作为**：本节不改变 `FamilyJoinSession`/`InviteService` 的冻结方法签名，不新增在线协议、服务器或 LAN GCM；F-01/F-03/F-05 的代码修复与其它 findings 由实现/测试任务按 `t13-review.md` 处理。
 
 ---
 
@@ -2939,7 +2952,8 @@ export class CreateProfileInput {
 
 | 能力 | ADMIN | MEMBER | GUEST |
 |---|---|---|---|
-| 控制设备/执行场景 | 允许 | 允许 | 仅 `allowedRoomIds` 内、未过期、设备已启用/已分配 |
+| 控制设备 | 允许 | 允许 | 仅 `allowedRoomIds` 内、未过期、设备已启用/已分配 |
+| 执行场景 | 允许 | 允许 | **拒绝（v1 fail-closed；`RBAC_DENIED`）** |
 | 家庭成员管理/邀请/移除 | 允许 | 拒绝 | 拒绝 |
 | 房间/网关/密钥管理 | 允许 | 拒绝 | 拒绝 |
 | 查看家庭全部设备 | 允许 | 允许 | 仅授权房间（只读/受限） |
@@ -2952,6 +2966,13 @@ export class CreateProfileInput {
 5. `GUEST` → `device.roomId !== ''` 且 `allowedRoomIds` 包含 `device.roomId`；否则 `deny('ROOM_NOT_ALLOWED')`。
 6. 设备类型不受支持 → `deny('UNSUPPORTED_DEVICE_TYPE')`（只读降级）。
 7. 设备离线不改变策略（允许发命令，由传输层返回离线）。
+
+**`canExecuteScene` 规则（T-13 裁定同步，2026-10-17；F-08）**：
+1. session 无效/过期 → `deny('SESSION_EXPIRED')`；成员状态非 `ACTIVE`/GUEST 到期 → `deny('MEMBER_INACTIVE')`。
+2. `ADMIN/MEMBER` → allow。
+3. `GUEST` → **一律 `deny('RBAC_DENIED')`**。冻结签名没有 `Scene`/解析后动作/房间上下文，无法证明场景内每个动作都落在 `allowedRoomIds`；场景可跨房间且可包含门锁/敏感设备。该拒绝是 v1 的明确能力边界，**不是**“RBAC 矩阵已完整实现”。
+4. GUEST 的设备控制仍由 `canControl(session, device, room)` 逐设备判定；UI 必须对 GUEST 隐藏/禁用场景执行入口，服务层仍拒绝（不依赖 UI 隐藏）。
+5. 若产品未来要求 GUEST 执行授权房间内场景，必须新增带场景与解析后动作上下文的 API，逐动作执行 `ROOM_NOT_ALLOWED`/门锁拒绝预检，并走 Change Impact；不得修改本冻结签名。
 
 ### 12.2 错误（`DES-A-C12-ERR`）
 
@@ -2981,6 +3002,7 @@ export class CreateProfileInput {
 7. **角色/状态变更**：成员角色/状态/GUEST 到期变化后，C-08/C-22 必须调用 `AuthService.invalidateSessionsForMember(memberId)`；否则 `SessionInfo.role` 可能陈旧。`canControl` 仍以 session 中的角色做快速判断，但 session 失效优先。
 8. **密码变更**：验证旧密码 → 写新 hash → 清除所有会话；失败不改变旧 hash。
 9. **迁移**：`AuthService.registerMigrations(registry)` 注册 v3（`auth_profile`）；`initialize()` 不重复 DDL；DES-001B 不改 v3 语义。
+10. **GUEST 场景边界（T-13 裁定同步，2026-10-17；F-08）**：`canExecuteScene` 对 GUEST fail-closed；GUEST 只能通过 `canControl` 控制 `allowedRoomIds` 内设备。不得把 `FamilyCapabilities.canControlAll=ADMIN/MEMBER` 解释为 GUEST 可间接执行场景。
 
 ### 12.4 v3 表结构（C-12 注册）
 
@@ -3126,7 +3148,7 @@ export class AcceptedInvitation {
   readonly role: MemberRole;
   readonly allowedRoomIds: ReadonlyArray<string>;
   readonly appliedGatewayIds: ReadonlyArray<string>;
-  readonly receipt: string;
+  readonly receipt: string;               // canonical YCP1 信封；见 §13.2.1
 }
 
 export class ReceiptVerification {
@@ -3149,7 +3171,9 @@ export class InviteService {
 
   createJoinRequest(displayName?: string): Promise<JoinRequestContainer>;
   createInvitation(input: CreateInvitationInput): Promise<InvitationCreationResult>;
+  /** 解封并校验 bundle.familyId 后，若本地无 family 行则调用 FamilyRepository.importFamily（DES-B EXT-DES-B-25）；见 §13.4.10。 */
   acceptInvitation(containerText: string, options: AcceptInvitationOptions): Promise<AcceptedInvitation>;
+  /** receiptText 必须是 canonical YCP1 信封；裸 hex/非规范输入按 INVITE_RECEIPT_INVALID 拒绝；见 §13.2.1。 */
   verifyReceipt(receiptText: string, inviteId: string): Promise<ReceiptVerification>;
   revokeInvitation(inviteId: string): Promise<void>;
   rotateGatewaySecret(gatewayId: string): Promise<RotationPlan>;
@@ -3202,14 +3226,39 @@ YCI1.<b64url(header)>.<b64url(iv)>.<b64url(ciphertext||tag)>
 - 解封失败统一 `INVITE_INVALID`（不区分版本/码/篡改，防 oracle）。
 - GCM `iv` 一次一密；禁止复用；`header` 大小上限 4096B；明文上限 32KB；容器总长上限 65536B。
 
-**回执**：
+**回执（`YCP1` 规范信封；T-13 裁定同步，2026-10-17；F-07）**：
+
 ```text
-receipt = hex_lower(HMAC-SHA256(bundle.seed,
+receipt = "YCP1." + b64url(canonical JSON)
+canonical JSON = {"acceptedAt":"<UTC compact>","inviteId":"<uuid>","mac":"<64 lower hex>","memberId":"<16B hex>","v":1}
+mac = hex_lower(HMAC-SHA256(bundle.seed,
   "YAOCORE-INVITE-RECEIPT-V1\n" + inviteId + "\n" + memberId + "\n" + acceptedAt))
 ```
-- `memberId` 使用加入请求的 `memberId`；`acceptedAt` UTC 紧凑。
-- `verifyReceipt` 必须常数时间比较；失败 → `INVITE_RECEIPT_INVALID`。
-- Admin 侧 `seed` 存 Asset Store `yaocore.invite.seed.<inviteId>`；`InvitationRecord.seedAlias` 只存别名。
+- **HMAC 公式不变**：信封只承载 `memberId/acceptedAt` 等验证输入，不改变 MAC 覆盖范围；`seed` 仍为 32B bundle seed。
+- **canonical JSON**：键名严格字典序（`acceptedAt` → `inviteId` → `mac` → `memberId` → `v`）、无空白、UTF-8、精确字段集（缺字段/额外字段/重复键均拒绝）、`v=1`；`acceptedAt` 为 `YYYYMMDDTHHMMSSZ` UTC 紧凑秒；`memberId` 16B hex；`mac` 64 位小写 hex。
+- **b64url**：无 padding；解码后重编码必须逐字节一致；`YCP1` 后恰一个 `.`，多余段/空载荷拒绝。
+- **拒绝非规范 YCP1**：实现必须执行 `encodeReceipt(decodeReceipt(text)) === text` 的规范化校验；键序/空白/转义/额外字段/重复键/非 canonical b64url/畸形信封 → `INVITE_RECEIPT_INVALID`（不读账本、不写账本、不触发 C-08 状态变化）。未知 `v` 同样按 `INVITE_RECEIPT_INVALID` 拒绝。
+- **不兼容裸 hex**：旧定义 `hex_lower(HMAC(...))` 不再是回执输入；`verifyReceipt` 只接受 `YCP1.` 信封。冻结签名 `verifyReceipt(receiptText, inviteId)` 无法从裸 HMAC 恢复 `memberId/acceptedAt`，因此不存在“裸 hex 回退”。**不声称与裸 hex 互操作。**
+- `memberId`：KEY_WRAP 使用加入请求的 `memberId`；CODE_KEK 使用接受时生成的随机 `memberId`。`acceptedAt` 为成员设备接受时刻（UTC 紧凑，秒精度）。
+- `verifyReceipt` 必须常数时间比较 MAC；HMAC/规范化失败 → `INVITE_RECEIPT_INVALID`。
+- Admin 侧 `seed` 存 Asset Store `yaocore.invite.seed.<inviteId>`；`InvitationRecord.seedAlias` 只存别名；账本/回执不存明文回执。
+
+> **上游冲突记录（T-13 裁定同步，2026-10-17）**：ADR-003 §5.4 仍把回执写作裸 `hex_lower(HMAC(...))`。本裁定不修改 ADR-003（不在 `wp-051` 写范围），但明确 HMAC 公式不变、回执文本形态为 `YCP1` canonical 信封；实现与评审以本节为准。若后续同步 ADR-003，只更新回执文本形态，不改 MAC 覆盖范围或 G-004 语义。
+
+#### 13.2.1 `verifyReceipt` 输入语义与账本哈希（`DES-A-C13-RECEIPT`）
+
+- **`receiptText`**：必须是 `acceptInvitation` 返回的、逐字节 canonical 的 `YCP1` 信封；Admin 不得重新序列化/格式化后再提交（重新编码后的等价语义回执属于非规范输入，按上节拒绝）。
+- **`inviteId`**：Admin 本地邀请 ID；必须与 `payload.inviteId` 完全相等，否则 `INVITE_RECEIPT_INVALID`，且不得写账本/递增 `usedCount`。
+- **错误优先级**（与 §13.3 一致）：信封/规范化校验 → `inviteId` 匹配 → 邀请不存在 `CONFIGURATION_ERROR(field=inviteId)` → `INVITE_REVOKED` → `INVITE_EXPIRED`（状态）→ `INVITE_MAX_USES` → `expireAt` 本地时钟过期（`INVITE_EXPIRED`）→ MAC 常数时间比较 → 账本重复（`INVITE_RECEIPT_INVALID`）。任一失败不得写账本、不得让 C-08 修改成员/`usedCount`。
+- **成功返回**：`ReceiptVerification{valid:true, inviteId, memberId, acceptedAt}`；失败以 `AppError` 抛出，不返回 `valid=false`。
+- **账本哈希（F-01/F-07）**：
+  ```text
+  receiptHash = hex_lower(SHA-256(UTF8(
+    "YAOCORE-INVITE-RECEIPT-HASH-V1\n" + inviteId + "\n" + canonicalReceiptText)))
+  canonicalReceiptText = encodeReceipt(decodeReceipt(receiptText))
+  ```
+  必须对重新编码后的 canonical 字节计算，**禁止**直接哈希收到的原始 `receiptText`；该域分离同时绑定 `inviteId`，账本键为 `(inviteId, receiptHash)`。同一语义、不同文本编码的回执必须在解码阶段被拒绝，不能产生第二个 `receiptHash`。
+- **端口注释（`InviteServicePort`）**：`entry/src/main/ets/service/family/FamilyModels.ets` 的 `verifyReceipt` JSDoc 必须复述本节输入语义（canonical `YCP1`、`inviteId` 匹配、拒绝裸 hex/非规范信封）；`InviteService.ets` 顶部关于账本哈希/别名唯一性的注释必须在 F-01/F-04 修复时同步更正。DES-B §23.6 为账本并发边界的唯一口径。
 
 ### 13.3 错误（`DES-A-C13-ERR`）
 
@@ -3226,6 +3275,7 @@ receipt = hex_lower(HMAC-SHA256(bundle.seed,
 | 加入请求非法 | `INVITE_JOIN_REQUEST_INVALID` |
 | 私钥/seed 别名缺失 | `INVITE_KEY_MISSING` |
 | 回执 HMAC 失败 | `INVITE_RECEIPT_INVALID` |
+| 回执信封非规范（键序/空白/额外字段/重复键/非 canonical b64url/裸 hex/未知 `v`） | `INVITE_RECEIPT_INVALID`（回执专用；容器版本仍为 `INVITE_VERSION_UNSUPPORTED`） |
 | 轮换未完成 | `INVITE_ROTATION_INCOMPLETE` |
 | 存储/Asset 失败 | 透传 `STORAGE_*`/`ASSET_*` |
 
@@ -3240,16 +3290,21 @@ receipt = hex_lower(HMAC-SHA256(bundle.seed,
 7. **成员去重**：同一成员设备对同一 `inviteId` 只接受一次；Admin 注册表按 `inviteId` 去重。
 8. **无实时同步**：成员/角色/房间变化只在接触式交换时收敛；UI 不得暗示实时（D-010）。
 9. **秘密擦除**：加入私钥、KEK、`seed`、`commandSecret` 临时缓冲在成功/失败/取消后清零。
+10. **新设备家庭行导入（T-13 裁定同步，2026-10-17；F-02）**：C-13 仅在 YCI1 解封、`bundle.familyId` 与 header 一致后，调用 `FamilyRepository.importFamily`（DES-B `EXT-DES-B-25`）创建/确保本地 `family` 行；使用邀请中的固定 `familyId/familyName`，**不生成新 UUID**、不创建成员/档案、不创建 ADMIN；未认证容器不得建行。C-13 不得在认证后仍以“本地无 family 行”返回 `CONFIGURATION_ERROR`，该前置检查由 `importFamily` 取代。该调用不改变 C-13 冻结构造器（仍注入 `FamilyRepository`）。
+11. **回执规范化身份（T-13 裁定同步，2026-10-17；F-01/F-07）**：回执身份是 canonical `YCP1` 字节；同一语义的不同文本编码不是新回执；账本哈希对 canonical 字节计算（§13.2.1）。
 
 ### 13.5 依赖注入与测试 seam（`DES-A-C13-SEAM`）
 
 - 依赖 `CryptoPort`/`SecretStore`/`FamilyRepository`/`GatewayRoutePort`/`GatewayCredentialPort`/`InvitationApplicationPort`/`ClockPort`/`RandomPort`/`IdPort`；纯逻辑，无平台 import。
+- C-13 的 `FamilyRepository` 依赖包含 DES-B 增量 `importFamily`（`EXT-DES-B-25`）：仅在认证后建/确保家庭行，不反向依赖 C-08 `FamilyService`（T-13 裁定同步，2026-10-17；F-02）。
 - host 测试：
   - YCR1/YCI1 往返；header 字典序；AAD 篡改失败；版本前缀失败；
   - KEY_WRAP 固定 X25519 向量（成员/Admin 临时密钥）→ 解封；
   - CODE_KEK 固定码/salt → 解封；错误码/归一化；PBKDF2 120k 用例标记 `SLOW`，容器往返可用预计算 KEK 避免每个用例重复 120k；
   - expireAt/maxUses/inviteId 去重；
-  - 回执 HMAC 正确/篡改；
+  - 回执 HMAC 正确/篡改；`verifyReceipt` 的 `inviteId` 不匹配、错误 MAC、畸形信封负例（F-06）；
+  - 回执 canonical 信封：`YCP1` 往返；键序/空白/额外字段/重复键/非 canonical b64url/裸 hex/未知 `v` → `INVITE_RECEIPT_INVALID`（F-07）；同一语义、不同文本编码在解码阶段拒绝，账本不新增条目（F-01）；
+  - 新成员设备空 `family` 表 → `acceptInvitation` 经 `importFamily` 建固定 `familyId` 行 → 完成；重复接受幂等；同名不同 id 并存；owner 占位不产生 ADMIN/RBAC 提升（F-02）；
   - 私钥/seed 缺失；`SecureBytes` 擦除断言；
   - `maxUses>1` 的 CODE_KEK；KEY_WRAP `maxUses!=1` 拒绝。
 - device 测试：真实 cryptoFramework GCM/X25519/HKDF/PBKDF2；无设备 `UNAVAILABLE`。
@@ -3265,6 +3320,7 @@ receipt = hex_lower(HMAC-SHA256(bundle.seed,
 | ADR-002 §8 | 每网关 secret/pin |
 | SC-16、DP-05/DP-06 | 离线凭据、无实时在线、GUEST 边界 |
 | D-009/D-010/D-013 | 主路径/状态一致性/到期轮换 |
+| REV-T13 F-07/F-08 | `artifacts/70-review/t13-review.md`：canonical `YCP1` 回执/账本哈希；GUEST 场景 fail-closed |
 | T-13 | 本组件主交付 |
 
 ---
