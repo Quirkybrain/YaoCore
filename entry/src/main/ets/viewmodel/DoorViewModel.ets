@@ -218,7 +218,7 @@ export class DoorViewModel implements ViewModelBase<DoorViewState> {
     }
     this.publish(this.copy(this.state.phase,
       new ControlUiState(record.state.key, action, ControlPhase.PENDING, this.revision + 1,
-        value), this.tracker.getState(), undefined));
+        this.state.control.confirmedValue, value), this.tracker.getState(), undefined));
     this.timeoutId = this.timer.setTimer(TIMEOUT_MS, (): void => {
       if (this.disposed || token !== this.token) {
         return;
@@ -253,9 +253,13 @@ export class DoorViewModel implements ViewModelBase<DoorViewState> {
           this.applyRevert(door.error === undefined ? this.errorOf(execution) : door.error);
           return;
         }
+        // F-02: confirmedValue comes from the reported door state, never from
+        // the requested value. UNVERIFIED keeps the previous confirmed state.
+        const reported = DoorConfirmationTracker.reportedOpen(execution);
+        const confirmed = reported === undefined ? this.state.control.confirmedValue : reported;
         this.publish(this.copy(LoadPhase.READY,
           new ControlUiState(record.state.key, action, ControlPhase.COMMITTED,
-            this.revision + 1, value, undefined, undefined,
+            this.revision + 1, confirmed, undefined, undefined,
             execution.lan === undefined ? undefined : execution.lan.outcome, execution),
           door, undefined));
         return;

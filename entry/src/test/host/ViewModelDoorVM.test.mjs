@@ -89,6 +89,7 @@ test('T15_DoorView_unlockReachesOpenWithoutWaitingForContact', async () => {
   await h.vm.unlock();
   assert.equal(h.vm.getState().door.stage, DoorStage.OPEN);
   assert.equal(h.vm.getState().control.phase, 'COMMITTED');
+  assert.equal(h.vm.getState().control.confirmedValue, true);
 });
 
 test('T15_DoorView_unlockWithNoReportedOpenIsUnverifiedNotOpen', async () => {
@@ -103,6 +104,7 @@ test('T15_DoorView_unlockWithNoReportedOpenIsUnverifiedNotOpen', async () => {
   assert.notEqual(state.door.stage, DoorStage.OPEN);
   assert.notEqual(state.door.lockState, DoorLockState.OPEN);
   assert.equal(state.control.phase, 'COMMITTED');
+  assert.equal(state.control.confirmedValue, undefined);
 });
 
 test('T15_DoorView_unlockWithReportedClosedIsARejectedAttempt', async () => {
@@ -116,6 +118,7 @@ test('T15_DoorView_unlockWithReportedClosedIsARejectedAttempt', async () => {
   assert.notEqual(state.door.stage, DoorStage.OPEN);
   assert.equal(state.control.phase, 'REVERT');
   assert.equal(state.control.lastError.error.code, 'ACK_STATE_MISMATCH');
+  assert.equal(state.control.confirmedValue, undefined);
   h.timer.advance(320);
   state = h.vm.getState();
   assert.equal(state.control.phase, 'IDLE');
@@ -135,6 +138,7 @@ test('T15_DoorView_closeWithReportedOpenStillRevertsEvenWhenAckSucceeded', async
   assert.equal(state.door.lockState, DoorLockState.OPEN);
   assert.equal(state.control.phase, 'REVERT');
   assert.equal(state.control.lastError.error.code, 'ACK_STATE_MISMATCH');
+  assert.equal(state.control.confirmedValue, undefined);
 });
 
 test('T15_DoorView_closeWithoutReportedOpenStaysUnverifiedAndNeverOpen', async () => {
@@ -149,6 +153,7 @@ test('T15_DoorView_closeWithoutReportedOpenStaysUnverifiedAndNeverOpen', async (
   assert.notEqual(state.door.stage, DoorStage.OPEN);
   assert.notEqual(state.door.lockState, DoorLockState.SECURED);
   assert.equal(state.control.phase, 'COMMITTED');
+  assert.equal(state.control.confirmedValue, undefined);
 });
 
 test('T15_DoorView_ackRejectedRevertsAndNeverClaimsSecured', async () => {

@@ -6,16 +6,16 @@
 > hvigor [32mFinished :entry:ohosTest@CreateBuildProfile... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@PreCheckSyscap... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@GenerateOhosTestTemplate... after 4 ms [39m
-> hvigor [32mFinished :entry:ohosTest@GeneratePkgContextInfo... after 5 ms [39m
+> hvigor [32mFinished :entry:ohosTest@GeneratePkgContextInfo... after 6 ms [39m
 > hvigor [32mFinished :entry:ohosTest@GeneratePkgSdkInfo... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ProcessIntegratedHsp... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@BuildNativeWithCmake... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@MakePackInfo... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@SyscapTransform... after 8 ms [39m
-> hvigor [32mFinished :entry:ohosTest@ProcessProfile... after 42 ms [39m
-> hvigor [32mFinished :entry:ohosTest@ProcessRouterMap... after 3 ms [39m
-> hvigor [32mFinished :entry:ohosTest@ProcessShareConfig... after 2 ms [39m
-> hvigor [32mFinished :entry:ohosTest@ProcessStartupConfig... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessProfile... after 51 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessRouterMap... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessShareConfig... after 1 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessStartupConfig... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@BuildNativeWithNinja... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ProcessResource... after 4 ms [39m
 > hvigor [32mFinished :entry:ohosTest@GenerateLoaderJson... after 5 ms [39m
@@ -25,10 +25,10 @@ at /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/resources/base
 but declared again.
 at /home/quirkybrain/code/harmony-projects/YaoCore/entry/.test/default/intermediates/src/ohosTest/resources/base/element/color.json
 [39m
-> hvigor [32mFinished :entry:ohosTest@CompileResource... after 80 ms [39m
+> hvigor [32mFinished :entry:ohosTest@CompileResource... after 76 ms [39m
 > hvigor [32mFinished :entry:ohosTest@DoNativeStrip... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@OhosTestBuildJS... after 1 ms [39m
-> hvigor [32mFinished :entry:ohosTest@CacheNativeLibs... after 5 ms [39m
+> hvigor [32mFinished :entry:ohosTest@CacheNativeLibs... after 7 ms [39m
 > hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/ohosTest/ets/test/viewmodel/ViewModelsDevice.test.ets:42:14
  Classes cannot be used as objects (arkts-no-classes-as-obj)
 [39m[39m
@@ -356,17 +356,17 @@ ohos.permission.GET_BLUETOOTH_PEERS_MAC) [since 26.0.0]
  To use this API, you need to apply for the permissions: ohos.permission.INTERNET
 [39m[39m
 [39m
-> hvigor [32mFinished :entry:ohosTest@OhosTestCompileArkTS... after 7 s 348 ms [39m
+> hvigor [32mFinished :entry:ohosTest@OhosTestCompileArkTS... after 7 s 400 ms [39m
 > hvigor [32mFinished :entry:ohosTest@OhosTestCopyMockConfigJson... after 1 ms [39m
-> hvigor [32mFinished :entry:ohosTest@GeneratePkgModuleJson... after 1 ms [39m
+> hvigor [32mFinished :entry:ohosTest@GeneratePkgModuleJson... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ProcessCompiledResources... after 1 ms [39m
-> hvigor [32mFinished :entry:ohosTest@PackageHap... after 296 ms [39m
+> hvigor [32mFinished :entry:ohosTest@PackageHap... after 294 ms [39m
 > hvigor [32mFinished :entry:ohosTest@PackingCheck... after 2 ms [39m
 > hvigor [33mWARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
              If needed, configure the signingConfigs in /home/quirkybrain/code/harmony-projects/YaoCore/build-profile.json5.[39m
 > hvigor [32mFinished :entry:ohosTest@SignHap... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@CollectDebugSymbol... after 1 ms [39m
 > hvigor [32mFinished :entry:assembleHap... after 1 ms [39m
-> hvigor [32mBUILD SUCCESSFUL in 9 s 858 ms [39m
+> hvigor [32mBUILD SUCCESSFUL in 9 s 898 ms [39m
 
 35 tasks in total: 34 executed, 1 up-to-date

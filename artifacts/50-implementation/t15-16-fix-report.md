@@ -61,6 +61,7 @@
   - ACK 拒绝/错误/MISMATCH → `FAILED`。
 - `DoorViewModel.applyLock` 改为由 tracker 的门结果驱动控制态：tracker `FAILED` → `REVERT`（使用 tracker 的 `ACK_STATE_MISMATCH`/错误）；CLOSE 的 `UNVERIFIED`（明确无回报）允许 `COMMITTED` 作为“已执行、状态未回传”；`SECURED/WAITING_CONTACT` → `COMMITTED`；任何路径都不把 `UNVERIFIED` 写成 `OPEN`。
 - CLOSE 的 `ackAccepted && reported open === true` 由 tracker 判为 `FAILED/OPEN`，VM 必须 `REVERT`，不得 `COMMITTED`。
+- 同时修正 `ControlUiState.confirmedValue`：PENDING 保留上一确认值、请求值放 `optimisticValue`；成功时 `confirmedValue` 取 reported `open`，无回报（`UNVERIFIED`）保留上一确认值而不是请求值，避免 UI 从控制态读出虚构的门状态。
 
 **回归**（`ViewModelDoorVM.test.mjs`，新增 4 条）：
 
@@ -68,6 +69,8 @@
 - `T15_DoorView_unlockWithReportedClosedIsARejectedAttempt`
 - `T15_DoorView_closeWithReportedOpenStillRevertsEvenWhenAckSucceeded`
 - `T15_DoorView_closeWithoutReportedOpenStaysUnverifiedAndNeverOpen`
+
+上述用例同时断言 `control.confirmedValue`：只有 reported `open` 才写入，`UNVERIFIED`/`REVERT` 不把请求值伪装成确认值。
 
 ### 2.3 F-03：配网 `back()` 清理扫描
 
