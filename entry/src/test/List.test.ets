@@ -1,7 +1,7 @@
 /*
  * YaoCore host (local) unit-test entry point.
- * Producer: agent:test-engineer (baseline) / agent:implementation-engineer (T-06 suites)
- * Task: T-05 / wp-010-test-plan; T-06 / wp-012-foundation
+ * Producer: agent:test-engineer (baseline) / agent:implementation-engineer (T-06/T-07 suites)
+ * Task: T-05 / wp-010-test-plan; T-06 / wp-012-foundation; T-07 / wp-016-security
  *
  * `hvigorw test` generates a local TestAbility that imports this exact module
  * (`entry/src/test/List.test.ets`). Keep this file as the single suite
@@ -19,6 +19,7 @@ import { ControlAckMapperSuite } from './protocol/ControlAckMapper.test';
 import { ControlRequestSerializerSuite } from './protocol/ControlRequestSerializer.test';
 import { IdentityParserSuite } from './protocol/IdentityParser.test';
 import { StateReportMapperSuite } from './protocol/StateReportMapper.test';
+import { SecurityHostSuite } from './security/SecurityHost.test';
 
 export default function testsuite() {
   hostBaselineTest();
@@ -29,4 +30,5 @@ export default function testsuite() {
   ControlRequestSerializerSuite();
   IdentityParserSuite();
   StateReportMapperSuite();
+  SecurityHostSuite();
 }

@@ -10,8 +10,12 @@
 entry/src/ohosTest/
 ├── module.json5                         # entry_test feature 模块
 └── ets/test/
-    ├── List.test.ets                    # Hypium suite 入口（当前导入 Baseline）
+    ├── List.test.ets                    # Hypium suite 入口（注册 baseline/foundation/security）
     ├── Baseline.test.ets                # T-01 框架冒烟（仅编译过，未执行）
+    ├── foundation/
+    │   └── FoundationDevice.test.ets    # T-06 C-01..C-03 设备骨架（BLOCKED_ON_DEVICE_RUNNER）
+    ├── security/
+    │   └── SecurityDevice.test.ets      # T-07 C-04/C-05 设备向量（BLOCKED_ON_DEVICE_RUNNER）
     └── contract/
         └── fixtures/                    # 协议 golden（PUBLIC TEST DATA ONLY）
             ├── hmac-sha256-test-vectors.json
@@ -61,6 +65,6 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default onDeviceTest -
 
 ## 5. 限制
 
-- 本目录当前只有 T-01 探针；契约用例的 ArkTS 实现从 T-06 起补充。
+- 本目录的设备套件已全部注册进 `List.test.ets`（T-06 foundation、T-07 security）；注册只表示设备可用时会执行，当前仍为 `BLOCKED_ON_DEVICE_RUNNER`，不得写成 PASS。
 - 设备测试不覆盖真实硬件/射频/真实网关；这些由用户自行执行（CP-03）。
 - `code-linter.json5` 当前忽略 `src/ohosTest/**`；测试源码检查策略见 TEST-001。

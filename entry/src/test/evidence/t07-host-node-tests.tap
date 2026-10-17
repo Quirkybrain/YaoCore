@@ -1,0 +1,718 @@
+TAP version 13
+# Subtest: C04_CryptoService_sha256MatchesNodeOracle
+ok 1 - C04_CryptoService_sha256MatchesNodeOracle
+  ---
+  duration_ms: 11.408638
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_hmacSha256MatchesNodeOracle
+ok 2 - C04_CryptoService_hmacSha256MatchesNodeOracle
+  ---
+  duration_ms: 4.235011
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_hkdfSha256MatchesRfc5869Case1
+ok 3 - C04_CryptoService_hkdfSha256MatchesRfc5869Case1
+  ---
+  duration_ms: 0.929098
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_pbkdf2Sha256MatchesNodeOracleAtContractMinimum
+ok 4 - C04_CryptoService_pbkdf2Sha256MatchesNodeOracleAtContractMinimum
+  ---
+  duration_ms: 762.400563
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_kdfParametersFailClosed
+ok 5 - C04_CryptoService_kdfParametersFailClosed
+  ---
+  duration_ms: 1.537873
+  type: 'test'
+  ...
+# Subtest: C04_X25519KeyCodec_wrapsRfc7748RawKeysAsValidDer
+ok 6 - C04_X25519KeyCodec_wrapsRfc7748RawKeysAsValidDer
+  ---
+  duration_ms: 2.232795
+  type: 'test'
+  ...
+# Subtest: C04_X25519KeyCodec_rejectsLengthPrefixAndTrailingData
+ok 7 - C04_X25519KeyCodec_rejectsLengthPrefixAndTrailingData
+  ---
+  duration_ms: 0.465105
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_x25519InputsAndZeroSharedSecretFailClosed
+ok 8 - C04_CryptoService_x25519InputsAndZeroSharedSecretFailClosed
+  ---
+  duration_ms: 0.923057
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_constantTimeEqualHandlesEveryShape
+ok 9 - C04_CryptoService_constantTimeEqualHandlesEveryShape
+  ---
+  duration_ms: 0.234356
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_ctrStreamIsContinuousAndTerminalOnFailure
+ok 10 - C04_CryptoService_ctrStreamIsContinuousAndTerminalOnFailure
+  ---
+  duration_ms: 1.617798
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_ctrRejectsOutputLengthMismatch
+ok 11 - C04_CryptoService_ctrRejectsOutputLengthMismatch
+  ---
+  duration_ms: 0.283394
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_gcmValidationAndTagMismatchFailClosed
+ok 12 - C04_CryptoService_gcmValidationAndTagMismatchFailClosed
+  ---
+  duration_ms: 0.556291
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_randomBytesContractIsExactAndNonZero
+ok 13 - C04_CryptoService_randomBytesContractIsExactAndNonZero
+  ---
+  duration_ms: 0.47894
+  type: 'test'
+  ...
+# Subtest: C04_CryptoService_inputLengthMismatchFromProviderFailsClosed
+ok 14 - C04_CryptoService_inputLengthMismatchFromProviderFailsClosed
+  ---
+  duration_ms: 0.43508
+  type: 'test'
+  ...
+# Subtest: C02_DeviceKey_derivesGlobalIdAndNeverParsesIt
+ok 15 - C02_DeviceKey_derivesGlobalIdAndNeverParsesIt
+  ---
+  duration_ms: 8.280618
+  type: 'test'
+  ...
+# Subtest: C02_DeviceSnapshot_derivesStateEpochAndValidatesRanges
+ok 16 - C02_DeviceSnapshot_derivesStateEpochAndValidatesRanges
+  ---
+  duration_ms: 0.975291
+  type: 'test'
+  ...
+# Subtest: C02_DeviceState_separatesLocalAndGatewayAuthority
+ok 17 - C02_DeviceState_separatesLocalAndGatewayAuthority
+  ---
+  duration_ms: 1.460051
+  type: 'test'
+  ...
+# Subtest: C02_DeviceStatePatch_acceptsAckFieldsWithoutDeviceMetadata
+ok 18 - C02_DeviceStatePatch_acceptsAckFieldsWithoutDeviceMetadata
+  ---
+  duration_ms: 0.574563
+  type: 'test'
+  ...
+# Subtest: C02_GatewayRoute_enforcesHmacAndTlsProfiles
+ok 19 - C02_GatewayRoute_enforcesHmacAndTlsProfiles
+  ---
+  duration_ms: 1.421331
+  type: 'test'
+  ...
+# Subtest: C02_ControlOutcome_refusesOptimisticSuccess
+ok 20 - C02_ControlOutcome_refusesOptimisticSuccess
+  ---
+  duration_ms: 1.776126
+  type: 'test'
+  ...
+# Subtest: C02_DiscoverySnapshot_enforcesWireConstants
+ok 21 - C02_DiscoverySnapshot_enforcesWireConstants
+  ---
+  duration_ms: 1.005797
+  type: 'test'
+  ...
+# Subtest: C02_ProvisioningIdentity_andResultRespectTlsPorts
+ok 22 - C02_ProvisioningIdentity_andResultRespectTlsPorts
+  ---
+  duration_ms: 0.455858
+  type: 'test'
+  ...
+# Subtest: C02_FamilyModels_enforceGuestAndInviteInvariants
+ok 23 - C02_FamilyModels_enforceGuestAndInviteInvariants
+  ---
+  duration_ms: 0.927825
+  type: 'test'
+  ...
+# Subtest: C02_RoomSceneCloudConfig_shapesAreUsable
+ok 24 - C02_RoomSceneCloudConfig_shapesAreUsable
+  ---
+  duration_ms: 0.91969
+  type: 'test'
+  ...
+# Subtest: C01_AppError_catalogCarriesCategoryRetryableAndI18nKey
+ok 25 - C01_AppError_catalogCarriesCategoryRetryableAndI18nKey
+  ---
+  duration_ms: 3.840194
+  type: 'test'
+  ...
+# Subtest: C01_Result_neverSwallowsAppError
+ok 26 - C01_Result_neverSwallowsAppError
+  ---
+  duration_ms: 0.348563
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_roundTripsSecondsAndValidatesCalendar
+ok 27 - C01_DateTimeUtil_roundTripsSecondsAndValidatesCalendar
+  ---
+  duration_ms: 6.981569
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_windowIsInclusiveAt120000ms
+ok 28 - C01_DateTimeUtil_windowIsInclusiveAt120000ms
+  ---
+  duration_ms: 0.24213
+  type: 'test'
+  ...
+# Subtest: C01_DateTimeUtil_requestIdUsesMillisAndSeq
+ok 29 - C01_DateTimeUtil_requestIdUsesMillisAndSeq
+  ---
+  duration_ms: 0.549007
+  type: 'test'
+  ...
+# Subtest: C01_BytesUtil_hexRoundTripsAndStrictLowerRejectsUppercase
+ok 30 - C01_BytesUtil_hexRoundTripsAndStrictLowerRejectsUppercase
+  ---
+  duration_ms: 1.101791
+  type: 'test'
+  ...
+# Subtest: C01_Utf8_isStrictAndRoundTripsUnicode
+ok 31 - C01_Utf8_isStrictAndRoundTripsUnicode
+  ---
+  duration_ms: 2.001755
+  type: 'test'
+  ...
+# Subtest: C01_Base64Url_isUnpaddedAndStrict
+ok 32 - C01_Base64Url_isUnpaddedAndStrict
+  ---
+  duration_ms: 0.931612
+  type: 'test'
+  ...
+# Subtest: C01_JsonAtom_matchesCanonicalValueRules
+ok 33 - C01_JsonAtom_matchesCanonicalValueRules
+  ---
+  duration_ms: 0.51189
+  type: 'test'
+  ...
+# Subtest: C01_JsonParser_rejectsMalformedOrAmbiguousInput
+ok 34 - C01_JsonParser_rejectsMalformedOrAmbiguousInput
+  ---
+  duration_ms: 2.629084
+  type: 'test'
+  ...
+# Subtest: C01_JsonCanonicalizer_isCompactAndSupportsSortedKeys
+ok 35 - C01_JsonCanonicalizer_isCompactAndSupportsSortedKeys
+  ---
+  duration_ms: 0.52305
+  type: 'test'
+  ...
+# Subtest: C01_HttpHeaders_areCaseInsensitiveAndLastWins
+ok 36 - C01_HttpHeaders_areCaseInsensitiveAndLastWins
+  ---
+  duration_ms: 0.521227
+  type: 'test'
+  ...
+# Subtest: C01_GatewayResultClassifier_separatesGatewayNamespace
+ok 37 - C01_GatewayResultClassifier_separatesGatewayNamespace
+  ---
+  duration_ms: 0.319179
+  type: 'test'
+  ...
+# Subtest: C01_IpAddressUtil_validatesLanAddresses
+ok 38 - C01_IpAddressUtil_validatesLanAddresses
+  ---
+  duration_ms: 0.393114
+  type: 'test'
+  ...
+# Subtest: C01_SecureBytes_zeroizesAndRejectsUseAfterDestroy
+ok 39 - C01_SecureBytes_zeroizesAndRejectsUseAfterDestroy
+  ---
+  duration_ms: 0.466137
+  type: 'test'
+  ...
+# Subtest: C01_UuidUtil_usesInjectedIdPort
+ok 40 - C01_UuidUtil_usesInjectedIdPort
+  ---
+  duration_ms: 0.424631
+  type: 'test'
+  ...
+# Subtest: host runner baseline: arithmetic
+ok 41 - host runner baseline: arithmetic
+  ---
+  duration_ms: 2.187643
+  type: 'test'
+  ...
+# Subtest: host runner baseline: strings
+ok 42 - host runner baseline: strings
+  ---
+  duration_ms: 0.900065
+  type: 'test'
+  ...
+# Subtest: host runner executes pure arithmetic and assertions
+ok 43 - host runner executes pure arithmetic and assertions
+  ---
+  duration_ms: 1.789289
+  type: 'test'
+  ...
+# Subtest: valueAtom follows the protocol README
+ok 44 - valueAtom follows the protocol README
+  ---
+  duration_ms: 0.708687
+  type: 'test'
+  ...
+# Subtest: all 4 control HMAC vectors reproduce canonical and signature
+ok 45 - all 4 control HMAC vectors reproduce canonical and signature
+  ---
+  duration_ms: 1.290684
+  type: 'test'
+  ...
+# Subtest: response-auth vector reproduces body hash, canonical and signature
+ok 46 - response-auth vector reproduces body hash, canonical and signature
+  ---
+  duration_ms: 0.638229
+  type: 'test'
+  ...
+# Subtest: discovery-request vector reproduces canonical and signature
+ok 47 - discovery-request vector reproduces canonical and signature
+  ---
+  duration_ms: 4.243877
+  type: 'test'
+  ...
+# Subtest: golden discover response is schema-shaped and uses wire field names
+ok 48 - golden discover response is schema-shaped and uses wire field names
+  ---
+  duration_ms: 1.693205
+  type: 'test'
+  ...
+# Subtest: golden ACK satisfies execution-confirmation fields
+ok 49 - golden ACK satisfies execution-confirmation fields
+  ---
+  duration_ms: 0.636386
+  type: 'test'
+  ...
+# Subtest: golden replay ACK only adds idempotent_replay
+ok 50 - golden replay ACK only adds idempotent_replay
+  ---
+  duration_ms: 0.348463
+  type: 'test'
+  ...
+# Subtest: test certificate SPKI matches the Python simulator pin
+ok 51 - test certificate SPKI matches the Python simulator pin
+  ---
+  duration_ms: 4.927328
+  type: 'test'
+  ...
+# Subtest: percentile uses nearest-rank and handles p50/p95
+ok 52 - percentile uses nearest-rank and handles p50/p95
+  ---
+  duration_ms: 1.472644
+  type: 'test'
+  ...
+# Subtest: summarizeSamples reports count/min/p50/p95/max
+ok 53 - summarizeSamples reports count/min/p50/p95/max
+  ---
+  duration_ms: 1.174192
+  type: 'test'
+  ...
+# Subtest: measureOperation discards warmup and collects N samples
+ok 54 - measureOperation discards warmup and collects N samples
+  ---
+  duration_ms: 0.713476
+  type: 'test'
+  ...
+# Subtest: buildPerfReport rejects invented result classes
+ok 55 - buildPerfReport rejects invented result classes
+  ---
+  duration_ms: 1.353137
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_goldenACKMatchesExpectedCommand
+ok 56 - C03_ControlAckMapper_goldenACKMatchesExpectedCommand
+  ---
+  duration_ms: 6.406184
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_replayDoesNotDuplicateAlreadyAppliedState
+ok 57 - C03_ControlAckMapper_replayDoesNotDuplicateAlreadyAppliedState
+  ---
+  duration_ms: 4.145398
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_correlationMismatchFailsClosed
+ok 58 - C03_ControlAckMapper_correlationMismatchFailsClosed
+  ---
+  duration_ms: 1.54709
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonZeroResultNeverClaimsSuccess
+ok 59 - C03_ControlAckMapper_nonZeroResultNeverClaimsSuccess
+  ---
+  duration_ms: 2.432758
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_zeroWithoutReportedStateIsProtocolViolation
+ok 60 - C03_ControlAckMapper_zeroWithoutReportedStateIsProtocolViolation
+  ---
+  duration_ms: 0.69912
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_reportedStateMustHaveExactlyOneShape
+ok 61 - C03_ControlAckMapper_reportedStateMustHaveExactlyOneShape
+  ---
+  duration_ms: 0.560027
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_targetMismatchThrowsStateMismatch
+ok 62 - C03_ControlAckMapper_targetMismatchThrowsStateMismatch
+  ---
+  duration_ms: 1.279484
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_stateVerificationDistinguishesMatchMismatchUnverified
+ok 63 - C03_ControlAckMapper_stateVerificationDistinguishesMatchMismatchUnverified
+  ---
+  duration_ms: 0.737419
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_gatewayBoardStateIsExposedButNotApplied
+ok 64 - C03_ControlAckMapper_gatewayBoardStateIsExposedButNotApplied
+  ---
+  duration_ms: 2.684004
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_successFieldIsAlwaysIgnoredAndCounted
+ok 65 - C03_ControlAckMapper_successFieldIsAlwaysIgnoredAndCounted
+  ---
+  duration_ms: 0.883925
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_errorCodeOnSuccessIsDiagnosticOnly
+ok 66 - C03_ControlAckMapper_errorCodeOnSuccessIsDiagnosticOnly
+  ---
+  duration_ms: 0.333947
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes
+ok 67 - C03_ControlAckMapper_rejectsUnknownFieldsAndInvalidTypes
+  ---
+  duration_ms: 0.78769
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_unknownFieldsUseAckProtocolViolationInAllShapes
+ok 68 - C03_ControlAckMapper_unknownFieldsUseAckProtocolViolationInAllShapes
+  ---
+  duration_ms: 1.732005
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonZeroResultStillValidatesReportedStateSchema
+ok 69 - C03_ControlAckMapper_nonZeroResultStillValidatesReportedStateSchema
+  ---
+  duration_ms: 0.692278
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_nonStandardModeComparesRawValue
+ok 70 - C03_ControlAckMapper_nonStandardModeComparesRawValue
+  ---
+  duration_ms: 0.61659
+  type: 'test'
+  ...
+# Subtest: C03_ControlAckMapper_lowercaseColorIsNormalizedForComparison
+ok 71 - C03_ControlAckMapper_lowercaseColorIsNormalizedForComparison
+  ---
+  duration_ms: 0.69413
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_emitsExactEnvelopeOrder
+ok 72 - C03_CloudCommandSerializer_emitsExactEnvelopeOrder
+  ---
+  duration_ms: 4.239009
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_valueIsCompactAtomText
+ok 73 - C03_CloudCommandSerializer_valueIsCompactAtomText
+  ---
+  duration_ms: 6.366231
+  type: 'test'
+  ...
+# Subtest: C03_CloudCommandSerializer_rejectsNonCanonicalValueAndFields
+ok 74 - C03_CloudCommandSerializer_rejectsNonCanonicalValueAndFields
+  ---
+  duration_ms: 2.714199
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_servicesShapeMapsFixedPropertyPaths
+ok 75 - C03_StateReportMapper_servicesShapeMapsFixedPropertyPaths
+  ---
+  duration_ms: 4.284251
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_shadowShapeAndDevicesShapeAreAccepted
+ok 76 - C03_StateReportMapper_shadowShapeAndDevicesShapeAreAccepted
+  ---
+  duration_ms: 0.904613
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_servicesShapeIsStrictPerSchema
+ok 77 - C03_StateReportMapper_servicesShapeIsStrictPerSchema
+  ---
+  duration_ms: 1.862943
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_rejectsUnknownShapesAndInvalidProperties
+ok 78 - C03_StateReportMapper_rejectsUnknownShapesAndInvalidProperties
+  ---
+  duration_ms: 1.237147
+  type: 'test'
+  ...
+# Subtest: C03_StateReportMapper_DeviceInventoryJsonIsPreservedButNotParsedYet
+ok 79 - C03_StateReportMapper_DeviceInventoryJsonIsPreservedButNotParsedYet
+  ---
+  duration_ms: 0.784755
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder
+ok 80 - C03_ControlRequestSerializer_allPublicVectorsMatchSchemaOrder
+  ---
+  duration_ms: 15.356297
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_fixtureNoncesAreOutsideOutboundContract
+ok 81 - C03_ControlRequestSerializer_fixtureNoncesAreOutsideOutboundContract
+  ---
+  duration_ms: 3.002572
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_roundTripsValueTypes
+ok 82 - C03_ControlRequestSerializer_roundTripsValueTypes
+  ---
+  duration_ms: 1.208044
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_rejectsFieldViolations
+ok 83 - C03_ControlRequestSerializer_rejectsFieldViolations
+  ---
+  duration_ms: 1.400674
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesActionValueKind
+ok 84 - C03_ControlRequestSerializer_enforcesActionValueKind
+  ---
+  duration_ms: 0.762214
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesHexLower32Nonce
+ok 85 - C03_ControlRequestSerializer_enforcesHexLower32Nonce
+  ---
+  duration_ms: 0.611661
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_enforcesOutboundValueBounds
+ok 86 - C03_ControlRequestSerializer_enforcesOutboundValueBounds
+  ---
+  duration_ms: 0.900515
+  type: 'test'
+  ...
+# Subtest: C03_ControlRequestSerializer_producesNoTrailingNewlineAndUtf8
+ok 87 - C03_ControlRequestSerializer_producesNoTrailingNewlineAndUtf8
+  ---
+  duration_ms: 0.395418
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_goldenMapsAllFourDevicesWithoutDeviations
+ok 88 - C03_DiscoverMapper_goldenMapsAllFourDevicesWithoutDeviations
+  ---
+  duration_ms: 7.475506
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_readsKnownAliasesOnlyWhenCanonicalIsAbsent
+ok 89 - C03_DiscoverMapper_readsKnownAliasesOnlyWhenCanonicalIsAbsent
+  ---
+  duration_ms: 0.811143
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_aliasAndPartialAreIndependentDiagnostics
+ok 90 - C03_DiscoverMapper_aliasAndPartialAreIndependentDiagnostics
+  ---
+  duration_ms: 1.379465
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_canonicalWinsAliasConflict
+ok 91 - C03_DiscoverMapper_canonicalWinsAliasConflict
+  ---
+  duration_ms: 0.426184
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated
+ok 92 - C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated
+  ---
+  duration_ms: 0.750222
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_acceptsOversizeInboundIdAndSkipsInvalidDevices
+ok 93 - C03_DiscoverMapper_acceptsOversizeInboundIdAndSkipsInvalidDevices
+  ---
+  duration_ms: 0.516909
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_readOnlyTypeIsKeptButNotSupported
+ok 94 - C03_DiscoverMapper_readOnlyTypeIsKeptButNotSupported
+  ---
+  duration_ms: 0.333636
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_topLevelFailuresAreFailClosed
+ok 95 - C03_DiscoverMapper_topLevelFailuresAreFailClosed
+  ---
+  duration_ms: 1.46474
+  type: 'test'
+  ...
+# Subtest: C03_DiscoverMapper_emptyDeviceListIsAValidEnvelope
+ok 96 - C03_DiscoverMapper_emptyDeviceListIsAValidEnvelope
+  ---
+  duration_ms: 0.386031
+  type: 'test'
+  ...
+# Subtest: C03_DeviationCounter_resetsAndCopiesCounts
+ok 97 - C03_DeviationCounter_resetsAndCopiesCounts
+  ---
+  duration_ms: 0.357509
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v20StrictFourFieldEnvelope
+ok 98 - C03_IdentityParser_v20StrictFourFieldEnvelope
+  ---
+  duration_ms: 7.437137
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21AcceptsKnownSecurityLanOnly
+ok 99 - C03_IdentityParser_v21AcceptsKnownSecurityLanOnly
+  ---
+  duration_ms: 1.764574
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21FailsClosedOnUnknownOrInconsistentFields
+ok 100 - C03_IdentityParser_v21FailsClosedOnUnknownOrInconsistentFields
+  ---
+  duration_ms: 2.864592
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_v21ValidatesPortPinsAndPinAlg
+ok 101 - C03_IdentityParser_v21ValidatesPortPinsAndPinAlg
+  ---
+  duration_ms: 2.915725
+  type: 'test'
+  ...
+# Subtest: C03_IdentityParser_serializesGetIdentityRequest
+ok 102 - C03_IdentityParser_serializesGetIdentityRequest
+  ---
+  duration_ms: 0.390319
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_reproducesAllFourV01CanonicalAndHmacVectors
+ok 103 - C05_CanonicalBuilder_reproducesAllFourV01CanonicalAndHmacVectors
+  ---
+  duration_ms: 3.225238
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_reproducesDiscoveryRequestVector
+ok 104 - C05_CanonicalBuilder_reproducesDiscoveryRequestVector
+  ---
+  duration_ms: 0.525033
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_acceptsResponseAuthVectorAndComputesBodySha
+ok 105 - C05_ResponseVerifier_acceptsResponseAuthVectorAndComputesBodySha
+  ---
+  duration_ms: 1.174703
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_headerLookupIsCaseInsensitiveAndTimeAgnostic
+ok 106 - C05_ResponseVerifier_headerLookupIsCaseInsensitiveAndTimeAgnostic
+  ---
+  duration_ms: 0.344576
+  type: 'test'
+  ...
+# Subtest: C05_ResponseVerifier_negativePathsUseContractErrorCodes
+ok 107 - C05_ResponseVerifier_negativePathsUseContractErrorCodes
+  ---
+  duration_ms: 2.025147
+  type: 'test'
+  ...
+# Subtest: C05_ExpectedResponse_controlCorrelationIsRequestIdColonSeq
+ok 108 - C05_ExpectedResponse_controlCorrelationIsRequestIdColonSeq
+  ---
+  duration_ms: 0.384198
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_signControlUsesOneClockSnapshotAndContractNonce
+ok 109 - C05_RequestSigner_signControlUsesOneClockSnapshotAndContractNonce
+  ---
+  duration_ms: 0.959433
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_encodesEveryValueKindAndAbsentValue
+ok 110 - C05_RequestSigner_encodesEveryValueKindAndAbsentValue
+  ---
+  duration_ms: 0.73204
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_signDiscoverUsesIndependent32HexChallengeAndNonce
+ok 111 - C05_RequestSigner_signDiscoverUsesIndependent32HexChallengeAndNonce
+  ---
+  duration_ms: 0.519534
+  type: 'test'
+  ...
+# Subtest: C05_RequestSigner_rejectsRepeatedNonceAndBadSecrets
+ok 112 - C05_RequestSigner_rejectsRepeatedNonceAndBadSecrets
+  ---
+  duration_ms: 0.934277
+  type: 'test'
+  ...
+# Subtest: C05_NonceCache_ttlBoundaryAndCapacityEviction
+ok 113 - C05_NonceCache_ttlBoundaryAndCapacityEviction
+  ---
+  duration_ms: 0.185336
+  type: 'test'
+  ...
+# Subtest: C05_CanonicalBuilder_rejectsLineInjectionAndBadAtoms
+ok 114 - C05_CanonicalBuilder_rejectsLineInjectionAndBadAtoms
+  ---
+  duration_ms: 0.40215
+  type: 'test'
+  ...
+# Subtest: C05_timeWindowBoundaryIsInclusiveAt120Seconds
+ok 115 - C05_timeWindowBoundaryIsInclusiveAt120Seconds
+  ---
+  duration_ms: 0.223436
+  type: 'test'
+  ...
+# Subtest: C05_ClockSkewTracker_hintsWithoutChangingAcceptance
+ok 116 - C05_ClockSkewTracker_hintsWithoutChangingAcceptance
+  ---
+  duration_ms: 0.228906
+  type: 'test'
+  ...
+# Subtest: C05_ACKChain_verifiedResponseFeedsC03MapperWithoutReinterpretation
+ok 117 - C05_ACKChain_verifiedResponseFeedsC03MapperWithoutReinterpretation
+  ---
+  duration_ms: 2.231533
+  type: 'test'
+  ...
+# Subtest: C05_CorrelationIsExactAndNonceGenerationIs32LowerHex
+ok 118 - C05_CorrelationIsExactAndNonceGenerationIs32LowerHex
+  ---
+  duration_ms: 0.339346
+  type: 'test'
+  ...
+1..118
+# tests 118
+# suites 0
+# pass 118
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1230.054329
