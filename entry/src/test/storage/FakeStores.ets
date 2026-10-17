@@ -122,6 +122,7 @@ export class InMemoryRdbStore implements RdbStore {
   failGetVersion: boolean = false;
   failSetVersion: boolean = false;
   failTransaction: boolean = false;
+  failCommit: boolean = false;
   executeCalls: number = 0;
 
   async execute(sql: string, args?: ReadonlyArray<RdbValue>): Promise<void> {
@@ -162,6 +163,11 @@ export class InMemoryRdbStore implements RdbStore {
     if (this.failTransaction) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
+    // Check BEFORE queueing: an `inTransaction` check inside the chain is
+    // unreachable for a nested call and would deadlock instead (wp-026 R-04).
+    if (this.inTransaction) {
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
     const run: Promise<T> = this.chain.then((): Promise<T> => {
       return this.runTransaction(fn);
     });
@@ -169,6 +175,11 @@ export class InMemoryRdbStore implements RdbStore {
     }, (): void => {
     });
     return run;
+  }
+
+  /** Test-only: true while a transaction callback is executing. */
+  isInTransactionForTest(): boolean {
+    return this.inTransaction;
   }
 
   async getVersion(): Promise<number> {
@@ -197,6 +208,10 @@ export class InMemoryRdbStore implements RdbStore {
     this.inTransaction = true;
     try {
       const result = await fn(this);
+      if (this.failCommit) {
+        this.failCommit = false;
+        throw AppErrors.of('STORAGE_RDB_ERROR', []);
+      }
       return result;
     } catch (error) {
       this.tables = snapshot;
@@ -231,7 +246,7 @@ export class InMemoryRdbStore implements RdbStore {
     if (upper.startsWith('CREATE INDEX')) {
       // Index metadata is irrelevant to the fake; the statement shape is
       // still validated so a typo fails the test.
-      if (!/^CREATE INDEX IF NOT EXISTS [A-Za-z0-9_]+ ON [A-Za-z0-9_]+ \([A-Za-z0-9_, ]+\)$/i
+      if (!/^CREATE INDEX IF NOT EXISTS [A-Za-z0-9_]+ ON [A-Za-z0-9_]+ ?\([A-Za-z0-9_, ]+\)$/i
         .test(normalized)) {
         throw AppErrors.of('STORAGE_RDB_ERROR', []);
       }
@@ -335,14 +350,14 @@ export class InMemoryRdbStore implements RdbStore {
   }
 
   private updateRows(sql: string, args: ReadonlyArray<RdbValue>): void {
-    const match = /^UPDATE ([A-Za-z0-9_]+) SET (.+) WHERE ([A-Za-z0-9_]+) = \?$/i
-      .exec(sql);
+    const match = /^UPDATE ([A-Za-z0-9_]+) SET (.+) WHERE (.+)$/i.exec(sql);
     if (match === null) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
     const table = this.requireTable(match[1]);
     const assignments = InMemoryRdbStore.splitTopLevel(match[2]);
-    if (assignments.length + 1 !== args.length) {
+    const whereColumns = InMemoryRdbStore.parseWhere(match[3]);
+    if (assignments.length + whereColumns.length !== args.length) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
     const setColumns: string[] = [];
@@ -353,13 +368,20 @@ export class InMemoryRdbStore implements RdbStore {
       }
       setColumns.push(pair[1]);
     }
-    const whereColumn = match[3];
-    if (!table.columns.has(whereColumn)) {
-      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    for (let index = 0; index < whereColumns.length; index++) {
+      if (!table.columns.has(whereColumns[index])) {
+        throw AppErrors.of('STORAGE_RDB_ERROR', []);
+      }
     }
-    const whereValue = args[args.length - 1];
     table.rows.forEach((row: Map<string, RdbValue>): void => {
-      if (row.get(whereColumn) === whereValue) {
+      let matches = true;
+      for (let index = 0; index < whereColumns.length; index++) {
+        if (row.get(whereColumns[index]) !== args[assignments.length + index]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
         for (let index = 0; index < setColumns.length; index++) {
           row.set(setColumns[index], args[index]);
         }
@@ -368,8 +390,7 @@ export class InMemoryRdbStore implements RdbStore {
   }
 
   private deleteRows(sql: string, args: ReadonlyArray<RdbValue>): void {
-    const match = /^DELETE FROM ([A-Za-z0-9_]+)(?: WHERE ([A-Za-z0-9_]+) = \?)?$/i
-      .exec(sql);
+    const match = /^DELETE FROM ([A-Za-z0-9_]+)(?: WHERE (.+))?$/i.exec(sql);
     if (match === null) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
@@ -378,12 +399,25 @@ export class InMemoryRdbStore implements RdbStore {
       table.rows.clear();
       return;
     }
-    if (!table.columns.has(match[2]) || args.length !== 1) {
+    const whereColumns = InMemoryRdbStore.parseWhere(match[2]);
+    if (whereColumns.length !== args.length) {
       throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
+    for (let index = 0; index < whereColumns.length; index++) {
+      if (!table.columns.has(whereColumns[index])) {
+        throw AppErrors.of('STORAGE_RDB_ERROR', []);
+      }
     }
     const keys: string[] = [];
     table.rows.forEach((row: Map<string, RdbValue>, key: string): void => {
-      if (row.get(match[2]) === args[0]) {
+      let matches = true;
+      for (let index = 0; index < whereColumns.length; index++) {
+        if (row.get(whereColumns[index]) !== args[index]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
         keys.push(key);
       }
     });
@@ -400,21 +434,38 @@ export class InMemoryRdbStore implements RdbStore {
     const table = this.requireTable(match[2]);
     const selectText = match[1].trim();
     const rest = match[3].trim();
-    let whereColumn = '';
-    let whereValue: RdbValue = null;
+    let whereColumns: string[] = [];
+    const whereArgs: RdbValue[] = [];
     let orderColumn = '';
     let orderDesc = false;
     let limit = -1;
     let remainder = rest;
 
-    const whereMatch = /^WHERE ([A-Za-z0-9_]+) = \?/i.exec(remainder);
-    if (whereMatch !== null) {
-      if (!table.columns.has(whereMatch[1]) || args.length < 1) {
+    if (/^WHERE /i.test(remainder)) {
+      let clauseEnd = remainder.length;
+      const upper = remainder.toUpperCase();
+      const orderIndex = upper.indexOf(' ORDER BY ');
+      const limitIndex = upper.indexOf(' LIMIT ');
+      if (orderIndex >= 0 && orderIndex < clauseEnd) {
+        clauseEnd = orderIndex;
+      }
+      if (limitIndex >= 0 && limitIndex < clauseEnd) {
+        clauseEnd = limitIndex;
+      }
+      const whereText = remainder.substring(6, clauseEnd).trim();
+      whereColumns = InMemoryRdbStore.parseWhere(whereText);
+      if (whereColumns.length !== args.length) {
         throw AppErrors.of('STORAGE_RDB_ERROR', []);
       }
-      whereColumn = whereMatch[1];
-      whereValue = args[0];
-      remainder = remainder.substring(whereMatch[0].length).trim();
+      for (let index = 0; index < whereColumns.length; index++) {
+        if (!table.columns.has(whereColumns[index])) {
+          throw AppErrors.of('STORAGE_RDB_ERROR', []);
+        }
+        whereArgs.push(args[index]);
+      }
+      remainder = remainder.substring(clauseEnd).trim();
+    } else if (args.length > 0) {
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
     }
     const orderMatch = /^ORDER BY ([A-Za-z0-9_]+) (ASC|DESC)/i.exec(remainder);
     if (orderMatch !== null) {
@@ -452,7 +503,14 @@ export class InMemoryRdbStore implements RdbStore {
 
     let rows: Array<Map<string, RdbValue>> = [];
     table.rows.forEach((row: Map<string, RdbValue>): void => {
-      if (whereColumn.length === 0 || row.get(whereColumn) === whereValue) {
+      let matches = true;
+      for (let index = 0; index < whereColumns.length; index++) {
+        if (row.get(whereColumns[index]) !== whereArgs[index]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
         rows.push(row);
       }
     });
@@ -487,8 +545,25 @@ export class InMemoryRdbStore implements RdbStore {
     return table;
   }
 
-  private static splitTopLevel(text: string): string[] {
-    const parts: string[] = [];
+  /** Parses `a = ? AND b = ?` into ordered column names, validating shape. */
+  private static parseWhere(text: string): string[] {
+    const trimmed = text.trim();
+    if (trimmed.length === 0) {
+      throw AppErrors.of('STORAGE_RDB_ERROR', []);
+    }
+    const parts = trimmed.split(/\s+AND\s+/i);
+    const columns: string[] = [];
+    for (let index = 0; index < parts.length; index++) {
+      const match = /^([A-Za-z0-9_]+) = \?$/i.exec(parts[index].trim());
+      if (match === null) {
+        throw AppErrors.of('STORAGE_RDB_ERROR', []);
+      }
+      columns.push(match[1]);
+    }
+    return columns;
+  }
+
+  private static splitTopLevel(text: string): string[] {    const parts: string[] = [];
     let depth = 0;
     let current = '';
     for (let index = 0; index < text.length; index++) {

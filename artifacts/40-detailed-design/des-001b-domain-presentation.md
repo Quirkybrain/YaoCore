@@ -3,7 +3,8 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Proposed（待 G-007）
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。
 - **Date**: 2026-10-17
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
@@ -634,6 +635,7 @@ CREATE TABLE IF NOT EXISTS cloud_config (
 | 主题 | 契约 |
 |---|---|
 | 单写者 | 每个仓储实例对其表串行写；`RdbStore.transaction` 内完成复合操作 |
+| 域操作门（O-1） | C-08..C-11 共享一个注入的 `DomainOperationGate`；普通操作/顶层事务单飞；合法排队默认有界等待 2000 ms（构造注入，组合根可调；**D-023**）；同步重入 `CONFIGURATION_ERROR(nestedGateOperation)`，超预算排队 `CONFIGURATION_ERROR(nestedOperationOrQueueTimeout)` 且不执行；预期 <2s 的合法域操作可排队，更长操作由调用方串行化；事务上下文方法不得调用 `run()` |
 | 同网关命令 | C-17 每网关串行；C-10/C-11 不并行发同网关命令（场景串行；VM 单次控制；节流器保证 1 在途） |
 | 跨网关 | 可并行；场景仍按动作数组顺序串行（`SceneAction.delayMs` 生效） |
 | 取消 | C-11 场景执行、C-15 影子轮询、C-23 配网接受 `CancellationToken`；每步/每轮检查 |
@@ -641,6 +643,8 @@ CREATE TABLE IF NOT EXISTS cloud_config (
 | 时间 | 领域仲裁用 `DateTimeUtil.parseUtcCompact`；UI 计时用 `ClockPort.nowMs()`；超时差值不用 wall clock 直接相减跨重启 |
 | 应用后台 | C-28 调用 `AuthService.lockAll()`、`SecretDraftStore.clearAll()`、`BleProvisioningService.cancel()`、`CloudService.stopPolling()`、`PreferencesStore.flush()`；取消所有 VM 定时器 |
 | 重启 | `PendingCommand` 不持久化；重启后控制显示未确认，不自动重放；`seq` 持久化继续递增（DES-A §14.3） |
+
+> **G-007 扩展 / T-09 复审同步（2026-10-17）**：域操作门行按 **D-023** 书面化，语义与实现头注释一致（`DomainOperationGate` 默认 2000 ms、构造注入、组合根可调）；不新增架构裁定，不改变既有仓储/事务契约。
 
 ---
 
@@ -841,10 +845,13 @@ export class FamilyService {
 - `extendGuest`：仅 ADMIN；`expiresAt` 必须是未来 UTC 紧凑时间；更新后调用 `auth.invalidateSessionsForMember`（让新时效生效）；更新 GUEST 时效，不改角色；返回 `MemberChangeResult`。
 - `dissolveFamily`：仅 ADMIN；`families.removeFamilyLocal` 删除本地数据；随后 `auth.removeProfilesForFamily(familyId)` 删除该家庭的本地档案（若失败，返回 `CONFIGURATION_ERROR` 并提示重试；家庭数据已删除，档案残留需清理）；返回 `FamilyDissolutionPlan`，其中 `gatewayIds` 来自 `routes.listRoutesByFamily`；**不**删除 route/secret（C-22 在用户确认后调用 `GatewayRepository.removeLocalBinding` 或保留为“待重新配网”）。
 - `leaveFamily`：普通成员自退出；若为最后一个 ADMIN → `AUTH_RBAC_DENIED`；删除成员记录；删除该成员在该家庭的本地档案（`auth.removeProfilesForMember(familyId, memberId)`）；返回轮换引导；不删除家庭（家庭仍属其他成员）。
-- `importReceipt`：调用 `invites.verifyReceipt`；成功后 `families.applyReceipt(inviteId, patch)`（单事务：ACCEPTED + accepted 字段 + `usedCount++`）；若成员不存在则 `upsertMember(ACTIVE)`；失败抛 `INVITE_RECEIPT_INVALID`；不改变 `payloadString`/`seedAlias`。
+- `importReceipt`（**D-022**）：调用 `invites.verifyReceipt`；成功后 `families.applyReceipt(inviteId, patch)`（单事务：写入本次 ACCEPTED 记录 + accepted 字段 + `usedCount++`）；若成员不存在则 `upsertMember(ACTIVE)`；失败抛 `INVITE_RECEIPT_INVALID`；不改变 `payloadString`/`seedAlias`。
+  - **`ACCEPTED` 不是邀请终态**：`usedCount < maxUses` 且 `expireAt > now` 时，后续**不同**回执继续被接受并递增 `usedCount`；C-08 单收据列记录本次 `acceptedAt/acceptedByMemberId/receipt`（覆盖上一次），历史回执由 C-13 持久账本判定（§23.6）。仅 `usedCount == maxUses`、`REVOKED` 或 `EXPIRED` 终止。
+  - **过期回执**：`expireAt <= now` 的邀请（含此前已 ACCEPTED、未达 `maxUses` 的多用途邀请）在导入回执时 → `INVITE_EXPIRED`，不得递增 `usedCount`（ADR-003 §5.2 时钟信任边界）。
+  - **回执重放**：同一 `(inviteId, receiptHash)` 的历史重放由 C-13 持久账本拒绝（§23.6；R3-01）；C-08 的即时重复检查保留为轻量防御，不替代账本。
 - `createInvitationForJoinRequest`：`joinRequestText` 必须是 `YCR1`；调用 `invites.createInvitation({ mode: KEY_WRAP, joinRequest })`；`putInvitation(record)`；`seedAlias` 已由 C-13 写入 Asset Store。
 - `createCodeInvitation`：强制 `mode=CODE_KEK`；`maxUses` 默认 1（可显式 >1，UI 必须标弱模式）；返回 `code` 仅本次展示；不持久化明文码。
-- `expireInvitations`：`PENDING` 且 `expireAt <= now` → `EXPIRED`；已 `ACCEPTED/REVOKED` 不变。
+- `expireInvitations`（**D-022**）：`PENDING` 或 `ACCEPTED`（`usedCount < maxUses`）且 `expireAt <= now` → `EXPIRED`（含已记录过 ACCEPTED、仍有剩余次数的多用途邀请）；`usedCount == maxUses` 的 `ACCEPTED` 保持终态（用尽语义仍为 `INVITE_MAX_USES`）；`REVOKED` 不变；已 `EXPIRED` 幂等。
 - `markContactSync`：只调用 `families.markSynced(memberId, atMs)`；表示本机最近接触式同步，不产生在线/心跳语义（D-010）。
 
 #### 3.1.4 `FamilyJoinSession`（成员侧）
@@ -953,21 +960,29 @@ stateDiagram-v2
 
 #### 3.3.3 邀请状态机
 
+> **G-007 扩展 / T-09 复审同步（2026-10-17）**：本节按 **D-022** 修订；`ACCEPTED` 为每次回执记录而非邀请终态；不改变 DES-A 冻结签名与 G-004 语义。
+
 ```mermaid
 stateDiagram-v2
     [*] --> PENDING: createInvitation (KEY_WRAP / CODE_KEK)
     PENDING --> ACCEPTED: verifyReceipt success + usedCount++
+    ACCEPTED --> ACCEPTED: 后续不同回执（usedCount < maxUses 且未过期）+ usedCount++
     PENDING --> EXPIRED: expireAt <= now
+    ACCEPTED --> EXPIRED: expireAt <= now（含未达 maxUses）
     PENDING --> REVOKED: revokeInvitation
-    ACCEPTED --> [*]
+    ACCEPTED --> REVOKED: revokeInvitation（含未达 maxUses）
+    ACCEPTED --> [*]: usedCount == maxUses
     EXPIRED --> [*]
     REVOKED --> [*]
 ```
 
 - `PENDING → ACCEPTED` 仅在**回执到达并校验通过**后发生；成员设备本地接受但回执未达时，Admin 仍看到 `PENDING`（ADR-003 §5.4）。
-- `usedCount` 单调递增；`ACCEPTED` 时 `acceptedAt/acceptedByMemberId/receipt` 必须同时写入。
+- **`ACCEPTED` 是每次回执的记录，不是邀请终态（D-022）**：`usedCount < maxUses` 且 `expireAt > now` 时，后续不同回执继续接受并递增 `usedCount`；只有达到 `maxUses`、`REVOKED` 或 `EXPIRED` 才终止。
+- **过期回执**：`expireAt <= now`（含此前已 ACCEPTED、未达 `maxUses` 的多用途邀请）→ `INVITE_EXPIRED`；不递增 `usedCount`，不写入本次接受元数据（D-022；ADR-003 §5.2）。
+- **历史回执重放**：唯一 `(inviteId, receiptHash)` 持久账本由 C-13 `InviteServicePort.verifyReceipt` 拒绝，且不递增 `usedCount`（§23.6；R3-01）。C-08 的单收据列 `receipt/acceptedByMemberId` 只做即时防御，不承担历史去重。
+- `usedCount` 单调递增；每次接受均覆盖写入 `acceptedAt/acceptedByMemberId/receipt`（C-08 单收据列模型）；全量历史记录由 C-13 账本维护。
 - `KEY_WRAP.maxUses` 必须 1；`CODE_KEK.maxUses>=1`，>1 时 UI 必须显示弱模式警告与“可重复使用（安全性降低）”。
-- 撤销只改本地状态；真正失效需逐网关 BLE 轮换（ADR-003 §6）；`revokeInvitation` 返回/触发轮换引导，不执行 BLE。
+- 撤销只改本地状态（`PENDING` 或 `ACCEPTED` 且未达 `maxUses` 均可撤销）；真正失效需逐网关 BLE 轮换（ADR-003 §6）；`revokeInvitation` 返回/触发轮换引导，不执行 BLE。
 - 邀请容器 `payloadString` 是密文，可重复分享；`seedAlias` 只存别名；不得在日志/异常中输出 seed/码。
 
 #### 3.3.4 加入流程（D-009 主路径）
@@ -1028,8 +1043,8 @@ sequenceDiagram
   - 家庭创建 + ADMIN 不变量 + activeFamily 切换；
   - 最后一个 ADMIN 删除/降级/退出失败；
   - GUEST 到期/续期/不自动恢复；
-  - 邀请状态 PENDING→ACCEPTED/EXPIRED/REVOKED；`usedCount` 上限；KEY_WRAP `maxUses!=1` 拒绝；
-  - 回执校验成功/篡改；重复回执拒绝；
+  - 邀请状态 PENDING→ACCEPTED/EXPIRED/REVOKED；ACCEPTED→ACCEPTED（未达 `maxUses` 且未过期，D-022）/EXPIRED/REVOKED；`usedCount` 上限；KEY_WRAP `maxUses!=1` 拒绝；
+  - 回执校验成功/篡改；同回执即时重复拒绝（C-08 当前防御）；历史回执重放由 C-13 `(inviteId, receiptHash)` 账本拒绝且不递增 `usedCount`（§23.6；R3-01）；D-022 不同回执按 `usedCount < maxUses` 继续成功；
   - 加入 session：`start → submitInvitation(KEY_WRAP) → COMPLETED`；CODE_KEK 缺码 → `CODE_REQUIRED`；取消清理 join 私钥别名；
   - removeMember 调用 `auth.invalidateSessionsForMember`（fake 记录）；
   - D-010：`markContactSync` 只写字段，不产生“在线”语义；
@@ -1801,7 +1816,7 @@ export class SceneExecutor {
 - `runId` = `ids.newId()`；返回/进度均带 `runId`。`cancel(runId)`：设置取消标志；不强制中断在途 C-17 请求（等其返回/超时），后续步骤不再下发。
 - `SceneExecutor` 用 `TimerPort` 对每步施加 `stepTimeoutMs`；超时 → 该步 `FAILED`（`SCENE_STEP_FAILED` + `GATEWAY_TIMEOUT` 语义），后续 `SKIPPED`；迟到的 `ControlOutcome` 不得改写已结束的步骤结果（operation token 丢弃）。
 - 场景执行不自动重试；C-17 `BACKGROUND` 客户端负责传输级精确重传。
-- 并发：同一场景同一时间只允许一个 run；不同场景可并行但共享网关时由 C-17 串行；建议 UI 全局串行执行场景。
+- 并发：同一场景同一时间只允许一个 run；第二次 `run` 在首条命令前以 `SCENE_RUN_IN_PROGRESS` 拒绝（不排队、不产生部分执行）；不同场景可并行但共享网关时由 C-17 串行；建议 UI 全局串行执行场景。
 
 ### 6.2 错误（`DES-B-C11-ERR`）
 
@@ -1815,9 +1830,12 @@ export class SceneExecutor {
 | 步骤失败 | `SCENE_STEP_FAILED`（新增；含 step index/AppError） |
 | 网关/设备引用失效 | `SCENE_REFERENCE_INVALID`（新增） |
 | 取消 | `SCENE_CANCELLED`（新增） |
+| 同场景并发运行 | `SCENE_RUN_IN_PROGRESS`（新增；首条命令前拒绝，不排队、无部分执行） |
 | 值非法 | `PROTOCOL_VALUE_OUT_OF_RANGE`/`CONFIGURATION_ERROR` |
 | RDB/JSON 失败 | `STORAGE_RDB_ERROR` |
 | 场景引用清理失败 | 透传 `STORAGE_RDB_ERROR`（调用方事务回滚） |
+
+> **G-007 扩展 / T-09 复审同步（2026-10-17）**：按 T-09 复审 R2-04 登记 `SCENE_RUN_IN_PROGRESS`；i18n 键约定 `errors.scene.run_in_progress`（实际资源由 C-14/T-10 落地）。本表既有 `SCENE_*` 错误码语义不变；全部为增量。
 
 ### 6.3 状态机与不变量（`DES-B-C11-STATE`）
 
@@ -1838,6 +1856,8 @@ stateDiagram-v2
     SUCCEEDED --> [*]
     CANCELLED --> [*]
 ```
+
+> **G-007 扩展 / T-09 复审同步（2026-10-17）**：同一场景已有 run 时，第二次 `run` 在进入 `PREFLIGHT` 前被拒绝（`SCENE_RUN_IN_PROGRESS`），不产生状态迁移、不排队、不下发命令。
 
 #### 6.3.2 预检清单（全部通过才发第一条命令）
 
@@ -5511,6 +5531,7 @@ CQG-Txx
 | `RISK-I18N-DUAL-STORE` | 双存储文案漂移 | `RISK` | 中英混排 | 一个 key 一处；CHK-01/02/09；运行时同时切换 | T-10/T-19 |
 | `RISK-PB02-INVENTORY-PARSER` | 候选 parser 与固件不一致 | `RISK` | 外部模块误判 | fail-closed；`UNSUPPORTED`；不声明 PASS | 固件 schema |
 | `RISK-FR-FAM-004-CONSISTENCY` | 退出/解散跨设备一致性 | `RISK`（v1 声明） | 旧成员仍可控制 | 轮换引导；UI 声明；不承诺实时 | 产品/安全评审 |
+| `RISK-INVITE-RECEIPT-REPLAY` | C-08 单收据列无法识别历史回执重放（R3-01） | `RISK`（Medium） | 多用途 CODE_KEK 的 `usedCount` 可被陈旧回执消耗，后续合法成员被 `INVITE_MAX_USES` 拒绝 | C-13 `(inviteId, receiptHash)` 持久账本正式修复（§23.6）；C-08 即时防御保留；T-13 前不声称“已完全拒绝” | T-13 账本 + `maxUses=3` 用例通过 |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
 
@@ -5621,6 +5642,7 @@ export interface DeviceStatePort {
 | `EXT-DES-B-19` | `GatewayRepository` | 无变更 | C-23 只调用既有 `commitBinding/removeLocalBinding` |
 | `EXT-DES-B-20` | `AuthService` | `removeProfilesForFamily(familyId)`、`removeProfilesForMember(familyId, memberId)` | 退出/解散时清理本地档案；新方法，不改变既有会话/RBAC 语义 |
 | `EXT-DES-B-21` | `AuthService` | 多家庭实现 | 每家庭一个 `LocalProfile`（§3.3.1）；不新增 `rebindProfile` |
+| `EXT-DES-B-24` | `InviteServicePort`（C-13） | `verifyReceipt`（签名不变） | 增加持久账本去重语义：唯一 `(inviteId, receiptHash)`；历史回执重放拒绝且不递增 `usedCount`；见 §23.6（R3-01） |
 
 > `AuthService` 不新增 `rebindProfile`：v1 每家庭一个档案，避免修改冻结的 `LocalProfile.familyId` 语义。加入家庭后由 C-22 调用既有 `createProfile`。该选择登记为 `RISK-MULTIFAMILY-PROFILE`。
 
@@ -5644,6 +5666,7 @@ export interface DeviceStatePort {
 | 场景 | `SCENE_STEP_FAILED` | CONFIG | 是 | `errors.app.scene_step_failed` |
 | 场景 | `SCENE_REFERENCE_INVALID` | CONFIG | 否 | `errors.app.scene_reference_invalid` |
 | 场景 | `SCENE_CANCELLED` | CONFIG | 是 | `errors.app.scene_cancelled` |
+| 场景 | `SCENE_RUN_IN_PROGRESS` | CONFIG | 是 | `errors.scene.run_in_progress` |
 | i18n | `I18N_RESOURCE_LOAD_FAILED` | CONFIG | 是 | `errors.app.i18n_resource_load_failed` |
 | i18n | `I18N_BUNDLE_INVALID` | CONFIG | 否 | `errors.app.i18n_bundle_invalid` |
 | i18n | `I18N_LOCALE_UNSUPPORTED` | CONFIG | 否 | `errors.app.i18n_locale_unsupported` |
@@ -5668,6 +5691,8 @@ export interface DeviceStatePort {
 - 全部为**新增**；不得修改 DES-A 已有 code 的类别/重试/i18n 语义（DES-A §27.3）。
 - 所有 i18n 键必须同时存在于 zh-CN/en-US rawfile；CHK-06 检查。
 - `CLOUD_*` 不复用网关 `result_code` 数值空间；`errors.cloud.*` 与 `errors.gateway.*` 分离。
+- **`SCENE_RUN_IN_PROGRESS`（G-007 扩展 / T-09 复审同步，2026-10-17；R2-04）**：同一场景已有 run 时拒绝第二次并发 `run`，在首条命令前返回；可重试（待首个 run 结束）。i18n 键约定 `errors.scene.run_in_progress`，实际资源由 C-14/T-10 落地；不改变既有错误码。
+- **观察项（不裁定）**：本表既有场景错误键使用 `errors.app.scene_*`，§7.4.2 的 `errors` 域也只列 `errors.app.*`/`errors.gateway.*`/`errors.cloud.*`；R2-04 给出的 `errors.scene.run_in_progress` 前缀与之不同。最终桶名由 C-14/T-10 按 I18N-DESIGN 统一；本修订不改变既有键，仅登记该差异。
 
 ### 23.5 不构成 DES-A 变更的内容
 
@@ -5683,6 +5708,24 @@ export interface DeviceStatePort {
 3. `GatewayRepository` 是否被 C-23 调用 `commitBinding`（已完成）。
 4. `I18nService`/`CloudService` 为新增，不影响已实现组件。
 5. 任何已冻结签名不匹配 → 标 `STALE`，走 Change Impact；不得静默改 DES-A。
+
+### 23.6 C-13 回执去重账本（`G-007 扩展 / T-09 复审同步`，2026-10-17；R3-01）
+
+> **性质**：上游契约语义要求，**不新增/修改 DES-A §13.1 已冻结方法签名**，不改变 G-004 语义；也**不要求 C-08/T-09 在当前任务重写**。C-08 现有 `isDuplicateReceipt` 保留为即时防御，正式修复落在 C-13/T-13。
+
+- **适用方法**：`InviteServicePort.verifyReceipt(receiptText, inviteId)`（T-09 消费端口，`entry/src/main/ets/service/family/FamilyModels.ets`；与 DES-A §13.1 `InviteService.verifyReceipt` 同语义）。
+- **持久账本**：按邀请维护已接受回执的持久化账本，逻辑唯一键 **`(inviteId, receiptHash)`**；`receiptHash` 为域分离的 SHA-256（禁止明文回执入库）。存储介质/schema 由 T-13 依 ADR-003 §5.4/§9 与 DES-A §13 实现；若落 RDB，唯一约束必须在库层生效。
+- **记录字段（最小）**：`inviteId`、`receiptHash`、`memberId`、`acceptedAt`、`recordedAt`；账本跨重启有效。
+- **行为要求**：
+  1. 首次回执：正常验证并写入账本；`ReceiptVerification.valid=true`。
+  2. **历史回执重放**：同 `(inviteId, receiptHash)` 再次导入（即使该邀请后来由其他成员接受、`receipt/acceptedByMemberId` 已被覆盖）→ 拒绝；映射 `INVITE_RECEIPT_INVALID`（若邀请已用尽，按既有错误优先级为 `INVITE_MAX_USES`；无论返回哪个码，均**不得递增** C-08 `usedCount`、不得创建/更新成员）。
+  3. **D-022 不同回执**：`usedCount < maxUses` 且未过期时继续接受，按 `(inviteId, receiptHash)` 追加账本；达 `maxUses` 后 `INVITE_MAX_USES`。
+  4. 过期/撤销的前置错误仍为 `INVITE_EXPIRED` / `INVITE_REVOKED`；错误优先级与 DES-A §13.3 一致。
+- **责任划分（R3-01）**：C-08 单收据列模型只覆盖“最后一次回执/成员”的即时重放（**轻量缓解**）；C-13 账本负责**历史回执重放**（**正式修复**）。在 T-13 落地前，任何报告不得声称“历史回执重放已完全拒绝”。
+- **验证（归 T-13）**：`maxUses=3`：member-a 接受 → member-b 接受 → 重放 member-a 被拒且 `usedCount` 不变 → member-c 成功；覆盖跨重启与“不同回执正常消耗”（D-022）。T-09 仅验证 C-08 即时防御。
+- **不做的事**：本修订不新增 `(inviteId, memberId)` 唯一约束；同成员再次接受沿用既有 C-08 防御（`artifacts/70-review/t09-review-c.md` §4.1）。如需改为“每成员一次”账本语义，走 Clarification / Change Impact。
+- **状态**：`PENDING-C13`（T-13 实现 + 证据后关闭）；不阻塞 G-007，但 CQG 记录必须保留该跟踪项。
+- **Change Impact**：本修订为上游契约同步，不使任何已实现组件 `STALE`。C-08/T-09 的行为与 D-022 一致（R3-01 的账本缺口由本节跟踪，不要求重写 C-08）；C-11 的 `SCENE_RUN_IN_PROGRESS` 仅为契约登记（实现已有等价拒绝，见 `artifacts/70-review/t09-review-b.md` R-02）。下游按 §3.3.3/§6.2/§23.4 编码。
 
 ---
 
