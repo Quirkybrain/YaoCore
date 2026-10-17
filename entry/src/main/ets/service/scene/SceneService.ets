@@ -35,6 +35,16 @@ import {
 import { RunCancellation, SceneExecutor } from './SceneExecutor';
 import type { SceneTimerPort } from './SceneTimerPort';
 import { SceneValidation } from './SceneValidation';
+import type { PolicyDecision } from '../auth/AuthModels';
+
+/**
+ * F-02 / DES-A §12.1: C-12 remains the policy owner. The composition root
+ * adapts AuthService.canExecuteScene(session) to this port; SceneService.run
+ * refuses before any command is dispatched. A missing port is fail-closed.
+ */
+export interface SceneExecutionAuthorizationPort {
+  canExecuteScene(): PolicyDecision;
+}
 
 export class SceneInput {
   readonly familyId: string;
@@ -63,13 +73,15 @@ export class SceneService {
   private readonly rdb?: RdbStore;
   private readonly gate?: DomainOperationGate;
   private readonly executor: SceneExecutor;
+  private readonly authorization?: SceneExecutionAuthorizationPort;
   private readonly listeners: Array<(event: SceneExecutionEvent) => void> = [];
   private readonly runs: Map<string, RunCancellation> = new Map<string, RunCancellation>();
   private readonly activeSceneRuns: Map<string, string> = new Map<string, string>();
 
   constructor(scenes: SceneRepository, devices: DeviceRepository, control: DeviceControlPort,
     routes: GatewayRoutePort, clock: ClockPort, timer: SceneTimerPort, ids: IdPort,
-    logger: LoggerPort, metrics: MetricsPort, rdb?: RdbStore, gate?: DomainOperationGate) {
+    logger: LoggerPort, metrics: MetricsPort, rdb?: RdbStore, gate?: DomainOperationGate,
+    authorization?: SceneExecutionAuthorizationPort) {
     this.scenes = scenes;
     this.routes = routes;
     this.clock = clock;
@@ -78,6 +90,7 @@ export class SceneService {
     this.metrics = metrics;
     this.rdb = rdb;
     this.gate = gate;
+    this.authorization = authorization;
     this.executor = new SceneExecutor(control, devices, routes, clock, timer, logger);
   }
 
@@ -140,6 +153,7 @@ export class SceneService {
 
   async run(sceneId: string, listener?: (progress: SceneExecutionProgress) => void,
     cancellation?: CancellationToken): Promise<SceneExecutionResult> {
+    this.authorizeExecution();
     const scene = await this.scenes.getScene(sceneId);
     if (scene === undefined) {
       throw AppErrors.of('SCENE_NOT_FOUND', []);
@@ -232,6 +246,18 @@ export class SceneService {
   }
 
   // ---- Internals ----------------------------------------------------------
+
+  private authorizeExecution(): void {
+    if (this.authorization === undefined) {
+      // Fail closed: a SceneService constructed without the C-12 policy port
+      // must never dispatch commands (T-13 F-08 / T-18 F-02).
+      throw AppErrors.of('AUTH_RBAC_DENIED', []);
+    }
+    const decision = this.authorization.canExecuteScene();
+    if (!decision.allowed) {
+      throw AppErrors.of('AUTH_RBAC_DENIED', [new NameValue('reason', decision.reason)]);
+    }
+  }
 
   private async validateInput(input: SceneInput): Promise<void> {
     SceneService.sceneName(input.sceneName);

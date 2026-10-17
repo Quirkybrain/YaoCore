@@ -38,23 +38,23 @@ class FakeRoomAdmin {
 
   async listRooms() { return this.rooms; }
 
-  async createRoom(familyId, name, icon) {
+  async createRoom(familyId, name, icon, actorMemberId) {
     const created = roomValue('33333333-3333-4333-8333-333333333333', name, this.rooms.length);
     this.rooms.push(created);
-    this.created.push({ familyId, name, icon });
+    this.created.push({ familyId, name, icon, actorMemberId });
     return created;
   }
 
-  async renameRoom(roomId, name) {
+  async renameRoom(roomId, name, actorMemberId) {
     const target = this.rooms.find((room) => room.roomId === roomId);
     const renamed = roomValue(roomId, name, target.orderIndex);
-    this.renamed.push({ roomId, name });
+    this.renamed.push({ roomId, name, actorMemberId });
     this.rooms = this.rooms.map((room) => room.roomId === roomId ? renamed : room);
     return renamed;
   }
 
-  async reorderRooms(familyId, orderedRoomIds) {
-    this.reordered.push({ familyId, orderedRoomIds });
+  async reorderRooms(familyId, orderedRoomIds, actorMemberId) {
+    this.reordered.push({ familyId, orderedRoomIds, actorMemberId });
   }
 
   async previewDelete(roomId) {
@@ -63,8 +63,9 @@ class FakeRoomAdmin {
       requiresConfirmation: true };
   }
 
-  async deleteRoom(roomId, confirmation) {
+  async deleteRoom(roomId, confirmation, actorMemberId) {
     this.confirmation = confirmation;
+    this.actorMemberId = actorMemberId;
     if (confirmation.userAcknowledgedDeviceCount !== 2) {
       throw AppErrors.of('ROOM_DELETE_NOT_CONFIRMED', []);
     }
@@ -73,24 +74,25 @@ class FakeRoomAdmin {
     return { roomId, deleted: true, affectedDeviceCount: 2, affectedMemberCount: 1 };
   }
 
-  async assignDevice(familyId, key, roomId) {
-    this.assigned.push({ familyId, key, roomId });
+  async assignDevice(familyId, key, roomId, actorMemberId) {
+    this.assigned.push({ familyId, key, roomId, actorMemberId });
     return { key };
   }
 
-  async unassignDevice(familyId, key) {
-    this.unassigned.push({ familyId, key });
+  async unassignDevice(familyId, key, actorMemberId) {
+    this.unassigned.push({ familyId, key, actorMemberId });
     return { key };
   }
 }
 
-function setup() {
+function setup(session = undefined) {
   const clock = new FakeClock();
   const admin = new FakeRoomAdmin();
   const pool = record({ deviceId: 'dev-pool', roomId: '', isUnassigned: true,
     isEnabled: false });
   const devices = new FakeDeviceQuery([pool]);
-  const vm = new RoomViewModel(admin, devices, new FakeI18n(), clock, new FakeLogger());
+  const vm = new RoomViewModel(admin, devices, new FakeI18n(), clock, new FakeLogger(),
+    session);
   return { clock, admin, pool, devices, vm, key: pool.state.key };
 }
 
@@ -163,4 +165,20 @@ test('T16_Room_cancelDeleteClearsPreviewWithoutCallingService', async () => {
   h.vm.cancelDelete();
   assert.equal(h.vm.getState().deletionPreview, undefined);
   assert.equal(h.admin.deleted.length, 0);
+});
+
+test('T18_RoomViewModel_passesActiveMemberIdToServiceActorChecks', async () => {
+  const h = setup({ getMemberId: () => 'member-admin' });
+  await h.vm.initialize('family-1');
+  await h.vm.createRoom('Kitchen', 'kitchen');
+  assert.equal(h.admin.created[0].actorMemberId, 'member-admin');
+  await h.vm.renameRoom(ROOM_A, 'Lounge');
+  assert.equal(h.admin.renamed[0].actorMemberId, 'member-admin');
+  await h.vm.assignDevice(h.key, ROOM_A);
+  assert.equal(h.admin.assigned[0].actorMemberId, 'member-admin');
+  await h.vm.unassignDevice(h.key);
+  assert.equal(h.admin.unassigned[0].actorMemberId, 'member-admin');
+  await h.vm.previewDelete(ROOM_A);
+  await h.vm.confirmDelete(ROOM_A, 2);
+  assert.equal(h.admin.actorMemberId, 'member-admin');
 });

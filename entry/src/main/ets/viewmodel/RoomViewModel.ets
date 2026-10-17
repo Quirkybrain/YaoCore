@@ -27,6 +27,14 @@ import { DeviceRepository } from '../repository/DeviceRepository';
 
 const TAG: string = 'RoomViewModel';
 
+/**
+ * F-03: narrow session lookup supplied by the composition root. The view model
+ * passes the active member id to RoomService, which refuses non-ADMIN actors.
+ */
+export interface RoomSessionPort {
+  getMemberId(): string | undefined;
+}
+
 export class RoomViewState {
   readonly phase: LoadPhase;
   readonly rooms: ReadonlyArray<Room>;
@@ -59,6 +67,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   private readonly i18n: I18nService;
   private readonly clock: ClockPort;
   private readonly logger: LoggerPort;
+  private readonly session?: RoomSessionPort;
 
   private state: RoomViewState = RoomViewState.initial();
   private listeners: Array<(state: RoomViewState) => void> = [];
@@ -67,12 +76,17 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   private disposed: boolean = false;
 
   constructor(rooms: RoomService, devices: DeviceRepository, i18n: I18nService,
-    clock: ClockPort, logger: LoggerPort) {
+    clock: ClockPort, logger: LoggerPort, session?: RoomSessionPort) {
     this.rooms = rooms;
     this.devices = devices;
     this.i18n = i18n;
     this.clock = clock;
     this.logger = logger;
+    this.session = session;
+  }
+
+  private actorMemberId(): string | undefined {
+    return this.session === undefined ? undefined : this.session.getMemberId();
   }
 
   getState(): RoomViewState {
@@ -112,7 +126,8 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   async createRoom(name: string, icon?: string): Promise<Room> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
-      const room = await this.rooms.createRoom(this.familyId, name, icon);
+      const room = await this.rooms.createRoom(this.familyId, name, icon,
+        this.actorMemberId());
       await this.refresh();
       this.publish(this.copy(this.state.phase, false, undefined, this.state.deletionPreview));
       return room;
@@ -125,7 +140,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   async renameRoom(roomId: string, name: string): Promise<void> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
-      await this.rooms.renameRoom(roomId, name);
+      await this.rooms.renameRoom(roomId, name, this.actorMemberId());
       await this.refresh();
       this.publish(this.copy(this.state.phase, false, undefined, this.state.deletionPreview));
     } catch (error) {
@@ -136,7 +151,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   async reorderRooms(orderedRoomIds: ReadonlyArray<string>): Promise<void> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
-      await this.rooms.reorderRooms(this.familyId, orderedRoomIds);
+      await this.rooms.reorderRooms(this.familyId, orderedRoomIds, this.actorMemberId());
       await this.refresh();
       this.publish(this.copy(this.state.phase, false, undefined, this.state.deletionPreview));
     } catch (error) {
@@ -165,7 +180,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
       const result = await this.rooms.deleteRoom(roomId,
-        new RoomDeletionConfirmation(true, acknowledgedCount));
+        new RoomDeletionConfirmation(true, acknowledgedCount), this.actorMemberId());
       this.publish(new RoomViewState(this.state.phase, this.state.rooms,
         this.state.unassignedRecords, false, this.revision + 1, undefined, undefined));
       await this.refresh();
@@ -180,7 +195,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   async assignDevice(key: DeviceKey, roomId: string): Promise<void> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
-      await this.rooms.assignDevice(this.familyId, key, roomId);
+      await this.rooms.assignDevice(this.familyId, key, roomId, this.actorMemberId());
       await this.refresh();
       this.publish(this.copy(this.state.phase, false, undefined, this.state.deletionPreview));
     } catch (error) {
@@ -191,7 +206,7 @@ export class RoomViewModel implements ViewModelBase<RoomViewState> {
   async unassignDevice(key: DeviceKey): Promise<void> {
     this.publish(this.copy(this.state.phase, true, undefined, this.state.deletionPreview));
     try {
-      await this.rooms.unassignDevice(this.familyId, key);
+      await this.rooms.unassignDevice(this.familyId, key, this.actorMemberId());
       await this.refresh();
       this.publish(this.copy(this.state.phase, false, undefined, this.state.deletionPreview));
     } catch (error) {

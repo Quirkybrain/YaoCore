@@ -21,6 +21,7 @@ import {
   BleProvisioningRequest,
   BleProvisioningStage,
   BleScanFilter,
+  BleWifiScanRequest,
   ProvisioningProgress,
   ProvisioningState,
   WifiAp
@@ -133,9 +134,17 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   private revision: number = 0;
   private disposed: boolean = false;
   private submitting: boolean = false;
+  private preparing: boolean = false;
   private scanTimerId: number | undefined = undefined;
   /** F-03: invalidates a late startScan continuation after back/cancel/dispose. */
   private scanGeneration: number = 0;
+  /**
+   * R3-02: cancellation generation for prepareWifi/submit/commitResult.
+   * cancel() and dispose() advance it synchronously, so every continuation that
+   * resumes from an await can drop a late AP list, provisioning result or
+   * listener event instead of publishing over CANCELLED or committing a binding.
+   */
+  private cancelGeneration: number = 0;
   private requestDraftId?: string = undefined;
   private resultDraftId?: string = undefined;
   private selectedDevice?: BleProvisioningDevice = undefined;
@@ -180,11 +189,18 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   }
 
   async requestPermission(): Promise<void> {
+    const generation = this.cancelGeneration;
     try {
       await this.permissions.ensure(PermissionKind.BLUETOOTH);
+      if (this.isStale(generation)) {
+        return;
+      }
       this.publish(this.copy(WizardStep.STEP_0_PERMISSION, ProvisioningState.PERMISSION,
         ProvisioningPermissionState.GRANTED, undefined, false, false));
     } catch (error) {
+      if (this.isStale(generation)) {
+        return;
+      }
       const appError = ViewModelSupport.asAppError(error);
       const permission = appError.code === 'PROVISIONING_BLUETOOTH_OFF' ?
         ProvisioningPermissionState.BLUETOOTH_OFF : ProvisioningPermissionState.DENIED;
@@ -194,30 +210,32 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   }
 
   async startScan(): Promise<void> {
+    const generation = this.cancelGeneration;
     if (!this.permissionGranted()) {
       await this.requestPermission();
-      if (!this.permissionGranted()) {
+      if (this.isStale(generation) || !this.permissionGranted()) {
         return;
       }
     }
+    let scanToken: number = 0;
     try {
       this.clearScanTimer();
-      const generation = ++this.scanGeneration;
+      scanToken = ++this.scanGeneration;
       const filter = new BleScanFilter(GattEndpointMap.SERVICE_UUID, SERVICE_NAME_PREFIX,
         DEFAULT_SCAN_TIMEOUT_MS);
       this.publish(this.copy(WizardStep.STEP_1_SCAN, ProvisioningState.SCANNING,
         this.state.permission, undefined, false, true));
-      await this.ble.startScan(filter, new WizardScanListener(this));
-      if (this.disposed || generation !== this.scanGeneration ||
+      await this.ble.startScan(filter, new WizardScanListener(this, scanToken));
+      if (this.isStale(generation) || scanToken !== this.scanGeneration ||
         this.state.step !== WizardStep.STEP_1_SCAN) {
-        // F-03: back/cancel/dispose happened while startScan was in flight.
+        // F-03/R3-02: back/cancel/dispose happened while startScan was in flight.
         this.clearScanTimer();
         await this.stopScan();
         return;
       }
       this.scanTimerId = this.timer.setTimer(DEFAULT_SCAN_TIMEOUT_MS, (): void => {
         this.scanTimerId = undefined;
-        if (this.disposed || generation !== this.scanGeneration ||
+        if (this.isStale(generation) || scanToken !== this.scanGeneration ||
           this.state.step !== WizardStep.STEP_1_SCAN ||
           this.state.scanResults.length > 0) {
           return;
@@ -226,7 +244,8 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
           ProvisioningState.SCANNING);
       });
     } catch (error) {
-      if (this.disposed || this.state.step !== WizardStep.STEP_1_SCAN) {
+      if (this.isStale(generation) || scanToken !== this.scanGeneration ||
+        this.state.step !== WizardStep.STEP_1_SCAN) {
         return;
       }
       this.failWith(ViewModelSupport.asAppError(error), WizardStep.STEP_1_SCAN,
@@ -252,8 +271,71 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       this.state.permission, undefined, this.state.draftReady, true, device));
   }
 
+  /**
+   * F-08: C-23 exposes the C-28 permission gate's "open settings" recovery.
+   * The port is optional so older test harnesses keep their narrow shape.
+   */
+  async openSettings(): Promise<void> {
+    if (this.permissions.openSettings === undefined) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'openSettings')]);
+    }
+    await this.permissions.openSettings();
+  }
+
+  /**
+   * F-07: real handshake + AP scan for step 3. The aggregated submit() below
+   * still performs the authoritative flow when credentials are applied.
+   */
+  async prepareWifi(pop: string, expectedGatewayId?: string): Promise<void> {
+    if (this.preparing || this.submitting) {
+      return;
+    }
+    if (this.selectedDevice === undefined) {
+      this.failWith(AppErrors.of('PROVISIONING_DEVICE_NOT_FOUND', []), this.state.step,
+        this.state.provisioning);
+      return;
+    }
+    if (pop.length === 0) {
+      this.failWith(AppErrors.of('PROVISIONING_POP_INVALID', []), this.state.step,
+        this.state.provisioning);
+      return;
+    }
+    const generation = this.cancelGeneration;
+    let popBytes: Uint8Array = new Uint8Array(0);
+    this.preparing = true;
+    try {
+      popBytes = Utf8.encode(pop);
+      const request = new BleWifiScanRequest(popBytes, this.selectedDevice, expectedGatewayId);
+      this.publish(new BleProvisioningViewState(LoadPhase.READY,
+        WizardStep.STEP_2_HANDSHAKE, ProvisioningState.CONNECTING, this.state.permission,
+        this.state.scanResults, this.selectedDevice, [], undefined, undefined, undefined,
+        undefined, false, true, this.revision + 1));
+      if (this.isStale(generation)) {
+        return;
+      }
+      const accessPoints = await this.ble.scanWifiAccessPoints(request,
+        new WizardProgressListener(this, generation));
+      // R3-02: cancel() may have won the race while the handshake/AP scan was
+      // pending; a late AP list must not replace the CANCELLED state.
+      if (this.isStale(generation)) {
+        return;
+      }
+      this.publish(new BleProvisioningViewState(LoadPhase.READY,
+        WizardStep.STEP_3_WIFI_SELECT, ProvisioningState.AP_SCANNING, this.state.permission,
+        this.state.scanResults, this.selectedDevice, accessPoints, this.state.selectedSsid,
+        undefined, undefined, undefined, false, true, this.revision + 1));
+    } catch (error) {
+      if (!this.isStale(generation)) {
+        this.handleProvisionFailure(error as Object);
+      }
+    } finally {
+      BytesUtil.zeroize(popBytes);
+      this.preparing = false;
+    }
+  }
+
   async submit(pop: string, ssid: string, wifiPassword: string,
-    commandSecretHex?: string): Promise<void> {
+    commandSecretHex?: string, expectedGatewayId?: string): Promise<void> {
     if (this.submitting) {
       return;
     }
@@ -267,12 +349,17 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
         this.state.provisioning);
       return;
     }
+    const generation = this.cancelGeneration;
     let secret: Uint8Array = new Uint8Array(0);
     let popBytes: Uint8Array = new Uint8Array(0);
     let passwordBytes: Uint8Array = new Uint8Array(0);
     try {
       if (commandSecretHex === undefined || commandSecretHex.length === 0) {
         secret = await this.crypto.randomBytes(COMMAND_SECRET_BYTES);
+        // R3-02: do not create a request draft after cancel() won this race.
+        if (this.isStale(generation)) {
+          return;
+        }
       } else {
         try {
           secret = BytesUtil.hexToBytes(commandSecretHex);
@@ -292,25 +379,35 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       popBytes = Utf8.encode(pop);
       passwordBytes = Utf8.encode(wifiPassword);
       const request = new BleProvisioningRequest(ssid, passwordBytes, popBytes,
-        this.selectedDevice, this.requestDraftId, this.familyId);
+        this.selectedDevice, this.requestDraftId, this.familyId, expectedGatewayId);
       this.submitting = true;
       this.publish(new BleProvisioningViewState(LoadPhase.READY,
         WizardStep.STEP_2_HANDSHAKE, ProvisioningState.CONNECTING,
         this.state.permission, this.state.scanResults, this.selectedDevice,
         this.state.accessPoints, ssid, undefined, undefined, undefined, true, true,
         this.revision + 1));
-      const result = await this.ble.provision(request, new WizardProgressListener(this));
-      if (this.disposed) {
-        this.drafts.destroy(result.credentialDraftId);
+      if (this.isStale(generation)) {
+        return;
+      }
+      const result = await this.ble.provision(request,
+        new WizardProgressListener(this, generation));
+      // R3-02: BLE success after cancel is not binding success. Drop the late
+      // result and destroy the re-issued draft before commitResult can reach
+      // commitBinding/addGatewayToFamily or republish BOUND.
+      if (this.isStale(generation)) {
+        this.destroyResultDraft(result);
         return;
       }
       this.resultDraftId = result.credentialDraftId;
-      await this.commitResult(result);
+      await this.commitResult(result, generation);
     } catch (error) {
-      if (!this.disposed) {
-        this.handleProvisionFailure(error as Object);
-      } else {
+      if (this.isStale(generation)) {
+        // cancel()/dispose() own the cancelled state; never publish a failure
+        // over it. Drafts are released here as well because a BLE cancel hook
+        // may reject the pending provision before the owner resumes.
         this.destroyDrafts();
+      } else {
+        this.handleProvisionFailure(error as Object);
       }
     } finally {
       BytesUtil.zeroize(secret);
@@ -333,6 +430,12 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   }
 
   async cancel(): Promise<void> {
+    // R3-02: advance the cancellation generation synchronously, before the
+    // first await, so a provision/AP-scan continuation or listener callback
+    // that resumes later can never publish or enter commitResult after this
+    // call. Repeated calls are safe: they only advance the generation again
+    // and republish the same terminal CANCELLED state.
+    this.cancelGeneration++;
     this.scanGeneration++;
     this.clearScanTimer();
     try {
@@ -376,6 +479,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   dispose(): void {
     this.disposed = true;
+    this.cancelGeneration++;
     this.scanGeneration++;
     this.clearScanTimer();
     this.destroyDrafts();
@@ -385,8 +489,9 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   // ---- callbacks from listeners ------------------------------------------
 
-  onScanDevice(device: BleProvisioningDevice): void {
-    if (this.disposed || this.state.step !== WizardStep.STEP_1_SCAN) {
+  onScanDevice(device: BleProvisioningDevice, scanToken?: number): void {
+    if (this.isStale() || (scanToken !== undefined && scanToken !== this.scanGeneration) ||
+      this.state.step !== WizardStep.STEP_1_SCAN) {
       return;
     }
     for (let index = 0; index < this.state.scanResults.length; index++) {
@@ -405,21 +510,29 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       this.state.error, this.state.draftReady, this.state.canCancel, this.revision + 1));
   }
 
-  onScanFinished(): void {
+  onScanFinished(scanToken?: number): void {
+    if (scanToken !== undefined && scanToken !== this.scanGeneration) {
+      return;
+    }
     this.clearScanTimer();
   }
 
-  onScanError(error: Object): void {
+  onScanError(error: Object, scanToken?: number): void {
+    if (scanToken !== undefined && scanToken !== this.scanGeneration) {
+      return;
+    }
     this.clearScanTimer();
-    if (this.disposed || this.state.step !== WizardStep.STEP_1_SCAN) {
+    if (this.isStale() || this.state.step !== WizardStep.STEP_1_SCAN) {
       return;
     }
     this.failWith(ViewModelSupport.asAppError(error), WizardStep.STEP_1_SCAN,
       ProvisioningState.SCANNING);
   }
 
-  onProvisionState(progress: ProvisioningProgress): void {
-    if (this.disposed) {
+  onProvisionState(progress: ProvisioningProgress, generation?: number): void {
+    // R3-02: a listener owned by an older generation is a late event after
+    // cancel/dispose; it must not overwrite the CANCELLED snapshot.
+    if (this.isStale(generation)) {
       return;
     }
     const step = this.mapStep(progress.state);
@@ -447,14 +560,20 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       this.canCancelFor(step), this.revision + 1));
   }
 
-  onAccessPoints(aps: ReadonlyArray<WifiAp>): void {
+  onAccessPoints(aps: ReadonlyArray<WifiAp>, generation?: number): void {
+    if (this.isStale(generation)) {
+      return;
+    }
     this.publish(new BleProvisioningViewState(this.state.phase, WizardStep.STEP_3_WIFI_SELECT,
       ProvisioningState.AP_SCANNING, this.state.permission, this.state.scanResults,
       this.state.selectedDevice, aps, this.state.selectedSsid, this.state.progress,
       this.state.result, this.state.error, this.state.draftReady, true, this.revision + 1));
   }
 
-  onProvisionError(error: Object): void {
+  onProvisionError(error: Object, generation?: number): void {
+    if (this.isStale(generation)) {
+      return;
+    }
     this.lastErrorCode = ViewModelSupport.codeOf(error as Object);
     this.destroyDrafts();
     this.publish(new BleProvisioningViewState(LoadPhase.ERROR, this.state.step,
@@ -464,12 +583,23 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       this.revision + 1));
   }
 
-  onCompleted(result: BleProvisioningResult): void {
+  onCompleted(result: BleProvisioningResult, generation?: number): void {
     // C-19 has finished BLE; C-07 commitBinding is still required for BOUND.
+    if (this.isStale(generation)) {
+      // R3-02: a completion that lands after cancel/dispose owns a re-issued
+      // draft the cancelled session will never commit; zeroize it immediately.
+      this.destroyResultDraft(result);
+      return;
+    }
     this.resultDraftId = result.credentialDraftId;
   }
 
-  private async commitResult(result: BleProvisioningResult): Promise<void> {
+  private async commitResult(result: BleProvisioningResult,
+    generation: number): Promise<void> {
+    if (this.isStale(generation)) {
+      this.destroyResultDraft(result);
+      return;
+    }
     try {
       // R-1 ruling: commitBinding must consume the draft id re-issued by the
       // binding probe, not the original request draft id.
@@ -477,19 +607,34 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
     } catch (error) {
       this.drafts.destroy(result.credentialDraftId);
       this.resultDraftId = undefined;
+      if (this.isStale(generation)) {
+        return;
+      }
       this.failWith(ViewModelSupport.asAppError(error), this.state.step,
         ProvisioningState.DISCOVERING_ON_LAN);
       return;
     }
     this.requestDraftId = undefined;
     this.resultDraftId = undefined;
+    // R3-02: if cancel() won while commitBinding was in flight, the durable
+    // route commit cannot be unwound, but the cancelled session must not add
+    // the gateway to the family or report BOUND.
+    if (this.isStale(generation)) {
+      return;
+    }
     try {
       await this.families.addGatewayToFamily(this.familyId, result.identity.gatewayId);
     } catch (error) {
       // The route is already durable; surface a partial-success error without
       // pretending the wizard completed.
+      if (this.isStale(generation)) {
+        return;
+      }
       this.failWith(ViewModelSupport.asAppError(error), WizardStep.STEP_4_APPLY,
         ProvisioningState.DISCOVERING_ON_LAN);
+      return;
+    }
+    if (this.isStale(generation)) {
       return;
     }
     this.publish(new BleProvisioningViewState(LoadPhase.READY, WizardStep.STEP_5_BOUND,
@@ -560,6 +705,26 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
     return this.state.permission === ProvisioningPermissionState.GRANTED;
   }
 
+  /**
+   * R3-02: true when the VM was disposed or cancel() advanced the generation
+   * captured by an in-flight operation. An omitted generation is only used by
+   * direct (non-listener) callers and keeps the pre-R3-02 method shape working.
+   */
+  private isStale(generation?: number): boolean {
+    return this.disposed ||
+      (generation !== undefined && generation !== this.cancelGeneration);
+  }
+
+  /** Zeroize a re-issued result draft that the cancelled session won't commit. */
+  private destroyResultDraft(result: BleProvisioningResult): void {
+    if (this.resultDraftId === result.credentialDraftId) {
+      this.resultDraftId = undefined;
+    }
+    if (result.credentialDraftId.length > 0) {
+      this.drafts.destroy(result.credentialDraftId);
+    }
+  }
+
   private canCancelFor(step: WizardStep): boolean {
     return step >= WizardStep.STEP_1_SCAN && step < WizardStep.STEP_5_BOUND;
   }
@@ -608,29 +773,35 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
 class WizardScanListener implements BleScanListener {
   private readonly vm: BleProvisioningViewModel;
+  /** R3-02: scan generation captured when this listener's scan started. */
+  private readonly scanToken: number;
 
-  constructor(vm: BleProvisioningViewModel) {
+  constructor(vm: BleProvisioningViewModel, scanToken: number) {
     this.vm = vm;
+    this.scanToken = scanToken;
   }
 
   onDeviceFound(device: BleProvisioningDevice): void {
-    this.vm.onScanDevice(device);
+    this.vm.onScanDevice(device, this.scanToken);
   }
 
   onScanFinished(): void {
-    this.vm.onScanFinished();
+    this.vm.onScanFinished(this.scanToken);
   }
 
   onScanError(error: AppError): void {
-    this.vm.onScanError(error);
+    this.vm.onScanError(error, this.scanToken);
   }
 }
 
 class WizardProgressListener implements BleProvisioningProgressListener {
   private readonly vm: BleProvisioningViewModel;
+  /** R3-02: cancel generation this handshake/provision operation started in. */
+  private readonly generation: number;
 
-  constructor(vm: BleProvisioningViewModel) {
+  constructor(vm: BleProvisioningViewModel, generation: number) {
     this.vm = vm;
+    this.generation = generation;
   }
 
   onStage(stage: BleProvisioningStage): void {
@@ -639,18 +810,18 @@ class WizardProgressListener implements BleProvisioningProgressListener {
   }
 
   onStateChanged(progress: ProvisioningProgress): void {
-    this.vm.onProvisionState(progress);
+    this.vm.onProvisionState(progress, this.generation);
   }
 
   onAccessPoints(aps: ReadonlyArray<WifiAp>): void {
-    this.vm.onAccessPoints(aps);
+    this.vm.onAccessPoints(aps, this.generation);
   }
 
   onError(error: AppError): void {
-    this.vm.onProvisionError(error);
+    this.vm.onProvisionError(error, this.generation);
   }
 
   onCompleted(result: BleProvisioningResult): void {
-    this.vm.onCompleted(result);
+    this.vm.onCompleted(result, this.generation);
   }
 }

@@ -20,7 +20,11 @@ import {
   BleProvisioningRequest,
   BleProvisioningStage,
   BleScanDevice,
-  BleScanFilter
+  BleScanFilter,
+  BleWifiScanRequest,
+  ProvisioningProgress,
+  ProvisioningState,
+  WifiAp
 } from '../ble/BleProvisioningPorts';
 import type {
   BleProvisioningProgressListener,
@@ -96,6 +100,30 @@ export class MockBleProvisioningClient implements IBleProvisioningClient {
     const identity = this.identity();
     return new BleProvisioningResult(identity, MOCK_IP, identity.tls === undefined ?
       MOCK_PORT : identity.tls.port, true, MOCK_DRAFT_ID, this.nowCompact());
+  }
+
+  async scanWifiAccessPoints(request: BleWifiScanRequest,
+    listener: BleProvisioningProgressListener,
+    cancellation?: CancellationToken): Promise<ReadonlyArray<WifiAp>> {
+    this.cancelled = false;
+    if (this.scenario.mode === MockMode.OFFLINE) {
+      throw AppErrors.of('PROVISIONING_CONNECT_FAILED', []);
+    }
+    this.stage(listener, BleProvisioningStage.CONNECTING, cancellation);
+    this.stage(listener, BleProvisioningStage.SECURITY, cancellation);
+    this.stage(listener, BleProvisioningStage.IDENTITY, cancellation);
+    this.stage(listener, BleProvisioningStage.WIFI_SCAN, cancellation);
+    if (listener.onStateChanged !== undefined) {
+      listener.onStateChanged(new ProvisioningProgress(ProvisioningState.AP_SCANNING));
+    }
+    const accessPoints: ReadonlyArray<WifiAp> = [
+      new WifiAp('Mock-Home', 'aa:bb:cc:dd:ee:01', 6, -42, 3),
+      new WifiAp('Mock-Office', 'aa:bb:cc:dd:ee:02', 11, -58, 3)
+    ];
+    if (listener.onAccessPoints !== undefined) {
+      listener.onAccessPoints(accessPoints);
+    }
+    return accessPoints;
   }
 
   async cancel(): Promise<void> {

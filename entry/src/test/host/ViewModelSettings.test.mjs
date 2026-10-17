@@ -124,6 +124,7 @@ class FakePrefs {
 class FakeAuth {
   constructor(familyId = FAMILY_ID) { this.familyId = familyId; }
   getActiveSession() { return { familyId: this.familyId, memberId: 'member-admin' }; }
+  canManageFamily() { return { allowed: true, reason: 'ALLOWED' }; }
 }
 
 function setup(options = {}) {

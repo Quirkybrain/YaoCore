@@ -14,7 +14,7 @@
  * The backdrop (not interactive content) expands into the system safe area so
  * the immersive window layout from EntryAbility is painted edge-to-edge.
  */
-import { ShellTheme } from '../app/ShellTheme';
+import { ShellTheme } from '../common/theme/ShellTheme';
 
 @Component
 export struct ShellBackdrop {

@@ -16,6 +16,7 @@ import {
   SceneExecutionResult
 } from '../repository/DomainModels';
 import type { SceneInput } from '../service/scene/SceneService';
+import type { SceneExecutionAuthorizationPort } from '../service/scene/SceneService';
 import {
   LoadPhase,
   ViewModelError,
@@ -55,6 +56,7 @@ export class SceneViewModel implements ViewModelBase<SceneViewState> {
   private readonly devices: DeviceRepository;
   private readonly i18n: I18nService;
   private readonly logger: LoggerPort;
+  private readonly authorization?: SceneExecutionAuthorizationPort;
 
   private state: SceneViewState;
   private listeners: Array<(state: SceneViewState) => void> = [];
@@ -64,12 +66,21 @@ export class SceneViewModel implements ViewModelBase<SceneViewState> {
   private activeRunId?: string = undefined;
 
   constructor(scenes: SceneService, devices: DeviceRepository, i18n: I18nService,
-    logger: LoggerPort) {
+    logger: LoggerPort, authorization?: SceneExecutionAuthorizationPort) {
     this.scenes = scenes;
     this.devices = devices;
     this.i18n = i18n;
     this.logger = logger;
+    this.authorization = authorization;
     this.state = new SceneViewState(LoadPhase.IDLE, [], 0);
+  }
+
+  /** F-02: UI capability is derived from the same C-12 policy as the service. */
+  canExecuteScene(): boolean {
+    if (this.authorization === undefined) {
+      return false;
+    }
+    return this.authorization.canExecuteScene().allowed;
   }
 
   getState(): SceneViewState {
@@ -113,6 +124,13 @@ export class SceneViewModel implements ViewModelBase<SceneViewState> {
         new NameValue('sceneId', this.state.runningSceneId)]);
       this.fail(error);
       throw error;
+    }
+    if (!this.canExecuteScene()) {
+      // Fail fast for the UI; SceneService.run independently re-checks and
+      // refuses even if a caller bypasses this view model.
+      const denied = AppErrors.of('AUTH_RBAC_DENIED', []);
+      this.fail(denied);
+      throw denied;
     }
     this.activeRunId = undefined;
     this.publish(new SceneViewState(LoadPhase.READY, this.state.scenes, this.revision + 1,

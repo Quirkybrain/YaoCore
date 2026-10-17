@@ -22,6 +22,8 @@ export enum PermissionKind {
 export interface PermissionPort {
   /** Throws PROVISIONING_PERMISSION_DENIED / PROVISIONING_BLUETOOTH_OFF. */
   ensure(kind: PermissionKind): Promise<void>;
+  /** F-08: opens the app settings page after a terminal permission denial. */
+  openSettings?(): Promise<void>;
 }
 
 /** Discovery subset consumed by Home/Settings; C-18 satisfies it after the

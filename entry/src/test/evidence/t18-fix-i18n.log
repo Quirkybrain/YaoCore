@@ -1,0 +1,149 @@
+CHK-01 PASS (0 findings)
+CHK-02 PASS (0 findings)
+CHK-03 PASS (0 findings)
+CHK-04 PASS (0 findings)
+CHK-05 PASS (57 findings)
+  - warning: [cloud.token.missing] rawfile key is not referenced by product code
+  - warning: [common.add] rawfile key is not referenced by product code
+  - warning: [common.all] rawfile key is not referenced by product code
+  - warning: [common.create] rawfile key is not referenced by product code
+  - warning: [common.disabled] rawfile key is not referenced by product code
+  - warning: [common.done] rawfile key is not referenced by product code
+  - warning: [common.empty] rawfile key is not referenced by product code
+  - warning: [common.enabled] rawfile key is not referenced by product code
+  - warning: [common.read_only] rawfile key is not referenced by product code
+  - warning: [common.remove] rawfile key is not referenced by product code
+  - warning: [common.rename] rawfile key is not referenced by product code
+  - warning: [invite.receipt.pending] rawfile key is not referenced by product code
+  - warning: [onboarding.join_request_hint] rawfile key is not referenced by product code
+  - warning: [provisioning.step0] rawfile key is not referenced by product code
+  - warning: [provisioning.step1] rawfile key is not referenced by product code
+  - warning: [provisioning.step2] rawfile key is not referenced by product code
+  - warning: [provisioning.step3] rawfile key is not referenced by product code
+  - warning: [provisioning.step4] rawfile key is not referenced by product code
+  - warning: [provisioning.step5] rawfile key is not referenced by product code
+  - warning: [room.assign.title] rawfile key is not referenced by product code
+  - warning: [session.lock] rawfile key is not referenced by product code
+  - warning: [session.locked.message] rawfile key is not referenced by product code
+  - warning: [session.locked.title] rawfile key is not referenced by product code
+  - warning: [session.no_profile.message] rawfile key is not referenced by product code
+  - warning: [session.no_profile.title] rawfile key is not referenced by product code
+  - warning: [session.password.placeholder] rawfile key is not referenced by product code
+  - warning: [session.profile.prompt] rawfile key is not referenced by product code
+  - warning: [session.unlock] rawfile key is not referenced by product code
+  - warning: [startup.error.message] rawfile key is not referenced by product code
+  - warning: [startup.error.title] rawfile key is not referenced by product code
+  - warning: [common_back] string.json key is not referenced by product code
+  - warning: [common_cancel] string.json key is not referenced by product code
+  - warning: [common_confirm] string.json key is not referenced by product code
+  - warning: [common_delete] string.json key is not referenced by product code
+  - warning: [common_edit] string.json key is not referenced by product code
+  - warning: [common_failed] string.json key is not referenced by product code
+  - warning: [common_no] string.json key is not referenced by product code
+  - warning: [common_refresh] string.json key is not referenced by product code
+  - warning: [common_save] string.json key is not referenced by product code
+  - warning: [common_save_failed] string.json key is not referenced by product code
+  - warning: [common_success] string.json key is not referenced by product code
+  - warning: [common_unknown] string.json key is not referenced by product code
+  - warning: [common_view] string.json key is not referenced by product code
+  - warning: [common_yes] string.json key is not referenced by product code
+  - warning: [home_add_gateway] string.json key is not referenced by product code
+  - warning: [page_about] string.json key is not referenced by product code
+  - warning: [page_device_control] string.json key is not referenced by product code
+  - warning: [page_family] string.json key is not referenced by product code
+  - warning: [page_provisioning] string.json key is not referenced by product code
+  - warning: [page_room_manage] string.json key is not referenced by product code
+  - warning: [page_settings] string.json key is not referenced by product code
+  - warning: [placeholder_message] string.json key is not referenced by product code
+  - warning: [rooms_manage] string.json key is not referenced by product code
+  - warning: [route_unknown_message] string.json key is not referenced by product code
+  - warning: [route_unknown_title] string.json key is not referenced by product code
+  - warning: [session_lock] string.json key is not referenced by product code
+  - warning: [settings_language_title] string.json key is not referenced by product code
+CHK-06 PASS (0 findings)
+CHK-07 PASS (82 findings)
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:141 hardcoded English sentence
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:142 hardcoded English sentence
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:143 hardcoded English sentence
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:144 hardcoded English sentence
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:145 hardcoded English sentence
+  - warning: entry/src/main/ets/common/theme/AppTheme.ets:146 hardcoded English sentence
+  - warning: entry/src/main/ets/components/DeviceCards.ets:352 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/DeviceCards.ets:403 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:168 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:171 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:171 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:328 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:330 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:332 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:334 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:336 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:345 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:347 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:349 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:350 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:352 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:361 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:363 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:365 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:369 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:371 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:381 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:381 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:385 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:386 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:393 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:393 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:397 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:417 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:419 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:423 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:425 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:427 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:556 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:632 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/components/support/UiMapping.ets:640 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/DeviceControlPage.ets:83 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:110 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:116 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:1006 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:1008 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:1087 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:1090 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/FamilyManagePage.ets:1093 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/HomePage.ets:238 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/HomePage.ets:248 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/HomePage.ets:250 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ProfilePage.ets:178 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ProfilePage.ets:180 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ProvisioningPage.ets:89 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ProvisioningPage.ets:206 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ProvisioningPage.ets:654 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/RoomManagePage.ets:230 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/RoomManagePage.ets:232 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/RoomsPage.ets:212 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/RoomsPage.ets:214 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ScenePage.ets:183 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ScenePage.ets:184 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ScenePage.ets:193 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ScenePage.ets:265 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/ScenePage.ets:267 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:83 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:86 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:89 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:455 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:646 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/SettingsPage.ets:648 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:36 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:36 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:39 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:39 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:42 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/AcAdapterFactory.ets:42 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/GreeAcAdapter.ets:16 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/HaierAcAdapter.ets:16 hardcoded CJK text
+  - warning: entry/src/main/ets/service/ac/MideaAcAdapter.ets:16 hardcoded CJK text
+  - warning: entry/src/main/ets/service/mock/MockGatewayService.ets:280 hardcoded English sentence
+CHK-08 PASS (0 findings)
+CHK-09 PASS (0 findings)
+summary: blockingFailures=0 warnings=139 missingKeys=0 hardcoded=82

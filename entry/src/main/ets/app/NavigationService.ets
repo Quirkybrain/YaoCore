@@ -165,6 +165,8 @@ export class NavigationService {
   private readonly stack: NavPathStack;
   private selectedTabIndex: number = 0;
   private tabListener: TabChangeListener | undefined = undefined;
+  /** T-18: one-shot Home room chip -> Rooms selection (not persisted). */
+  private roomsHighlight: string | undefined = undefined;
 
   constructor(stack: NavPathStack) {
     this.stack = stack;
@@ -247,6 +249,19 @@ export class NavigationService {
 
   getSelectedTabIndex(): number {
     return this.selectedTabIndex;
+  }
+
+  /** Home room chip -> Rooms tab selected room. */
+  openRoomsWithHighlight(roomId: string): void {
+    this.roomsHighlight = roomId;
+    this.switchTab(AppRoute.ROOMS_TAB);
+  }
+
+  /** One-shot read; the Rooms page consumes the highlight once. */
+  consumeRoomsHighlight(): string | undefined {
+    const value = this.roomsHighlight;
+    this.roomsHighlight = undefined;
+    return value;
   }
 
   setTabChangeListener(listener: TabChangeListener | undefined): void {
