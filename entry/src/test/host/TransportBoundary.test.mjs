@@ -84,6 +84,19 @@ test('T11_pureGatewayLogicHasNoPlatformImport', () => {
     'service/mock/MockBleProvisioningClient.ets',
     'service/mock/MockScenario.ets',
     'service/ble/BleProvisioningPorts.ets',
+    'service/ble/BleSupport.ets',
+    'service/ble/Protobuf.ets',
+    'service/ble/ProtocommCodec.ets',
+    'service/ble/GattEndpointMap.ets',
+    'service/ble/GattRequestQueue.ets',
+    'service/ble/GattChannel.ets',
+    'service/ble/ProtoVerParser.ets',
+    'service/ble/Security1Session.ets',
+    'service/ble/IdentityNegotiator.ets',
+    'service/ble/WifiProvisioningFlow.ets',
+    'service/ble/ProvisioningStateMachine.ets',
+    'service/ble/BindingProbe.ets',
+    'service/ble/BleProvisioningService.ets',
   ];
   const offenders = [];
   for (const relative of pure) {

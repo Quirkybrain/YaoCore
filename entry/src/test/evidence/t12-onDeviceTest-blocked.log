@@ -1,0 +1,356 @@
+> hvigor UP-TO-DATE :entry:default@PreBuild...
+> hvigor UP-TO-DATE :entry:ohosTest@PreBuild...
+> hvigor Finished :entry:default@CreateModuleInfo... after 1 ms
+> hvigor UP-TO-DATE :entry:default@GenerateMetadata...
+> hvigor Finished :entry:default@ConfigureCmake... after 1 ms
+> hvigor UP-TO-DATE :entry:default@MergeProfile...
+> hvigor UP-TO-DATE :entry:default@CreateBuildProfile...
+> hvigor Finished :entry:default@PreCheckSyscap... after 1 ms
+> hvigor Finished :entry:default@BeforeGenerateDeviceCoverage... after 1 ms
+> hvigor UP-TO-DATE :entry:default@GeneratePkgContextInfo...
+> hvigor Finished :entry:default@GeneratePkgSdkInfo... after 2 ms
+> hvigor Finished :entry:default@ProcessIntegratedHsp... after 1 ms
+> hvigor Finished :entry:ohosTest@CreateModuleInfo... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@GenerateMetadata...
+> hvigor Finished :entry:ohosTest@ConfigureCmake... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@MergeProfile...
+> hvigor Finished :entry:ohosTest@CreateBuildProfile... after 1 ms
+> hvigor Finished :entry:ohosTest@PreCheckSyscap... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@GenerateOhosTestTemplate...
+> hvigor Finished :entry:ohosTest@GenerateDeviceCoverage... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@GeneratePkgContextInfo...
+> hvigor Finished :entry:ohosTest@GeneratePkgSdkInfo... after 1 ms
+> hvigor Finished :entry:ohosTest@ProcessIntegratedHsp... after 1 ms
+> hvigor Finished :entry:default@BuildNativeWithCmake... after 1 ms
+> hvigor UP-TO-DATE :entry:default@MakePackInfo...
+> hvigor Finished :entry:default@SyscapTransform... after 1 ms
+> hvigor UP-TO-DATE :entry:default@ProcessProfile...
+> hvigor UP-TO-DATE :entry:default@ProcessRouterMap...
+> hvigor UP-TO-DATE :entry:default@ProcessShareConfig...
+> hvigor Finished :entry:default@ProcessStartupConfig... after 2 ms
+> hvigor Finished :entry:ohosTest@BuildNativeWithCmake... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@MakePackInfo...
+> hvigor Finished :entry:ohosTest@SyscapTransform... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@ProcessProfile...
+> hvigor UP-TO-DATE :entry:ohosTest@ProcessRouterMap...
+> hvigor UP-TO-DATE :entry:ohosTest@ProcessShareConfig...
+> hvigor Finished :entry:ohosTest@ProcessStartupConfig... after 1 ms
+> hvigor Finished :entry:default@BuildNativeWithNinja... after 1 ms
+> hvigor UP-TO-DATE :entry:default@ProcessResource...
+> hvigor UP-TO-DATE :entry:default@GenerateLoaderJson...
+> hvigor Finished :entry:ohosTest@BuildNativeWithNinja... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@ProcessResource...
+> hvigor Finished :entry:ohosTest@GenerateLoaderJson... after 4 ms
+> hvigor UP-TO-DATE :entry:default@ProcessLibs...
+> hvigor UP-TO-DATE :entry:default@CompileResource...
+> hvigor UP-TO-DATE :entry:ohosTest@ProcessLibs...
+> hvigor UP-TO-DATE :entry:ohosTest@CompileResource...
+> hvigor UP-TO-DATE :entry:default@DoNativeStrip...
+> hvigor Finished :entry:default@BuildJS... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@DoNativeStrip...
+> hvigor Finished :entry:ohosTest@OhosTestBuildJS... after 2 ms
+> hvigor UP-TO-DATE :entry:default@CacheNativeLibs...
+> hvigor UP-TO-DATE :entry:ohosTest@CacheNativeLibs...
+> hvigor Finished :entry:default@CompileArkTS... after 2 s 365 ms
+> hvigor UP-TO-DATE :entry:default@GeneratePkgModuleJson...
+> hvigor Finished :entry:default@ProcessCompiledResources... after 1 ms
+> hvigor Finished :entry:default@PackageHap... after 321 ms
+> hvigor WARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
+             If needed, configure the signingConfigs in /home/quirkybrain/code/harmony-projects/YaoCore/build-profile.json5.
+> hvigor Finished :entry:default@SignHap... after 2 ms
+> hvigor WARN: WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:70:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:82:32
+ The system capacity of this api 'createMd' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:96:29
+ The system capacity of this api 'createMac' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:97:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:108:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:117:35
+ The system capacity of this api 'createKdf' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:126:33
+ The system capacity of this api 'generateSecret' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:137:35
+ The system capacity of this api 'createKdf' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:146:33
+ The system capacity of this api 'generateSecret' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:156:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:160:28
+ The system capacity of this api 'pubKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:160:35
+ The system capacity of this api 'getEncoded' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:162:51
+ The system capacity of this api 'priKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:162:64
+ The system capacity of this api 'pubKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:173:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:177:43
+ The system capacity of this api 'priKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:177:56
+ The system capacity of this api 'pubKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:192:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:196:54
+ The system capacity of this api 'pubKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:208:59
+ The system capacity of this api 'getEncoded' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:220:41
+ The system capacity of this api 'createAsyKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:225:41
+ The system capacity of this api 'createKeyAgreement' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:227:38
+ The system capacity of this api 'generateSecret' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:227:81
+ The system capacity of this api 'pubKey' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:238:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:242:38
+ The system capacity of this api 'createCipher' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:248:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:248:50
+ The system capacity of this api 'ENCRYPT_MODE' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:256:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:267:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:271:32
+ The system capacity of this api 'createCipher' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:279:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:279:50
+ The system capacity of this api 'ENCRYPT_MODE' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:295:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:306:41
+ The system capacity of this api 'createSymKeyGenerator' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:310:32
+ The system capacity of this api 'createCipher' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:318:39
+ The system capacity of this api 'CryptoMode' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:318:50
+ The system capacity of this api 'DECRYPT_MODE' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:328:16
+ The system capacity of this api 'clearMem' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:337:32
+ The system capacity of this api 'createRandom' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:339:21
+ The system capacity of this api 'generateRandomSync' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:143:11
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH or (ohos.permission.ACCESS_BLUETOOTH and
+ohos.permission.GET_BLUETOOTH_PEERS_MAC) [since 26.0.0]
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:144:11
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:157:11
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:179:18
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:194:20
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:212:16
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:221:16
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:230:16
+ The 'serviceUuids' API is supported since SDK version 22. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:234:40
+ The 'serviceUuids' API is supported since SDK version 22. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:235:18
+ The 'serviceUuids' API is supported since SDK version 22. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:245:13
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:274:23
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:295:21
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:300:21
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:309:42
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:325:42
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:381:40
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:392:25
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:401:40
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:415:19
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/ble/adapters/OhosBleTransport.ets:420:19
+ To use this API, you need to apply for the permissions: ohos.permission.ACCESS_BLUETOOTH
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/gateway/adapters/TlsPinCheck.ets:32:29
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/gateway/adapters/TlsPinCheck.ets:36:28
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/gateway/adapters/TlsPinCheck.ets:37:28
+ The system capacity of this api 'getEncoded' is not supported on all devices
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/gateway/adapters/TlsPinCheck.ets:37:28
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/gateway/adapters/OhosHttpTransport.ets:128:37
+ To use this API, you need to apply for the permissions: ohos.permission.INTERNET
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:30:16
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:34:16
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:38:16
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:162:30
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:169:19
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:172:34
+ The 'getColumnTypeSync' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:172:34
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:173:40
+ The 'ColumnType' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:173:51
+ The 'INTEGER' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:174:24
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:176:40
+ The 'ColumnType' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:176:51
+ The 'REAL' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:177:24
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:179:40
+ The 'ColumnType' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:179:51
+ The 'TEXT' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:180:24
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:182:40
+ The 'ColumnType' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:182:51
+ The 'BLOB' API is supported since SDK version 18. However, the current compatible SDK version is 5.0.2(14).
+ It is recommended to use apiAvailable to safeguard API compatibility.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:183:24
+ Function may throw exceptions. Special handling is required.
+
+WARN: ArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/storage/RdbStoreAdapter.ets:185:22
+ Function may throw exceptions. Special handling is required.
+
+
+> hvigor Finished :entry:ohosTest@OhosTestCompileArkTS... after 5 s 532 ms
+> hvigor Finished :entry:ohosTest@OhosTestCopyMockConfigJson... after 1 ms
+> hvigor UP-TO-DATE :entry:ohosTest@GeneratePkgModuleJson...
+> hvigor Finished :entry:ohosTest@ProcessCompiledResources... after 1 ms
+> hvigor Finished :entry:ohosTest@PackageHap... after 285 ms
+> hvigor WARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
+             If needed, configure the signingConfigs in /home/quirkybrain/code/harmony-projects/YaoCore/build-profile.json5.
+> hvigor Finished :entry:ohosTest@SignHap... after 1 ms
+> hvigor ERROR: Failed :entry:default@GenerateDeviceCoverage...
+> hvigor ERROR:
+ErrorCode: 00507013
+Description: Error: [Fail]ExecuteCommand need connect-key? please confirm a device by help info
+
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+
+> hvigor ERROR: BUILD FAILED in 8 s 47 ms
+
+64 tasks in total: 33 executed, 31 up-to-date
