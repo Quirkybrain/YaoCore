@@ -7,6 +7,7 @@
 - **Date**: 2026-10-17
 - **Task**: `wp-004-contracts`（task 分支 `task/wp-004-contracts`，父分支 `feat/yaocore-app`，base commit `54c1d786`）
 - **Workflow**: STANDARD / GATED_AUTO
+- **决议引用**: D-011（Q1）、D-012（Q2）、D-014（Q3）；见文末「决议（RESOLVED，2026-10-17）」
 - **Upstream**: ADR-001（线格式与错误语义）、ADR-002（LAN 安全通道）、ADR-003（家庭凭据）、ADR-004（家庭/房间/设备边界）；`WP2`、`WP3`；26 项冻结输入
 - **Downstream**: wp-005 交付规划、wp-006 DES-001 详细设计、实现任务、TEST-001、评审门禁（G-004 后续）、文档维护轮次（勘误与修订提案）
 - **用法**: 本文档的 §1-§4 为**冻结基线**（实现必须遵守）；§5-§7 为裁定结果与勘误；§8 为 v1 范围声明；§9-§11 为索引、补丁提案与固件协同。任何条目变更须走 ADR/修订流程并触发 Change Impact。
@@ -242,7 +243,7 @@
 
 - 事实：`discover-response.schema.json` 设备对象（L82-167）与 `local-control-ack.schema.json` `deviceState`（L80-149）**均封闭且无 `position/speed/volume`**；而 `module-state.schema.json` L38-40 定义了三者（percent 0..100），`网关接口协议.md` L40-42 声明 curtain/fan/speaker 支持。
 - **裁定**：
-  1. **v1 设备范围 = `door` / `light` / `sensor` / `ac`**（完整支持，见 §8.1）；`curtain/fan/speaker/switch/camera` 为"**可识别但不受支持**"：DTO 必须能解析并持有其状态（schema 合法），UI 降级为只读展示 + "暂不支持控制"标记，**不下发任何控制命令**。
+  1. **v1 设备范围 = `door` / `light` / `sensor` / `ac`**（完整支持，见 §8.1）；`curtain/fan/speaker/switch/camera` 为"**可识别但不受支持**"：DTO 必须能解析并持有其状态（schema 合法），UI 降级为只读展示 + "暂不支持控制"标记，**不下发任何控制命令**（D-011）。
   2. 不修改 v1 schema；`position/speed/volume` 的 LAN 表达能力记入扩展提案 **`EXT-LAN-STATE-001`**（需固件协同，归档依据：ADR-001 §1.4-A4 与 `WP2` §7.3）。
   3. **`speed` 单位裁定**：线上/模型一律 **percent 0..100**（依据：`module-state.schema.json` L22/L39；`EXTERNAL_MODULE_PROTOCOL.md` L159；归档 `DeviceRepository.ets` L608 以 0..100 clamp）。"1~5 档"是**适配/展示层**表达（可由适配器映射或由 UI 以档位标签呈现），不得作为线格式单位（E-10）。
   4. `position` 语义（未来扩展沿用）：0=全关、100=全开（`EXTERNAL_MODULE_PROTOCOL.md` L162）。
@@ -272,8 +273,8 @@
 | 签名 | `Sign = hex_lower(HMAC-SHA256(commandSecret, canonical_utf8))`，canonical 见 §2.4 | README L164-181 |
 | 影子读取 | `GET .../devices/{deviceId}/shadow`（X-Auth-Token）；解析 `services[].properties`（`SmartHomeService`） | README L248-249；归档 L728；SR 全文 |
 | **命令完成判定** | 影子中出现 `*_LastRequestId == RequestId` 且 `*_LastSeq == Seq`（内置设备），或 `DeviceInventoryJson` 中同 id 设备的 `lastRequestId/lastSeq` 匹配（外部模块设备）；**且**该属性 `event_time` 不早于命令时刻（容差 2s）。IoTDA 受理、旧影子、网关缓存均不构成执行确认 | 需求 L10；`网关接口协议.md` L66；SR L47-51/L73-101；参考归档新鲜度判定（`NetworkService.ets` L520-525，`eventMs + 2000 >= notBeforeMs`） |
-| 设备 inventory | `DeviceInventoryJson`（≤8192，JSON 字符串，按稳定 `device_id` 键的状态数组）为通用承载；内置设备另有固定属性（SR L37-45） | SR L47-51 |
-| Token 生命周期 | v1 **不做**自动刷新/后端换取（`网关接口协议.md` L66：IAM Token 不应烧录网关；正式部署用受控后端短期权限）；Token 过期 → 明确错误提示并要求用户更新 | GWO L66；归档 L739 |
+| 设备 inventory | **SR 固定属性为一等公民**（`Door_01_Online` 等内置属性，SR L37-45）；其他设备一律经 `DeviceInventoryJson`（≤8192，JSON 字符串，按稳定 `device_id` 键的状态数组）承载；不向固件提协议变更（D-014） | SR L37-45/L47-51 |
+| Token 生命周期 | v1 **不做**自动刷新/后端换取（D-012；`网关接口协议.md` L66：IAM Token 不应烧录网关；正式部署用受控后端短期权限）；Token 过期 → 明确错误提示并要求用户更新 | GWO L66；归档 L739 |
 | 云错误映射 | IoTDA HTTP 4xx/5xx + 业务错误体 → App 命名空间错误码（§4.2）+ i18n（`errors.cloud.*`）；**不得**与网关 `result_code` 混用 | §4.2；假设见下 |
 | 范围外（v1 声明） | IoTDA 应用侧设备 CRUD、IAM Token 服务端换取、MQTTS 直连、产品模型在线管理 | 需求只要求配置与命令/影子 |
 
@@ -304,12 +305,12 @@
 | `curtain` / `fan` / `speaker` | 可解析、只读降级（不提供控制）；状态字段缺口见 §6.2 | schema 枚举含之；LAN 契约缺 `position/speed/volume`；PRD 无 FR；UIUX 无对应组件 |
 | 未知 `deviceType` 值 | 解析保留 + "未知类型"只读展示 + 偏差记录 | schema 封闭枚举 → 未知值即偏差 |
 
-> 依据链：PRD 功能需求仅覆盖 door/light/sensor/ac（§3.5、§3.3）；UIUX 组件集（`StatusBanner/ClimateCard/LightCard/DoorCard/SceneCard/RoomCard`，L58）无窗帘/风扇/音箱；LAN 契约字段缺位（§6.2）。产品形态选择（隐藏 vs 只读降级）见 `## ORCHESTRATOR_CLARIFICATION` Q1。
+> 依据链：PRD 功能需求仅覆盖 door/light/sensor/ac（§3.5、§3.3）；UIUX 组件集（`StatusBanner/ClimateCard/LightCard/DoorCard/SceneCard/RoomCard`，L58）无窗帘/风扇/音箱；LAN 契约字段缺位（§6.2）。产品形态已由 **D-011** 裁定为**只读降级**（保留本表、不隐藏），见文末「决议（RESOLVED，2026-10-17）」与 §9 R-26。
 
 ### 8.2 云路径
 
-- v1 **在范围**：IoTDA 配置（§7.1）、签名云命令、影子轮询确认、Token 过期提示。
-- v1 **范围外**：Token 自动获取/刷新、MQTTS 直连、应用侧设备管理、后端代理。
+- v1 **在范围**：IoTDA 配置（§7.1）、签名云命令、影子轮询确认、Token 过期提示（D-012）。
+- v1 **范围外**：Token 自动获取/刷新、MQTTS 直连、应用侧设备管理、后端代理（D-012）。
 - 依据：FR-SET-003、FR-HOME-001（云状态展示）、需求 L10（广域网回退）与 GWO L62-66 的边界要求。
 
 ### 8.3 GCM 扩展归档
@@ -364,26 +365,27 @@
 | R-08 | 指纹格式/绑定/轮换（ADR-002 §4） | 架构 L135-137；DM L233-234 | FR-SET-002 |
 | R-09 | 密钥模型/存储/轮换（ADR-002 §8） | PRIV L37；`EXTERNAL_MODULE_PROTOCOL.md` L24；归档 Asset Store | FR-SET-002；NFR-4.2；DES-001 |
 | R-10 | GCM 归档 `EXT-GCM-001`（ADR-002 §5） | DM §3；API L146-166；D-007 | FR-SET-002（预留不实现） |
-| R-11 | 离线凭据容器与双路径封装（ADR-003 §3/§4） | `WP3` §4.2（G-D8-1/2） | FR-FAM-002/003；DATA-001 提案 P-12 |
-| R-12 | 离线校验语义 + 回执（ADR-003 §5） | `WP3` §4.2（G-D8-3） | FR-FAM-002/003/004 |
-| R-13 | 撤销=轮换模型与成本（ADR-003 §6） | `WP3` §4.2（G-D8-4） | FR-FAM-003；ADR-002 §8.4 |
+| R-11 | 离线凭据容器与双路径封装（ADR-003 §3/§4；D-009） | `WP3` §4.2（G-D8-1/2） | FR-FAM-002/003；DATA-001 提案 P-12 |
+| R-12 | 离线校验语义 + 回执（ADR-003 §5；D-010） | `WP3` §4.2（G-D8-3） | FR-FAM-002/003/004 |
+| R-13 | 撤销=轮换模型与成本（ADR-003 §6；D-013） | `WP3` §4.2（G-D8-4） | FR-FAM-003；ADR-002 §8.4 |
 | R-14 | 指纹随凭据分发（ADR-003 §7） | `WP3` §4.2（G-D8-5）；架构 L112-113 | FR-FAM-002 |
 | R-15 | 威胁模型 14 项（ADR-003 §8） | `WP3` §4.2（G-D8-6） | 评审/UI 文案义务 |
 | R-16 | 房间=本地、`roomName` 提示、仲裁表（ADR-004 §1/§2） | `WP3` §2.1-C005/§2.3-C015 | FR-ROOM-001..006、FR-HOME-002 |
 | R-17 | 改名/换房/删除=本地（ADR-004 §2） | `WP3` §2.1-C006；MC L12 | FR-ROOM-003/004/005/006 |
 | R-18 | 未分配/禁用本地态（ADR-004 §2.1-4） | DM L165-179；UIUX L126-147 | FR-ROOM-004 |
 | R-19 | 邀请码 6 位（ADR-004 §3） | UX L90/98/106 | FR-FAM-002；勘误 E-06 |
-| R-20 | Guest 时效（ADR-004 §4；ADR-003 §9.2） | `WP3` §2.3-C017 | FR-FAM-002/003 |
-| R-21 | 手动 IP=定位非身份（ADR-004 §5） | `WP3` §2.1-C012；BLE 设计 L143 | FR-HOME-001；安全 |
-| R-22 | 门锁-门磁四阶段（ADR-004 §6） | 需求 L121-122；GWO L24 | FR-DEV-001/003；UIUX 补丁 P-13 |
+| R-20 | Guest 时效（ADR-004 §4；ADR-003 §9.2；D-013） | `WP3` §2.3-C017 | FR-FAM-002/003 |
+| R-21 | 手动 IP=定位非身份；高级入口保留（ADR-004 §5；D-015） | `WP3` §2.1-C012；BLE 设计 L143 | FR-HOME-001；安全 |
+| R-22 | 门锁-门磁四阶段 + 一次性关联引导（ADR-004 §6；D-016） | 需求 L121-122；GWO L24 | FR-DEV-001/003；UIUX 补丁 P-13 |
 | R-23 | DEV-ONLY 落位（ADR-004 §7.1） | GWO L11；README L224-226 | 安全约束 SC-11；测试边界 |
 | R-24 | 语言入口（ADR-004 §7.2） | 需求 L139；架构 L56 | FR-SET-003；i18n 设计；补丁 P-10 |
 | R-25 | 5 值 `stateSource`（§6.1） | README L197-198；归档 L2224 | FR-DEV-005；勘误 E-11 |
-| R-26 | 设备范围 4 类 + 只读降级（§6.2/§8.1） | PRD §3.5；UIUX 组件集；DR/CA 封闭 | FR-DEV-002/003/004；扩充提案 `EXT-LAN-STATE-001` |
+| R-26 | 设备范围 4 类 + 只读降级（§6.2/§8.1；D-011） | PRD §3.5；UIUX 组件集；DR/CA 封闭 | FR-DEV-002/003/004；扩充提案 `EXT-LAN-STATE-001` |
 | R-27 | `speed` percent / `mode` 7 值（§6.2/§6.3） | MS L22/L37；Gree L21 | FR-DEV-004；勘误 E-09/E-10 |
-| R-28 | 云路径 v1 范围与完成判定（§7.1） | CC/SR；GWO L62-66；归档 CloudService | FR-SET-003、FR-HOME-001 |
+| R-28 | 云路径 v1 范围与完成判定（§7.1；D-012） | CC/SR；GWO L62-66；归档 CloudService | FR-SET-003、FR-HOME-001 |
 | R-29 | WP2-F04 补建+降级（§7.2） | `WP2` §3.3-A | 测试计划；`WP3` §5-P2-15 |
 | R-30 | v1 范围与修订机制（§8） | `WP3` §2.1-C003/C013/C014、§5 | wp-005 规划 |
+| R-31 | `state-report` 固定属性一等公民；其他设备走 `DeviceInventoryJson`（D-014） | SR L37-51；§7.1 | FR-SET-003；云命令完成判定；无协议变更 |
 
 ---
 
@@ -421,23 +423,23 @@
 
 ---
 
-## ORCHESTRATOR_CLARIFICATION（需用户/产品决策）
+## 决议（RESOLVED，2026-10-17）
 
-**Q1（不受支持设备类型的产品形态，§8.1）**：`curtain/fan/speaker/switch/camera` 在 v1 的呈现方式：
+> 原澄清项的三项问题已按 **GATED_AUTO** 裁定，生效值为架构师推荐选项；用户可覆盖，覆盖时须走 Change Impact（至少修订本文档相关章节与测试计划）。权威决策记录：`state/decisions/wp-004-resolutions.md`；ADR/CB 状态维持 `Proposed`，待 G-004 门禁批准。
 
-- **选项 A（推荐）**：可解析 + 只读降级 + "暂不支持控制"标记（透明、无死路；便于未来扩展）。
-- **选项 B**：完全隐藏（UI 不出现；实现仅保证 DTO 不崩溃）。最简但用户不知设备存在。
-- **选项 C**：把 curtain/fan/speaker 提为 v1 完整支持 → 需要协议扩展 `EXT-LAN-STATE-001` + 固件协同 + 新增 PRD/UIUX 设计（范围显著扩大）。
+| 原问题 | 生效裁定 | 编号 | 决策来源 |
+|---|---|---|---|
+| Q1 不受支持设备类型的产品形态（§8.1） | **选项 A**：`switch/camera/curtain/fan/speaker` 可解析 + 只读降级 + "暂不支持控制"标记；保留 §8.1 只读降级表，**不隐藏**；不扩展协议 | **D-011** | GATED_AUTO（架构师推荐；用户可覆盖） |
+| Q2 云路径 Token 体验（§7.1） | **选项 A**：保持用户手工填写 IAM Token；过期明确提示更新；**不做**自动获取/刷新（OAuth 与后端换取在 v1 范围外） | **D-012** | GATED_AUTO（架构师推荐；用户可覆盖） |
+| Q3 `state-report` 固定属性与外部模块设备命名（§7.1/§2.4） | **选项 A**：SR 固定属性为一等公民；其他设备一律经 `DeviceInventoryJson` 承载；不向固件提协议变更 | **D-014** | GATED_AUTO（Orchestrator 代决） |
 
-**Q2（云路径 Token 体验，§7.1）**：v1 采用用户手工填入 IAM Token 的方式（过期即提示更新）。是否接受"无自动刷新"为 v1 限制？
+**对实现的约束**：
 
-- **选项 A（推荐）**：接受（与 GWO L66"受控后端短期权限"的正式做法并存，v1 不做后端）。
-- **选项 B**：要求 v1 内建 Token 自动获取/刷新（引入云端账号/OAuth 设计，超出当前语料）。
+1. **D-011**：§8.1 表即 v1 产品形态基线；UI 不得隐藏已知但不受支持的设备，须显示只读状态与"暂不支持控制"标记。
+2. **D-012**：测试须覆盖"Token 过期提示 + 用户更新"路径；不得引入自动刷新或后端换取的隐式依赖。
+3. **D-014**：命令完成判定同时支持内置固定属性与 `DeviceInventoryJson` 两种承载（§7.1），不得为外部设备扩展固定属性名。
 
-**Q3（`state-report` 固定属性与外部模块设备的命名，§7.1/§2.4）**：内置设备属性名固定（`Door_01_Online` 等，SR L37-45），外部模块设备经 `DeviceInventoryJson` 承载——若用户的真实设备族与固定属性名不符（例如 `Presence_01` 之外的人体传感器），是否允许 App 侧把约定扩展到"任意 `<deviceId>_Online`"形态？
-
-- **选项 A（推荐）**：以 SR 固定属性为一等公民；其他设备一律走 `DeviceInventoryJson`（不改协议）。
-- **选项 B**：向固件提出属性名动态化（需固件协同与产品模型变更）。
+**覆盖方式**：用户如选择其他选项，回复对应编号并触发 Change Impact（至少修订 §8.1/§7.1 与测试计划）。
 
 ---
 
