@@ -171,6 +171,11 @@ export class InviteCodec {
       throw AppErrors.of('INVITE_INVALID', []);
     }
     const node = InviteCodec.parseObject(headerBytes, MAX_HEADER_BYTES, 'INVITE_INVALID');
+    const versionNode = node.get('v');
+    if (versionNode !== undefined && versionNode.kind === JsonKind.NUMBER &&
+      versionNode.numberValue !== 1) {
+      throw AppErrors.of('INVITE_VERSION_UNSUPPORTED', []);
+    }
     InviteCodec.requireKeys(node, ['allowedRoomIds', 'expireAt', 'familyId', 'familyName',
       'inviteId', 'kdf', 'keyId', 'maxUses', 'targetRole', 'v'], 'INVITE_INVALID');
     const version = InviteCodec.requireNumber(node, 'v', 'INVITE_INVALID');
@@ -255,6 +260,11 @@ export class InviteCodec {
     }
     const node = InviteCodec.parseObject(BytesUtil.utf8(text), MAX_BUNDLE_BYTES,
       'INVITE_INVALID');
+    const versionNode = node.get('v');
+    if (versionNode !== undefined && versionNode.kind === JsonKind.NUMBER &&
+      versionNode.numberValue !== 1) {
+      throw AppErrors.of('INVITE_VERSION_UNSUPPORTED', []);
+    }
     InviteCodec.requireKeys(node, ['familyId', 'gateways', 'issuedAt', 'keyId', 'seed', 'v'],
       'INVITE_INVALID');
     const version = InviteCodec.requireNumber(node, 'v', 'INVITE_INVALID');
@@ -299,7 +309,13 @@ export class InviteCodec {
   }
 
   static decodeContainer(text: string): ContainerEnvelope {
-    if (text.length > MAX_CONTAINER_BYTES || !text.startsWith(INVITE_PREFIX)) {
+    if (text.length > MAX_CONTAINER_BYTES) {
+      throw AppErrors.of('INVITE_INVALID', []);
+    }
+    if (/^YCI[0-9]+\./.test(text) && !text.startsWith(INVITE_PREFIX)) {
+      throw AppErrors.of('INVITE_VERSION_UNSUPPORTED', []);
+    }
+    if (!text.startsWith(INVITE_PREFIX)) {
       throw AppErrors.of('INVITE_INVALID', []);
     }
     const segments = text.split('.');

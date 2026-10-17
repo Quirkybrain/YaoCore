@@ -150,7 +150,7 @@ test('C13_containerRejectsAadTamperCiphertextAndUnknownVersion', async () => {
 
   const prefixTampered = 'YCI2.' + parts.slice(1).join('.');
   await expectRejectCode(service.acceptInvitation(prefixTampered,
-    new AcceptInvitationOptions(harness.clock.nowMs())), 'INVITE_INVALID');
+    new AcceptInvitationOptions(harness.clock.nowMs())), 'INVITE_VERSION_UNSUPPORTED');
 });
 
 test('C13_expiredAndRevokedInvitationsFailClosed', async () => {

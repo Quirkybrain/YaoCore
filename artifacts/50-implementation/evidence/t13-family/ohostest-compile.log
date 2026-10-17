@@ -1,29 +1,34 @@
 > hvigor [32mUP-TO-DATE :entry:ohosTest@PreBuild...  [39m
 > hvigor [32mFinished :entry:ohosTest@CreateModuleInfo... after 1 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@GenerateMetadata...  [39m
+> hvigor [32mFinished :entry:ohosTest@GenerateMetadata... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ConfigureCmake... after 1 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@MergeProfile...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@CreateBuildProfile...  [39m
+> hvigor [32mFinished :entry:ohosTest@MergeProfile... after 5 ms [39m
+> hvigor [32mFinished :entry:ohosTest@CreateBuildProfile... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@PreCheckSyscap... after 1 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@GenerateOhosTestTemplate...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@GeneratePkgContextInfo...  [39m
+> hvigor [32mFinished :entry:ohosTest@GenerateOhosTestTemplate... after 4 ms [39m
+> hvigor [32mFinished :entry:ohosTest@GeneratePkgContextInfo... after 5 ms [39m
 > hvigor [32mFinished :entry:ohosTest@GeneratePkgSdkInfo... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ProcessIntegratedHsp... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@BuildNativeWithCmake... after 1 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@MakePackInfo...  [39m
-> hvigor [32mFinished :entry:ohosTest@SyscapTransform... after 2 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@ProcessProfile...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@ProcessRouterMap...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@ProcessShareConfig...  [39m
-> hvigor [32mFinished :entry:ohosTest@ProcessStartupConfig... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@MakePackInfo... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@SyscapTransform... after 8 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessProfile... after 51 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessRouterMap... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessShareConfig... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessStartupConfig... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@BuildNativeWithNinja... after 1 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@ProcessResource...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@GenerateLoaderJson...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@ProcessLibs...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@CompileResource...  [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@DoNativeStrip...  [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessResource... after 4 ms [39m
+> hvigor [32mFinished :entry:ohosTest@GenerateLoaderJson... after 5 ms [39m
+> hvigor [32mFinished :entry:ohosTest@ProcessLibs... after 3 ms [39m
+> hvigor [33mWARN: Warning: 'start_window_background' conflict, first declared.
+at /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/resources/base/element/color.json
+but declared again.
+at /home/quirkybrain/code/harmony-projects/YaoCore/entry/.test/default/intermediates/src/ohosTest/resources/base/element/color.json
+[39m
+> hvigor [32mFinished :entry:ohosTest@CompileResource... after 73 ms [39m
+> hvigor [32mFinished :entry:ohosTest@DoNativeStrip... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@OhosTestBuildJS... after 2 ms [39m
-> hvigor [32mUP-TO-DATE :entry:ohosTest@CacheNativeLibs...  [39m
+> hvigor [32mFinished :entry:ohosTest@CacheNativeLibs... after 8 ms [39m
 > hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: /home/quirkybrain/code/harmony-projects/YaoCore/entry/src/main/ets/service/crypto/OhosCryptoProvider.ets:70:16
  The system capacity of this api 'clearMem' is not supported on all devices
 [39m[39m
@@ -299,17 +304,17 @@ ohos.permission.GET_BLUETOOTH_PEERS_MAC) [since 26.0.0]
  Function may throw exceptions. Special handling is required.
 [39m[39m
 [39m
-> hvigor [32mFinished :entry:ohosTest@OhosTestCompileArkTS... after 4 s 328 ms [39m
+> hvigor [32mFinished :entry:ohosTest@OhosTestCompileArkTS... after 5 s 674 ms [39m
 > hvigor [32mFinished :entry:ohosTest@OhosTestCopyMockConfigJson... after 1 ms [39m
 > hvigor [32mFinished :entry:ohosTest@GeneratePkgModuleJson... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@ProcessCompiledResources... after 1 ms [39m
-> hvigor [32mFinished :entry:ohosTest@PackageHap... after 293 ms [39m
-> hvigor [32mFinished :entry:ohosTest@PackingCheck... after 2 ms [39m
+> hvigor [32mFinished :entry:ohosTest@PackageHap... after 301 ms [39m
+> hvigor [32mFinished :entry:ohosTest@PackingCheck... after 3 ms [39m
 > hvigor [33mWARN: Will skip sign 'hos_hap'. No signingConfigs profile is configured in current project.
              If needed, configure the signingConfigs in /home/quirkybrain/code/harmony-projects/YaoCore/build-profile.json5.[39m
 > hvigor [32mFinished :entry:ohosTest@SignHap... after 2 ms [39m
 > hvigor [32mFinished :entry:ohosTest@CollectDebugSymbol... after 1 ms [39m
 > hvigor [32mFinished :entry:assembleHap... after 1 ms [39m
-> hvigor [32mBUILD SUCCESSFUL in 7 s 202 ms [39m
+> hvigor [32mBUILD SUCCESSFUL in 8 s 237 ms [39m
 
-35 tasks in total: 19 executed, 16 up-to-date
+35 tasks in total: 34 executed, 1 up-to-date
