@@ -219,7 +219,9 @@ export class ProtobufReader {
   /**
    * Reads a length prefix. Unlike `readUnsigned` (which keeps the low 32 bits
    * for int32 two's complement), a wire length must fit in 32 bits; a varint
-   * whose value exceeds 0xFFFFFFFF is a malformed frame (F-11).
+   * whose value exceeds 0xFFFFFFFF is a malformed frame (F-11). The encoding
+   * must also be minimal: a multi-byte varint ending in a zero payload is
+   * overlong (e.g. `80 00`, or the 10-byte zero) and is rejected (R2-04).
    */
   readLength(): number {
     let low = 0;
@@ -244,6 +246,11 @@ export class ProtobufReader {
         fail('length');
       }
       if ((byte & 0x80) === 0) {
+        // A non-minimal (overlong) length varint ends with a zero payload;
+        // accept only the canonical single-byte form for zero (R2-04).
+        if (index > 0 && payload === 0) {
+          fail('length');
+        }
         return low >>> 0;
       }
       shift += 7;

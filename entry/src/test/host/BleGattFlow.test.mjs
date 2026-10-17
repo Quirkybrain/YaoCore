@@ -8,7 +8,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { AppError } from '../../main/ets/common/types/AppError.ets';
+import { AppError, AppErrors } from '../../main/ets/common/types/AppError.ets';
+import { NameValue } from '../../main/ets/common/types/NameValue.ets';
 import { BleDescriptorRef } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
 import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
 import { GattRequestQueue } from '../../main/ets/service/ble/GattRequestQueue.ets';
@@ -278,6 +279,49 @@ test('C19_GattChannel_readBusyIsTerminalWithoutResend', async () => {
   assert.equal(connection.writeAttempts.length, 1,
     'a read busy must not resend the already delivered write');
   assert.equal(connection.readAttempts, 1);
+});
+
+test('C19_GattChannel_ambiguousWriteFailureIsNotRetried', async () => {
+  const cases = [
+    {
+      label: 'adapter fallback 2900099',
+      error: AppErrors.of('PROVISIONING_GATT_BUSY',
+        [new NameValue('field', 'ble:2900099')]),
+      code: 'PROVISIONING_GATT_BUSY',
+    },
+    {
+      label: 'unmarked GATT busy',
+      error: AppErrors.of('PROVISIONING_GATT_BUSY', []),
+      code: 'PROVISIONING_GATT_BUSY',
+    },
+    {
+      label: 'unknown error without a numeric code',
+      error: new Error('unknown write failure'),
+      code: 'PROVISIONING_GATT_BUSY',
+    },
+    {
+      label: 'adapter fallback 2900001',
+      error: AppErrors.of('PROVISIONING_GATT_INCOMPLETE',
+        [new NameValue('field', 'ble:2900001')]),
+      code: 'PROVISIONING_GATT_INCOMPLETE',
+    },
+  ];
+  for (const item of cases) {
+    const gateway = new FakeGateway();
+    const connection = new FakeBleConnection(gateway, { writeErrorOnce: item.error });
+    const { characteristics, descriptors } = await validMap(connection);
+    const map = GattEndpointMap.build(characteristics, descriptors);
+    const clock = new FakeClock();
+    const channel = new GattChannel(connection, map, new GattRequestQueue(1000),
+      fakeDelay(clock));
+    await expectCode(() => channel.requestPlain('proto-ver', utf8('ESP')), item.code);
+    assert.equal(connection.writeAttempts.length, 1,
+      item.label + ': an ambiguous write failure must not be resent');
+    assert.equal(connection.writes.length, 0,
+      item.label + ': the frame was never accepted');
+    assert.equal(clock.nowMs(), FakeClockBase(),
+      item.label + ': no busy retry delay may be spent');
+  }
 });
 
 test('C19_GattChannel_writeBusyRetryPreservesCtrStream', async () => {

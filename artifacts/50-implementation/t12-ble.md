@@ -9,6 +9,8 @@
 - **Status**: 实现与本机验证完成，等待独立 Review / Component Quality Gate。
 - **权威契约**: DES-001A §16（C-19）、§20、§3.2、§23；ADR-002 §3；`input/existing/docs/BLE配网设计.md`；identity v2.0 schema；`contract-baseline.md`；`project-constraints.md`；`test-plan.md`。
 
+> **SUPERSEDED（F-04 / GATT busy 口径）**：本报告冻结于原实现 `27dc537`。§2.1 `GattChannel` 行“GATT busy 仅未开始时重试一次（50ms）”及 §3 相关表述已过时；当前行为（仅确认写 busy `2900011`/`2901004` 重试一次并复用同一密文；`2900099`/未知写失败不重试；读 busy 终止；队列获取超时不重试）以 `t12-fix-report.md` 与 `t12-fix2-report.md` 为准。R2-05 / REV-T12-002。
+
 ---
 
 ## 1. 结论摘要
@@ -36,7 +38,7 @@
 | `ProtocommCodec.ets` | SessionData step0/step1、Wi-Fi config/scan/status、自定义 JSON；冻结向量 |
 | `GattEndpointMap.ets` | SERVICE_UUID、`0x2901` endpoint 映射、必需端点/重名/不可读写 fail-closed |
 | `GattRequestQueue.ets` | 单飞 write→read 队列、超时 `PROVISIONING_GATT_BUSY`、reset/destroy |
-| `GattChannel.ets` | 明文/密文请求统一串行；CTR 加解密在队列槽内完成；GATT busy 仅未开始时重试一次（50ms） |
+| `GattChannel.ets` | 明文/密文请求统一串行；CTR 加解密在队列槽内完成；~~GATT busy 仅未开始时重试一次（50ms）~~ **已过时，见顶部 SUPERSEDED 注记与 `t12-fix2-report.md`** |
 | `ProtoVerParser.ets` | `proto-ver` 能力门禁（v1.1、sec_ver=1、no_sec/no_pop、wifi_scan、yaocore 2.0） |
 | `Security1Session.ets` | X25519/CTR 会话状态机、step0/step1、常数时间 verify、`destroy()` 清零 |
 | `IdentityNegotiator.ets` | v2.1 严格解析、v2.0 同会话一次回退、pin/常量/多余字段 fail-closed、expectedGatewayId |

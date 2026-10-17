@@ -233,6 +233,23 @@ test('C19_ProtobufReader_rejectsLengthVarintAbove32Bits', () => {
   assert.equal(Buffer.from(reader.readBytes()).toString('utf8'), 'ok');
 });
 
+test('C19_ProtobufReader_rejectsNonCanonicalLengthVarint', () => {
+  // A 10-byte zero length is overlong and must not be accepted as 0 (R2-04).
+  expectCode(() => {
+    const reader = new ProtobufReader(new Uint8Array([
+      0x0a, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00,
+    ]));
+    reader.readTag();
+    reader.readBytes();
+  }, 'PROTOCOL_INVALID_JSON');
+  // The same non-minimal rule applies to a short overlong encoding.
+  expectCode(() => {
+    const reader = new ProtobufReader(new Uint8Array([0x0a, 0x80, 0x00]));
+    reader.readTag();
+    reader.readBytes();
+  }, 'PROTOCOL_INVALID_JSON');
+});
+
 test('C19_ProtocommCodec_customJsonHasNoFrameHeader', () => {
   const json = '{"op":"finish","protocolVersion":"2.0"}';
   assert.equal(hex(ProtocommCodec.encodeCustomJson(json)), hex(utf8(json)));

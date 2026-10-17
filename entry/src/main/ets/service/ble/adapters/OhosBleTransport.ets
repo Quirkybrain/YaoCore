@@ -6,7 +6,9 @@
  * COMPILED_ONLY (no device/radio in this environment). This is the only
  * production file that imports @ohos.bluetooth.*. It maps platform types to
  * the pure BleTransport port, maps BusinessError codes to AppError, and never
- * interprets provisioning semantics.
+ * interprets provisioning semantics. Write errors are special: only
+ * 2900011/2901004 are confirmed busy and safe to resend; every other write
+ * failure maps to a non-GATT_BUSY code (REV-T12-002 R2-01).
  *
  * Runtime permission: ohos.permission.ACCESS_BLUETOOTH is requested through
  * the injected UIAbility context. module.json5 declaration is owned by T-17
@@ -19,6 +21,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { AppError, AppErrors } from '../../../common/types/AppError';
 import { NameValue } from '../../../common/types/NameValue';
 import type { CancellationToken } from '../../../common/types/Ports';
+import { confirmedWriteBusy } from '../BleSupport';
 import {
   BleCharacteristicRef,
   BleConnection,
@@ -77,6 +80,22 @@ function mapBleError(error: Error, fallbackCode: string): AppError {
     return AppErrors.of('PROVISIONING_GATT_INCOMPLETE', []);
   }
   return AppErrors.of(fallbackCode, [new NameValue('field', 'ble:' + String(code))]);
+}
+
+/**
+ * Maps a write failure. Only an explicit GATT busy / connection-congested
+ * rejection confirms that the write was not accepted and may be resent.
+ * 2900099 Operation failed, 2900001, 2901005..2901007 and missing/unknown
+ * codes are ambiguous and map to a non-GATT_BUSY code so the channel never
+ * resends the same frame (REV-T12-002 R2-01).
+ */
+function mapWriteError(error: Error): AppError {
+  const business = error as BusinessError;
+  if (typeof business.code === 'number' &&
+    (business.code === CODE_GATT_BUSY || business.code === CODE_CONNECTION_CONGESTED)) {
+    return confirmedWriteBusy();
+  }
+  return mapBleError(error, 'PROVISIONING_GATT_INCOMPLETE');
 }
 
 /** Runtime permission gate; module.json5 declaration is T-17. */
@@ -391,7 +410,7 @@ class OhosBleConnection implements BleConnection {
     try {
       await this.client.writeCharacteristicValue(target, ble.GattWriteType.WRITE);
     } catch (error) {
-      throw mapBleError(error as Error, 'PROVISIONING_GATT_BUSY');
+      throw mapWriteError(error as Error);
     }
   }
 

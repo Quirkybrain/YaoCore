@@ -8,14 +8,18 @@
  * no notification subscription is used. Encryption and decryption happen
  * inside the queue slot so concurrent callers cannot interleave stream bytes.
  *
- * GATT busy policy (DES-A §16.2-3911): a platform busy on the write retries
- * once after 50ms with the same bytes; a secure retry reuses the already
- * encrypted frame so the client CTR stream is not advanced twice. A busy on
- * the read is never retried (the write may have been delivered); the caller
- * tears down the session/connection and restarts from Security1 step0.
+ * GATT busy policy (DES-A §16.2-3911; REV-T12-002 R2-01/R2-03): only a write
+ * rejection explicitly confirmed as busy by the platform (2900011/2901004)
+ * retries once after 50ms with the same bytes. Ambiguous write failures
+ * (2900099, unknown or missing code) are terminal because the write may have
+ * been accepted. A secure retry reuses the already encrypted frame so the
+ * client CTR stream is not advanced twice. A busy on the read is never
+ * retried (the write may have been delivered); the caller tears down the
+ * session/connection and restarts from Security1 step0. A queue-acquisition
+ * timeout marks the queue broken, so it is terminal as well.
  */
 import { AppErrors } from '../../common/types/AppError';
-import { defaultBleDelay, isCode, mapProvisioningError } from './BleSupport';
+import { defaultBleDelay, isConfirmedWriteBusy, mapProvisioningError } from './BleSupport';
 import type { BleDelay } from './BleSupport';
 import type { BleCharacteristicRef, BleConnection } from './BleProvisioningPorts';
 
@@ -52,7 +56,7 @@ export class GattChannel implements SecureGattChannel {
   }
 
   async requestPlain(endpoint: string, payload: Uint8Array): Promise<Uint8Array> {
-    return this.runWithBusyRetry(endpoint, async (): Promise<Uint8Array> => {
+    return this.runSerialized(endpoint, async (): Promise<Uint8Array> => {
       return await this.writeRead(endpoint, payload);
     });
   }
@@ -62,7 +66,7 @@ export class GattChannel implements SecureGattChannel {
       throw AppErrors.of('PROVISIONING_SECURITY_HANDSHAKE_FAILED', []);
     }
     const session = this.session;
-    return this.runWithBusyRetry(endpoint, async (): Promise<Uint8Array> => {
+    return this.runSerialized(endpoint, async (): Promise<Uint8Array> => {
       const encrypted = await session.encrypt(payload);
       let response: Uint8Array;
       try {
@@ -75,34 +79,29 @@ export class GattChannel implements SecureGattChannel {
     });
   }
 
-  private async runWithBusyRetry(endpoint: string,
+  /**
+   * One serialized attempt. There is deliberately no queue-acquisition retry:
+   * a queue timeout permanently breaks the queue (the timed-out operation may
+   * still be in flight), so a second run would fail immediately; retrying only
+   * added 50ms and misreported the semantics (REV-T12-002 R2-03). Write-busy
+   * handling lives in `writeRead`, where the same encrypted frame is reused.
+   */
+  private async runSerialized(endpoint: string,
     operation: () => Promise<Uint8Array>): Promise<Uint8Array> {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      let started = false;
-      try {
-        return await this.queue.run<Uint8Array>(async (): Promise<Uint8Array> => {
-          started = true;
-          return await operation();
-        });
-      } catch (error) {
-        const typed = error as Error;
-        // Retry only when the operation never started (queue acquisition
-        // timeout); a started operation already owns the CTR/command state.
-        if (isCode(typed, 'PROVISIONING_GATT_BUSY') && !started && attempt === 0) {
-          await Promise.resolve(this.delay(50));
-          continue;
-        }
-        throw mapProvisioningError(typed, 'PROVISIONING_GATT_BUSY', endpoint);
-      }
+    try {
+      return await this.queue.run<Uint8Array>(operation);
+    } catch (error) {
+      throw mapProvisioningError(error as Error, 'PROVISIONING_GATT_BUSY', endpoint);
     }
-    throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
   }
 
   /**
-   * One write-with-response followed by one read. A busy on the write is the
-   * only retryable failure: the value was rejected, and retrying the exact
-   * same bytes cannot advance the Security1 CTR stream twice. A busy on the
-   * read is ambiguous (the write may have been delivered), so it is terminal.
+   * One write-with-response followed by one read. Only a platform-confirmed
+   * write busy is retryable: the write was rejected before acceptance, and
+   * retrying the exact same bytes cannot advance the Security1 CTR stream
+   * twice. Any other write failure (2900099, unknown/missing code) may have
+   * been accepted and is terminal. A busy on the read is ambiguous (the write
+   * may have been delivered), so it is terminal too.
    */
   private async writeRead(endpoint: string, value: Uint8Array): Promise<Uint8Array> {
     const characteristic: BleCharacteristicRef = this.endpoints.get(endpoint);
@@ -111,7 +110,7 @@ export class GattChannel implements SecureGattChannel {
         await this.connection.writeCharacteristic(characteristic, value);
       } catch (error) {
         const typed = error as Error;
-        if (attempt === 0 && isCode(typed, 'PROVISIONING_GATT_BUSY')) {
+        if (attempt === 0 && isConfirmedWriteBusy(typed)) {
           await Promise.resolve(this.delay(50));
           continue;
         }

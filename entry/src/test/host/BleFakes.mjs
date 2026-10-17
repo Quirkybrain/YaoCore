@@ -18,6 +18,7 @@ import {
 } from 'node:crypto';
 
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
+import { NameValue } from '../../main/ets/common/types/NameValue.ets';
 import { SecureBytes } from '../../main/ets/common/types/SecureBytes.ets';
 import {
   BleProvisioningDevice,
@@ -575,7 +576,12 @@ export class FakeBleConnection {
     this.writes = [];
     this.writeAttempts = [];
     this.readAttempts = 0;
+    // `writeBusyOnce` models the adapter's confirmed busy marker. The literal
+    // detail is pinned here so a marker drift between product adapter and
+    // channel fails this test instead of being hidden by a shared helper.
     this.writeBusyRemaining = options.writeBusyOnce === true ? 1 : 0;
+    this.writeErrorOnce = options.writeErrorOnce;
+    this.writeErrorRemaining = options.writeErrorOnce === undefined ? 0 : 1;
     this.readBusyRemaining = options.readBusyOnce === true ? 1 : 0;
     this.disconnectCalls = 0;
     this.pending = undefined;
@@ -638,9 +644,14 @@ export class FakeBleConnection {
   async writeCharacteristic(reference, value) {
     const endpoint = reference.characteristicUuid.substring('char-'.length);
     this.writeAttempts.push({ endpoint, value: new Uint8Array(value) });
+    if (this.writeErrorRemaining > 0) {
+      this.writeErrorRemaining--;
+      throw this.writeErrorOnce;
+    }
     if (this.writeBusyRemaining > 0) {
       this.writeBusyRemaining--;
-      throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
+      throw AppErrors.of('PROVISIONING_GATT_BUSY',
+        [new NameValue('retryable', 'write-busy')]);
     }
     this.writes.push({ endpoint, value: new Uint8Array(value) });
     this.pending = await this.gateway.handle(endpoint, value);
