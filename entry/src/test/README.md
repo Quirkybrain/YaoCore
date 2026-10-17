@@ -20,6 +20,11 @@ entry/src/test/
 │   ├── ProtocolCloud.test.mjs    # 云 canonical
 │   ├── ProtocolIdentity.test.mjs # 身份/SPKI
 │   ├── DomainModels.test.mjs     # 域模型
+│   ├── DomainDevice.test.mjs     # T-09 C-10 仲裁/墓碑/ACK/命令预检
+│   ├── DomainRoom.test.mjs       # T-09 C-09 房间/删除事务/回滚/未分配池
+│   ├── DomainScene.test.mjs      # T-09 C-11 场景串行/局部失败/取消
+│   ├── DomainFamily.test.mjs     # T-09 C-08 家庭/成员/邀请/加入/RBAC
+│   ├── domain-helpers.mjs        # T-09 值对象夹具
 │   ├── Foundation.test.mjs       # 基础工具
 │   ├── PerfHarness.test.mjs      # NFR 4.3 测量 harness
 │   ├── Crypto.test.mjs           # T-07 C-04 host 测试（含 R-01 分类器/R-07 前缀副本）
@@ -30,6 +35,10 @@ entry/src/test/
 │   ├── protocol-oracle.ets       # 纯 TS canonical oracle（无 @ohos）
 │   ├── ets-hooks.mjs             # Node loader：.ets -> TS strip -> ESM
 │   └── register-ets.mjs
+├── domain/
+│   ├── DomainHarness.ets         # T-09 共享 fake RDB + O-1 gate 装配
+│   ├── DomainFakes.ets           # T-09 Invite/Auth/Control/Route/Timer fakes
+│   └── DomainHost.test.ets       # T-09 ArkTS 编译套件（仅编译）
 ├── foundation/                   # Hypium host 冒烟（仅编译）
 ├── protocol/                     # Hypium host 冒烟（仅编译）
 ├── security/
@@ -64,7 +73,7 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前 revision：**166/166 PASS**（`evidence/t08-fix-host-node-tests.tap`，wp-022-fix-t08 后）。覆盖：
+当前 revision：**216/216 PASS**（`evidence/t09-host-node-tests.tap`，wp-024-domain 后）。覆盖：
 
 - 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
@@ -77,6 +86,10 @@ node --no-warnings \
 - T-07 C-05：V-01 4/4、发现/响应向量、correlation/nonce/TTL/±120s 负例与 ACK 链组合；
 - T-08 C-06（15）：draft 复制/一次性/TTL/clearAll/非法 TTL、迁移 0→2/重复/缺口/失败回滚/拒绝降版本、v1 初始化/幂等/close、secret 副本清零与 alias 语法、`RdbTransactionRunner` begin 失败映射与状态复位；
 - T-08 C-07（29）：HMAC/TLS 绑定、短/超长 draft secret 拒绝（R-01）、draft 重放/不匹配/家庭迁移负例、route/secret 补偿与 fail-closed、secret 写失败、复用路径、markSeen/回读 post-commit 语义（R-05）、邀请幂等、P-BLOCKED 拒绝、TLS→HMAC、多 pin 收缩/未知 pin、轮换成功/失败/异常、initialize 清理 pending、本机解绑、sequence 读/增/重置/上限/40 并发、路由列表/家庭索引/地址更新、未绑定错误、秘密泄漏审计；
+- T-09 C-08（15）：家庭创建/activeFamily、切换锁会话/档案、RBAC 矩阵/actor 拒绝、最后 ADMIN、转让、GUEST 到期/续期、邀请/回执状态机、撤销/过期、加入会话 KEY_WRAP/CODE_KEK、接触式收敛、退出/解散/profile 清理；
+- T-09 C-09（8）：房间创建/改名/ID 不变、排序校验、指派/换房/未分配池、删除预览/确认竞态、删除事务（设备禁用+授权清理）、失败回滚、空/最后房间、零网络；
+- T-09 C-10（17）：发现新增未分配/禁用、陈旧包整条丢弃、同 epoch 覆盖、缺字段保留/离线不清空、partial 不标记网关移除、aliasUsed 仅诊断、未知类型只读、tombstone/restore、设备删除场景清理/回滚、ACK 应用/陈旧/不匹配/重放、applyCloudState 边界、命令预检、O-1 gate 串行；
+- T-09 C-11（10）：场景 CRUD/值校验、串行成功/事件、预检 0 命令、首步/次步失败、局部失败不回滚、MISMATCH/UNVERIFIED、delayMs、取消、房间删除后预检失败、禁用/空场景；
 - host runner 基线断言。
 
 T-08 修复前基线为 **161/161 PASS**（`evidence/t08-host-node-tests.tap`）；T-06 修复时基线为 **88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`）；T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）。这些旧数字仅代表当时范围，不代表当前 revision。
@@ -85,7 +98,12 @@ T-08 证据：
 
 | 文件 | 内容 |
 |---|---|
-| `evidence/t08-fix-host-node-tests.tap` | 当前 166/166 TAP（wp-022-fix-t08） |
+| `evidence/t09-host-node-tests.tap` | 当前 216/216 TAP（wp-024-domain） |
+| `evidence/t09-clean-assemble.log` | `hvigorw clean assembleHap --no-daemon`（wp-024-domain） |
+| `evidence/t09-codelinter.log` | `codelinter -c code-linter.json5 -p default .`（wp-024-domain） |
+| `evidence/t09-hvigor-test-compile.log` | `hvigorw test` UnitTestArkTS 编译成功；Previewer 仍 BLOCKED |
+| `evidence/t09-ohosTest-compile-probe.log` | 临时注册设备骨架后的 ohosTest 编译通过（注册本身不在本任务写范围） |
+| `evidence/t08-fix-host-node-tests.tap` | 历史 166/166 TAP（wp-022-fix-t08） |
 | `evidence/t08-fix-ohpm-install.log` | `ohpm install`（修复 revision） |
 | `evidence/t08-fix-clean-assemble.log` | `hvigorw clean assembleHap --no-daemon`（修复 revision） |
 | `evidence/t08-fix-codelinter.log` | `codelinter -c code-linter.json5 -p default .`（产品源码） |
@@ -131,7 +149,7 @@ Node host runner 是本环境唯一已实证的可执行 host 路径，覆盖纯
 
 | 层 | 路径 | 运行条件 | 当前 |
 |---|---|---|---|
-| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 166/166**（wp-022-fix-t08 后） |
+| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 216/216**（wp-024-domain 后） |
 | Hypium host | `entry/src/test/List.test.ets` | `hvigorw test` + Linux Previewer | **BLOCKED**（见 §3） |
 | 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README；storage 套件已注册但未执行） |
 

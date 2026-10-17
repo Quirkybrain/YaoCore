@@ -21,6 +21,7 @@ import { IdentityParserSuite } from './protocol/IdentityParser.test';
 import { StateReportMapperSuite } from './protocol/StateReportMapper.test';
 import { SecurityHostSuite } from './security/SecurityHost.test';
 import { StorageHostSuite } from './storage/StorageHost.test';
+import { DomainHostSuite } from './domain/DomainHost.test';
 
 export default function testsuite() {
   hostBaselineTest();
@@ -33,4 +34,5 @@ export default function testsuite() {
   StateReportMapperSuite();
   SecurityHostSuite();
   StorageHostSuite();
+  DomainHostSuite();
 }
