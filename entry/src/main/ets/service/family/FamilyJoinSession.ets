@@ -29,9 +29,10 @@ export class FamilyJoinSession {
   private readonly clock: ClockPort;
   private readonly logger: LoggerPort;
   private readonly listeners: Array<(state: JoinSessionState) => void> = [];
-  private readonly acceptedContainers: Map<string, boolean> = new Map<string, boolean>();
   private state: JoinSessionState = new JoinSessionState(FamilyJoinPhase.IDLE, 0);
   private handle?: JoinRequestHandle;
+  private accepted?: AcceptedInvitation = undefined;
+  private acceptedText?: string = undefined;
   private disposed: boolean = false;
 
   constructor(invites: InviteServicePort, families: FamilyRepository, auth: FamilyAuthPort,
@@ -59,6 +60,10 @@ export class FamilyJoinSession {
 
   async start(displayName?: string): Promise<JoinRequestHandle> {
     this.ensureActive();
+    if (this.state.phase === FamilyJoinPhase.MEMBER_BOUND ||
+      this.state.phase === FamilyJoinPhase.COMPLETED) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'phase')]);
+    }
     try {
       const handle = await this.invites.createJoinRequest(displayName);
       this.handle = handle;
@@ -79,12 +84,17 @@ export class FamilyJoinSession {
 
   async submitInvitation(text: string, code?: string): Promise<AcceptedInvitation> {
     this.ensureActive();
-    if (!text.startsWith('YCI1.') || text.length <= 5) {
-      const error = AppErrors.of('INVITE_INVALID', []);
-      this.fail(error as Error);
-      throw error as Error;
+    // T-15 ruling (F-06): MEMBER_BOUND/COMPLETED is terminal for accepting a
+    // container. The same text is idempotent (return the saved accepted
+    // invitation); a different container is rejected without leaving the phase.
+    if (this.state.phase === FamilyJoinPhase.MEMBER_BOUND ||
+      this.state.phase === FamilyJoinPhase.COMPLETED) {
+      if (this.accepted !== undefined && this.acceptedText === text) {
+        return this.accepted;
+      }
+      throw AppErrors.of('INVITE_INVALID', []);
     }
-    if (this.acceptedContainers.has(text)) {
+    if (!text.startsWith('YCI1.') || text.length <= 5) {
       const error = AppErrors.of('INVITE_INVALID', []);
       this.fail(error as Error);
       throw error as Error;
@@ -128,14 +138,59 @@ export class FamilyJoinSession {
       this.fail(error as Error);
       throw error as Error;
     }
-    this.acceptedContainers.set(text, true);
-    this.setState(new JoinSessionState(FamilyJoinPhase.COMPLETED,
+    this.accepted = accepted;
+    this.acceptedText = text;
+    // C-08's own terminal phase. COMPLETED is reserved for markProfileBound().
+    this.setState(new JoinSessionState(FamilyJoinPhase.MEMBER_BOUND,
       this.state.revision + 1, this.state.joinRequestText, undefined, undefined, accepted));
     return accepted;
   }
 
+  /**
+   * T-15 ruling (F-06 / EXT-DES-B-27): the only COMPLETED writer. Requires the
+   * exact member profile plus the accepted family as active family; otherwise
+   * throws CONFIGURATION_ERROR and keeps MEMBER_BOUND + accepted for retry.
+   */
+  async markProfileBound(): Promise<void> {
+    this.ensureActive();
+    if (this.state.phase === FamilyJoinPhase.COMPLETED) {
+      return;
+    }
+    if (this.state.phase !== FamilyJoinPhase.MEMBER_BOUND || this.accepted === undefined) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'phase')]);
+    }
+    const accepted = this.accepted;
+    const member = await this.families.getMember(accepted.familyId, accepted.memberId);
+    if (member === undefined || member.status !== MemberStatus.ACTIVE) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'memberId')]);
+    }
+    const profiles = await this.auth.listProfiles(accepted.familyId);
+    let profileFound = false;
+    for (let index = 0; index < profiles.length; index++) {
+      if (profiles[index].memberId === accepted.memberId) {
+        profileFound = true;
+        break;
+      }
+    }
+    if (!profileFound) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'profileId')]);
+    }
+    const active = await this.families.getActiveFamily();
+    if (active === undefined || active.familyId !== accepted.familyId) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'activeFamilyId')]);
+    }
+    this.setState(new JoinSessionState(FamilyJoinPhase.COMPLETED,
+      this.state.revision + 1, this.state.joinRequestText, undefined, undefined, accepted));
+  }
+
   async cancel(): Promise<void> {
     if (this.disposed) {
+      return;
+    }
+    // T-15 ruling: members are already persisted in MEMBER_BOUND/COMPLETED;
+    // cancellation is a no-op there and must not discard the join request.
+    if (this.state.phase === FamilyJoinPhase.MEMBER_BOUND ||
+      this.state.phase === FamilyJoinPhase.COMPLETED) {
       return;
     }
     const handle = this.handle;
@@ -156,7 +211,8 @@ export class FamilyJoinSession {
   dispose(): void {
     this.disposed = true;
     this.listeners.splice(0, this.listeners.length);
-    this.acceptedContainers.clear();
+    this.accepted = undefined;
+    this.acceptedText = undefined;
     this.handle = undefined;
   }
 

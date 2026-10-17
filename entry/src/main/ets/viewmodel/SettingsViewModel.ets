@@ -260,16 +260,21 @@ export class SettingsViewModel implements ViewModelBase<SettingsViewState> {
       if (!result.valid) {
         const error = result.errors.length > 0 ? result.errors[0] :
           AppErrors.of('CLOUD_NOT_CONFIGURED', []);
-        this.fail(error);
+        // F-04: C-15 records 401/403 as a transient TOKEN_EXPIRED/INVALID view.
+        // Refresh the persistent layer so the UI stops showing CONFIGURED.
+        let cloud = this.state.cloud;
+        try {
+          cloud = await this.loadCloud();
+        } catch (loadError) {
+          this.logger.warn(TAG, 'cloud_state_refresh_failed',
+            [new NameValue('code', ViewModelSupport.codeOf(loadError as Object))]);
+          cloud = this.state.cloud;
+        }
+        this.publish(this.cloudState(cloud, false, ViewModelSupport.viewError(error, this.clock)));
         return false;
       }
       const cloud = await this.loadCloud();
-      this.publish(new SettingsViewState(this.state.phase, this.state.section,
-        this.state.localeMode, this.state.currentLocale, cloud, this.state.security,
-        this.state.advancedExpanded, this.state.manualAddressResult, this.state.motionEnabled,
-        this.state.notificationsEnabled, this.state.appVersion, false,
-        this.state.cloudRestricted, this.state.cloudRestrictionKey,
-        this.state.platformRestartRequired, undefined, this.revision + 1));
+      this.publish(this.cloudState(cloud, false, undefined));
       return true;
     } catch (error) {
       this.fail(error as Object);
@@ -411,6 +416,16 @@ export class SettingsViewModel implements ViewModelBase<SettingsViewState> {
 
   private async loadCloud(): Promise<CloudConfigView> {
     return await this.cloud.getState();
+  }
+
+  private cloudState(cloud: CloudConfigView | undefined, pendingAction: boolean,
+    error: ViewModelError | undefined): SettingsViewState {
+    return new SettingsViewState(this.state.phase, this.state.section, this.state.localeMode,
+      this.state.currentLocale, cloud, this.state.security, this.state.advancedExpanded,
+      this.state.manualAddressResult, this.state.motionEnabled, this.state.notificationsEnabled,
+      this.state.appVersion, pendingAction, this.state.cloudRestricted,
+      this.state.cloudRestrictionKey, this.state.platformRestartRequired, error,
+      this.revision + 1);
   }
 
   private async loadSecurity(): Promise<ReadonlyArray<GatewaySecurityView>> {

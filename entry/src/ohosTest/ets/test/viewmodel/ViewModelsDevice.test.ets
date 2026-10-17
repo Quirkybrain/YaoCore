@@ -31,6 +31,10 @@ import { SupportedLocale } from '../../../../main/ets/service/i18n/I18nModels';
 import { DeviceControlCoordinator } from '../../../../main/ets/viewmodel/core/DeviceControlCoordinator';
 import { DoorConfirmationTracker } from '../../../../main/ets/viewmodel/core/DoorConfirmationTracker';
 import { ThrottleGate } from '../../../../main/ets/viewmodel/core/ThrottleGate';
+// U-01 compile probe (T-15/16 fix): keep C-18 GatewayDiscoveryService in the
+// ohosTest production compile graph. This test never runs on a device here;
+// its value is the ArkTS type-check failure if the class regresses.
+import { GatewayDiscoveryService } from '../../../../main/ets/service/gateway/GatewayDiscoveryService';
 
 export default function viewModelsDeviceTest(): void {
   describe('BLOCKED_ON_DEVICE_RUNNER C21-C23 view models', () => {
@@ -47,6 +51,7 @@ export default function viewModelsDeviceTest(): void {
       expect(DeviceControlCoordinator !== undefined).assertTrue();
       expect(DoorConfirmationTracker !== undefined).assertTrue();
       expect(ThrottleGate !== undefined).assertTrue();
+      expect(GatewayDiscoveryService !== undefined).assertTrue();
       expect(HomeViewState.initial() !== undefined).assertTrue();
       expect(DeviceViewState.initial() !== undefined).assertTrue();
       expect(FamilyViewState.initial() !== undefined).assertTrue();

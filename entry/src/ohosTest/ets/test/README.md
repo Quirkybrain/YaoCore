@@ -23,7 +23,7 @@ entry/src/ohosTest/
     ├── i18n/
     │   └── I18nDevice.test.ets          # T-10 C-14 rawfile/applier/Preferences 骨架（BLOCKED）
     ├── viewmodel/
-    │   └── ViewModelsDevice.test.ets    # T-15/T-16 C-21..C-23 编译/接线骨架（BLOCKED）
+    │   └── ViewModelsDevice.test.ets    # T-15/T-16 C-21..C-23 编译/接线骨架（BLOCKED）；含 C-18 `GatewayDiscoveryService` 编译探针（U-01）
     └── contract/
         └── fixtures/                    # 协议 golden（PUBLIC TEST DATA ONLY）
             ├── hmac-sha256-test-vectors.json

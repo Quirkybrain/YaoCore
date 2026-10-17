@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 
 import { FamilyViewModel } from '../../main/ets/viewmodel/FamilyViewModel.ets';
 import { MemberRole } from '../../main/ets/model/FamilyModels.ets';
+import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 import {
   FakeAppContext,
   FakeClock,
@@ -129,11 +130,63 @@ test('T16_Family_joinStateMachineAndProfileCompletion', async () => {
   await h.vm.startJoin('New Member');
   assert.equal(h.vm.getState().join.phase, 'JOIN_REQUEST_READY');
   await h.vm.submitJoinInvitation('YCI1.test');
-  assert.equal(h.vm.getState().join.phase, 'COMPLETED');
+  // T-15 ruling F-06: submitInvitation stops at MEMBER_BOUND, not COMPLETED.
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
+  assert.equal(h.vm.getState().join.accepted.memberId, 'member-new');
+  assert.equal(h.auth.profiles.length, 0);
   await h.vm.completeJoinWithProfile('New Member', 'correct-horse-1');
+  assert.equal(h.vm.getState().join.phase, 'COMPLETED');
   assert.equal(h.auth.profiles.length, 1);
   assert.equal(h.auth.profiles[0].memberId, 'member-new');
+  assert.equal(h.workflow.switched[0], FAMILY_ID);
+  assert.equal(h.workflow.joinSession.markCalls, 1);
+  assert.equal(h.appContext.lockCount, 1);
   assert.equal(h.appContext.refreshCount, 1);
+  assert.equal(h.vm.getState().needsUnlock, true);
+  assert.equal(JSON.stringify(h.vm.getState()).indexOf('correct-horse-1'), -1);
+});
+
+test('T16_Family_joinPartialFailureKeepsMemberBoundAndRetriesViaProfileExists', async () => {
+  const h = setup({ session: undefined });
+  await h.vm.initialize();
+  await h.vm.startJoin('New Member');
+  await h.vm.submitJoinInvitation('YCI1.test');
+  h.workflow.switchFailure = AppErrors.of('STORAGE_RDB_ERROR', []);
+  h.workflow.switchFailuresRemaining = 1;
+  await h.vm.completeJoinWithProfile('New Member', 'correct-horse-1');
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
+  assert.equal(h.vm.getState().join.accepted.memberId, 'member-new');
+  assert.equal(h.vm.getState().error.error.code, 'STORAGE_RDB_ERROR');
+  assert.equal(h.vm.getState().needsUnlock, true);
+  assert.equal(h.auth.profiles.length, 1);
+  assert.equal(h.workflow.joinSession.markCalls, 0);
+
+  // Retry: C-12 reports AUTH_PROFILE_EXISTS for the same member; this is
+  // idempotent and must continue through switchFamily -> markProfileBound.
+  await h.vm.completeJoinWithProfile('New Member', 'correct-horse-1');
+  assert.equal(h.vm.getState().join.phase, 'COMPLETED');
+  assert.equal(h.auth.profiles.length, 1);
+  assert.equal(h.workflow.switched.length, 2);
+  assert.equal(h.workflow.joinSession.markCalls, 1);
+  assert.equal(h.vm.getState().needsUnlock, true);
+});
+
+test('T16_Family_joinTerminalPhasesRejectStartCancelAndOtherContainers', async () => {
+  const h = setup({ session: undefined });
+  await h.vm.initialize();
+  await h.vm.startJoin('New Member');
+  await h.vm.submitJoinInvitation('YCI1.test');
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
+  await h.vm.startJoin('Again');
+  assert.equal(h.vm.getState().error.error.code, 'CONFIGURATION_ERROR');
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
+  assert.equal(h.vm.getState().join.accepted.memberId, 'member-new');
+  await h.vm.cancelJoin();
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
+  assert.equal(h.vm.getState().join.accepted.memberId, 'member-new');
+  await h.vm.submitJoinInvitation('YCI1.other');
+  assert.equal(h.vm.getState().error.error.code, 'INVITE_INVALID');
+  assert.equal(h.vm.getState().join.phase, 'MEMBER_BOUND');
 });
 
 test('T16_Family_codeRequiredJoinKeepsAcceptedAndClearErrorWorks', async () => {

@@ -260,13 +260,47 @@ export class DoorConfirmationTracker {
       this.state.lastAckAtMs, this.state.lastContactAtMs, this.state.error);
   }
 
-  markUnlocked(): void {
+  /**
+   * F-02: an unlock ACK is not door-state evidence. OPEN is published only when
+   * the execution itself reports `openStatus === true`; a missing report stays
+   * UNVERIFIED (previous confirmed lock state preserved) and a contradictory
+   * `openStatus === false` is a failed attempt, never OPEN.
+   */
+  onUnlockResult(execution: ControlExecution): void {
     if (this.disposed) {
       return;
     }
+    const now = this.clock.nowMs();
+    if (execution.error !== undefined) {
+      this.markUnlockFailed(ViewModelError.fromError(execution.error, now));
+      return;
+    }
+    if (!execution.ackAccepted ||
+      execution.stateVerification === StateVerification.MISMATCH) {
+      const error = execution.stateVerification === StateVerification.MISMATCH ?
+        AppErrors.of('ACK_STATE_MISMATCH', []) : AppErrors.of('ACK_PROTOCOL_VIOLATION', []);
+      this.markUnlockFailed(ViewModelError.fromError(error, now));
+      return;
+    }
+    const open = DoorConfirmationTracker.reportedOpen(execution);
+    if (open === true) {
+      this.clearTimeout();
+      this.state = this.copy(DoorStage.OPEN, DoorLockState.OPEN, this.state.link, false,
+        now, this.state.lastContactAtMs, undefined);
+      return;
+    }
+    if (open === false) {
+      this.clearTimeout();
+      this.state = this.copy(DoorStage.FAILED, DoorLockState.UNCONFIRMED, this.state.link, false,
+        now, this.state.lastContactAtMs, ViewModelError.fromError(
+          AppErrors.of('ACK_STATE_MISMATCH', []), now));
+      return;
+    }
+    // Executed, but the door did not report its state: keep the last confirmed
+    // lock state and expose the honest UNVERIFIED stage.
     this.clearTimeout();
-    this.state = this.copy(DoorStage.OPEN, DoorLockState.OPEN, this.state.link, false,
-      this.state.lastAckAtMs, this.state.lastContactAtMs, undefined);
+    this.state = this.copy(DoorStage.UNVERIFIED, this.state.lockState, this.state.link, false,
+      now, this.state.lastContactAtMs, undefined);
   }
 
   markUnlockFailed(error: ViewModelError): void {

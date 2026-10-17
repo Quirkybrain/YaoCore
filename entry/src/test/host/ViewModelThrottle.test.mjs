@@ -87,6 +87,36 @@ test('T15_Throttle_cancelInvalidatesTimerAndLateResult', async () => {
   assert.equal(h.gate.getPhase(), ThrottlePhase.IDLE);
 });
 
+test('T15_Throttle_commitBefore55msSendsFinalValueImmediately', async () => {
+  const h = gateWithQueue();
+  h.gate.onInput(10);
+  const committed = h.gate.onCommit(20);
+  await waitMicrotasks();
+  assert.deepEqual(h.dispatched, [20]);
+  h.resolvers[0]();
+  await committed;
+  assert.equal(h.gate.getPhase(), ThrottlePhase.IDLE);
+  assert.equal(h.gate.getLastDispatched(), 20);
+});
+
+test('T15_Throttle_cancelWithWaiterResolvesWithoutExtraDispatch', async () => {
+  const h = gateWithQueue();
+  h.gate.onInput(10);
+  h.timer.advance(55);
+  assert.deepEqual(h.dispatched, [10]);
+  const committed = h.gate.onCommit(30);
+  h.gate.cancel();
+  await committed;
+  assert.equal(h.gate.getPhase(), ThrottlePhase.IDLE);
+  h.timer.advance(500);
+  await waitMicrotasks();
+  assert.deepEqual(h.dispatched, [10]);
+  h.resolvers[0]();
+  await waitMicrotasks();
+  assert.deepEqual(h.dispatched, [10]);
+  assert.equal(h.gate.getPhase(), ThrottlePhase.IDLE);
+});
+
 test('T15_Throttle_dispatchFailureReturnsToIdleWithoutRetry', async () => {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);

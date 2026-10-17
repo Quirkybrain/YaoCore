@@ -96,6 +96,8 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
 
   private gate?: ThrottleGate = undefined;
   private gateKey?: DeviceKey = undefined;
+  /** F-01: one generation per beginContinuous session; late results are dropped. */
+  private gateToken: number = 0;
   private gateAction: DeviceAction = DeviceAction.PING;
   private gateMin: number = 0;
   private gateMax: number = 100;
@@ -203,7 +205,10 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
     this.gateLastOk = true;
     this.gateLastExecution = undefined;
     this.gateLastError = undefined;
-    const token = this.nextToken(key);
+    // Arm the per-key settle token (the control-timeout generation) and capture
+    // the F-01 gate generation that owns this session's in-flight dispatches.
+    this.nextToken(key);
+    const token = this.gateToken;
     const current = this.controls.get(key.globalId());
     const start = current !== undefined && current.confirmedValue !== undefined ?
       DeviceViewModel.numeric(current.confirmedValue) : min;
@@ -242,25 +247,29 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
       return;
     }
     const gate = this.gate;
+    const sessionToken = this.gateToken;
+    const action = this.gateAction;
     const clamped = DeviceViewModel.clamp(value, this.gateMin, this.gateMax);
     await gate.onCommit(clamped);
-    if (this.disposed) {
+    // F-01: a concurrent cancel/dispose/new session invalidates this commit.
+    // Only the session that still owns the gate may publish COMMITTED/REVERT.
+    if (this.disposed || this.gate !== gate || this.gateToken !== sessionToken) {
       return;
     }
     const failed = !this.gateLastOk;
     const execution = this.gateLastExecution;
     const error = this.gateLastError;
-    const token = this.nextToken(key);
     this.gate = undefined;
     this.gateKey = undefined;
+    this.gateToken++;
     if (failed) {
-      this.applyRevert(key, this.gateAction, error === undefined ?
+      this.applyRevert(key, action, error === undefined ?
         ViewModelSupport.viewError(AppErrors.of('GATEWAY_TIMEOUT', []), this.clock) : error);
       return;
     }
     const confirmed = execution === undefined ? clamped :
-      DeviceViewModel.reportedValue(execution, this.gateAction);
-    this.setControl(new ControlUiState(key, this.gateAction, ControlPhase.COMMITTED,
+      DeviceViewModel.reportedValue(execution, action);
+    this.setControl(new ControlUiState(key, action, ControlPhase.COMMITTED,
       this.revision + 1, confirmed === undefined ? clamped : confirmed, undefined, undefined,
       execution === undefined ? undefined : execution.lan === undefined ? undefined :
         execution.lan.outcome, execution, undefined));
@@ -274,6 +283,8 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
     }
     this.gate = undefined;
     this.gateKey = undefined;
+    // F-01: invalidate every in-flight dispatch of the cancelled session.
+    this.gateToken++;
     const current = this.controls.get(key.globalId());
     if (current === undefined) {
       return;
@@ -306,6 +317,7 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
 
   dispose(): void {
     this.disposed = true;
+    this.gateToken++;
     if (this.gate !== undefined) {
       this.gate.dispose();
       this.gate = undefined;
@@ -369,28 +381,37 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
   }
 
   private async dispatchContinuous(value: number, token: number): Promise<void> {
-    if (this.disposed || this.gateKey === undefined) {
+    if (!this.isGateCurrent(token)) {
       return;
     }
-    const key = this.gateKey;
+    const gate = this.gate as ThrottleGate;
+    const key = this.gateKey as DeviceKey;
+    const action = this.gateAction;
     const record = this.recordFor(key);
     if (record === undefined) {
-      this.gateLastOk = false;
-      this.gateLastError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
-        this.clock);
+      if (this.isGateCurrent(token)) {
+        this.gateLastOk = false;
+        this.gateLastError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
+          this.clock);
+      }
       return;
     }
     try {
-      const command = new DeviceControlCommand(key.gatewayId, key.deviceId, this.gateAction,
+      const command = new DeviceControlCommand(key.gatewayId, key.deviceId, action,
         this.clock.nowMs(), value);
       const execution = await this.control.execute(command, record.state.familyId);
+      // F-01: cancel/dispose/new begin increments the generation. A late
+      // result must not resurrect PENDING or mutate the new session.
+      if (this.disposed || this.gate !== gate || this.gateToken !== token) {
+        return;
+      }
       this.gateLastExecution = execution;
       this.gateLastOk = DeviceControlCoordinator.succeeded(execution);
       this.gateLastError = this.gateLastOk ? undefined : this.errorOf(execution);
       if (this.gateLastOk) {
         const current = this.controls.get(key.globalId());
         if (current !== undefined) {
-          this.setControl(new ControlUiState(key, this.gateAction, ControlPhase.PENDING,
+          this.setControl(new ControlUiState(key, action, ControlPhase.PENDING,
             this.revision + 1, current.confirmedValue, value, current.pendingSinceMs,
             execution.lan === undefined ? undefined : execution.lan.outcome, execution,
             undefined));
@@ -398,9 +419,17 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
         }
       }
     } catch (error) {
+      if (this.disposed || this.gate !== gate || this.gateToken !== token) {
+        return;
+      }
       this.gateLastOk = false;
       this.gateLastError = ViewModelSupport.viewError(error as Object, this.clock);
     }
+  }
+
+  private isGateCurrent(token: number): boolean {
+    return !this.disposed && this.gate !== undefined && this.gateKey !== undefined &&
+      this.gateToken === token;
   }
 
   private applyRevert(key: DeviceKey, action: DeviceAction, error: ViewModelError): void {

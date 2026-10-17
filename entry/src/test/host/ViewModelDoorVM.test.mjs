@@ -91,6 +91,66 @@ test('T15_DoorView_unlockReachesOpenWithoutWaitingForContact', async () => {
   assert.equal(h.vm.getState().control.phase, 'COMMITTED');
 });
 
+test('T15_DoorView_unlockWithNoReportedOpenIsUnverifiedNotOpen', async () => {
+  const h = setup();
+  h.control.push(executionOf(record({ deviceId: 'door-1', deviceType: 'door' }),
+    DeviceAction.OPEN, { value: true, verification: 'UNVERIFIED' }));
+  await h.vm.load(h.key);
+  await h.vm.unlock();
+  const state = h.vm.getState();
+  // F-02: the ACK succeeded but the door did not report `open`; never OPEN.
+  assert.equal(state.door.stage, DoorStage.UNVERIFIED);
+  assert.notEqual(state.door.stage, DoorStage.OPEN);
+  assert.notEqual(state.door.lockState, DoorLockState.OPEN);
+  assert.equal(state.control.phase, 'COMMITTED');
+});
+
+test('T15_DoorView_unlockWithReportedClosedIsARejectedAttempt', async () => {
+  const h = setup();
+  h.control.push(executionOf(record({ deviceId: 'door-1', deviceType: 'door',
+    openStatus: false }), DeviceAction.OPEN, { value: true }));
+  await h.vm.load(h.key);
+  await h.vm.unlock();
+  let state = h.vm.getState();
+  assert.equal(state.door.stage, DoorStage.FAILED);
+  assert.notEqual(state.door.stage, DoorStage.OPEN);
+  assert.equal(state.control.phase, 'REVERT');
+  assert.equal(state.control.lastError.error.code, 'ACK_STATE_MISMATCH');
+  h.timer.advance(320);
+  state = h.vm.getState();
+  assert.equal(state.control.phase, 'IDLE');
+});
+
+test('T15_DoorView_closeWithReportedOpenStillRevertsEvenWhenAckSucceeded', async () => {
+  const h = setup();
+  h.control.push(executionOf(record({ deviceId: 'door-1', deviceType: 'door',
+    openStatus: true }), DeviceAction.CLOSE, { value: false }));
+  await h.vm.load(h.key);
+  await h.vm.configureLink(new DoorLinkConfig(DoorLinkMode.GATEWAY_MERGED));
+  await h.vm.lock();
+  const state = h.vm.getState();
+  // F-02 / DES-B §10.1.7: ackAccepted + reported open==true is FAILED + REVERT,
+  // never COMMITTED.
+  assert.equal(state.door.stage, DoorStage.FAILED);
+  assert.equal(state.door.lockState, DoorLockState.OPEN);
+  assert.equal(state.control.phase, 'REVERT');
+  assert.equal(state.control.lastError.error.code, 'ACK_STATE_MISMATCH');
+});
+
+test('T15_DoorView_closeWithoutReportedOpenStaysUnverifiedAndNeverOpen', async () => {
+  const h = setup();
+  h.control.push(executionOf(record({ deviceId: 'door-1', deviceType: 'door' }),
+    DeviceAction.CLOSE, { value: false, verification: 'UNVERIFIED' }));
+  await h.vm.load(h.key);
+  await h.vm.configureLink(new DoorLinkConfig(DoorLinkMode.NONE));
+  await h.vm.lock();
+  const state = h.vm.getState();
+  assert.equal(state.door.stage, DoorStage.UNVERIFIED);
+  assert.notEqual(state.door.stage, DoorStage.OPEN);
+  assert.notEqual(state.door.lockState, DoorLockState.SECURED);
+  assert.equal(state.control.phase, 'COMMITTED');
+});
+
 test('T15_DoorView_ackRejectedRevertsAndNeverClaimsSecured', async () => {
   const h = setup();
   h.control.push(executionOf(h.door, DeviceAction.CLOSE, {

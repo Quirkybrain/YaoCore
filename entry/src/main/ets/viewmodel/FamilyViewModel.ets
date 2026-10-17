@@ -20,6 +20,7 @@ import type {
 import {
   AcceptedInvitation,
   CreateInvitationInput,
+  FamilyJoinPhase,
   InviteCreation
 } from '../service/family/FamilyModels';
 import { FamilyJoinSession } from '../service/family/FamilyJoinSession';
@@ -322,6 +323,12 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
   }
 
   async startJoin(displayName?: string): Promise<void> {
+    // T-15 ruling: MEMBER_BOUND must not discard the accepted invitation.
+    if (this.state.join !== undefined &&
+      this.state.join.phase === FamilyJoinPhase.MEMBER_BOUND) {
+      this.fail(AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'joinPhase')]));
+      return;
+    }
     try {
       this.disposeJoin();
       const session = this.families.createJoinSession();
@@ -351,6 +358,11 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
     } catch (error) {
       // FamilyJoinSession already exposes a typed FAILED/CODE_REQUIRED state.
       this.syncJoin(session.getState());
+      if (session.getState().error === undefined) {
+        // e.g. a different container rejected while MEMBER_BOUND; the phase and
+        // accepted invitation stay unchanged but the user still needs the error.
+        this.fail(error as Object);
+      }
     }
   }
 
@@ -360,18 +372,52 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
       this.fail(AppErrors.of('INVITE_INVALID', []));
       return;
     }
+    if (join.phase === FamilyJoinPhase.COMPLETED) {
+      await this.refresh();
+      return;
+    }
+    if (join.phase !== FamilyJoinPhase.MEMBER_BOUND) {
+      this.fail(AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'joinPhase')]));
+      return;
+    }
+    const session = this.joinSession;
+    if (session === undefined) {
+      this.fail(AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'joinSession')]));
+      return;
+    }
     const accepted: AcceptedInvitation = join.accepted;
+    this.publish(this.copy(this.state.phase, true, undefined));
     try {
+      // T-15 ruling fixed order: createProfile -> switchFamily ->
+      // (publish needsUnlock) -> markProfileBound -> lock/refreshSessionGate.
       const profile = new CreateProfileInput(FamilyViewModel.profileIdFor(accepted.memberId),
         accepted.familyId, accepted.memberId, displayName, password, accepted.role);
-      await this.auth.createProfile(profile);
-      await this.families.switchFamily(accepted.familyId);
+      try {
+        await this.auth.createProfile(profile);
+      } catch (error) {
+        const appError = ViewModelSupport.asAppError(error as Object);
+        // F-07: only an existing profile for this exact (familyId, memberId)
+        // is idempotent success; any other profile conflict is rethrown.
+        if (appError.code !== 'AUTH_PROFILE_EXISTS' ||
+          !(await this.hasMemberProfile(accepted))) {
+          throw error as Error;
+        }
+      }
+      const switched = await this.families.switchFamily(accepted.familyId);
+      // needsUnlock must be visible before COMPLETED (DES-B §11.1.1). Do not
+      // auto-unlock: switchFamily already locked the session.
+      this.publish(this.copy(this.state.phase, true, undefined, switched.requiresUnlock));
+      await session.markProfileBound();
+      this.appContext.lock();
       this.appContext.refreshSessionGate();
       await this.refresh();
+      this.publish(this.copy(this.state.phase, false, undefined, switched.requiresUnlock));
     } catch (error) {
-      // Keep AcceptedInvitation so the user can retry without re-consuming the
-      // invitation container; the profile creation is idempotent-guarded by C-12.
-      this.fail(error as Object);
+      // Keep AcceptedInvitation/MEMBER_BOUND so retry never re-consumes the
+      // container; refresh needsUnlock from persistent facts on partial failure.
+      const needsUnlock = await this.computeNeedsUnlock();
+      this.publish(this.copy(this.state.phase, false,
+        ViewModelSupport.viewError(error as Object, this.clock), needsUnlock));
     }
   }
 
@@ -429,6 +475,14 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
   }
 
   async cancelJoin(): Promise<void> {
+    // T-15 ruling: cancel only in IDLE..APPLYING. In MEMBER_BOUND/COMPLETED the
+    // member is persisted; revocation goes through leaveFamily, not join cancel.
+    if (this.state.join !== undefined &&
+      (this.state.join.phase === FamilyJoinPhase.MEMBER_BOUND ||
+        this.state.join.phase === FamilyJoinPhase.COMPLETED)) {
+      this.fail(AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'joinPhase')]));
+      return;
+    }
     try {
       if (this.joinSession !== undefined) {
         await this.joinSession.cancel();
@@ -539,6 +593,33 @@ export class FamilyViewModel implements ViewModelBase<FamilyViewState> {
       this.state.activeFamily, this.state.members, this.state.invitations, this.state.section,
       this.state.pendingAction, this.revision + 1, this.state.capabilities, join,
       this.state.error, this.state.needsUnlock, this.state.inviteSecurityKey));
+  }
+
+  private async hasMemberProfile(accepted: AcceptedInvitation): Promise<boolean> {
+    try {
+      const profiles = await this.auth.listProfiles(accepted.familyId);
+      for (let index = 0; index < profiles.length; index++) {
+        if (profiles[index].memberId === accepted.memberId) {
+          return true;
+        }
+      }
+    } catch (error) {
+      return false;
+    }
+    return false;
+  }
+
+  private async computeNeedsUnlock(): Promise<boolean> {
+    try {
+      const active = await this.families.getActiveFamily();
+      if (active === undefined) {
+        return false;
+      }
+      const session = this.auth.getActiveSession();
+      return session === undefined || session.familyId !== active.familyId;
+    } catch (error) {
+      return true;
+    }
   }
 
   private requireSession(): SessionInfo | undefined {

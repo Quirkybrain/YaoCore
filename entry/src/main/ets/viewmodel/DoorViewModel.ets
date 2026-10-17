@@ -33,6 +33,7 @@ import {
   DoorConfirmationPolicy,
   DoorConfirmationTracker,
   DoorLinkConfig,
+  DoorStage,
   DoorUiState
 } from './core/DoorConfirmationTracker';
 import type { DeviceControlCoordinatorPort } from './ViewModelPorts';
@@ -241,13 +242,22 @@ export class DoorViewModel implements ViewModelBase<DoorViewState> {
         if (action === DeviceAction.CLOSE) {
           this.tracker.onResult(execution);
         } else {
-          this.tracker.markUnlocked();
+          this.tracker.onUnlockResult(execution);
+        }
+        const door = this.tracker.getState();
+        // F-02: the control ACK is not a door-state confirmation. A tracker
+        // FAILED verdict (e.g. CLOSE reported open=true) must revert, never
+        // publish COMMITTED; an UNVERIFIED verdict keeps COMMITTED only as
+        // "executed, state not reported" and never as OPEN.
+        if (door.stage === DoorStage.FAILED) {
+          this.applyRevert(door.error === undefined ? this.errorOf(execution) : door.error);
+          return;
         }
         this.publish(this.copy(LoadPhase.READY,
           new ControlUiState(record.state.key, action, ControlPhase.COMMITTED,
             this.revision + 1, value, undefined, undefined,
             execution.lan === undefined ? undefined : execution.lan.outcome, execution),
-          this.tracker.getState(), undefined));
+          door, undefined));
         return;
       }
       const error = this.errorOf(execution);

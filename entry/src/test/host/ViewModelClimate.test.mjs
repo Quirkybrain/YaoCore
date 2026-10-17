@@ -74,6 +74,39 @@ test('T15_Climate_setModeRejectsNonStandardModeBeforeAnyCall', async () => {
   assert.equal(h.vm.getState().error.error.code, 'CONFIGURATION_ERROR');
 });
 
+test('T15_Climate_newBeginDropsAnOlderInFlightTemperatureResult', async () => {
+  const h = setup();
+  const releases = [];
+  h.control.execute = async () => new Promise((resolve) => {
+    releases.push(resolve);
+  });
+  await h.vm.load(h.key);
+  h.vm.beginTemperature(24);
+  h.vm.updateTemperature(25);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(releases.length, 1);
+  h.vm.beginTemperature(24);
+  h.vm.updateTemperature(26);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(releases.length, 2);
+  releases[0](executionOf(acRecord({ targetTemperature: 25 }),
+    DeviceAction.SET_TARGET_TEMPERATURE, { value: 25 }));
+  await waitMicrotasks();
+  let control = h.vm.getState().control;
+  assert.equal(control.phase, 'PENDING');
+  assert.equal(control.optimisticValue, 26);
+  const ending = h.vm.endTemperature(26);
+  await waitMicrotasks();
+  releases[1](executionOf(acRecord({ targetTemperature: 26 }),
+    DeviceAction.SET_TARGET_TEMPERATURE, { value: 26 }));
+  await ending;
+  control = h.vm.getState().control;
+  assert.equal(control.phase, 'COMMITTED');
+  assert.equal(control.confirmedValue, 26);
+});
+
 test('T15_Climate_temperatureContinuousCoalescesAndTouchUpCommits', async () => {
   const h = setup();
   const warmed = acRecord({ targetTemperature: 26 });

@@ -134,6 +134,8 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   private disposed: boolean = false;
   private submitting: boolean = false;
   private scanTimerId: number | undefined = undefined;
+  /** F-03: invalidates a late startScan continuation after back/cancel/dispose. */
+  private scanGeneration: number = 0;
   private requestDraftId?: string = undefined;
   private resultDraftId?: string = undefined;
   private selectedDevice?: BleProvisioningDevice = undefined;
@@ -200,26 +202,40 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
     }
     try {
       this.clearScanTimer();
+      const generation = ++this.scanGeneration;
       const filter = new BleScanFilter(GattEndpointMap.SERVICE_UUID, SERVICE_NAME_PREFIX,
         DEFAULT_SCAN_TIMEOUT_MS);
       this.publish(this.copy(WizardStep.STEP_1_SCAN, ProvisioningState.SCANNING,
         this.state.permission, undefined, false, true));
       await this.ble.startScan(filter, new WizardScanListener(this));
+      if (this.disposed || generation !== this.scanGeneration ||
+        this.state.step !== WizardStep.STEP_1_SCAN) {
+        // F-03: back/cancel/dispose happened while startScan was in flight.
+        this.clearScanTimer();
+        await this.stopScan();
+        return;
+      }
       this.scanTimerId = this.timer.setTimer(DEFAULT_SCAN_TIMEOUT_MS, (): void => {
         this.scanTimerId = undefined;
-        if (this.disposed || this.state.scanResults.length > 0) {
+        if (this.disposed || generation !== this.scanGeneration ||
+          this.state.step !== WizardStep.STEP_1_SCAN ||
+          this.state.scanResults.length > 0) {
           return;
         }
         this.failWith(AppErrors.of('PROVISIONING_DEVICE_NOT_FOUND', []), WizardStep.STEP_1_SCAN,
           ProvisioningState.SCANNING);
       });
     } catch (error) {
+      if (this.disposed || this.state.step !== WizardStep.STEP_1_SCAN) {
+        return;
+      }
       this.failWith(ViewModelSupport.asAppError(error), WizardStep.STEP_1_SCAN,
         ProvisioningState.SCANNING);
     }
   }
 
   async stopScan(): Promise<void> {
+    this.scanGeneration++;
     this.clearScanTimer();
     try {
       await this.ble.stopScan();
@@ -317,6 +333,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   }
 
   async cancel(): Promise<void> {
+    this.scanGeneration++;
     this.clearScanTimer();
     try {
       await this.ble.cancel();
@@ -332,8 +349,18 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   }
 
   back(): void {
-    if (this.state.step === WizardStep.STEP_0_PERMISSION ||
-      this.state.step === WizardStep.STEP_1_SCAN) {
+    if (this.state.step === WizardStep.STEP_0_PERMISSION) {
+      this.publish(this.copy(WizardStep.STEP_0_PERMISSION, ProvisioningState.IDLE,
+        this.state.permission, undefined, false, false, this.state.selectedDevice));
+      return;
+    }
+    if (this.state.step === WizardStep.STEP_1_SCAN) {
+      // F-03: stepping back from scan is a free back (DES-B §12.1.1) but must
+      // stop the radio and drop the 10s timer so it cannot bounce the UI back
+      // to STEP_1 with a late PROVISIONING_DEVICE_NOT_FOUND.
+      this.scanGeneration++;
+      this.clearScanTimer();
+      this.stopScan().catch((): void => undefined);
       this.publish(this.copy(WizardStep.STEP_0_PERMISSION, ProvisioningState.IDLE,
         this.state.permission, undefined, false, false, this.state.selectedDevice));
       return;
@@ -349,6 +376,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   dispose(): void {
     this.disposed = true;
+    this.scanGeneration++;
     this.clearScanTimer();
     this.destroyDrafts();
     this.ble.cancel().catch((): void => undefined);
@@ -383,6 +411,9 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   onScanError(error: Object): void {
     this.clearScanTimer();
+    if (this.disposed || this.state.step !== WizardStep.STEP_1_SCAN) {
+      return;
+    }
     this.failWith(ViewModelSupport.asAppError(error), WizardStep.STEP_1_SCAN,
       ProvisioningState.SCANNING);
   }

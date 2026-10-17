@@ -1,7 +1,7 @@
 # Host 单元测试（无设备）
 
-- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06..T-11、T-15/T-16 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b、wp-033-fix-t10、wp-035-transport、wp-060-vm）
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06..T-11；**T-15/T-16 `wp-060-vm`（C-21..C-23 ViewModel host 套件，88 用例）**
+- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06..T-11、T-15/T-16 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b、wp-033-fix-t10、wp-035-transport、wp-060-vm、wp-063-fix-vm）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06..T-11；**T-15/T-16 `wp-060-vm` + 评审修复 `wp-063-fix-vm`（C-21..C-23 ViewModel host 套件，105 用例）**
 - **状态**: **可运行（Node host runner）**；`hvigorw test` 的 Hypium 入口可编译，但本环境无法执行（见 §3）。
 
 ## 1. 目录与约定
@@ -36,18 +36,18 @@ entry/src/test/
 │   ├── GatewayDiscovery.test.mjs # T-11 C-18 LAST_KNOWN/mDNS/手动 IP/UDP seam/退避（19 用例）
 │   ├── GatewayMock.test.mjs      # T-11 C-20 Mock 行为矩阵/TLS 四模式/MockBLE（17 用例）
 │   ├── TransportBoundary.test.mjs # T-11 SC-11/D-04 生产边界静态检查（3 用例）
-│   ├── ViewModelThrottle.test.mjs # T-15 55ms/TouchUp/cancel（5）
-│   ├── ViewModelDevice.test.mjs   # T-15 三态/超时/连续控制/房间池（7）
+│   ├── ViewModelThrottle.test.mjs # T-15 55ms/TouchUp/cancel/commit-before-waiter（7）
+│   ├── ViewModelDevice.test.mjs   # T-15 三态/超时/连续控制/取消竞态/房间池（10）
 │   ├── ViewModelCoordinator.test.mjs # T-15 LAN→云回退矩阵（7）
 │   ├── ViewModelDoor.test.mjs     # T-15 门锁四阶段/10s/离线（9）
-│   ├── ViewModelDoorVM.test.mjs   # T-15 DoorViewModel 控制组合（4）
+│   ├── ViewModelDoorVM.test.mjs   # T-15 DoorViewModel 控制组合/门态负例（8）
 │   ├── ViewModelHome.test.mjs     # T-15 Home 状态/过滤/环境（7）
-│   ├── ViewModelClimate.test.mjs  # T-15 AC 状态/温度（4）
-│   ├── ViewModelFamily.test.mjs   # T-16 家庭/RBAC/邀请/加入（10）
+│   ├── ViewModelClimate.test.mjs  # T-15 AC 状态/温度/在途代际（5）
+│   ├── ViewModelFamily.test.mjs   # T-16 家庭/RBAC/邀请/MEMBER_BOUND 加入（12）
 │   ├── ViewModelRoom.test.mjs     # T-16 房间 CRUD/删除保护/池（7）
 │   ├── ViewModelScene.test.mjs    # T-16 场景进度/局部失败/取消（7）
-│   ├── ViewModelBle.test.mjs      # T-16 配网 6 步/取消/R-1（11）
-│   ├── ViewModelSettings.test.mjs # T-16 语言/云/单网关/手动 IP（10）
+│   ├── ViewModelBle.test.mjs      # T-16 配网 6 步/取消/R-1/back 清理（13）
+│   ├── ViewModelSettings.test.mjs # T-16 语言/云/单网关/手动 IP/token 状态（11）
 │   ├── viewmodel-helpers.mjs      # T-15/T-16 clock/timer/record/control fakes
 │   ├── viewmodel-admin-helpers.mjs # T-16 family/join/room/scene fakes
 │   ├── TransportFakes.ets        # T-11 clock/random/route/credential/transport fakes
@@ -101,7 +101,7 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前 revision：**593/593 PASS**（T-15/T-16 新增 88；T-14 修复基线 505）。T-15/T-16 覆盖：
+当前 revision：**610/610 PASS**（T-15/T-16 共 105：首轮 88 + 评审修复 17；T-14 修复基线 505）。T-15/T-16 覆盖：
 
 - 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
@@ -125,8 +125,9 @@ node --no-warnings \
 - T-11 C-20（17）：normal/offline/ack-lost/replay/timeout/dev-only、TLS pin-match/pin-mismatch/handshake-fail、resultCode/omitReportedState/badSignature/badCorrelation、failAtAttempt、MockBLE 正常/v2.1/离线/超时/取消；
 - T-11 边界（3）：生产树无 Mock/ohosTest import、Mock TEST ONLY 标记、纯逻辑 gateway 无 `@ohos`/`@kit`；
 - host runner 基线断言；
-- T-15（43）：ThrottleGate 55ms/在途/latest/TouchUp/cancel/failure；DeviceViewModel 三态/MISMATCH/超时/连续/取消/筛选；DeviceControlCoordinator LAN 成功/回退边界/云 Token/UNSUPPORTED；DoorConfirmationTracker 四阶段/10s 在线离线/无关联/开门报警；DoorViewModel；Home 状态/环境/过滤/解锁；Climate AC；
-- T-16（45）：Family RBAC/F-08/GUEST 房间范围/切换解锁/创建档案/加入状态机/CODE_REQUIRED/弱模式；Room 预览/确认计数竞态/删除事务结果/指派；Scene 进度/局部失败/noRollback/cancel/单飞；BLE 6 步映射/权限/扫描去重/取消清理/R-1 `result.credentialDraftId`/retry；Settings 语言/云单网关 F-06/token/手动 IP/安全档案/Preferences。
+- T-15（43）：ThrottleGate 55ms/在途/latest/TouchUp/cancel/failure/**commit-before-55/cancel-with-waiter**；DeviceViewModel 三态/MISMATCH/超时/连续/取消/筛选/**cancel-in-flight、new-begin 晚到结果、cancel/end 并发**；DeviceControlCoordinator LAN 成功/回退边界/云 Token/UNSUPPORTED；DoorConfirmationTracker 四阶段/10s 在线离线/无关联/开门报警；DoorViewModel **unlock UNVERIFIED/open=false、CLOSE open=true/无回报**；Home 状态/环境/过滤/解锁；Climate AC **温度在途代际丢弃**；
+- T-16（45）：Family RBAC/F-08/GUEST 房间范围/切换解锁/创建档案/**MEMBER_BOUND→COMPLETED 时序、部分失败重试、终态拒绝 start/cancel**；Room 预览/确认计数竞态/删除事务结果/指派；Scene 进度/局部失败/noRollback/cancel/单飞；BLE 6 步映射/权限/扫描去重/取消清理/**back 停扫与定时器/晚到 startScan**/R-1 `result.credentialDraftId`/retry；Settings 语言/云单网关 F-06/token/**过期刷新持久层、网络失败不改状态**/手动 IP/安全档案/Preferences。
+- C-08（T-09 套件 + 修复 2）：`MEMBER_BOUND` 幂等接受/拒绝其他容器/cancel no-op；`markProfileBound` 精确成员档案前置与 `COMPLETED` 幂等。
 
 计数口径：T-11 新增 60 条（21+19+17+3）；T-10 基线 275；当前总数 **335**。
 

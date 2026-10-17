@@ -5,6 +5,7 @@
  */
 import { Family, FamilyMember, MemberRole, MemberStatus } from '../../main/ets/model/FamilyModels.ets';
 import { FamilyMemberView, FamilyContactSyncState } from '../../main/ets/service/family/FamilyModels.ets';
+import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 
 export const FAMILY_ID = 'family-1';
 export const MEMBER_ADMIN = 'member-admin';
@@ -45,6 +46,8 @@ export class FakeFamilyWorkflow {
     this.inviteCalls = [];
     this.codeInviteCalls = [];
     this.joinSession = options.joinSession;
+    this.switchFailure = undefined;
+    this.switchFailuresRemaining = 0;
   }
 
   async listFamilies() { return this.families; }
@@ -59,6 +62,10 @@ export class FakeFamilyWorkflow {
 
   async switchFamily(familyId) {
     this.switched.push(familyId);
+    if (this.switchFailure !== undefined && this.switchFailuresRemaining > 0) {
+      this.switchFailuresRemaining--;
+      throw this.switchFailure;
+    }
     const target = this.families.find((entry) => entry.familyId === familyId);
     this.active = target;
     return { family: target, requiresUnlock: true, activeProfileId: 'p-1' };
@@ -109,7 +116,20 @@ export class FakeFamilyAuth {
   }
 
   getActiveSession() { return this.session; }
-  async createProfile(input) { this.profiles.push(input); return { profileId: input.profileId }; }
+
+  async createProfile(input) {
+    const existing = this.profiles.find((profile) => profile.familyId === input.familyId &&
+      profile.memberId === input.memberId);
+    if (existing !== undefined) {
+      throw AppErrors.of('AUTH_PROFILE_EXISTS', []);
+    }
+    this.profiles.push(input);
+    return { profileId: input.profileId };
+  }
+
+  async listProfiles(familyId) {
+    return this.profiles.filter((profile) => profile.familyId === familyId);
+  }
   canManageFamily() { return { allowed: this.manageFamily, reason: '' }; }
   canManageRooms() { return { allowed: this.manageRooms, reason: '' }; }
   canInvite() { return { allowed: this.invite, reason: '' }; }
@@ -123,7 +143,9 @@ export class FakeJoinSession {
     this.listeners = [];
     this.started = 0;
     this.cancelled = false;
+    this.markCalls = 0;
     this.accepted = undefined;
+    this.acceptedText = undefined;
     this.error = undefined;
     this.revision = 0;
   }
@@ -160,6 +182,12 @@ export class FakeJoinSession {
   }
 
   async submitInvitation(text) {
+    if (this.phase === 'MEMBER_BOUND' || this.phase === 'COMPLETED') {
+      if (this.acceptedText === text) {
+        return this.accepted;
+      }
+      throw AppErrors.of('INVITE_INVALID', []);
+    }
     if (text === 'CODE_REQUIRED') {
       this.phase = 'CODE_REQUIRED';
       this.error = { code: 'INVITE_CODE_INVALID' };
@@ -172,7 +200,10 @@ export class FakeJoinSession {
       this.emit();
       throw this.error;
     }
-    this.phase = 'COMPLETED';
+    // T-15 ruling F-06: C-08 stops at MEMBER_BOUND; markProfileBound is the
+    // only COMPLETED writer.
+    this.phase = 'MEMBER_BOUND';
+    this.acceptedText = text;
     this.accepted = {
       familyId: FAMILY_ID,
       familyName: 'Home',
@@ -186,7 +217,22 @@ export class FakeJoinSession {
     return this.accepted;
   }
 
+  async markProfileBound() {
+    if (this.phase === 'COMPLETED') {
+      return;
+    }
+    if (this.phase !== 'MEMBER_BOUND') {
+      throw AppErrors.of('CONFIGURATION_ERROR', []);
+    }
+    this.markCalls++;
+    this.phase = 'COMPLETED';
+    this.emit();
+  }
+
   async cancel() {
+    if (this.phase === 'MEMBER_BOUND' || this.phase === 'COMPLETED') {
+      return;
+    }
     this.cancelled = true;
     this.phase = 'CANCELLED';
     this.emit();

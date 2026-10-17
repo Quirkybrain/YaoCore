@@ -75,7 +75,19 @@ class FakeCloud {
     this.cleared++;
     this.view = { state: 'TOKEN_MISSING', tokenPresent: false };
   }
-  async testConnection() { return this.testResult; }
+  async testConnection() {
+    // Mirror C-15 T-14 F-03 ruling: 401/403 are a transient TOKEN_* view,
+    // network failures do not change the persistent state.
+    if (!this.testResult.valid) {
+      const tokenError = this.testResult.errors.find((entry) =>
+        entry.code === 'CLOUD_TOKEN_EXPIRED' || entry.code === 'CLOUD_TOKEN_INVALID');
+      if (tokenError !== undefined) {
+        this.view = { state: tokenError.code === 'CLOUD_TOKEN_EXPIRED' ?
+          'TOKEN_EXPIRED' : 'TOKEN_INVALID', tokenPresent: true };
+      }
+    }
+    return this.testResult;
+  }
 }
 
 class FakeDiscovery {
@@ -192,8 +204,22 @@ test('T16_Settings_testConnectionSuccessRefreshesAndFailureMapsTokenError', asyn
     AppErrors.of('CLOUD_TOKEN_EXPIRED', [])
   ] } });
   await bad.vm.initialize();
+  assert.equal(bad.vm.getState().cloud.state, 'CONFIGURED');
   assert.equal(await bad.vm.testCloudConnection(), false);
   assert.equal(bad.vm.getState().error.error.code, 'CLOUD_TOKEN_EXPIRED');
+  // F-04: the persistent layer must no longer look CONFIGURED after expiry.
+  assert.equal(bad.vm.getState().cloud.state, 'TOKEN_EXPIRED');
+});
+
+test('T16_Settings_networkTestFailureDoesNotDowngradeCloudState', async () => {
+  const h = setup({ testResult: { valid: false, errors: [
+    AppErrors.of('CLOUD_REQUEST_FAILED', [])
+  ] } });
+  await h.vm.initialize();
+  assert.equal(h.vm.getState().cloud.state, 'CONFIGURED');
+  assert.equal(await h.vm.testCloudConnection(), false);
+  assert.equal(h.vm.getState().error.error.code, 'CLOUD_REQUEST_FAILED');
+  assert.equal(h.vm.getState().cloud.state, 'CONFIGURED');
 });
 
 test('T16_Settings_clearTokenKeepsConfigAndShowsTokenMissing', async () => {

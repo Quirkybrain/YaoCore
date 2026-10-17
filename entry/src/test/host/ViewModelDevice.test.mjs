@@ -143,6 +143,84 @@ test('T15_Device_cancelContinuousSendsNothingAndRebounds', async () => {
   assert.equal(control.optimisticValue, undefined);
 });
 
+test('T15_Device_cancelWhileDispatchInFlightDropsLateSuccess', async () => {
+  const h = setup();
+  let release;
+  h.control.execute = async (command, familyId) => {
+    h.control.calls.push({ command, familyId });
+    return new Promise((resolve) => {
+      release = resolve;
+    });
+  };
+  await h.vm.initialize('family-1');
+  h.vm.beginContinuous(h.key, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  h.vm.updateContinuous(h.key, 80);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(h.control.calls.length, 1);
+  assert.equal(h.vm.getControl(h.key).phase, ControlPhase.PENDING);
+  h.vm.cancelContinuous(h.key);
+  assert.equal(h.vm.getControl(h.key).phase, ControlPhase.IDLE);
+  release(executionOf(record({ brightness: 80 }), DeviceAction.SET_BRIGHTNESS, { value: 80 }));
+  await waitMicrotasks();
+  const control = h.vm.getControl(h.key);
+  assert.equal(control.phase, ControlPhase.IDLE);
+  assert.equal(control.optimisticValue, undefined);
+  assert.equal(control.confirmedValue, undefined);
+});
+
+test('T15_Device_newBeginInvalidatesAnOlderDispatchResult', async () => {
+  const h = setup();
+  const releases = [];
+  h.control.execute = async () => new Promise((resolve) => {
+    releases.push(resolve);
+  });
+  await h.vm.initialize('family-1');
+  h.vm.beginContinuous(h.key, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  h.vm.updateContinuous(h.key, 10);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(releases.length, 1);
+  h.vm.beginContinuous(h.key, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  h.vm.updateContinuous(h.key, 30);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(releases.length, 2);
+  releases[0](executionOf(record({ brightness: 10 }), DeviceAction.SET_BRIGHTNESS,
+    { value: 10 }));
+  await waitMicrotasks();
+  const control = h.vm.getControl(h.key);
+  assert.equal(control.phase, ControlPhase.PENDING);
+  assert.equal(control.optimisticValue, 30);
+  assert.equal(control.lastExecution, undefined);
+  releases[1](executionOf(record({ brightness: 30 }), DeviceAction.SET_BRIGHTNESS,
+    { value: 30 }));
+  await waitMicrotasks();
+  h.vm.cancelContinuous(h.key);
+});
+
+test('T15_Device_cancelRacingEndCommitNeverPublishesCommitted', async () => {
+  const h = setup();
+  let release;
+  h.control.execute = async () => new Promise((resolve) => {
+    release = resolve;
+  });
+  await h.vm.initialize('family-1');
+  h.vm.beginContinuous(h.key, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  h.vm.updateContinuous(h.key, 20);
+  h.timer.advance(55);
+  await waitMicrotasks();
+  const ending = h.vm.endContinuous(h.key, 40);
+  await waitMicrotasks();
+  h.vm.cancelContinuous(h.key);
+  release(executionOf(record({ brightness: 20 }), DeviceAction.SET_BRIGHTNESS, { value: 20 }));
+  await ending;
+  await waitMicrotasks();
+  const control = h.vm.getControl(h.key);
+  assert.equal(control.phase, ControlPhase.IDLE);
+  assert.equal(control.confirmedValue, undefined);
+});
+
 test('T15_Device_roomFilterAndUnassignedPool', async () => {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);

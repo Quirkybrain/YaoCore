@@ -83,6 +83,8 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
   private token: number = 0;
   private timerId: number | undefined = undefined;
   private gate?: ThrottleGate = undefined;
+  /** F-01: generation for the temperature throttle session. */
+  private gateToken: number = 0;
   private gateOk: boolean = true;
   private gateExecution?: ControlExecution = undefined;
   private gateError?: ViewModelError = undefined;
@@ -165,13 +167,14 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
     this.gateError = undefined;
     const clamped = this.clamp(value);
     this.token++;
+    const generation = this.gateToken;
     const confirmed = record.state.snapshot.targetTemperature;
     this.publish(new ClimateViewState(LoadPhase.READY,
       new ControlUiState(record.state.key, DeviceAction.SET_TARGET_TEMPERATURE,
         ControlPhase.PENDING, this.revision + 1, confirmed, clamped, this.clock.nowMs()),
       this.state.modeOptions, this.revision + 1, record, this.state.ac));
     this.gate = new ThrottleGate(this.timer, this.clock, THROTTLE_MS,
-      (next: number): Promise<void> => this.dispatchTemperature(next));
+      (next: number): Promise<void> => this.dispatchTemperature(next, generation));
   }
 
   updateTemperature(value: number): void {
@@ -194,12 +197,16 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
       return;
     }
     const gate = this.gate;
+    const generation = this.gateToken;
     const clamped = this.clamp(value);
     await gate.onCommit(clamped);
-    if (this.disposed) {
+    // F-01: a new beginTemperature/dispose invalidates this commit; stale
+    // results must not publish COMMITTED/REVERT into the new session.
+    if (this.disposed || this.gate !== gate || this.gateToken !== generation) {
       return;
     }
     this.gate = undefined;
+    this.gateToken++;
     if (!this.gateOk) {
       this.applyRevert(this.gateError === undefined ?
         ViewModelSupport.viewError(AppErrors.of('GATEWAY_TIMEOUT', []), this.clock) :
@@ -289,12 +296,18 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
     }
   }
 
-  private async dispatchTemperature(value: number): Promise<void> {
+  private async dispatchTemperature(value: number, generation: number): Promise<void> {
+    if (!this.isGateCurrent(generation)) {
+      return;
+    }
+    const gate = this.gate as ThrottleGate;
     const record = this.record;
     if (record === undefined) {
-      this.gateOk = false;
-      this.gateError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
-        this.clock);
+      if (this.isGateCurrent(generation)) {
+        this.gateOk = false;
+        this.gateError = ViewModelSupport.viewError(AppErrors.of('DEVICE_NOT_FOUND', []),
+          this.clock);
+      }
       return;
     }
     try {
@@ -302,13 +315,23 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
         record.state.key.deviceId, DeviceAction.SET_TARGET_TEMPERATURE, this.clock.nowMs(),
         value);
       const execution = await this.control.execute(command, record.state.familyId);
+      if (!this.isGateCurrent(generation) || this.gate !== gate) {
+        return;
+      }
       this.gateExecution = execution;
       this.gateOk = DeviceControlCoordinator.succeeded(execution);
       this.gateError = this.gateOk ? undefined : this.errorOf(execution);
     } catch (error) {
+      if (!this.isGateCurrent(generation) || this.gate !== gate) {
+        return;
+      }
       this.gateOk = false;
       this.gateError = ViewModelSupport.viewError(error as Object, this.clock);
     }
+  }
+
+  private isGateCurrent(generation: number): boolean {
+    return !this.disposed && this.gate !== undefined && this.gateToken === generation;
   }
 
   private applyRevert(error: ViewModelError): void {
@@ -372,6 +395,9 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
   }
 
   private disposeGate(): void {
+    // F-01: any dispose (new session or page leave) invalidates in-flight
+    // temperature dispatches.
+    this.gateToken++;
     if (this.gate !== undefined) {
       this.gate.dispose();
       this.gate = undefined;

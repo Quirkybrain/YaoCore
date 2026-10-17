@@ -73,7 +73,7 @@ test('T09_C08_switchFamilyLocksSessionAndRequiresTargetProfile', async () => {
   const family = await createFamily(service);
   await assert.rejects(service.switchFamily(family.familyId),
     (error) => error.code === 'AUTH_PROFILE_NOT_FOUND');
-  h.auth.profiles.push(new FamilyProfileRef('profile-1', family.familyId));
+  h.auth.profiles.push(new FamilyProfileRef('profile-1', family.familyId, family.ownerMemberId));
   const result = await service.switchFamily(family.familyId);
   assert.equal(result.requiresUnlock, true);
   assert.equal(result.activeProfileId, 'profile-1');
@@ -401,10 +401,64 @@ test('T09_C08_joinSessionKeyWrapCompletesAndWritesMember', async () => {
   assert.equal(session.getState().phase, FamilyJoinPhase.WAITING_FOR_INVITATION);
   const accepted = await session.submitInvitation('YCI1.fake.key_wrap');
   assert.equal(accepted.memberId, 'member-join');
-  assert.equal(session.getState().phase, FamilyJoinPhase.COMPLETED);
+  // T-15 ruling F-06: C-08 owns only the member binding.
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  assert.equal(session.getState().accepted.receipt, accepted.receipt);
   const member = await h.families.getMember(family.familyId, 'member-join');
   assert.equal(member.status, MemberStatus.ACTIVE);
   assert.equal(handle.text.startsWith('YCR1.'), true);
+  await assert.rejects(session.markProfileBound(),
+    (error) => error.code === 'CONFIGURATION_ERROR');
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  h.auth.profiles.push(new FamilyProfileRef('profile-join', family.familyId, 'member-join'));
+  await session.markProfileBound();
+  assert.equal(session.getState().phase, FamilyJoinPhase.COMPLETED);
+  await session.markProfileBound();
+  assert.equal(session.getState().phase, FamilyJoinPhase.COMPLETED);
+});
+
+test('T15_C08_memberBoundIsIdempotentRejectsOtherContainerAndCancelNoop', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  h.invites.acceptedFamilyId = family.familyId;
+  h.invites.acceptedMemberId = 'member-join-2';
+  const session = service.createJoinSession();
+  const handle = await session.start('Joiner');
+  const accepted = await session.submitInvitation('YCI1.fake.key_wrap');
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  const repeated = await session.submitInvitation('YCI1.fake.key_wrap');
+  assert.equal(repeated.receipt, accepted.receipt);
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  assert.equal(h.invites.acceptCalls, 1);
+  await assert.rejects(session.submitInvitation('YCI1.fake.other'),
+    (error) => error.code === 'INVITE_INVALID');
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  assert.equal(session.getState().accepted.memberId, 'member-join-2');
+  await session.cancel();
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  assert.deepEqual(h.invites.discarded, []);
+  assert.equal(handle.memberId, 'member-1');
+});
+
+test('T15_C08_markProfileBoundRequiresActiveMemberAndAcceptedFamily', async () => {
+  const { h, service } = await setup();
+  const family = await createFamily(service);
+  h.invites.acceptedFamilyId = family.familyId;
+  h.invites.acceptedMemberId = 'member-join-3';
+  const session = service.createJoinSession();
+  await session.start('Joiner');
+  await session.submitInvitation('YCI1.fake.key_wrap');
+  // Wrong member profile does not satisfy the exact-member precondition.
+  h.auth.profiles.push(new FamilyProfileRef('profile-other', family.familyId,
+    family.ownerMemberId));
+  await assert.rejects(session.markProfileBound(),
+    (error) => error.code === 'CONFIGURATION_ERROR');
+  assert.equal(session.getState().phase, FamilyJoinPhase.MEMBER_BOUND);
+  h.auth.profiles.pop();
+  h.auth.profiles.push(new FamilyProfileRef('profile-join-3', family.familyId,
+    'member-join-3'));
+  await session.markProfileBound();
+  assert.equal(session.getState().phase, FamilyJoinPhase.COMPLETED);
 });
 
 test('T09_C08_joinSessionCodeKekWithoutCodeRequiresCodeAndCancelCleansUp', async () => {

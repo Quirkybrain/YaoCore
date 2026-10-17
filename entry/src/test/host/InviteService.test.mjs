@@ -11,7 +11,8 @@ import assert from 'node:assert/strict';
 
 import { newDomainHarness } from '../domain/DomainHarness.ets';
 import { FamilyService } from '../../main/ets/service/family/FamilyService.ets';
-import { CreateInvitationInput as FamilyCreateInvitationInput } from '../../main/ets/service/family/FamilyModels.ets';
+import { CreateInvitationInput as FamilyCreateInvitationInput,
+  FamilyProfileRef } from '../../main/ets/service/family/FamilyModels.ets';
 import {
   AcceptInvitationOptions,
   CreateInvitationInput as InviteCreateInvitationInput
@@ -211,9 +212,14 @@ test('C13_familyJoinSession_drivesRealInviteServiceToCompleted', async () => {
     new FamilyCreateInvitationInput(family.familyId, ROLE_MEMBER, [], InviteMode.KEY_WRAP,
       1, 3600000));
   const accepted = await session.submitInvitation(created.containerText);
-  assert.equal(session.getState().phase, 'COMPLETED');
+  assert.equal(session.getState().phase, 'MEMBER_BOUND');
   assert.equal(accepted.memberId, handle.memberId);
   assert.equal(session.getState().accepted.memberId, accepted.memberId);
+  harness.auth.profiles.push(new FamilyProfileRef('p-' + accepted.memberId,
+    accepted.familyId, accepted.memberId));
+  await harness.families.setActiveFamily(accepted.familyId);
+  await session.markProfileBound();
+  assert.equal(session.getState().phase, 'COMPLETED');
 });
 
 test('C13_keyWrapMaxUsesMustBeOne', async () => {

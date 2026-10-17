@@ -290,6 +290,45 @@ test('T16_Ble_cancelCallsBleCancelsAndDestroysSessionDraft', async () => {
   assert.equal(state.result, undefined);
 });
 
+test('T16_Ble_backFromScanStopsScanAndDropsTheTenSecondTimer', async () => {
+  const h = setup();
+  await h.vm.initialize('family-1');
+  await h.vm.requestPermission();
+  await h.vm.startScan();
+  assert.equal(h.timer.pending(), 1);
+  h.vm.back();
+  await waitMicrotasks();
+  assert.equal(h.vm.getState().step, 0);
+  assert.equal(h.vm.getState().error, undefined);
+  assert.equal(h.ble.stopCalls, 1);
+  assert.equal(h.timer.pending(), 0);
+  h.timer.advance(10000);
+  assert.equal(h.vm.getState().step, 0);
+  assert.equal(h.vm.getState().error, undefined);
+});
+
+test('T16_Ble_backDuringStartScanCannotInstallLateTimer', async () => {
+  const h = setup();
+  await h.vm.initialize('family-1');
+  await h.vm.requestPermission();
+  let releaseStart;
+  h.ble.startScan = async () => new Promise((resolve) => {
+    releaseStart = resolve;
+  });
+  const scanning = h.vm.startScan();
+  await waitMicrotasks();
+  assert.equal(h.vm.getState().step, 1);
+  h.vm.back();
+  releaseStart();
+  await scanning;
+  await waitMicrotasks();
+  assert.equal(h.vm.getState().step, 0);
+  assert.equal(h.timer.pending(), 0);
+  h.timer.advance(10000);
+  assert.equal(h.vm.getState().step, 0);
+  assert.equal(h.vm.getState().error, undefined);
+});
+
 test('T16_Ble_scanTimeoutWithoutResultsShowsRetryableError', async () => {
   const h = setup();
   await h.vm.initialize('family-1');
