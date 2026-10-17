@@ -4044,6 +4044,8 @@ export class IdentityNegotiator {
 ```
 
 **协商流程（ADR-002 §3.2）**：
+> schema 引用：`input/api/protocol/ble-enrollment-identity-request.schema.json` L6-15；`input/api/protocol/ble-enrollment-identity-response.schema.json` L6-26（v2.0，封闭）；v2.1 为 ADR-002 §3.2 的提案，仓库中暂无 schema（`UNRESOLVED-IDENTITY-V21`）。
+
 1. 在 `yaocore-id` 发 `{"op":"get_identity","protocolVersion":"2.1"}`（Security1 加密）。
 2. 若响应通过 v2.1 严格解析 → 返回 `IdentityVersion.V21`；`security.lan` 可选。
 3. 若 v2.1 解析失败/旧固件返回 v2.0/拒绝 → **在同一 Security1 会话内重试一次** `2.0` 请求：
