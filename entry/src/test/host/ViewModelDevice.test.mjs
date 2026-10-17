@@ -298,6 +298,127 @@ test('T15_Device_cancelOnOneDeviceKeepsAnotherSessionAlive', async () => {
   assert.equal(vm.getControl(keyA).confirmedValue, 40);
 });
 
+// R3-01 (t15-16-review-c §R3-01): the earlier cross-device cases were
+// serial. These two pin the missing concurrency/failure-isolation evidence.
+test('T19_R3_concurrentCrossDeviceInFlightDispatchesAreIsolated', async () => {
+  const clock = new FakeClock();
+  const timer = new FakeTimer(clock);
+  const lightA = record({ deviceId: 'dev-a', brightness: 10 });
+  const lightB = record({ deviceId: 'dev-b', brightness: 20 });
+  const devices = new FakeDeviceQuery([lightA, lightB]);
+  const control = new FakeControlCoordinator();
+  const pendingByTarget = new Map();
+  control.execute = async (command, familyId) => {
+    control.calls.push({ command, familyId });
+    return new Promise((resolve) => {
+      pendingByTarget.set(command.target, { command, resolve });
+    });
+  };
+  const vm = new DeviceViewModel(devices, new FakeRoomQuery([]), control, new FakeI18n(), clock,
+    timer, new FakeLogger());
+  await vm.initialize('family-1');
+  const keyA = lightA.state.key;
+  const keyB = lightB.state.key;
+
+  vm.beginContinuous(keyA, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.beginContinuous(keyB, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.updateContinuous(keyA, 60);
+  vm.updateContinuous(keyB, 75);
+  timer.advance(55);
+  await waitMicrotasks();
+
+  // Both dispatches are in flight at the same time, one per device.
+  assert.equal(control.calls.length, 2);
+  assert.deepEqual(control.calls.map((call) => call.command.target).sort(), ['dev-a', 'dev-b']);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+
+  // Completing A must not commit or clear B.
+  pendingByTarget.get('dev-a').resolve(executionOf(record({ deviceId: 'dev-a', brightness: 60 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 60 }));
+  await waitMicrotasks();
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+  await vm.endContinuous(keyA, 60);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyA).confirmedValue, 60);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).confirmedValue, undefined);
+
+  // B completes independently with its own target/value.
+  pendingByTarget.get('dev-b').resolve(executionOf(record({ deviceId: 'dev-b', brightness: 75 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 75 }));
+  await waitMicrotasks();
+  await vm.endContinuous(keyB, 75);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyA).confirmedValue, 60);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyB).confirmedValue, 75);
+});
+
+test('T19_R3_crossDeviceFailureDoesNotMutateOtherSession', async () => {
+  const clock = new FakeClock();
+  const timer = new FakeTimer(clock);
+  const lightA = record({ deviceId: 'dev-a', brightness: 10 });
+  const lightB = record({ deviceId: 'dev-b', brightness: 20 });
+  const devices = new FakeDeviceQuery([lightA, lightB]);
+  const control = new FakeControlCoordinator();
+  const pendingByTarget = new Map();
+  control.execute = async (command, familyId) => {
+    control.calls.push({ command, familyId });
+    return new Promise((resolve) => {
+      const list = pendingByTarget.get(command.target) || [];
+      list.push(resolve);
+      pendingByTarget.set(command.target, list);
+    });
+  };
+  const vm = new DeviceViewModel(devices, new FakeRoomQuery([]), control, new FakeI18n(), clock,
+    timer, new FakeLogger());
+  await vm.initialize('family-1');
+  const keyA = lightA.state.key;
+  const keyB = lightB.state.key;
+
+  vm.beginContinuous(keyA, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.beginContinuous(keyB, DeviceAction.SET_BRIGHTNESS, 0, 100);
+  vm.updateContinuous(keyA, 40);
+  vm.updateContinuous(keyB, 75);
+  timer.advance(55);
+  await waitMicrotasks();
+  assert.equal(control.calls.length, 2);
+
+  // A fails while B is still in flight.
+  pendingByTarget.get('dev-a')[0](executionOf(lightA, DeviceAction.SET_BRIGHTNESS, {
+    success: false,
+    error: AppErrors.of('GATEWAY_UNREACHABLE', [])
+  }));
+  await waitMicrotasks();
+  const endingA = vm.endContinuous(keyA, 40);
+  await waitMicrotasks();
+  // The failed dispatch already carried the final value, so TouchUp does not
+  // re-send it; the VM publishes REVERT from the recorded failure.
+  assert.equal(control.calls.length, 2);
+  await endingA;
+  await waitMicrotasks();
+
+  // A reverts; B is untouched and still pending.
+  const controlA = vm.getControl(keyA);
+  assert.equal(controlA.phase, ControlPhase.REVERT);
+  assert.equal(controlA.lastError.error.code, 'GATEWAY_UNREACHABLE');
+  assert.equal(controlA.confirmedValue, undefined);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.PENDING);
+  assert.equal(vm.getControl(keyB).confirmedValue, undefined);
+
+  // B succeeds independently and keeps its own confirmed value.
+  pendingByTarget.get('dev-b')[0](executionOf(record({ deviceId: 'dev-b', brightness: 75 }),
+    DeviceAction.SET_BRIGHTNESS, { value: 75 }));
+  await waitMicrotasks();
+  await vm.endContinuous(keyB, 75);
+  assert.equal(vm.getControl(keyB).phase, ControlPhase.COMMITTED);
+  assert.equal(vm.getControl(keyB).confirmedValue, 75);
+  assert.equal(vm.getControl(keyA).phase, ControlPhase.REVERT);
+  assert.equal(vm.getControl(keyA).confirmedValue, undefined);
+});
+
 test('T15_Device_roomFilterAndUnassignedPool', async () => {
   const clock = new FakeClock();
   const timer = new FakeTimer(clock);
