@@ -1,6 +1,6 @@
 # ohosTest（设备/模拟器测试）引导
 
-- **Producer**: agent:test-engineer；agent:implementation-engineer（T-06/T-07/T-08/T-10 设备骨架）
+- **Producer**: agent:test-engineer；agent:implementation-engineer（T-06/T-07/T-08/T-10/T-15/T-16 设备骨架）
 - **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-08 修复 `wp-022-fix-t08`；T-10 `wp-031-i18n` + 修复 `wp-033-fix-t10`
 - **当前状态**: **BLOCKED / 未运行**。本环境无真机、无模拟器实例、无签名配置；以下命令保留为设备可用时的执行入口，**不得**把“测试 HAP 编译成功”写成“设备测试通过”。
 
@@ -22,6 +22,8 @@ entry/src/ohosTest/
     │   └── GatewayTransportDevice.test.ets  # T-11 C-17 HTTP/TLS pin path B 骨架（BLOCKED）
     ├── i18n/
     │   └── I18nDevice.test.ets          # T-10 C-14 rawfile/applier/Preferences 骨架（BLOCKED）
+    ├── viewmodel/
+    │   └── ViewModelsDevice.test.ets    # T-15/T-16 C-21..C-23 编译/接线骨架（BLOCKED）
     └── contract/
         └── fixtures/                    # 协议 golden（PUBLIC TEST DATA ONLY）
             ├── hmac-sha256-test-vectors.json
@@ -71,7 +73,7 @@ hvigorw --mode module -p module=entry@ohosTest -p product=default onDeviceTest -
 
 ## 5. 限制
 
-- 本目录的设备套件已全部注册进 `List.test.ets`（T-06 foundation、T-07 security、T-08 storage、T-10 i18n）；注册只表示设备可用时会执行，当前仍为 `BLOCKED_ON_DEVICE_RUNNER`，不得写成 PASS。
+- 本目录的设备套件已全部注册进 `List.test.ets`（T-06 foundation、T-07 security、T-08 storage、T-10 i18n、T-15/T-16 viewmodel）；注册只表示设备可用时会执行，当前仍为 `BLOCKED_ON_DEVICE_RUNNER`，不得写成 PASS。
 - T-10 i18n 设备骨架使用 rawfile 键 `errors.gateway.success`（`common_*` 是 `string.json` 的 `$r` 键，不能经 `t()` 读取）；同时校验 en-US/zh-CN 切换、fallback、复数与 `I18nKeys` 映射。运行时 `$r` 重渲染仍由 T-17/T-18 验证。
 - T-08 storage 骨架包含 Preferences/RDB/Asset 读写、事务回滚、事务内 `setVersion` 回滚与锁屏 `ASSET_ACCESS_DENIED` 断言；锁屏分支需要 runner 先建立锁屏前置条件，未在无设备环境执行。
 - 设备测试不覆盖真实硬件/射频/真实网关；这些由用户自行执行（CP-03）。
