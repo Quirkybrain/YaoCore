@@ -97,6 +97,11 @@ export class LocaleChangedEvent {
 }
 
 export class I18nLoadResult {
+  /**
+   * Effective locale served by `t()`. `initialize` reports the zh-CN base when
+   * the requested current bundle failed but the base loaded, so this value is
+   * always consistent with the active resource bundle.
+   */
   readonly locale: SupportedLocale;
   readonly loaded: boolean;
   readonly missingKeys: ReadonlyArray<string>;

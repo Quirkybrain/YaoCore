@@ -52,19 +52,18 @@ export default function i18nDeviceTest() {
       expect(initialized.loaded).assertTrue();
       const locale = service.getLocale();
       expect(locale === SupportedLocale.ZH_CN || locale === SupportedLocale.EN_US).assertTrue();
-      expect(service.t('common.ok') === 'common.ok').assertFalse();
+      // `common_*` lives in string.json ($r); rawfile lookups use rawfile keys.
+      expect(service.t('errors.gateway.success') === 'errors.gateway.success').assertFalse();
 
       await service.setLocaleMode(LocaleMode.EN_US);
       expect(service.getLocale()).assertEqual(SupportedLocale.EN_US);
-      const english = service.t('common.ok');
-      expect(english.length > 0).assertTrue();
-      expect(english === 'common.ok').assertFalse();
+      const english = service.t('errors.gateway.success');
+      expect(english).assertEqual('Success');
 
       await service.setLocaleMode(LocaleMode.ZH_CN);
       expect(service.getLocale()).assertEqual(SupportedLocale.ZH_CN);
-      const chinese = service.t('common.ok');
-      expect(chinese.length > 0).assertTrue();
-      expect(chinese === 'common.ok').assertFalse();
+      const chinese = service.t('errors.gateway.success');
+      expect(chinese).assertEqual('成功');
 
       expect(service.t('missing.key.for.device.probe')).assertEqual('missing.key.for.device.probe');
       const count = I18nParams.countOf(2, [new NameValue('count', '2')]);

@@ -91,12 +91,20 @@ export class I18nService {
     const locale = mode === AUTO ? await this.resolveAutoLocale() : I18nService.modeLocale(mode);
     const loaded = await this.loadBundles(locale);
 
-    this.currentMode = mode;
-    this.currentLocale = locale;
-    this.assignBundles(loaded.current, loaded.base);
-    await this.applyPlatform(locale);
+    // F-08: when the current bundle fails but the zh-CN base loaded, serve the
+    // base bundle and apply zh-CN. Keeping the failed locale here would make
+    // `$r` (platform) and `t()` (rawfile) show different languages.
+    const effectiveLocale = loaded.current !== undefined ? locale : ZH_CN;
+    const effectiveCurrent = loaded.current !== undefined ? loaded.current : loaded.base;
 
-    return new I18nLoadResult(locale, loaded.current !== undefined, loaded.missingKeys, loaded.error);
+    this.currentMode = mode;
+    this.currentLocale = effectiveLocale;
+    this.assignBundles(effectiveCurrent, loaded.base);
+    await this.applyPlatform(effectiveLocale);
+    this.warnBaseFailure(loaded);
+    this.warnCurrentFailure(loaded, locale);
+
+    return new I18nLoadResult(effectiveLocale, loaded.current !== undefined, loaded.missingKeys, loaded.error);
   }
 
   getLocale(): SupportedLocale {
@@ -502,6 +510,17 @@ export class I18nService {
   private warnBaseFailure(loaded: LoadedBundles): void {
     if (loaded.current !== undefined && loaded.base === undefined && loaded.error !== undefined) {
       this.logger.warn(TAG, loaded.error.code, [new NameValue('locale', ZH_CN)]);
+    }
+  }
+
+  /** Current-locale load failure after a successful base fallback; logs locale names only. */
+  private warnCurrentFailure(loaded: LoadedBundles, requested: SupportedLocale): void {
+    if (loaded.current === undefined && loaded.error !== undefined) {
+      const fields: NameValue[] = [new NameValue('locale', requested)];
+      if (requested !== ZH_CN) {
+        fields.push(new NameValue('fallback', ZH_CN));
+      }
+      this.logger.warn(TAG, loaded.error.code, fields);
     }
   }
 

@@ -34,6 +34,7 @@ STRING_LOCALES = {"base": "zh-CN", "en_US": "en-US"}
 PARAM_RE = re.compile(r"\{([^{}]*)\}")
 PARAM_NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
 ENGLISH_WORD_RE = re.compile(r"[A-Za-z][A-Za-z']*")
+SHORT_UI_EN_RE = re.compile(r"^[A-Z][A-Za-z']*(?:[ \-][A-Z][A-Za-z']*){0,2}[.!?]?$")
 CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
 KEY_TOKEN_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*){0,3}$")
 T_CALL_RE = re.compile(r"\bt\(\s*(['\"])([^'\"]+)\1")
@@ -185,6 +186,14 @@ def strip_and_extract_literals(text: str):
     return "".join(clean), literals
 
 
+def require_reason(item, label: str):
+    if not isinstance(item, dict):
+        raise ToolError(f"allowlist {label} entry must be an object")
+    reason = item.get("reason")
+    if not isinstance(reason, str) or not reason.strip():
+        raise ToolError(f"allowlist {label} entry must have a non-empty reason")
+
+
 def load_allowlist(path: Path | None):
     if path is None or not path.exists():
         return {"entries": [], "keyPrefixes": [], "keyEntries": []}
@@ -196,6 +205,20 @@ def load_allowlist(path: Path | None):
     key_entries = data.get("keyEntries", [])
     if not isinstance(entries, list) or not isinstance(key_prefixes, list) or not isinstance(key_entries, list):
         raise ToolError(f"allowlist lists are malformed: {path}")
+    for entry in entries:
+        require_reason(entry, "entries")
+        if not isinstance(entry.get("file"), str) or not entry["file"].strip():
+            raise ToolError("allowlist entries item must have a non-empty file")
+        if not isinstance(entry.get("line"), int) or entry["line"] <= 0:
+            raise ToolError("allowlist entries item must have a positive line")
+    for entry in key_entries:
+        require_reason(entry, "keyEntries")
+        if not isinstance(entry.get("key"), str) or not entry["key"].strip():
+            raise ToolError("allowlist keyEntries item must have a non-empty key")
+    for entry in key_prefixes:
+        require_reason(entry, "keyPrefixes")
+        if not isinstance(entry.get("prefix"), str) or not entry["prefix"].strip():
+            raise ToolError("allowlist keyPrefixes item must have a non-empty prefix")
     return {"entries": entries, "keyPrefixes": key_prefixes, "keyEntries": key_entries}
 
 
@@ -225,7 +248,7 @@ def main(argv=None) -> int:
     root = Path(args.root).resolve()
     report_path = Path(args.report).resolve() if args.report else None
     allowlist_path = Path(args.allowlist).resolve() if args.allowlist else None
-    allowlist = load_allowlist(allowlist_path)
+    allowlist = {"entries": [], "keyPrefixes": [], "keyEntries": []}
 
     checks = []
 
@@ -239,6 +262,7 @@ def main(argv=None) -> int:
         })
 
     try:
+        allowlist = load_allowlist(allowlist_path)
         raw_paths = {
             locale: root / "entry/src/main/resources/rawfile/i18n" / f"{locale}.json"
             for locale in RAW_LOCALES
@@ -355,8 +379,16 @@ def main(argv=None) -> int:
             for key, value in sorted(bundle.items()):
                 if not isinstance(value, str):
                     findings.append(finding(message="non-string value", key=key))
-                elif not value.strip():
+                    continue
+                if not value.strip():
                     findings.append(finding(message="empty value", key=key))
+                    continue
+                # CHK-04 applies to both stores: string.json must not carry
+                # TODO/?? placeholders or unbalanced braces either.
+                if "TODO" in value or "??" in value:
+                    findings.append(finding(message="placeholder value", key=key))
+                if value.count("{") != value.count("}"):
+                    findings.append(finding(message="unbalanced braces", key=key))
         add_check("CHK-04", findings)
 
         # Collect source references for CHK-05/CHK-06.
@@ -439,11 +471,17 @@ def main(argv=None) -> int:
                 cjk = bool(CJK_RE.search(literal))
                 words = ENGLISH_WORD_RE.findall(literal)
                 sentence = len(words) >= 3 and bool(re.search(r"\s", literal))
-                if not cjk and not sentence:
+                # Short UI placeholders such as "Welcome" or "Hello World" must
+                # not evade the >=3-word sentence heuristic. CamelCase tokens
+                # (component ids, resource names) are excluded.
+                short_ui = (is_ui and not cjk and not sentence
+                            and SHORT_UI_EN_RE.match(literal.strip()) is not None
+                            and re.match(r"^[A-Z][a-z]+[A-Z]", literal) is None)
+                if not cjk and not sentence and not short_ui:
                     continue
                 technical = any(token in line_text for token in
                                 ("console.", "hilog.", ".debug(", ".info(", ".warn(", ".error(",
-                                 "throw new ", "new AppError(", "new Error(", "super("))
+                                 "throw new ", "new AppError(", "new Error(", "super(", ".id("))
                 # SQL/DDL, column lists and SCREAMING_SNAKE constants are
                 # technical strings, not user-visible prose (allowlist §6.4).
                 if SQL_RE.search(literal):
@@ -455,6 +493,14 @@ def main(argv=None) -> int:
                 if technical and not cjk:
                     continue
                 if allowlist_lookup(allowlist, rel, line):
+                    continue
+                if short_ui:
+                    # Advisory until T-17/T-18 replace the scaffold UTF-8 text;
+                    # promote to blocking after the UI migration.
+                    findings.append(finding(
+                        file=rel, line=line,
+                        message="hardcoded short English UI text (T-17/T-18 migration)",
+                        severity="warning"))
                     continue
                 severity = "blocking" if is_ui else "warning"
                 findings.append(finding(file=rel, line=line,

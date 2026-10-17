@@ -50,12 +50,14 @@ export class I18nKeys {
     return new I18nKey('ac.mode.unknown', [new NameValue('mode', value)]);
   }
 
+  /** Delegates to `ErrorCatalog`; the special provisioning/cloud mappings live only there. */
   static provisioningError(code: string): string {
-    return 'provisioning.error.' + I18nKeys.stripPrefix(code, 'PROVISIONING_').toLowerCase();
+    return ErrorCatalog.resolve(code).i18nKey;
   }
 
+  /** Delegates to `ErrorCatalog`; the special provisioning/cloud mappings live only there. */
   static cloudError(code: string): string {
-    return 'errors.cloud.' + I18nKeys.stripPrefix(code, 'CLOUD_').toLowerCase();
+    return ErrorCatalog.resolve(code).i18nKey;
   }
 
   static memberRole(role: MemberRole): string {
@@ -104,12 +106,5 @@ export class I18nKeys {
       stableName === 'unknown_device' || stableName === 'unsupported_action' ||
       stableName === 'unsupported_gateway_action' || stableName === 'device_offline' ||
       stableName === 'hardware_timeout';
-  }
-
-  private static stripPrefix(code: string, prefix: string): string {
-    if (code.startsWith(prefix)) {
-      return code.substring(prefix.length);
-    }
-    return code;
   }
 }

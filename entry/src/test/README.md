@@ -1,7 +1,7 @@
 # Host 单元测试（无设备）
 
-- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06/T-07/T-08/T-09/T-10 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b）
-- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`；T-08 `wp-020-storage` + 修复 `wp-022-fix-t08`；T-09 `wp-024-domain` + 修复 `wp-026-fix-t09` + 复审修复 `wp-028-fix-t09b`；T-10 `wp-031-i18n`
+- **Producer**: agent:test-engineer (baseline) / agent:implementation-engineer（T-06/T-07/T-08/T-09/T-10 及修复 wp-018-fix-t07、wp-022-fix-t08、wp-026-fix-t09、wp-028-fix-t09b、wp-033-fix-t10）
+- **Task**: T-05 / TEST-001（`wp-010-test-plan`）；T-06 修复 `wp-014-fix-t06`；T-07 `wp-016-security` + 修复 `wp-018-fix-t07`；T-08 `wp-020-storage` + 修复 `wp-022-fix-t08`；T-09 `wp-024-domain` + 修复 `wp-026-fix-t09` + 复审修复 `wp-028-fix-t09b`；T-10 `wp-031-i18n` + 评审修复 `wp-033-fix-t10`
 - **状态**: **可运行（Node host runner）**；`hvigorw test` 的 Hypium 入口可编译，但本环境无法执行（见 §3）。
 
 ## 1. 目录与约定
@@ -31,7 +31,7 @@ entry/src/test/
 │   ├── Security.test.mjs         # T-07 C-05 向量与负例
 │   ├── Storage.test.mjs          # T-08 C-06 存储/迁移/draft/事务运行器（15 用例）
 │   ├── GatewayRepository.test.mjs # T-08 C-07 路由/绑定/补偿/profile/sequence（29 用例）
-│   ├── I18n.test.mjs             # T-10 C-14 locale/fallback/插值/复数/键映射/CHK（24 用例）
+│   ├── I18n.test.mjs             # T-10 C-14 locale/fallback/插值/复数/键映射/权威 catalog/CHK（28 用例）
 │   ├── TestCryptoProvider.ets    # 测试专用纯 TS provider（仅 SHA/HMAC/HKDF/PBKDF2）
 │   ├── protocol-oracle.ets       # 纯 TS canonical oracle（无 @ohos）
 │   ├── ets-hooks.mjs             # Node loader：.ets -> TS strip -> ESM
@@ -82,7 +82,7 @@ node --no-warnings \
   entry/src/test/host/*.test.mjs
 ```
 
-当前 revision：**271/271 PASS**（`evidence/t10-host-node-tests.tap`，T-10 后）。覆盖：
+当前 revision：**275/275 PASS**（`evidence/t10-fix-host-node-tests.tap`，T-10 评审修复后）。覆盖：
 
 - 4 条控制 HMAC 向量（canonical + HMAC-SHA256）与 T-06 出站 nonce/值类型严格门；
 - 响应验签向量、发现请求签名向量；
@@ -100,14 +100,25 @@ node --no-warnings \
 - T-09 C-10（24）：发现新增未分配/禁用、陈旧包整条丢弃、同 epoch 覆盖、缺字段保留/离线不清空、partial 不标记网关移除、aliasUsed 仅诊断、未知类型只读、tombstone/restore、设备删除场景清理/回滚、ACK 应用/陈旧/不匹配/重放、applyCloudState 边界、跨家庭 assign 拒绝（R-07）、未绑定/家庭不匹配/重复 partial（R-14）、监听器隔离/commit 失败无事件（R-12）、commit 失败回滚诊断缓存（R2-05）、网关删除路由事务外读取（R-13）、命令预检含 UNASSIGNED、事件后置派发；
 - T-09 C-11（15）：场景 CRUD/值校验、串行成功/事件、预检 0 命令、首步/次步失败、局部失败不回滚、MISMATCH/UNVERIFIED（MISMATCH 回写 SSOT，R-03）、delayMs、取消、same-scene 单飞（R-02）、step/total timeout（R-05）、迟到 outcome 丢弃、监听器抛错隔离、房间删除后预检失败、禁用/空场景；
 - T-09 O-1（5）：gate 串行、合法排队在超时内成功（D-023/R2-02）、同步重入 fail-fast、异步重入有界失败、fake RDB 嵌套事务 fail-fast（R-04）；
-- T-10 C-14（24）：auto locale 解析（zh/en/其他/读取失败）、fallback 链与 missing 诊断、插值/缺参数/单次替换、英文 `_one/_other`/中文基键/缺变体回退、setLocaleMode 持久化+通知、apply 失败 `platformApplied=false`、加载失败回滚、Preferences 失败、reload 重解析、监听器隔离/退订、dispose、`has`/`tKey`、bundle codec 负例、I18nKeys/ErrorI18nMapper、65 个 AppError code 键存在、生产资源 parity、CHK good/bad 夹具、基准缺失/双缺失降级；
+- T-10 C-14（28）：auto locale 解析（zh/en/其他/读取失败）、fallback 链与 missing 诊断、插值/缺参数/单次替换、英文 `_one/_other`/中文基键/缺变体回退、setLocaleMode 持久化+通知、apply 失败 `platformApplied=false`、加载失败回滚、Preferences 失败、reload 重解析、监听器隔离/退订、dispose、`has`/`tKey`、bundle codec 负例、I18nKeys/ErrorI18nMapper、权威 catalog 派生（DES-A §3.2.3 + DES-B §23.4）、5 个动态 code 双 locale 渲染、生产资源 parity、CHK good/bad 夹具与 exit 2、current-only/base-only/both 缺失降级；
 - host runner 基线断言。
 
-计数口径：按 `test('T10_C14_...')` 前缀统计新增 24 条；T-09 五个域分类 81 条，其余 166 为 T-05..T-08 基线，当前总数 271。
+计数口径：按 `test('T10_C14_...')` 前缀统计 28 条（T-10 初版 24 条 + 评审修复 4 条）；T-09 五个域分类 81 条，其余 166 为 T-05..T-08 基线，当前总数 **275**。
 
 T-08 修复前基线为 **161/161 PASS**（`evidence/t08-host-node-tests.tap`）；T-06 修复时基线为 **88/88 PASS**（`evidence/t06-fix-host-node-tests.tap`）；T-05 历史基线为 **15/15 PASS**（`evidence/host-node-tests.tap`）。这些旧数字仅代表当时范围，不代表当前 revision。
 
-T-09 复审修复证据（wp-028-fix-t09b，当前 revision）：
+T-10 评审修复证据（wp-033-fix-t10，当前 revision）：
+
+| 文件 | 内容 |
+|---|---|
+| `evidence/t10-fix-host-node-tests.tap` | 当前 275/275 TAP |
+| `evidence/t10-fix-ohpm-install.log` | `ohpm install` |
+| `evidence/t10-fix-clean-assemble.log` | `hvigorw clean assembleHap --no-daemon` |
+| `evidence/t10-fix-codelinter.log` | `codelinter -c code-linter.json5 -p default .`（产品源码） |
+| `evidence/t10-fix-i18n-checker.log` | CHK-01..09；0 阻断、2 条短英文 UI 告警 |
+| `evidence/t10-fix-i18n-report.json` | 检查器 JSON 报告 |
+
+T-09 复审修复证据（wp-028-fix-t09b，历史 revision；当前总数已由 T-10 修复取代）：
 
 | 文件 | 内容 |
 |---|---|
@@ -182,7 +193,7 @@ Node host runner 是本环境唯一已实证的可执行 host 路径，覆盖纯
 
 | 层 | 路径 | 运行条件 | 当前 |
 |---|---|---|---|
-| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 271/271**（T-10 后） |
+| Host 纯逻辑 | `entry/src/test/host/**` | Node（无设备） | **PASS 275/275**（T-10 评审修复后） |
 | Hypium host | `entry/src/test/List.test.ets` | `hvigorw test` + Linux Previewer | **BLOCKED**（见 §3） |
 | 设备/模拟器 | `entry/src/ohosTest/**` | `onDeviceTest` + 设备 + 签名 | **BLOCKED**（见 ohosTest README；storage 套件已注册但未执行） |
 

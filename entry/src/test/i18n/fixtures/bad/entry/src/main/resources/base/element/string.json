@@ -1,6 +1,8 @@
 {
   "string": [
     { "name": "app_name", "value": "Bad fixture" },
-    { "name": "only_base", "value": "Only base" }
+    { "name": "only_base", "value": "Only base" },
+    { "name": "bad_placeholder", "value": "TODO" },
+    { "name": "bad_brace", "value": "Unclosed {value" }
   ]
 }

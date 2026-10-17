@@ -1,616 +1,616 @@
-旧中文,旧英文,分类,目标存储,目标键,审查结论,负责人,批次,备注
- · 无人,· No one,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
- · 有人,· Someone,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-（旧场景，需编辑后重新保存）,"(Old scene, need to be edited and re-saved)",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-（网关已变更，需重新选择）,(The gateway has been changed and needs to be selected again),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-2.4 GHz Wi-Fi 名称（SSID）,2.4 GHz Wi-Fi Name (SSID),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-ACK request_id 不匹配,ACK request_id does not match,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-ACK seq 不匹配,ACK seq does not match,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-BLE 配网成功，正在通过局域网认证并关联同一网关,"BLE network configuration is successful, passing LAN authentication and associating with the same gateway",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-BLE 配网失败，请让网关重新进入配网模式后重试,"BLE network configuration failed, please let the gateway re-enter the network configuration mode and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-BLE 配网异常中断，请让网关重新进入配网模式后重试,The BLE distribution network was interrupted abnormally. Please let the gateway re-enter the network distribution mode and try again.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-BLE 入网完成，但安全身份无效，已拒绝扫描与绑定,"BLE network access is completed, but the security identity is invalid and scanning and binding have been refused.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Gree/格力,Gree/Gree,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包
-Haier/海尔,Haier/Haier,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包
-HTTPS 地址,HTTPS address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 命令与本次设备状态回传已确认,The IoTDA command and this device status return have been confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 命令与设备影子状态已确认,IoTDA commands and device shadow status confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 已返回状态，正在校验状态时间与命令结果,IoTDA has returned status and is verifying status time and command results.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 已接收命令，但未取得不早于本次下发时间的设备影子确认,"IoTDA has received the command, but has not obtained device shadow confirmation no earlier than this issuance time.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 已接收命令，等待设备影子确认,IoTDA has received the command and is waiting for confirmation from the device shadow,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 影子连接正常，暂无已上报属性,IoTDA shadow connection is normal and no attributes have been reported yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-IoTDA 影子响应格式无法解析,IoTDA shadow response format cannot be parsed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Midea/美的,Midea/美的,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包
-UDP 广播,UDP broadcast,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Wi-Fi 密码（开放网络可留空）,Wi-Fi password (can be left blank for open networks),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Wi-Fi 密码不能超过 64 个 UTF-8 字节,Wi-Fi password cannot exceed 64 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Wi-Fi 名称必须为 1 至 32 个 UTF-8 字节,Wi-Fi name must be 1 to 32 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-Wi-Fi 认证失败，请检查密码,"Wi-Fi authentication failed, please check password",A 迁移,rawfile/i18n,provisioning.error.auth_error,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-YaoCore ESP32-S3M 网关,YaoCore ESP32-S3M Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-YaoCore 最近同步快照,YaoCore latest sync snapshot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-安防摄像头,security camera,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-把第一台设备带回家,Bring your first device home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-版本,version,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-版本 1.1.0,Version 1.1.0,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-保存并检查连接,Save and check the connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存场景,save scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存待绑定离线占位,Save offline placeholder to be bound,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存密钥,save key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存密钥并继续,Save the key and continue,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存失败，请重试,"Save failed, please try again",A 迁移,string.json,common_save_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-保存网络设置,Save network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-保存修改,Save changes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保护已开启,Protection is on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-本机安全档案保存失败,Failed to save local security file,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机安全组件不可用，请稍后重试,"Native security component is unavailable, please try again later",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-本机档案已解锁,Local file is unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机解锁状态保存失败,Failed to save local unlock status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-本机使用档案,local usage file,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机使用档案锁定失败,Failed to use file lock on this machine,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机使用档案已创建并解锁,Local usage profile created and unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机使用档案已解锁,Local usage profile has been unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机使用档案已锁定,The local usage file is locked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-本机已有使用档案，请直接解锁,"This machine already has a usage file, please unlock it directly.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-编辑,Edit,A 迁移,string.json,common_edit,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-编辑场景,Edit scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-部分门禁离线或状态未知,Some access controls are offline or their status is unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-操作失败，请重试,"Operation failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-测试设备控制,Test equipment control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-查看,View,A 迁移,string.json,common_view,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-查看通知效果,View notification effects,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-常用控制,Quick Controls,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-场景,Scenes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-场景名称,scene name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-场景已删除,Scene deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-成功,success,A 迁移,string.json,common_success,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-除湿,Dehumidification,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-传感器,sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-传感器仅显示状态,Sensors only show status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-创建本机档案,Create local file,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-创建本机使用档案,Create local usage profile,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-创建并解锁,Create and unlock,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-创建待绑定占位,Create a placeholder to be bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-创建后即可一键开启。,"Once created, it can be opened with one click.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-创建离线占位,Create an offline placeholder,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-待绑定 · 离线占位,To be bound ·Offline occupancy,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-待连接,To be connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-当前没有设备状态；执行时不会下发命令。,There is currently no device status; no command will be issued during execution.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-当前无人,There is currently no one,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-档案已创建，但解锁状态未保存，请重新解锁,"The file has been created, but the unlock status has not been saved. Please unlock it again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-灯光,lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-灯光不支持该控制动作,The light does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-灯光已更新,Lighting has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-灯光状态未知,Light status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-灯已关闭,light is off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-等待绑定,Waiting for binding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-第 1 步,Step 1,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-第 1 步 · 绑定控制密钥,Step 1 · Bind Control Key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-第 1 步：先保存开发板的控制密钥,Step 1: First save the control key of the development board,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-第 2 步,Step 2,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-点击本机解锁,Click to unlock this machine,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-点击新建添加场景,Click New to add a scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-点亮失败,Failed to light up,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-动作,action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-端口,port,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-盾,shield,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-发送配置并连接,Send & Connect,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-发现并校验网关,Discover and verify gateways,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-发现空网关，可继续绑定,"If an empty gateway is found, binding can continue.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-防止他人未经允许控制你的设备,Prevent others from taking control of your device without your permission,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-房间,room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-访问令牌,access token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-服务 ID,Service ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-服务地址,Service address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-该档案仅保存在本机，不是云端账号，不提供家庭成员身份或设备控制授权。,"The file is only saved locally, not a cloud account, and does not provide family member identity or device control authorization.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-该开关动作不接受额外参数,This switch action does not accept additional parameters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-该设备不是兼容的 YaoCore 配网网关,This device is not a compatible YaoCore distribution gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-该设备当前只支持状态读取,The device currently only supports status reading,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-该设备是待绑定离线占位，请先通过网关发现并绑定真实设备,This device is an offline placeholder to be bound. Please discover and bind the real device through the gateway first.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-该设备属于另一网关，请重新发现并绑定后再控制,This device belongs to another gateway. Please rediscover and bind it before controlling it.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-格力,Gree,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-跟着下面 3 步，很快就能使用,Follow the 3 steps below and you’ll be ready to use it in no time.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关闭,close,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关闭/上锁,Close/Lock,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关闭灯光和空调，门禁复位,"Turn off lights and air conditioning, reset access control",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关闭非必要设备并开启节能空调策略,Turn off non-essential equipment and turn on energy-saving air conditioning strategies,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关灯,Turn off the lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关机/关闭,Shut down/turn off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-关于 YaoCore,About YaoCore,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-还没有动作。,No action yet.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-还没有家庭设备,No home device yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-海尔,Haier,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-华为云 IoTDA 鉴权与设备影子连接正常,Huawei Cloud IoTDA authentication and device shadow connection are normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-欢迎回家,welcome home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-环境传感器,environmental sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-环境偏冷,The environment is cold,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-环境偏热,The environment is hot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-环境舒适,Comfortable environment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-环境与空调,Environment and air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-换个关键词试试。,Try changing the keywords.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-回家模式,home mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-加密网络,encrypted network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-家,home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-家庭 Wi-Fi（ESP32-S3 仅支持 2.4 GHz）,Home Wi-Fi (ESP32-S3 only supports 2.4 GHz),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-家庭连接,family connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-家庭网关,home gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-家庭状态,Home Status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-检测到开发协议模拟器，拒绝其控制响应,"Development protocol emulator detected, rejecting its control response",C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-检测到开发协议模拟器，正式版禁止将其绑定为真实网关,"The development protocol simulator is detected, and the official version prohibits binding it as a real gateway.",C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-检测到有人,Someone is detected,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-检查连接,Check connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-降低灯光亮度并设置舒适温度,Reduce light brightness and set comfort temperature,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-节能,Energy saving,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-节能模式,Energy saving mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-解锁本机档案,Unlock local files,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-解锁本机使用档案,Unlock local usage profile,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-仅用于本机名称显示,Only used for local name display,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-仅用于在本机显示使用者名称；不是云端账号，不提供家庭成员授权，也不限制设备控制。,"It is only used to display the user name locally; it is not a cloud account, does not provide family member authorization, and does not limit device control.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-仅在自动连接失败时修改,Modify only if autoconnect fails,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-旧版本机档案使用不安全的可逆存储，已失效并清除，请重新创建。,The old version of the machine file uses insecure reversible storage and has expired and been cleared. Please create it again.,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档
-局域网,LAN,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-局域网控制出现未知错误,An unknown error occurred in LAN control,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-局域网控制请求失败,LAN control request failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-局域网设备,LAN equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-局域网指令与设备回传状态已确认,LAN command and device return status confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开灯,Turn on the light,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开发者,Developer,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开放网络,open network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开关,switch,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开机/打开,Power on/open,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开门,open the door,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开门、亮灯并打开空调,"Open the door, turn on the lights and turn on the air conditioner",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开启,turn on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开启通知,Turn on notifications,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-开始配网,Start configuring network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开始设置,Start setting up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-开始设置你的家,Set Up Your Home,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-开始添加,Start adding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-可在外出时查看和控制设备,View and control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-客厅,living room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-客厅灯光,living room lighting,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调,Air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调不支持该控制动作,The air conditioner does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调离线，状态未知,The air conditioner is offline and the status is unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调模式,Air conditioning mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调模式仅支持自动、制冷、制热、除湿、送风、节能或睡眠,"Air conditioning mode only supports automatic, cooling, heating, dehumidification, air supply, energy saving or sleep",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调已更新,Air conditioning has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调已关闭,Air conditioner is off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-空调状态未知,Air conditioner status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制保护,control protection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制保护未开启,Control protection is not enabled,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制保护已开启,Control protection is on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥,control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥保存失败，请重试,"Failed to save control key, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥已安全保存。第 2 步：搜索附近网关,The control key is kept securely. Step 2: Search for nearby gateways,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥至少需要 16 位,Control key requires at least 16 bits,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制失败，请检查设备连接,"Control failed, please check device connection",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-快照来源：App 最后同步缓存,Snapshot source: App last synchronized cache,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-蓝牙权限未授予，请在系统设置中允许 YaoCore 使用附近设备,"Bluetooth permission is not granted, please allow YaoCore to use nearby devices in the system settings",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-蓝牙数据长度协商失败，当前连接无法完整传输配网数据,"Bluetooth data length negotiation failed, and the current connection cannot completely transmit the distribution network data.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-蓝牙数据长度协商失败，当前连接无法完整传输扫描结果,"Bluetooth data length negotiation failed, and the current connection cannot fully transmit the scan results.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-蓝牙通信超时，请靠近网关后重试,"Bluetooth communication timed out, please get close to the gateway and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-离家模式,away from home mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-离线,Offline,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-离线 · 状态未知,Offline · Status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-离线，状态未知,"Offline, status unknown",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-例如 192.168.1.10,For example 192.168.1.10,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接方式,Connection method,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接家庭网络,Connect to your home network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接失败,Connection failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接失败，请检查填写的信息,"Connection failed, please check the filled in information",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接失败，请检查网关和家庭网络,"Connection failed, please check gateway and home network",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接网关超时，请靠近开发板后重试,"The connection to the gateway timed out, please get close to the development board and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-连接信息,connection information,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-亮度,brightness,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-亮度必须是 0 到 100 的数字,Brightness must be a number from 0 to 100,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-亮度已更新,Brightness updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-亮度与空调,Brightness and air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-邻居表,neighbor list,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-没有可留空,None to leave blank,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-没有匹配的设备,No matching device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-没有找到？创建离线占位,Not found? Create an offline placeholder,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-没有找到网关，请检查家庭网络,"Gateway not found, please check your home network",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-美的,Midea,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先安全绑定家庭网关，再启用远程控制,Securely bind a home gateway before enabling remote control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-云端配置尚未关联当前网关，请在远程连接页重新保存,Cloud settings are not linked to the current gateway. Save them again on the Remote Connection page,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云端配置属于另一网关，已阻止跨家庭控制,Cloud settings belong to another gateway; cross-home control was blocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-Security1 握手失败，请核对 PoP 并保持手机靠近网关,Security1 handshake failed. Verify the PoP and keep the phone close to the gateway,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门禁,access control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门禁不支持该控制动作,The access control does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门禁未绑定,Access control is not bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门禁状态不完整,Access control status is incomplete,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门已打开,door is open,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门已关闭,door closed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-门状态未知,Door status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-密码（至少 8 位）,Password (minimum 8 characters),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-密码至少 8 位,Password must be at least 8 characters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-模式未知,Mode unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-模式已更新,Mode updated,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-目标,target,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-目标设备不存在或已被删除,The target device does not exist or has been deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-目标温度,target temperature,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-目标温度必须是 16 到 30 的数字,Target temperature must be a number between 16 and 30,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-目标响应了 HTTP，但不是有效的 YaoCore 网关,The target responded to HTTP but is not a valid YaoCore gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-配网码校验失败，请检查网关 PoP,"Network configuration code verification failed, please check the gateway PoP",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-偏冷,Cold,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-偏热,Hot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-品牌（可选）,Brand (optional),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-企业网络,Enterprise network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-前往设备页,Go to device page,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-前往设备页查找并连接网关,Go to the device page to find and connect to the gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-前往设备页控制,Go to device page control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-前往设备页连接,Go to the device page to connect,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-前往设备页添加设备。,Go to the Devices page to add a device.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-清空,Clear,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请补全连接信息,Please complete the connection information,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入 2.4 GHz Wi-Fi 名称,Please enter a 2.4 GHz Wi-Fi name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入场景名称,Please enter scene name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入访问令牌,Please enter access token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入设备名称,Please enter device name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入网关配网码（PoP）,Please enter the gateway distribution code (PoP),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请搜索正在配网的 YaoCore 网关,Please search for the YaoCore gateway being configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请添加一个动作,Please add an action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请填写 IoTDA Endpoint、Project ID 和 Device ID,"Please fill in IoTDA Endpoint, Project ID and Device ID",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请填写服务提供方给出的信息,Please fill in the information given by the service provider,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请填写有效的 IAM X-Auth-Token,Please fill in a valid IAM X-Auth-Token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先创建本机使用档案,Please create a local usage profile first,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-请先打开手机蓝牙,Please turn on your phone’s Bluetooth first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先发现并绑定设备,Please discover and bind the device first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先配置与网关一致的命令密钥，再验证网关身份,"Please configure the command key consistent with the gateway first, and then verify the gateway identity.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先配置至少 16 位命令密钥,Please configure at least a 16-digit command key first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先输入网关配网码（PoP），再扫描家庭 Wi-Fi,"Please enter the gateway distribution code (PoP) first, and then scan the home Wi-Fi",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先添加设备。,Please add the device first.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先添加网关,Please add gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先选择一个网关,Please select a gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先允许应用发送通知,Please allow the app to send notifications first,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-请先在“我的 > 安全配置”保存与网关一致的至少 16 位命令密钥,"Please first save at least a 16-digit command key consistent with the gateway in ""My > Security Configuration""",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-请先在“我的 > 安全配置”保存至少 16 位命令密钥,"Please save at least a 16-digit command key in ""My > Security Configuration"" first",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-请先在当前配网卡片保存与开发板一致的控制密钥,Please first save the control key consistent with the development board in the current distribution network card.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请选择设备,Please select a device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请在系统设置中允许通知,Please allow notifications in system settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-全部门禁上锁,All doors locked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-全部门禁已上锁,All doors are locked,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-全部设备,All equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-让家庭控制更简单,Make home control easier,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-让手机连上家里的 Wi-Fi,Connect your phone to your home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-让网关进入配网模式（首次启动自动进入，或长按 BOOT 5 秒），然后搜索附近网关。,"Let the gateway enter the network configuration mode (automatically enter it when it is first started, or press and hold BOOT for 5 seconds), and then search for nearby gateways.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-人体存在传感器,human presence sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描并选择家中的设备,Scan and select devices in your home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描家庭 Wi-Fi,Scan home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描设备,Scan Devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描失败，可尝试手动添加,"Scan failed, you can try to add it manually",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描失败，请重试,"Scan failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描网关,Scan gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描中,Scanning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-删除,Delete,A 迁移,string.json,common_delete,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-删除失败,Delete failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-删除入口仅解除本机绑定，不会恢复开发板出厂设置,Removal only unbinds this phone; it does not factory-reset the gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-上锁,Locked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-尚未绑定局域网网关,The LAN gateway has not been bound yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-尚未绑定控制网关，未下发控制指令,The control gateway has not been bound and no control instructions have been issued.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-尚未建立真实控制链路,No real control link has been established yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-尚未连接,Not connected yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-尚未配置网关控制密钥，请先到“我的 > 安全配置”保存与网关一致的密钥,"The gateway control key has not been configured yet. Please go to ""My > Security Configuration"" to save the key consistent with the gateway.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设备,Devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备当前离线，未下发控制指令,The device is currently offline and no control instructions have been issued.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备返回执行失败,The device returns execution failure,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备控制正常,Device control is normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备离线,Device offline,A 迁移,rawfile/i18n,errors.gateway.device_offline,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-设备离线，状态未知,"Device offline, status unknown",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备名称,Device name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备一目了然,All your devices at a glance,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备已删除,Device deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备已同步,Device synced,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备影子读取失败，请检查网络或鉴权,"Device shadow reading failed, please check the network or authentication",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备正在执行上一条指令，请稍候,"The device is executing the previous command, please wait.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备主动反馈,Active feedback from equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备状态通知,Device status notification,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设备状态通知已开启,Device status notifications are on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设备状态已刷新,Device status refreshed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设置后可在外出时控制设备,Set up to control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设置控制密钥,Set control key,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设置亮度,Set brightness,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设置模式,Setup mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设置温度,Set temperature,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设置远程控制,Set up remote control,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-摄像头,camera,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-失败,failed,A 迁移,string.json,common_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-湿度,Humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-湿度偏低,Humidity is low,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-湿度偏高,Humidity is high,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-湿度适中,Moderate humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-实例 ID,Instance ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-适用系统,Applicable system,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-室内环境,indoor environment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-室温,room temperature,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-收起,close,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-收起连接设置,Collapse connection settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-收起网络设置,Collapse network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-手动录入不会让设备立即可控；保存后保持离线，需由已绑定网关发现同一真实设备后再绑定。,"Manual entry will not make the device controllable immediately; it will remain offline after saving, and the same real device needs to be discovered by the bound gateway before binding again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-手机局域网控制确认,Mobile LAN control confirmation,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-手机蓝牙配网,Bluetooth Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-手机蓝牙未开启，请打开蓝牙后重试,The Bluetooth of your phone is not turned on. Please turn on Bluetooth and try again.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-手机云端控制确认,Mobile cloud control confirmation,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-首次使用时，通过蓝牙把 2.4 GHz Wi-Fi 安全发送给网关,"On first use, securely sends 2.4 GHz Wi-Fi to the gateway via Bluetooth",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-首页,Home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-受限网段扫描,Restricted network segment scanning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-舒适,Comfortable,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-输入开发板固件配置中的控制密钥。该密钥只保存在手机安全存储中，用于认证真实网关。,Enter the control key from the board firmware configuration. This key is only stored in the phone\'s secure storage and is used to authenticate the real gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-刷新,Refresh,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-刷新状态,refresh status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-双重身份校验通过，正在验证板载 LED 并保存绑定,"Double identity verification passed, onboard LED is being verified and binding saved",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-睡眠,sleep,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-睡眠模式,sleep mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-送风,Supply air,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-搜索附近网关,Find Nearby Gateways,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-搜索设备或房间,Search for a device or room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-锁定本机档案,Lock local files,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-态,state,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加,add,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加动作,Add action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加设备,Add device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加网关,Add gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加网关后即可扫描,Scan after adding gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-通知仅展示 App 最后一次同步快照，不代表后台持续监控；打开 App 并同步后才会更新。,The notification only displays the last synchronized snapshot of the App and does not represent continuous monitoring in the background; it will be updated after the App is opened and synchronized.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-通知已发送,Notification sent,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-同步,sync,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-同步成功,Synchronization successful,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-同步设备,Sync devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-同步失败,Sync failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-同步失败，请检查远程连接,"Synchronization failed, please check the remote connection",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-同步失败，请重试,"Synchronization failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-推荐,Recommended,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-外出时也能控制设备,Control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关 ACK 不是有效 JSON,Gateway ACK is not valid JSON,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关 ACK 与期望设备状态不一致，正在回读,"Gateway ACK is inconsistent with expected device status, reading back",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关地址,Gateway address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关发现响应身份校验失败，未绑定该地址,The gateway found that the response identity verification failed and the address was not bound.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关返回了空 ACK,Gateway returned empty ACK,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关拒绝或执行指令失败,The gateway rejected or failed to execute the command,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关拒绝了 Wi-Fi 配置,Gateway rejected Wi-Fi configuration,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关控制响应身份校验失败,Gateway control response identity verification failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关连接正常,Gateway connection is normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关配网码（PoP）,Gateway distribution code (PoP),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关配网 · 两步完成,Gateway setup · two steps,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-步骤一：保存控制密钥,Step 1: Save the control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-用于配网后的局域网认证和设备控制，不是 PoP。,Used for LAN authentication and device control after setup; this is not the PoP.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-步骤二：输入 PoP 完成 BLE 配网,Step 2: Enter the PoP to complete BLE setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-PoP 只用于本次 Security1 握手，当前固件的 PoP 显示在开发板屏幕上。,The PoP is used only for this Security1 handshake and is shown on the development board display.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请先完成步骤一，才能搜索和配置网关,Complete step 1 before searching for and configuring a gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥已安全保存,Control key securely saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-密钥不会显示或通过 BLE 发送，仅用于配网后的网关认证。,The key is never displayed or sent over BLE; it is used only for gateway authentication after setup.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-更换控制密钥,Change control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-输入新的控制密钥并保存，或取消更换,"Enter and save a new control key, or cancel the change.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-输入开发板固件配置中的控制密钥。它不是 PoP；只保存在手机安全存储中，用于认证真实网关。,Enter the control key configured in the board firmware. It is not the PoP and is stored only in secure phone storage to authenticate the physical gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-取消更换,Cancel change,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存新的控制密钥,Save new control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥保持不变，可继续步骤二,The control key is unchanged; continue to step 2.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-PoP · BLE 配网码,PoP · BLE setup code,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-请输入开发板屏幕显示的 PoP；它只用于 Security1 握手，不是控制密钥。,Enter the PoP shown on the board display. It is used only for the Security1 handshake and is not the control key.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-输入屏幕上的 PoP（区分大小写）,Enter the on-screen PoP (case-sensitive),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已完成,Completed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-待完成,Pending,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关配网码必须为 8 至 64 个 UTF-8 字节,The gateway configuration code must be 8 to 64 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关扫描 Wi-Fi 失败，请检查配网码并让网关重新进入配网模式,The gateway failed to scan Wi-Fi. Please check the configuration code and let the gateway re-enter the configuration mode.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关设备 ID,Gateway device ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关未连接,Gateway not connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关未能确认 Wi-Fi 连接状态,Gateway failed to confirm Wi-Fi connection status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关未启用 ESP-IDF Security1，无法安全配网,ESP-IDF Security1 is not enabled on the gateway and the network cannot be configured securely.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关未找到该 Wi-Fi，请确认使用 2.4 GHz 网络,"The Wi-Fi was not found by the gateway, please confirm that you are using a 2.4 GHz network",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关验证通过，但本地路由安全保存失败，未绑定,"The gateway verification passed, but the local route failed to be safely saved and was not bound.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已接收，正在读取设备状态,Gateway has received and is reading device status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已接收命令，但设备状态未在时限内确认,"The gateway received the command, but the device status was not confirmed within the time limit",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已连接,Gateway is connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已连接家庭 Wi-Fi，准备进行局域网身份认证,The gateway is connected to home Wi-Fi and is ready for LAN authentication,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已确认设备执行,The gateway has confirmed that the device performs,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已添加,Gateway has been added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关在线,Gateway online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关正在连接家庭 Wi-Fi,Gateway is connecting to home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关正在扫描 Wi-Fi…,The gateway is scanning for Wi-Fi…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关正在扫描周边 2.4 GHz Wi-Fi,The gateway is scanning for surrounding 2.4 GHz Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网络设置,Network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-网络设置已保存,Network settings saved,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-未绑定：没有发现与 BLE 安全身份完全一致的已认证网关,Unbound: No authenticated gateway found that exactly matches the BLE security identity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未绑定设备,Unbound device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未测试,Not tested,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未发现,not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未发现 YaoCore 网关，请确认网关与手机在同一局域网,"YaoCore gateway not found, please confirm that the gateway and mobile phone are in the same LAN",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未发现设备,Device not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未发现网关,Gateway not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未发现网关，请确认开发板处于配网模式,"No gateway found, please confirm that the development board is in network distribution mode",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未分区,unpartitioned,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未检查,Not checked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未解锁,Not unlocked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未连接,Not connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未能在安全会话内确认网关身份，已停止配网,"Unable to confirm gateway identity within secure session, network provisioning has stopped",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未配置控制密钥,No control key configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未扫描到 Wi-Fi，可继续手动输入隐藏 SSID,"Wi-Fi is not scanned, you can continue to enter the hidden SSID manually",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未设置,not set,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-未刷新,Not refreshed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未添加设备,No devices added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未同步,Not synced,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未找到场景,Scene not found,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未找到要删除的设备,The device to be removed was not found,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-温度已更新,Temperature has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-温湿度,Temperature and humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-温湿度传感器,Temperature and humidity sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-我,me,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-我的,Me,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-我的场景,my scene,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-无可用设备,No device available,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-物理传感器上报,Physical sensor reporting,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-系统未能启动蓝牙扫描，请确认蓝牙已开启且附近设备权限已允许,The system failed to start Bluetooth scanning. Please confirm that Bluetooth is turned on and the permissions of nearby devices are allowed.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-先添加网关,Add gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-先添加网关，再扫描设备。,"Add the gateway first, then scan the device.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-相关场景已自动更新,Related scenes have been automatically updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-响应,response,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-项目 ID,Project ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-新建,New,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-新建场景,Create new scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-修改连接设置,Modify connection settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-需要授予蓝牙访问权限才能配置网关,Bluetooth access needs to be granted to configure the gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-需要授予蓝牙访问权限才能扫描家庭 Wi-Fi,Bluetooth access needs to be granted to scan home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-玄关,Entrance,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-选择,Choose,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-选择网关扫描到的 2.4 GHz Wi-Fi（也可继续手动输入隐藏 SSID）,Select the 2.4 GHz Wi-Fi scanned by the gateway (you can also continue to enter the hidden SSID manually),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-颜色,Color,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-一键开启常用场景,Open common scenes with one click,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-一句话说明（可选）,One sentence description (optional),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-移除,Remove,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已绑定地址,Address bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已绑定网关未发现,The bound gateway was not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已保存待绑定离线占位；通过网关发现并绑定真实设备后才可使用,The offline placeholder has been saved to be bound; it can only be used after discovering and binding the real device through the gateway.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已点亮,lit,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已关闭,Closed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已开启,Already turned on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已连接,Connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已配置,configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已取消蓝牙配网，可随时重新开始,Bluetooth configuration has been canceled and can be restarted at any time,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已删除设备,Device removed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已上锁,locked,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已刷新,Refreshed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已添加,Added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已选,Selected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已选择,Selected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-隐私与安全,Privacy and security,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-应用,App,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-用户名,Username,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-用户名或密码不正确,Incorrect username or password,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-用户名至少 2 位,Username must be at least 2 characters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-用户配置的设备状态组合,User-configured device status combinations,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-优先使用家庭网络,Prioritize home network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-有门禁开启,There is a door open,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-有门禁已开启,A door is open,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-远程连接,Remote Connection,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-远程连接设置已保存,Remote connection settings saved,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-远程连接未设置,Remote connection not set up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-远程连接已设置,Remote connection is set up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-远程连接正常,Remote connection is normal,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云,cloud,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-云端,Cloud,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云端 Endpoint 必须使用 HTTPS,Cloud Endpoint must use HTTPS,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云端可用,Cloud available,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云端控制请求失败，请检查网络与 IoTDA 配置,"Cloud control request failed, please check network and IoTDA configuration",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-云端已接收命令，等待设备影子确认,The cloud has received the command and is waiting for confirmation from the device shadow.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-允许直接连接网关,Allow direct connection to gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-在通知栏查看设备状态,Check the device status in the notification bar,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-在通知栏快速查看家中设备,Quickly check your home devices in the notification bar,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-在线,online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-在线设备,online device,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂不解锁,Not unlocked yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂未添加设备,No devices yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂无环境数据,No environmental data yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂无可用动作,No actions available yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂无可执行场景,There is currently no execution scenario,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-暂无推荐场景,No recommended scenes yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-找到网关并完成绑定,Find the gateway and complete the binding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-这是待绑定离线占位，请先通过网关发现并绑定真实设备,This is an offline placeholder to be bound. Please discover and bind the real device through the gateway first.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-真实局域网传输未启用,Real LAN transport is not enabled,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在安全配网,Safely distributing the network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在查找设备,Looking for device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在查找网关,Looking for gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在查找网关…,Looking for gateway…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在打开 YaoCore,Opening YaoCore,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在读取网关安全身份,Reading gateway security identity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在加密发送 Wi-Fi 凭据,Sending Wi-Fi credentials encrypted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在建立 Security1 加密会话,Establishing Security1 encrypted session,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在进入…,Entering…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在连接网关,Connecting to gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在请求蓝牙权限并搜索网关,Requesting Bluetooth permission and searching for gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-正在扫描设备,Scanning device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在扫描网关,Scanning for gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在识别安全配网服务,Identifying secure distribution network service,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在刷新…,Refreshing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在搜索 YaoCore-GW 网关（约 8 秒）,Searching for YaoCore-GW gateway (about 8 seconds),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在搜索…,Searching…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-知道了,Got it,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-执行,execute,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-执行中,Executing,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-只读设备,read-only device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-指定地址暂不可达，正在安全扫描并仅匹配 BLE 已确认身份,The specified address is currently unreachable and is being scanned for security and only matches BLE confirmed identities.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-至少 16 位控制密钥,At least 16-bit control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-至少输入 16 位,Enter at least 16 digits,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-制冷,Refrigeration,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-制热,heating,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-智能灯光,Smart lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-智能开关,Smart switch,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-智能空调,Smart air conditioner,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-智能门禁,Smart access control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-重新查找网关,Find the gateway again,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-状态未知,Status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-状态已同步,Status synchronized,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-准备安全配网,Prepare safe distribution network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-准备让网关扫描家庭 Wi-Fi,Prepare your gateway to scan your home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-自定义,Customize,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-自定义场景,Custom scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-自动,automatic,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-最近反馈,Recent feedback,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-开始使用,Get Started,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-欢迎使用爻构,Welcome to YaoCore,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-本地控制、自动化与远程连接,"Local control, automation, and remote access",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-准备网关,Prepare the Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-保存控制密钥,Save the Control Key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-打开设备页，先保存网关固件对应的控制密钥。,Open Devices and save the control key configured in the gateway firmware.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥用于配网后的网关认证,The control key authenticates the gateway after setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-输入 PoP 完成 BLE 配网,Enter the PoP to Complete BLE Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-搜索网关，选择 2.4 GHz Wi-Fi，并输入开发板屏幕上的 PoP。,"Find the gateway, choose a 2.4 GHz Wi-Fi network, and enter the PoP shown on the board.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-成功后自动认证并绑定，无需再次查找,The app authenticates and binds it automatically,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备与自动化,Devices & Automation,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-添加设备并同步真实状态,Add Devices and Sync Real State,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-扫描设备并创建本地自动化；配置云端后可在家庭网络外控制。,Discover devices and create local automations. Configure cloud access for control away from home.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-传感器触发后，设备最终状态会同步到手机,Final device state is synchronized after a sensor trigger,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-爻联万物，构筑智慧。,"Connecting Things, Building Intelligence.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-简体中文,Simplified Chinese,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-跳过,Skip,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-上一步,Back,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-英文,English,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-跟随系统地区,Follow System Region,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-下一步,Next,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-语言,Language,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-传感器可以直接触发网关自动化，手机会同步显示所有真实设备状态。,"Sensors can trigger gateway automations directly, while the app stays synchronized with every real device state.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-局域网优先，离线时自动化仍可执行,Local-first automation keeps working without the Internet,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-场景与远程控制,Scenes & Remote Control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-随时掌握家庭状态,Stay informed wherever you are,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-创建场景、查看执行确认；配置云端后，也可在家庭网络外安全控制设备。,Create scenes and verify execution. Add a cloud connection to securely control devices away from home.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-现在可以开始添加你的网关,You are ready to add your gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-选择应用语言,Choose App Language,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-中国大陆、台湾、香港和澳门默认使用简体中文，其他地区默认使用英文。,"Mainland China, Taiwan, Hong Kong, and Macao use Simplified Chinese by default. All other regions use English.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-根据系统地区自动选择,Select automatically from the system region,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-始终使用简体中文,Always use Simplified Chinese,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-始终使用英文,Always use English,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-通用,Generic,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关配网,Gateway Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-未添加网关,No Gateway Added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-点击添加或恢复网关,Tap to add or restore a gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-云端安全连接,Secure cloud connection,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-设备在线,Devices Online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-当前网关,Current Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-点击管理,Tap to manage,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-收起管理,Hide management,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关标识,Gateway ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-确认删除网关,Remove Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-是否确认删除网关？,Remove this gateway?,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-取消,Cancel,A 迁移,string.json,common_cancel,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-仍要删除,Remove Anyway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在删除网关绑定…,Removing gateway binding…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关删除失败，绑定信息未更改,Gateway removal failed. The binding was not changed.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已从本机删除,Gateway removed from this phone,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已删除,Gateway removed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关已删除，相关场景已自动更新,Gateway removed and related scenes updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-设备将从 App 移除，无法继续控制或查看状态,Devices will disappear from the App and can no longer be controlled or monitored,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-相关场景动作会被清理，远程控制将停止,Related scene actions will be removed and remote control will stop,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-本机保存的网关控制密钥会被清除,The locally saved gateway control key will be erased,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-网关 Wi-Fi、板载配置和实体设备不会恢复出厂,"Gateway Wi-Fi, onboard settings, and physical devices will not be factory-reset",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-重新使用时，需要再次保存控制密钥并绑定网关,"To use it again, save its control key and bind it again",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-通过云端连接,Connected through the cloud,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键
-请先保存控制密钥,Save the control key first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-控制密钥已保存,Control key saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-已保存,saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-恢复已联网网关,Restore an Online Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-换手机或自动绑定失败时使用,For a new phone or failed automatic binding,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-通过网关发现设备,Discover devices through the gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-刷新失败，请重试,Refresh failed. Please try again.,A 迁移,string.json,common_refresh_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查
-同步中…,Syncing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-处理中…,Working…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在检查连接…,Checking connection…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
-正在测试…,Testing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键
+旧中文,旧英文,分类,目标存储,目标键,审查结论,负责人,批次,备注,重译审查,复核标记
+ · 无人,· No one,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+ · 有人,· Someone,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+（旧场景，需编辑后重新保存）,"(Old scene, need to be edited and re-saved)",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+（网关已变更，需重新选择）,(The gateway has been changed and needs to be selected again),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+2.4 GHz Wi-Fi 名称（SSID）,2.4 GHz Wi-Fi Name (SSID),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+ACK request_id 不匹配,ACK request_id does not match,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+ACK seq 不匹配,ACK seq does not match,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+BLE 配网成功，正在通过局域网认证并关联同一网关,"BLE network configuration is successful, passing LAN authentication and associating with the same gateway",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+BLE 配网失败，请让网关重新进入配网模式后重试,"BLE network configuration failed, please let the gateway re-enter the network configuration mode and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+BLE 配网异常中断，请让网关重新进入配网模式后重试,The BLE distribution network was interrupted abnormally. Please let the gateway re-enter the network distribution mode and try again.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+BLE 入网完成，但安全身份无效，已拒绝扫描与绑定,"BLE network access is completed, but the security identity is invalid and scanning and binding have been refused.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Gree/格力,Gree/Gree,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包,NOT_APPLICABLE,NONE
+Haier/海尔,Haier/Haier,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包,NOT_APPLICABLE,NONE
+HTTPS 地址,HTTPS address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 命令与本次设备状态回传已确认,The IoTDA command and this device status return have been confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 命令与设备影子状态已确认,IoTDA commands and device shadow status confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 已返回状态，正在校验状态时间与命令结果,IoTDA has returned status and is verifying status time and command results.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 已接收命令，但未取得不早于本次下发时间的设备影子确认,"IoTDA has received the command, but has not obtained device shadow confirmation no earlier than this issuance time.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 已接收命令，等待设备影子确认,IoTDA has received the command and is waiting for confirmation from the device shadow,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 影子连接正常，暂无已上报属性,IoTDA shadow connection is normal and no attributes have been reported yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+IoTDA 影子响应格式无法解析,IoTDA shadow response format cannot be parsed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Midea/美的,Midea/美的,D 排除,,,EXCLUDED (brand data),LEGACY-001,none,品牌名作为数据显示，不进入资源包,NOT_APPLICABLE,NONE
+UDP 广播,UDP broadcast,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Wi-Fi 密码（开放网络可留空）,Wi-Fi password (can be left blank for open networks),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Wi-Fi 密码不能超过 64 个 UTF-8 字节,Wi-Fi password cannot exceed 64 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Wi-Fi 名称必须为 1 至 32 个 UTF-8 字节,Wi-Fi name must be 1 to 32 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Wi-Fi 认证失败，请检查密码,"Wi-Fi authentication failed, please check password",A 迁移,rawfile/i18n,provisioning.error.auth_error,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+YaoCore ESP32-S3M 网关,YaoCore ESP32-S3M Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+YaoCore 最近同步快照,YaoCore latest sync snapshot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+安防摄像头,security camera,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+把第一台设备带回家,Bring your first device home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+版本,version,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档,NOT_APPLICABLE,RECHECK_REQUIRED
+版本 1.1.0,Version 1.1.0,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档,NOT_APPLICABLE,RECHECK_REQUIRED
+保存并检查连接,Save and check the connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存场景,save scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存待绑定离线占位,Save offline placeholder to be bound,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存密钥,save key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存密钥并继续,Save the key and continue,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存失败，请重试,"Save failed, please try again",A 迁移,string.json,common_save_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+保存网络设置,Save network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存修改,Save changes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保护已开启,Protection is on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机安全档案保存失败,Failed to save local security file,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+本机安全组件不可用，请稍后重试,"Native security component is unavailable, please try again later",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机档案已解锁,Local file is unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+本机解锁状态保存失败,Failed to save local unlock status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机使用档案,local usage file,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+本机使用档案锁定失败,Failed to use file lock on this machine,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+本机使用档案已创建并解锁,Local usage profile created and unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机使用档案已解锁,Local usage profile has been unlocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机使用档案已锁定,The local usage file is locked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+本机已有使用档案，请直接解锁,"This machine already has a usage file, please unlock it directly.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+编辑,Edit,A 迁移,string.json,common_edit,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+编辑场景,Edit scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+部分门禁离线或状态未知,Some access controls are offline or their status is unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+操作失败，请重试,"Operation failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+测试设备控制,Test equipment control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+查看,View,A 迁移,string.json,common_view,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+查看通知效果,View notification effects,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+常用控制,Quick Controls,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+场景,Scenes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+场景名称,scene name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+场景已删除,Scene deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+成功,success,A 迁移,string.json,common_success,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+除湿,Dehumidification,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+传感器,sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+传感器仅显示状态,Sensors only show status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建本机档案,Create local file,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+创建本机使用档案,Create local usage profile,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建并解锁,Create and unlock,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建待绑定占位,Create a placeholder to be bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建后即可一键开启。,"Once created, it can be opened with one click.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建离线占位,Create an offline placeholder,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+待绑定 · 离线占位,To be bound ·Offline occupancy,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+待连接,To be connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+当前没有设备状态；执行时不会下发命令。,There is currently no device status; no command will be issued during execution.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+当前无人,There is currently no one,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+档案已创建，但解锁状态未保存，请重新解锁,"The file has been created, but the unlock status has not been saved. Please unlock it again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+灯光,lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+灯光不支持该控制动作,The light does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+灯光已更新,Lighting has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+灯光状态未知,Light status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+灯已关闭,light is off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+等待绑定,Waiting for binding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+第 1 步,Step 1,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+第 1 步 · 绑定控制密钥,Step 1 · Bind Control Key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+第 1 步：先保存开发板的控制密钥,Step 1: First save the control key of the development board,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+第 2 步,Step 2,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+点击本机解锁,Click to unlock this machine,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+点击新建添加场景,Click New to add a scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+点亮失败,Failed to light up,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+动作,action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+端口,port,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+盾,shield,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+发送配置并连接,Send & Connect,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+发现并校验网关,Discover and verify gateways,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+发现空网关，可继续绑定,"If an empty gateway is found, binding can continue.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+防止他人未经允许控制你的设备,Prevent others from taking control of your device without your permission,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+房间,room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+访问令牌,access token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+服务 ID,Service ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+服务地址,Service address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+该档案仅保存在本机，不是云端账号，不提供家庭成员身份或设备控制授权。,"The file is only saved locally, not a cloud account, and does not provide family member identity or device control authorization.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译,B_REWRITE_REQUIRED,NONE
+该开关动作不接受额外参数,This switch action does not accept additional parameters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+该设备不是兼容的 YaoCore 配网网关,This device is not a compatible YaoCore distribution gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+该设备当前只支持状态读取,The device currently only supports status reading,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+该设备是待绑定离线占位，请先通过网关发现并绑定真实设备,This device is an offline placeholder to be bound. Please discover and bind the real device through the gateway first.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+该设备属于另一网关，请重新发现并绑定后再控制,This device belongs to another gateway. Please rediscover and bind it before controlling it.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+格力,Gree,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+跟着下面 3 步，很快就能使用,Follow the 3 steps below and you’ll be ready to use it in no time.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关闭,close,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关闭/上锁,Close/Lock,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关闭灯光和空调，门禁复位,"Turn off lights and air conditioning, reset access control",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关闭非必要设备并开启节能空调策略,Turn off non-essential equipment and turn on energy-saving air conditioning strategies,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关灯,Turn off the lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关机/关闭,Shut down/turn off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+关于 YaoCore,About YaoCore,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档,NOT_APPLICABLE,RECHECK_REQUIRED
+还没有动作。,No action yet.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+还没有家庭设备,No home device yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+海尔,Haier,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+华为云 IoTDA 鉴权与设备影子连接正常,Huawei Cloud IoTDA authentication and device shadow connection are normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+欢迎回家,welcome home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+环境传感器,environmental sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+环境偏冷,The environment is cold,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+环境偏热,The environment is hot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+环境舒适,Comfortable environment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+环境与空调,Environment and air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+换个关键词试试。,Try changing the keywords.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+回家模式,home mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+加密网络,encrypted network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+家,home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+家庭 Wi-Fi（ESP32-S3 仅支持 2.4 GHz）,Home Wi-Fi (ESP32-S3 only supports 2.4 GHz),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+家庭连接,family connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+家庭网关,home gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+家庭状态,Home Status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+检测到开发协议模拟器，拒绝其控制响应,"Development protocol emulator detected, rejecting its control response",C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；DEV-ONLY/SC-11 安全文案：T-17/T-18 必须复核，禁止仅凭关键词删除；对应 errors.app.dev_simulator_rejected / GATEWAY_PROFILE_BLOCKED,NOT_APPLICABLE,SAFETY_RECHECK_REQUIRED
+检测到开发协议模拟器，正式版禁止将其绑定为真实网关,"The development protocol simulator is detected, and the official version prohibits binding it as a real gateway.",C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；DEV-ONLY/SC-11 安全文案：T-17/T-18 必须复核，禁止仅凭关键词删除；对应 errors.app.dev_simulator_rejected / GATEWAY_PROFILE_BLOCKED,NOT_APPLICABLE,SAFETY_RECHECK_REQUIRED
+检测到有人,Someone is detected,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+检查连接,Check connection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+降低灯光亮度并设置舒适温度,Reduce light brightness and set comfort temperature,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+节能,Energy saving,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+节能模式,Energy saving mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+解锁本机档案,Unlock local files,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（files/machine file），B 类重译,B_REWRITE_REQUIRED,NONE
+解锁本机使用档案,Unlock local usage profile,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+仅用于本机名称显示,Only used for local name display,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+仅用于在本机显示使用者名称；不是云端账号，不提供家庭成员授权，也不限制设备控制。,"It is only used to display the user name locally; it is not a cloud account, does not provide family member authorization, and does not limit device control.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+仅在自动连接失败时修改,Modify only if autoconnect fails,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+旧版本机档案使用不安全的可逆存储，已失效并清除，请重新创建。,The old version of the machine file uses insecure reversible storage and has expired and been cleared. Please create it again.,C 废弃,,,DEPRECATED (heuristic),LEGACY-001,none,旧版/关于/模拟器启发式；T-17/T-18 复核后删除，仅存档,NOT_APPLICABLE,RECHECK_REQUIRED
+局域网,LAN,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+局域网控制出现未知错误,An unknown error occurred in LAN control,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+局域网控制请求失败,LAN control request failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+局域网设备,LAN equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+局域网指令与设备回传状态已确认,LAN command and device return status confirmed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开灯,Turn on the light,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开发者,Developer,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开放网络,open network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开关,switch,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开机/打开,Power on/open,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开门,open the door,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开门、亮灯并打开空调,"Open the door, turn on the lights and turn on the air conditioner",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开启,turn on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开启通知,Turn on notifications,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开始配网,Start configuring network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开始设置,Start setting up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开始设置你的家,Set Up Your Home,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开始添加,Start adding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+可在外出时查看和控制设备,View and control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+客厅,living room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+客厅灯光,living room lighting,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调,Air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调不支持该控制动作,The air conditioner does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调离线，状态未知,The air conditioner is offline and the status is unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调模式,Air conditioning mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调模式仅支持自动、制冷、制热、除湿、送风、节能或睡眠,"Air conditioning mode only supports automatic, cooling, heating, dehumidification, air supply, energy saving or sleep",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调已更新,Air conditioning has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调已关闭,Air conditioner is off,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+空调状态未知,Air conditioner status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制保护,control protection,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制保护未开启,Control protection is not enabled,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制保护已开启,Control protection is on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥,control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥保存失败，请重试,"Failed to save control key, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥已安全保存。第 2 步：搜索附近网关,The control key is kept securely. Step 2: Search for nearby gateways,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥至少需要 16 位,Control key requires at least 16 bits,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制失败，请检查设备连接,"Control failed, please check device connection",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+快照来源：App 最后同步缓存,Snapshot source: App last synchronized cache,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+蓝牙权限未授予，请在系统设置中允许 YaoCore 使用附近设备,"Bluetooth permission is not granted, please allow YaoCore to use nearby devices in the system settings",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+蓝牙数据长度协商失败，当前连接无法完整传输配网数据,"Bluetooth data length negotiation failed, and the current connection cannot completely transmit the distribution network data.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+蓝牙数据长度协商失败，当前连接无法完整传输扫描结果,"Bluetooth data length negotiation failed, and the current connection cannot fully transmit the scan results.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+蓝牙通信超时，请靠近网关后重试,"Bluetooth communication timed out, please get close to the gateway and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+离家模式,away from home mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+离线,Offline,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+离线 · 状态未知,Offline · Status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+离线，状态未知,"Offline, status unknown",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+例如 192.168.1.10,For example 192.168.1.10,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接方式,Connection method,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接家庭网络,Connect to your home network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接失败,Connection failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接失败，请检查填写的信息,"Connection failed, please check the filled in information",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接失败，请检查网关和家庭网络,"Connection failed, please check gateway and home network",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接网关超时，请靠近开发板后重试,"The connection to the gateway timed out, please get close to the development board and try again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+连接信息,connection information,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+亮度,brightness,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+亮度必须是 0 到 100 的数字,Brightness must be a number from 0 to 100,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+亮度已更新,Brightness updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+亮度与空调,Brightness and air conditioning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+邻居表,neighbor list,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+没有可留空,None to leave blank,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+没有匹配的设备,No matching device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+没有找到？创建离线占位,Not found? Create an offline placeholder,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+没有找到网关，请检查家庭网络,"Gateway not found, please check your home network",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+美的,Midea,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先安全绑定家庭网关，再启用远程控制,Securely bind a home gateway before enabling remote control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端配置尚未关联当前网关，请在远程连接页重新保存,Cloud settings are not linked to the current gateway. Save them again on the Remote Connection page,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端配置属于另一网关，已阻止跨家庭控制,Cloud settings belong to another gateway; cross-home control was blocked,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+Security1 握手失败，请核对 PoP 并保持手机靠近网关,Security1 handshake failed. Verify the PoP and keep the phone close to the gateway,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门禁,access control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门禁不支持该控制动作,The access control does not support this control action,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门禁未绑定,Access control is not bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门禁状态不完整,Access control status is incomplete,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门已打开,door is open,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门已关闭,door closed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+门状态未知,Door status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+密码（至少 8 位）,Password (minimum 8 characters),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+密码至少 8 位,Password must be at least 8 characters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+模式未知,Mode unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+模式已更新,Mode updated,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+目标,target,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+目标设备不存在或已被删除,The target device does not exist or has been deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+目标温度,target temperature,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+目标温度必须是 16 到 30 的数字,Target temperature must be a number between 16 and 30,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+目标响应了 HTTP，但不是有效的 YaoCore 网关,The target responded to HTTP but is not a valid YaoCore gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+配网码校验失败，请检查网关 PoP,"Network configuration code verification failed, please check the gateway PoP",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+偏冷,Cold,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+偏热,Hot,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+品牌（可选）,Brand (optional),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+企业网络,Enterprise network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+前往设备页,Go to device page,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+前往设备页查找并连接网关,Go to the device page to find and connect to the gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+前往设备页控制,Go to device page control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+前往设备页连接,Go to the device page to connect,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+前往设备页添加设备。,Go to the Devices page to add a device.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+清空,Clear,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请补全连接信息,Please complete the connection information,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入 2.4 GHz Wi-Fi 名称,Please enter a 2.4 GHz Wi-Fi name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入场景名称,Please enter scene name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入访问令牌,Please enter access token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入设备名称,Please enter device name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入网关配网码（PoP）,Please enter the gateway distribution code (PoP),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请搜索正在配网的 YaoCore 网关,Please search for the YaoCore gateway being configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请添加一个动作,Please add an action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请填写 IoTDA Endpoint、Project ID 和 Device ID,"Please fill in IoTDA Endpoint, Project ID and Device ID",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请填写服务提供方给出的信息,Please fill in the information given by the service provider,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请填写有效的 IAM X-Auth-Token,Please fill in a valid IAM X-Auth-Token,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先创建本机使用档案,Please create a local usage profile first,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先打开手机蓝牙,Please turn on your phone’s Bluetooth first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先发现并绑定设备,Please discover and bind the device first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先配置与网关一致的命令密钥，再验证网关身份,"Please configure the command key consistent with the gateway first, and then verify the gateway identity.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先配置至少 16 位命令密钥,Please configure at least a 16-digit command key first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先输入网关配网码（PoP），再扫描家庭 Wi-Fi,"Please enter the gateway distribution code (PoP) first, and then scan the home Wi-Fi",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先添加设备。,Please add the device first.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先添加网关,Please add gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先选择一个网关,Please select a gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先允许应用发送通知,Please allow the app to send notifications first,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先在“我的 > 安全配置”保存与网关一致的至少 16 位命令密钥,"Please first save at least a 16-digit command key consistent with the gateway in ""My > Security Configuration""",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先在“我的 > 安全配置”保存至少 16 位命令密钥,"Please save at least a 16-digit command key in ""My > Security Configuration"" first",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先在当前配网卡片保存与开发板一致的控制密钥,Please first save the control key consistent with the development board in the current distribution network card.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请选择设备,Please select a device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请在系统设置中允许通知,Please allow notifications in system settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+全部门禁上锁,All doors locked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+全部门禁已上锁,All doors are locked,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+全部设备,All equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+让家庭控制更简单,Make home control easier,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+让手机连上家里的 Wi-Fi,Connect your phone to your home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+让网关进入配网模式（首次启动自动进入，或长按 BOOT 5 秒），然后搜索附近网关。,"Let the gateway enter the network configuration mode (automatically enter it when it is first started, or press and hold BOOT for 5 seconds), and then search for nearby gateways.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+人体存在传感器,human presence sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描并选择家中的设备,Scan and select devices in your home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描家庭 Wi-Fi,Scan home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描设备,Scan Devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描失败，可尝试手动添加,"Scan failed, you can try to add it manually",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描失败，请重试,"Scan failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描网关,Scan gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描中,Scanning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+删除,Delete,A 迁移,string.json,common_delete,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+删除失败,Delete failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+删除入口仅解除本机绑定，不会恢复开发板出厂设置,Removal only unbinds this phone; it does not factory-reset the gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+上锁,Locked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+尚未绑定局域网网关,The LAN gateway has not been bound yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+尚未绑定控制网关，未下发控制指令,The control gateway has not been bound and no control instructions have been issued.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+尚未建立真实控制链路,No real control link has been established yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+尚未连接,Not connected yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+尚未配置网关控制密钥，请先到“我的 > 安全配置”保存与网关一致的密钥,"The gateway control key has not been configured yet. Please go to ""My > Security Configuration"" to save the key consistent with the gateway.",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备,Devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备当前离线，未下发控制指令,The device is currently offline and no control instructions have been issued.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备返回执行失败,The device returns execution failure,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备控制正常,Device control is normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备离线,Device offline,A 迁移,rawfile/i18n,errors.gateway.device_offline,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+设备离线，状态未知,"Device offline, status unknown",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备名称,Device name,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备一目了然,All your devices at a glance,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备已删除,Device deleted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备已同步,Device synced,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备影子读取失败，请检查网络或鉴权,"Device shadow reading failed, please check the network or authentication",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备正在执行上一条指令，请稍候,"The device is executing the previous command, please wait.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备主动反馈,Active feedback from equipment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备状态通知,Device status notification,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备状态通知已开启,Device status notifications are on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备状态已刷新,Device status refreshed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置后可在外出时控制设备,Set up to control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置控制密钥,Set control key,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置亮度,Set brightness,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置模式,Setup mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置温度,Set temperature,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设置远程控制,Set up remote control,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+摄像头,camera,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+失败,failed,A 迁移,string.json,common_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+湿度,Humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+湿度偏低,Humidity is low,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+湿度偏高,Humidity is high,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+湿度适中,Moderate humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+实例 ID,Instance ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+适用系统,Applicable system,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+室内环境,indoor environment,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+室温,room temperature,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+收起,close,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+收起连接设置,Collapse connection settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+收起网络设置,Collapse network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+手动录入不会让设备立即可控；保存后保持离线，需由已绑定网关发现同一真实设备后再绑定。,"Manual entry will not make the device controllable immediately; it will remain offline after saving, and the same real device needs to be discovered by the bound gateway before binding again.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+手机局域网控制确认,Mobile LAN control confirmation,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+手机蓝牙配网,Bluetooth Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+手机蓝牙未开启，请打开蓝牙后重试,The Bluetooth of your phone is not turned on. Please turn on Bluetooth and try again.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+手机云端控制确认,Mobile cloud control confirmation,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+首次使用时，通过蓝牙把 2.4 GHz Wi-Fi 安全发送给网关,"On first use, securely sends 2.4 GHz Wi-Fi to the gateway via Bluetooth",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+首页,Home,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+受限网段扫描,Restricted network segment scanning,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+舒适,Comfortable,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+输入开发板固件配置中的控制密钥。该密钥只保存在手机安全存储中，用于认证真实网关。,Enter the control key from the board firmware configuration. This key is only stored in the phone\'s secure storage and is used to authenticate the real gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+刷新,Refresh,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+刷新状态,refresh status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+双重身份校验通过，正在验证板载 LED 并保存绑定,"Double identity verification passed, onboard LED is being verified and binding saved",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+睡眠,sleep,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+睡眠模式,sleep mode,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+送风,Supply air,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+搜索附近网关,Find Nearby Gateways,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+搜索设备或房间,Search for a device or room,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+锁定本机档案,Lock local files,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（files/machine file），B 类重译,B_REWRITE_REQUIRED,NONE
+态,state,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加,add,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加动作,Add action,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加设备,Add device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加网关,Add gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加网关后即可扫描,Scan after adding gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+通知仅展示 App 最后一次同步快照，不代表后台持续监控；打开 App 并同步后才会更新。,The notification only displays the last synchronized snapshot of the App and does not represent continuous monitoring in the background; it will be updated after the App is opened and synchronized.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+通知已发送,Notification sent,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步,sync,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步成功,Synchronization successful,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步设备,Sync devices,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步失败,Sync failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步失败，请检查远程连接,"Synchronization failed, please check the remote connection",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+同步失败，请重试,"Synchronization failed, please try again",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+推荐,Recommended,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+外出时也能控制设备,Control your device while on the go,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关 ACK 不是有效 JSON,Gateway ACK is not valid JSON,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关 ACK 与期望设备状态不一致，正在回读,"Gateway ACK is inconsistent with expected device status, reading back",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关地址,Gateway address,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关发现响应身份校验失败，未绑定该地址,The gateway found that the response identity verification failed and the address was not bound.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关返回了空 ACK,Gateway returned empty ACK,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关拒绝或执行指令失败,The gateway rejected or failed to execute the command,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关拒绝了 Wi-Fi 配置,Gateway rejected Wi-Fi configuration,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关控制响应身份校验失败,Gateway control response identity verification failed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关连接正常,Gateway connection is normal,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关配网码（PoP）,Gateway distribution code (PoP),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关配网 · 两步完成,Gateway setup · two steps,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+步骤一：保存控制密钥,Step 1: Save the control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+用于配网后的局域网认证和设备控制，不是 PoP。,Used for LAN authentication and device control after setup; this is not the PoP.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+步骤二：输入 PoP 完成 BLE 配网,Step 2: Enter the PoP to complete BLE setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+PoP 只用于本次 Security1 握手，当前固件的 PoP 显示在开发板屏幕上。,The PoP is used only for this Security1 handshake and is shown on the development board display.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先完成步骤一，才能搜索和配置网关,Complete step 1 before searching for and configuring a gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥已安全保存,Control key securely saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+密钥不会显示或通过 BLE 发送，仅用于配网后的网关认证。,The key is never displayed or sent over BLE; it is used only for gateway authentication after setup.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+更换控制密钥,Change control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+输入新的控制密钥并保存，或取消更换,"Enter and save a new control key, or cancel the change.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+输入开发板固件配置中的控制密钥。它不是 PoP；只保存在手机安全存储中，用于认证真实网关。,Enter the control key configured in the board firmware. It is not the PoP and is stored only in secure phone storage to authenticate the physical gateway.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+取消更换,Cancel change,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存新的控制密钥,Save new control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥保持不变，可继续步骤二,The control key is unchanged; continue to step 2.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+PoP · BLE 配网码,PoP · BLE setup code,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请输入开发板屏幕显示的 PoP；它只用于 Security1 握手，不是控制密钥。,Enter the PoP shown on the board display. It is used only for the Security1 handshake and is not the control key.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+输入屏幕上的 PoP（区分大小写）,Enter the on-screen PoP (case-sensitive),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已完成,Completed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+待完成,Pending,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关配网码必须为 8 至 64 个 UTF-8 字节,The gateway configuration code must be 8 to 64 UTF-8 bytes,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关扫描 Wi-Fi 失败，请检查配网码并让网关重新进入配网模式,The gateway failed to scan Wi-Fi. Please check the configuration code and let the gateway re-enter the configuration mode.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关设备 ID,Gateway device ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关未连接,Gateway not connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关未能确认 Wi-Fi 连接状态,Gateway failed to confirm Wi-Fi connection status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关未启用 ESP-IDF Security1，无法安全配网,ESP-IDF Security1 is not enabled on the gateway and the network cannot be configured securely.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关未找到该 Wi-Fi，请确认使用 2.4 GHz 网络,"The Wi-Fi was not found by the gateway, please confirm that you are using a 2.4 GHz network",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关验证通过，但本地路由安全保存失败，未绑定,"The gateway verification passed, but the local route failed to be safely saved and was not bound.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已接收，正在读取设备状态,Gateway has received and is reading device status,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已接收命令，但设备状态未在时限内确认,"The gateway received the command, but the device status was not confirmed within the time limit",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已连接,Gateway is connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已连接家庭 Wi-Fi，准备进行局域网身份认证,The gateway is connected to home Wi-Fi and is ready for LAN authentication,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已确认设备执行,The gateway has confirmed that the device performs,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已添加,Gateway has been added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关在线,Gateway online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关正在连接家庭 Wi-Fi,Gateway is connecting to home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关正在扫描 Wi-Fi…,The gateway is scanning for Wi-Fi…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关正在扫描周边 2.4 GHz Wi-Fi,The gateway is scanning for surrounding 2.4 GHz Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网络设置,Network settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网络设置已保存,Network settings saved,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未绑定：没有发现与 BLE 安全身份完全一致的已认证网关,Unbound: No authenticated gateway found that exactly matches the BLE security identity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未绑定设备,Unbound device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未测试,Not tested,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未发现,not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未发现 YaoCore 网关，请确认网关与手机在同一局域网,"YaoCore gateway not found, please confirm that the gateway and mobile phone are in the same LAN",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未发现设备,Device not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未发现网关,Gateway not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未发现网关，请确认开发板处于配网模式,"No gateway found, please confirm that the development board is in network distribution mode",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未分区,unpartitioned,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未检查,Not checked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未解锁,Not unlocked,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未连接,Not connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未能在安全会话内确认网关身份，已停止配网,"Unable to confirm gateway identity within secure session, network provisioning has stopped",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未配置控制密钥,No control key configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未扫描到 Wi-Fi，可继续手动输入隐藏 SSID,"Wi-Fi is not scanned, you can continue to enter the hidden SSID manually",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未设置,not set,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未刷新,Not refreshed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未添加设备,No devices added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未同步,Not synced,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未找到场景,Scene not found,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未找到要删除的设备,The device to be removed was not found,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+温度已更新,Temperature has been updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+温湿度,Temperature and humidity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+温湿度传感器,Temperature and humidity sensor,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+我,me,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+我的,Me,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+我的场景,my scene,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+无可用设备,No device available,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+物理传感器上报,Physical sensor reporting,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+系统未能启动蓝牙扫描，请确认蓝牙已开启且附近设备权限已允许,The system failed to start Bluetooth scanning. Please confirm that Bluetooth is turned on and the permissions of nearby devices are allowed.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+先添加网关,Add gateway first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+先添加网关，再扫描设备。,"Add the gateway first, then scan the device.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+相关场景已自动更新,Related scenes have been automatically updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+响应,response,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+项目 ID,Project ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+新建,New,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+新建场景,Create new scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+修改连接设置,Modify connection settings,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+需要授予蓝牙访问权限才能配置网关,Bluetooth access needs to be granted to configure the gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+需要授予蓝牙访问权限才能扫描家庭 Wi-Fi,Bluetooth access needs to be granted to scan home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+玄关,Entrance,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+选择,Choose,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+选择网关扫描到的 2.4 GHz Wi-Fi（也可继续手动输入隐藏 SSID）,Select the 2.4 GHz Wi-Fi scanned by the gateway (you can also continue to enter the hidden SSID manually),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+颜色,Color,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+一键开启常用场景,Open common scenes with one click,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+一句话说明（可选）,One sentence description (optional),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+移除,Remove,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已绑定地址,Address bound,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已绑定网关未发现,The bound gateway was not found,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已保存待绑定离线占位；通过网关发现并绑定真实设备后才可使用,The offline placeholder has been saved to be bound; it can only be used after discovering and binding the real device through the gateway.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已点亮,lit,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已关闭,Closed,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已开启,Already turned on,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已连接,Connected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已配置,configured,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已取消蓝牙配网，可随时重新开始,Bluetooth configuration has been canceled and can be restarted at any time,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已删除设备,Device removed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已上锁,locked,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已刷新,Refreshed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已添加,Added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已选,Selected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已选择,Selected,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+隐私与安全,Privacy and security,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+应用,App,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+用户名,Username,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+用户名或密码不正确,Incorrect username or password,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+用户名至少 2 位,Username must be at least 2 characters,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+用户配置的设备状态组合,User-configured device status combinations,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+优先使用家庭网络,Prioritize home network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+有门禁开启,There is a door open,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+有门禁已开启,A door is open,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+远程连接,Remote Connection,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+远程连接设置已保存,Remote connection settings saved,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+远程连接未设置,Remote connection not set up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+远程连接已设置,Remote connection is set up,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+远程连接正常,Remote connection is normal,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云,cloud,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端,Cloud,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端 Endpoint 必须使用 HTTPS,Cloud Endpoint must use HTTPS,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端可用,Cloud available,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端控制请求失败，请检查网络与 IoTDA 配置,"Cloud control request failed, please check network and IoTDA configuration",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端已接收命令，等待设备影子确认,The cloud has received the command and is waiting for confirmation from the device shadow.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+允许直接连接网关,Allow direct connection to gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+在通知栏查看设备状态,Check the device status in the notification bar,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+在通知栏快速查看家中设备,Quickly check your home devices in the notification bar,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+在线,online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+在线设备,online device,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂不解锁,Not unlocked yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂未添加设备,No devices yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂无环境数据,No environmental data yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂无可用动作,No actions available yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂无可执行场景,There is currently no execution scenario,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+暂无推荐场景,No recommended scenes yet,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+找到网关并完成绑定,Find the gateway and complete the binding,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+这是待绑定离线占位，请先通过网关发现并绑定真实设备,This is an offline placeholder to be bound. Please discover and bind the real device through the gateway first.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+真实局域网传输未启用,Real LAN transport is not enabled,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在安全配网,Safely distributing the network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在查找设备,Looking for device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在查找网关,Looking for gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在查找网关…,Looking for gateway…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在打开 YaoCore,Opening YaoCore,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在读取网关安全身份,Reading gateway security identity,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在加密发送 Wi-Fi 凭据,Sending Wi-Fi credentials encrypted,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在建立 Security1 加密会话,Establishing Security1 encrypted session,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在进入…,Entering…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在连接网关,Connecting to gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在请求蓝牙权限并搜索网关,Requesting Bluetooth permission and searching for gateway,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在扫描设备,Scanning device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在扫描网关,Scanning for gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在识别安全配网服务,Identifying secure distribution network service,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在刷新…,Refreshing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在搜索 YaoCore-GW 网关（约 8 秒）,Searching for YaoCore-GW gateway (about 8 seconds),A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在搜索…,Searching…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+知道了,Got it,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+执行,execute,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+执行中,Executing,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+只读设备,read-only device,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+指定地址暂不可达，正在安全扫描并仅匹配 BLE 已确认身份,The specified address is currently unreachable and is being scanned for security and only matches BLE confirmed identities.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+至少 16 位控制密钥,At least 16-bit control key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+至少输入 16 位,Enter at least 16 digits,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+制冷,Refrigeration,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+制热,heating,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+智能灯光,Smart lights,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+智能开关,Smart switch,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+智能空调,Smart air conditioner,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+智能门禁,Smart access control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+重新查找网关,Find the gateway again,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+状态未知,Status unknown,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+状态已同步,Status synchronized,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+准备安全配网,Prepare safe distribution network,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+准备让网关扫描家庭 Wi-Fi,Prepare your gateway to scan your home Wi-Fi,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+自定义,Customize,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+自定义场景,Custom scene,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+自动,automatic,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+最近反馈,Recent feedback,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+开始使用,Get Started,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+欢迎使用爻构,Welcome to YaoCore,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本地控制、自动化与远程连接,"Local control, automation, and remote access",A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+准备网关,Prepare the Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+保存控制密钥,Save the Control Key,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+打开设备页，先保存网关固件对应的控制密钥。,Open Devices and save the control key configured in the gateway firmware.,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥用于配网后的网关认证,The control key authenticates the gateway after setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+输入 PoP 完成 BLE 配网,Enter the PoP to Complete BLE Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+搜索网关，选择 2.4 GHz Wi-Fi，并输入开发板屏幕上的 PoP。,"Find the gateway, choose a 2.4 GHz Wi-Fi network, and enter the PoP shown on the board.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+成功后自动认证并绑定，无需再次查找,The app authenticates and binds it automatically,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备与自动化,Devices & Automation,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+添加设备并同步真实状态,Add Devices and Sync Real State,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+扫描设备并创建本地自动化；配置云端后可在家庭网络外控制。,Discover devices and create local automations. Configure cloud access for control away from home.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+传感器触发后，设备最终状态会同步到手机,Final device state is synchronized after a sensor trigger,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+爻联万物，构筑智慧。,"Connecting Things, Building Intelligence.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+简体中文,Simplified Chinese,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+跳过,Skip,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+上一步,Back,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+英文,English,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+跟随系统地区,Follow System Region,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+下一步,Next,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+语言,Language,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+传感器可以直接触发网关自动化，手机会同步显示所有真实设备状态。,"Sensors can trigger gateway automations directly, while the app stays synchronized with every real device state.",A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+局域网优先，离线时自动化仍可执行,Local-first automation keeps working without the Internet,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+场景与远程控制,Scenes & Remote Control,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+随时掌握家庭状态,Stay informed wherever you are,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+创建场景、查看执行确认；配置云端后，也可在家庭网络外安全控制设备。,Create scenes and verify execution. Add a cloud connection to securely control devices away from home.,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+现在可以开始添加你的网关,You are ready to add your gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+选择应用语言,Choose App Language,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+中国大陆、台湾、香港和澳门默认使用简体中文，其他地区默认使用英文。,"Mainland China, Taiwan, Hong Kong, and Macao use Simplified Chinese by default. All other regions use English.",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+根据系统地区自动选择,Select automatically from the system region,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+始终使用简体中文,Always use Simplified Chinese,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+始终使用英文,Always use English,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+通用,Generic,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关配网,Gateway Setup,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+未添加网关,No Gateway Added,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+点击添加或恢复网关,Tap to add or restore a gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+云端安全连接,Secure cloud connection,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备在线,Devices Online,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+当前网关,Current Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+点击管理,Tap to manage,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+收起管理,Hide management,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关标识,Gateway ID,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+确认删除网关,Remove Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+是否确认删除网关？,Remove this gateway?,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+取消,Cancel,A 迁移,string.json,common_cancel,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+仍要删除,Remove Anyway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在删除网关绑定…,Removing gateway binding…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关删除失败，绑定信息未更改,Gateway removal failed. The binding was not changed.,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已从本机删除,Gateway removed from this phone,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已删除,Gateway removed,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关已删除，相关场景已自动更新,Gateway removed and related scenes updated,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+设备将从 App 移除，无法继续控制或查看状态,Devices will disappear from the App and can no longer be controlled or monitored,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+相关场景动作会被清理，远程控制将停止,Related scene actions will be removed and remote control will stop,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+本机保存的网关控制密钥会被清除,The locally saved gateway control key will be erased,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+网关 Wi-Fi、板载配置和实体设备不会恢复出厂,"Gateway Wi-Fi, onboard settings, and physical devices will not be factory-reset",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+重新使用时，需要再次保存控制密钥并绑定网关,"To use it again, save its control key and bind it again",A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+通过云端连接,Connected through the cloud,A 迁移,string.json,,PENDING_REVIEW,T-18,T-18,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+请先保存控制密钥,Save the control key first,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+控制密钥已保存,Control key saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+已保存,saved,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+恢复已联网网关,Restore an Online Gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+换手机或自动绑定失败时使用,For a new phone or failed automatic binding,A 迁移,rawfile/i18n,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+通过网关发现设备,Discover devices through the gateway,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+刷新失败，请重试,Refresh failed. Please try again.,A 迁移,string.json,common_refresh_failed,ACCEPTED,T-10,T-10,语义化键已落地；英文按术语表审查,B_REVIEWED_ACCEPTED,NONE
+同步中…,Syncing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+处理中…,Working…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在检查连接…,Checking connection…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE
+正在测试…,Testing…,A 迁移,string.json,,PENDING_REVIEW,T-17,T-17,待 T-17/T-18 按页面/组件抽取语义化键,B_PENDING,NONE

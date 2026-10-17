@@ -1,0 +1,12 @@
+CHK-01 PASS (0 findings)
+CHK-02 PASS (0 findings)
+CHK-03 PASS (0 findings)
+CHK-04 PASS (0 findings)
+CHK-05 PASS (0 findings)
+CHK-06 PASS (0 findings)
+CHK-07 PASS (2 findings)
+  - warning: entry/src/main/ets/pages/Index.ets:19 hardcoded short English UI text (T-17/T-18 migration)
+  - warning: entry/src/main/ets/pages/Index.ets:32 hardcoded short English UI text (T-17/T-18 migration)
+CHK-08 PASS (0 findings)
+CHK-09 PASS (0 findings)
+summary: blockingFailures=0 warnings=2 missingKeys=0 hardcoded=2

@@ -16,7 +16,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { ErrorCatalog } from '../../main/ets/common/types/AppError.ets';
+import { AppErrors, ErrorCatalog } from '../../main/ets/common/types/AppError.ets';
 import { NameValue } from '../../main/ets/common/types/NameValue.ets';
 import { StorageConstants } from '../../main/ets/common/constants/StorageConstants.ets';
 import { DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets';
@@ -331,7 +331,16 @@ test('T10_C14_keyBuilders', () => {
   assert.equal(I18nKeys.acMode('COOL', true).key, 'ac.mode.cool');
   assert.equal(I18nKeys.acMode('TURBO', false).key, 'ac.mode.unknown');
   assert.equal(I18nKeys.provisioningError('PROVISIONING_POP_INVALID'), 'provisioning.error.pop_invalid');
+  // Special codes must use the single ErrorCatalog mapping, not a copied table.
+  assert.equal(I18nKeys.provisioningError('PROVISIONING_SECRET_DRAFT_EXPIRED'),
+    'provisioning.error.credential_missing');
+  assert.equal(I18nKeys.provisioningError('PROVISIONING_WIFI_AUTH_ERROR'), 'provisioning.error.auth_error');
+  assert.equal(I18nKeys.provisioningError('PROVISIONING_WIFI_NETWORK_NOT_FOUND'),
+    'provisioning.error.network_not_found');
   assert.equal(I18nKeys.cloudError('CLOUD_TOKEN_EXPIRED'), 'errors.cloud.token_expired');
+  assert.equal(I18nKeys.cloudError('CLOUD_COMPLETION_TIMEOUT'), 'cloud.command.accepted_not_confirmed');
+  assert.equal(I18nKeys.cloudError('CLOUD_COMPLETION_UNSUPPORTED'), 'cloud.completion.unsupported');
+  assert.equal(I18nKeys.cloudError('CLOUD_INVENTORY_UNSUPPORTED'), 'cloud.completion.unsupported');
   assert.equal(I18nKeys.memberRole(MemberRole.ADMIN), 'member.role.admin');
   assert.equal(I18nKeys.memberStatus(MemberStatus.INVITED), 'member.status.invited');
   assert.equal(I18nKeys.inviteMode(InviteMode.CODE_KEK), 'invite.mode.code_kek');
@@ -353,38 +362,19 @@ test('T10_C14_errorMapper', () => {
   assert.equal(ErrorI18nMapper.acModeKey('ECO', true).key, 'ac.mode.eco');
   assert.equal(ErrorI18nMapper.securityProfileKey(TransportProfile.P_TLS_PIN).key,
     'gateway.security.tls_pinned');
-});
 
-const CATALOG_CODES = [
-  'ACK_CORRELATION_MISMATCH', 'ACK_PROTOCOL_VIOLATION', 'ACK_STATE_MISMATCH', 'ASSET_NOT_FOUND',
-  'AUTH_PROFILE_NOT_FOUND', 'AUTH_RBAC_DENIED', 'CLOUD_ENDPOINT_INVALID', 'CLOUD_INVENTORY_UNSUPPORTED',
-  'CLOUD_SHADOW_INVALID', 'CONFIGURATION_ERROR', 'CRYPTO_INVALID_KEY', 'CRYPTO_OPERATION_FAILED',
-  'CRYPTO_STREAM_BROKEN', 'CRYPTO_TAG_MISMATCH', 'CRYPTO_UNAVAILABLE', 'DEVICE_DISMISSED',
-  'DEVICE_NAME_INVALID', 'DEVICE_NOT_FOUND', 'DISCOVERY_INVALID_RESPONSE', 'GATEWAY_ID_MISMATCH',
-  'GATEWAY_NOT_BOUND', 'GATEWAY_PROFILE_BLOCKED', 'INTERNAL_ERROR', 'INVITE_EXPIRED', 'INVITE_INVALID',
-  'INVITE_JOIN_REQUEST_INVALID', 'INVITE_MAX_USES', 'INVITE_RECEIPT_INVALID', 'INVITE_REVOKED',
-  'PROTOCOL_BODY_TOO_LARGE', 'PROTOCOL_DUPLICATE_KEY', 'PROTOCOL_INVALID_IDENTIFIER',
-  'PROTOCOL_INVALID_JSON', 'PROTOCOL_INVALID_TIMESTAMP', 'PROTOCOL_INVALID_TYPE',
-  'PROTOCOL_MISSING_FIELD', 'PROTOCOL_UNSUPPORTED_VERSION', 'PROTOCOL_VALUE_OUT_OF_RANGE',
-  'PROVISIONING_CREDENTIAL_MISSING', 'PROVISIONING_IDENTITY_INVALID', 'PROVISIONING_SECRET_DRAFT_EXPIRED',
-  'RESPONSE_AUTH_FAILED', 'RESPONSE_CORRELATION_MISMATCH', 'ROOM_DELETE_NOT_CONFIRMED',
-  'ROOM_NAME_INVALID', 'ROOM_NOT_FOUND', 'SCENE_CANCELLED', 'SCENE_DISABLED', 'SCENE_EMPTY',
-  'SCENE_NAME_INVALID', 'SCENE_NOT_FOUND', 'SCENE_PREFLIGHT_FAILED', 'SCENE_REFERENCE_INVALID',
-  'SCENE_RUN_IN_PROGRESS', 'SCENE_STEP_FAILED', 'SECRET_ALIAS_INVALID', 'SECRET_DESTROYED',
-  'SECRET_ENCODING_INVALID', 'SIGNATURE_INVALID', 'STORAGE_MIGRATION_FAILED', 'STORAGE_NOT_INITIALIZED',
-  'STORAGE_PREFERENCES_ERROR', 'STORAGE_RDB_ERROR', 'TLS_PIN_CONFIG_INVALID', 'TLS_PROFILE_INCONSISTENT',
-  'CLOUD_COMPLETION_TIMEOUT', 'CLOUD_COMPLETION_UNSUPPORTED', 'CLOUD_TOKEN_EXPIRED', 'CLOUD_TOKEN_INVALID',
-  'CLOUD_RATE_LIMITED', 'CLOUD_REQUEST_FAILED', 'CLOUD_RESPONSE_INVALID', 'CLOUD_SEQUENCE_UNAVAILABLE',
-  'CLOUD_SERVICE_UNAVAILABLE', 'NONCE_REUSED', 'TIMESTAMP_OUT_OF_WINDOW', 'LOCAL_REQUEST_FAILED',
-  'DEV_SIMULATOR_REJECTED', 'GATEWAY_UNREACHABLE', 'GATEWAY_TIMEOUT', 'DISCOVERY_NO_CANDIDATES',
-  'DISCOVERY_TRANSPORT_UNAVAILABLE', 'PROVISIONING_AUTH_ERROR', 'PROVISIONING_BLUETOOTH_OFF',
-  'PROVISIONING_BOARD_LED_UNCONFIRMED', 'PROVISIONING_BINDING_PROBE_FAILED', 'PROVISIONING_CANCELLED',
-  'PROVISIONING_CONNECT_FAILED', 'PROVISIONING_DEVICE_NOT_FOUND', 'PROVISIONING_DONE_REJECTED',
-  'PROVISIONING_GATT_BUSY', 'PROVISIONING_POP_INVALID', 'PROVISIONING_SECURITY_HANDSHAKE_FAILED',
-  'PROVISIONING_WIFI_AUTH_ERROR', 'PROVISIONING_WIFI_NETWORK_NOT_FOUND', 'PROVISIONING_WIFI_SCAN_FAILED',
-  'PROVISIONING_WIFI_TIMEOUT', 'I18N_LOCALE_UNSUPPORTED', 'I18N_PLATFORM_LOCALE_FAILED',
-  'I18N_RESOURCE_LOAD_FAILED',
-];
+  const http = ErrorI18nMapper.appKey(AppErrors.of('HTTP_503'));
+  assert.equal(http.key, 'errors.app.http_error');
+  assert.deepEqual(http.params.map((item) => item.value), ['503']);
+  assert.equal(I18nKeys.appError('HTTP_503'), http.key);
+
+  for (const code of ['DEVICE_DISABLED', 'DEVICE_UNASSIGNED', 'ASSET_UNAVAILABLE',
+    'ASSET_ACCESS_DENIED', 'ASSET_IO_FAILED']) {
+    const mapped = ErrorI18nMapper.appKey(AppErrors.of(code));
+    assert.equal(mapped.key, I18nKeys.appError(code), `mapper/key mismatch for ${code}`);
+    assert.equal(mapped.params.length, 0, `${code} must not require parameters`);
+  }
+});
 
 function flatten(node, prefix = '', out = {}) {
   for (const [key, value] of Object.entries(node)) {
@@ -399,20 +389,74 @@ function flatten(node, prefix = '', out = {}) {
 }
 
 const normalizePlural = (key) => key.replace(/_(one|other)$/, '');
+const DES_A_PATH = path.join(REPO_ROOT, 'artifacts/40-detailed-design/des-001a-foundation-transport.md');
+const DES_B_PATH = path.join(REPO_ROOT, 'artifacts/40-detailed-design/des-001b-domain-presentation.md');
+const DYNAMIC_REACHABLE_CODES = Object.freeze([
+  'DEVICE_DISABLED', 'DEVICE_UNASSIGNED', 'ASSET_UNAVAILABLE', 'ASSET_ACCESS_DENIED', 'ASSET_IO_FAILED',
+]);
 
-test('T10_C14_productionResources_parityAndEveryCatalogKeyExists', () => {
+/** Parses the authoritative App-error tables from the DES artifacts. */
+function parseDeclaredCodes(file, startHeading, endHeading) {
+  const text = fs.readFileSync(file, 'utf8');
+  const start = text.indexOf(startHeading);
+  const end = text.indexOf(endHeading, start + startHeading.length);
+  assert.ok(start >= 0, `missing heading ${startHeading} in ${file}`);
+  assert.ok(end > start, `missing end heading ${endHeading} in ${file}`);
+  const section = text.slice(start, end);
+  const row = /^\|\s*[^|]+\|\s*`([^`]+)`\s*\|.*?\|\s*`([^`]+)`[^|]*\|\s*$/gm;
+  const entries = [];
+  let match;
+  while ((match = row.exec(section)) !== null) {
+    entries.push({ code: match[1], key: match[2] });
+  }
+  return entries;
+}
+
+/** All AppErrors.<helper>('CODE') literals in product source (static reachability). */
+function staticProductErrorCodes() {
+  const root = path.join(REPO_ROOT, 'entry/src/main/ets');
+  const codes = new Set();
+  const visit = (directory) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const target = path.join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(target);
+      } else if (entry.name.endsWith('.ets')) {
+        const text = fs.readFileSync(target, 'utf8');
+        const pattern = /AppErrors\.\w+\(\s*'([A-Z][A-Z0-9_]*)'/g;
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          codes.add(match[1]);
+        }
+      }
+    }
+  };
+  if (fs.existsSync(root)) {
+    visit(root);
+  }
+  return codes;
+}
+
+function productionService(systemLocale) {
+  const loader = new FakeI18nLoader();
+  loader.put(I18nBundleCodec.parse(SupportedLocale.ZH_CN,
+    fs.readFileSync(path.join(RAW_DIR, 'zh-CN.json'), 'utf8')));
+  loader.put(I18nBundleCodec.parse(SupportedLocale.EN_US,
+    fs.readFileSync(path.join(RAW_DIR, 'en-US.json'), 'utf8')));
+  const applier = new FakeLocaleApplier();
+  applier.systemLocale = systemLocale;
+  const service = new I18nService(loader, applier, new InMemoryI18nPreferences(), new RecordingLogger());
+  return { service, applier };
+}
+
+test('T10_C14_productionResources_parity', () => {
   const zh = flatten(JSON.parse(fs.readFileSync(path.join(RAW_DIR, 'zh-CN.json'), 'utf8')));
   const en = flatten(JSON.parse(fs.readFileSync(path.join(RAW_DIR, 'en-US.json'), 'utf8')));
   const zhNorm = new Set(Object.keys(zh).map(normalizePlural));
   const enNorm = new Set(Object.keys(en).map(normalizePlural));
   assert.deepEqual([...zhNorm].filter((key) => !enNorm.has(key)), []);
   assert.deepEqual([...enNorm].filter((key) => !zhNorm.has(key)), []);
-  assert.ok(zhNorm.size >= 180, `expected a substantive rawfile key set, got ${zhNorm.size}`);
-  for (const code of CATALOG_CODES) {
-    const key = ErrorCatalog.resolve(code).i18nKey;
-    assert.ok(zhNorm.has(key), `missing rawfile key for ${code}: ${key}`);
-    assert.ok(enNorm.has(key), `missing en-US rawfile key for ${code}: ${key}`);
-  }
+  assert.ok(zhNorm.size >= 212, `expected the full rawfile key set, got ${zhNorm.size}`);
   assert.ok(zhNorm.has(I18nKeys.appError('SCENE_RUN_IN_PROGRESS')));
   assert.ok(zhNorm.has('errors.app.scene_run_in_progress'));
 
@@ -422,6 +466,71 @@ test('T10_C14_productionResources_parityAndEveryCatalogKeyExists', () => {
   const enKeys = enStrings.string.map((entry) => entry.name).sort();
   assert.deepEqual(baseKeys, enKeys);
   assert.ok(baseKeys.length >= 25);
+});
+
+test('T10_C14_authoritativeCatalog_everyDeclaredCodeHasBothLocaleKeys', () => {
+  const desA = parseDeclaredCodes(DES_A_PATH, '#### 3.2.3', '#### 3.2.4');
+  const desB = parseDeclaredCodes(DES_B_PATH, '### 23.4', '### 23.5');
+  assert.equal(desA.length, 96, 'DES-A §3.2.3 rows (95 codes + HTTP_<status>)');
+  assert.equal(desB.length, 36, 'DES-B §23.4 rows');
+
+  const zhKeys = new Set(Object.keys(flatten(
+    JSON.parse(fs.readFileSync(path.join(RAW_DIR, 'zh-CN.json'), 'utf8')))));
+  const enKeys = new Set(Object.keys(flatten(
+    JSON.parse(fs.readFileSync(path.join(RAW_DIR, 'en-US.json'), 'utf8')))));
+  const declaredCodes = new Set();
+
+  for (const entry of [...desA, ...desB]) {
+    const probe = entry.code.startsWith('HTTP_') ? 'HTTP_500' : entry.code;
+    const catalogKey = ErrorCatalog.resolve(probe).i18nKey;
+    if (entry.code === 'SCENE_RUN_IN_PROGRESS') {
+      // DES-B §6.2 contract key; ErrorCatalog keeps the App-namespace compatibility key.
+      assert.equal(I18nKeys.appError(entry.code), entry.key);
+      assert.equal(catalogKey, 'errors.app.scene_run_in_progress');
+      assert.ok(zhKeys.has(catalogKey) && enKeys.has(catalogKey), 'missing compatibility key');
+    } else {
+      assert.equal(catalogKey, entry.key, `ErrorCatalog mapping drifted for ${entry.code}`);
+    }
+    assert.ok(zhKeys.has(entry.key), `missing zh-CN rawfile key for ${entry.code}: ${entry.key}`);
+    assert.ok(enKeys.has(entry.key), `missing en-US rawfile key for ${entry.code}: ${entry.key}`);
+    if (!entry.code.startsWith('HTTP_')) {
+      declaredCodes.add(entry.code);
+    }
+  }
+
+  // Dynamic code paths (DeviceCommandRunner.reject / AssetStoreSecretStore.mapError)
+  // cannot be found by a static literal scan; keep them explicit and declared.
+  for (const code of DYNAMIC_REACHABLE_CODES) {
+    assert.ok(declaredCodes.has(code), `dynamic code ${code} is absent from the authoritative tables`);
+    const key = ErrorCatalog.resolve(code).i18nKey;
+    assert.ok(zhKeys.has(key), `missing zh-CN key for dynamic code ${code}: ${key}`);
+    assert.ok(enKeys.has(key), `missing en-US key for dynamic code ${code}: ${key}`);
+  }
+
+  // Guard against new static product codes escaping the authoritative tables.
+  for (const code of staticProductErrorCodes()) {
+    assert.ok(declaredCodes.has(code), `static product code ${code} is absent from DES-A/DES-B`);
+  }
+});
+
+test('T10_C14_reachableDynamicErrorCodes_renderBothLocales', async () => {
+  const { service } = productionService('en-GB');
+  const initialized = await service.initialize();
+  assert.equal(initialized.loaded, true);
+  for (const code of DYNAMIC_REACHABLE_CODES) {
+    const key = I18nKeys.appError(code);
+    assert.equal(ErrorI18nMapper.appKey(AppErrors.of(code)).key, key);
+    assert.notEqual(service.t(key), key, `en-US renders the raw key for ${code}`);
+  }
+  assert.equal(service.t('errors.app.device_disabled'),
+    'This device is disabled and cannot be controlled.');
+
+  await service.setLocaleMode(LocaleMode.ZH_CN);
+  for (const code of DYNAMIC_REACHABLE_CODES) {
+    const key = I18nKeys.appError(code);
+    assert.notEqual(service.t(key), key, `zh-CN renders the raw key for ${code}`);
+  }
+  assert.equal(service.t('errors.app.device_disabled'), '该设备已停用，无法控制。');
 });
 
 test('T10_C14_checker_goodFixturePasses', () => {
@@ -463,13 +572,48 @@ test('T10_C14_checker_badFixtureBlocksEveryDesignedCheck', () => {
     }
     assert.equal(statuses['CHK-05'], 'PASS', 'CHK-05 is warning-only');
     assert.ok(parsed.summary.blockingFailures >= 8);
+    const chk04 = parsed.checks.find((check) => check.id === 'CHK-04');
+    assert.ok(chk04.findings.some((item) => item.key === 'bad_placeholder'),
+      'CHK-04 must validate string.json placeholders');
+    assert.ok(chk04.findings.some((item) => item.key === 'bad_brace'),
+      'CHK-04 must validate string.json braces');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('T10_C14_checker_rejectsMalformedAllowlistAndMissingInputsWithExitTwo', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'yaocore-i18n-tool-'));
+  try {
+    const report = path.join(tmp, 'report.json');
+    const allowlist = path.join(tmp, 'allowlist.json');
+    fs.writeFileSync(allowlist, JSON.stringify({
+      keyPrefixes: [{ prefix: '', reason: '' }],
+    }));
+    const malformed = spawnSync('python3', [
+      CHECKER,
+      '--root', path.join(REPO_ROOT, 'entry/src/test/i18n/fixtures/good'),
+      '--report', report,
+      '--allowlist', allowlist,
+      '--strict-ui',
+    ], { encoding: 'utf8' });
+    assert.equal(malformed.status, 2, malformed.stdout + malformed.stderr);
+
+    const missing = spawnSync('python3', [
+      CHECKER,
+      '--root', path.join(tmp, 'missing-root'),
+      '--report', report,
+      '--allowlist', path.join(tmp, 'absent-allowlist.json'),
+      '--strict-ui',
+    ], { encoding: 'utf8' });
+    assert.equal(missing.status, 2, missing.stdout + missing.stderr);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
 test('T10_C14_baseBundleFailure_stillServesCurrentLocaleAndReturnsKeyForBaseOnly', async () => {
-  const { service, loader } = makeService({ systemLocale: 'en-GB' });
+  const { service, loader, logger } = makeService({ systemLocale: 'en-GB' });
   loader.fail(SupportedLocale.ZH_CN);
   const result = await service.initialize();
   assert.equal(result.loaded, true);
@@ -477,16 +621,33 @@ test('T10_C14_baseBundleFailure_stillServesCurrentLocaleAndReturnsKeyForBaseOnly
   assert.equal(result.error.code, 'I18N_RESOURCE_LOAD_FAILED');
   assert.equal(service.t('common.ok'), 'OK');
   assert.equal(service.t('only.base'), 'only.base');
+  assert.ok(logger.warnMessages.includes('I18N_RESOURCE_LOAD_FAILED'));
+});
+
+test('T10_C14_currentBundleFailure_fallsBackToBaseLocaleWithoutApplyingFailedLocale', async () => {
+  const { service, loader, applier, logger } = makeService({ systemLocale: 'en-GB' });
+  loader.fail(SupportedLocale.EN_US);
+  const result = await service.initialize();
+  assert.equal(result.loaded, false);
+  assert.equal(result.locale, SupportedLocale.ZH_CN);
+  assert.equal(service.getLocale(), SupportedLocale.ZH_CN);
+  assert.equal(service.getLocaleMode(), LocaleMode.AUTO);
+  assert.equal(service.t('common.ok'), '确定');
+  assert.deepEqual(applier.applied, [SupportedLocale.ZH_CN]);
+  assert.equal(applier.applied.includes(SupportedLocale.EN_US), false);
+  assert.ok(logger.warnMessages.includes('I18N_RESOURCE_LOAD_FAILED'));
 });
 
 test('T10_C14_bothBundlesMissing_returnsLoadedFalseAndKeys', async () => {
-  const { service, loader } = makeService({ systemLocale: 'en-GB' });
+  const { service, loader, applier } = makeService({ systemLocale: 'en-GB' });
   loader.fail(SupportedLocale.ZH_CN);
   loader.fail(SupportedLocale.EN_US);
   const result = await service.initialize();
   assert.equal(result.loaded, false);
+  assert.equal(result.locale, SupportedLocale.ZH_CN);
   assert.ok(result.error);
   assert.equal(service.t('common.ok'), 'common.ok');
+  assert.deepEqual(applier.applied, [SupportedLocale.ZH_CN]);
 });
 
 test('T10_C14_preferencesReadFailure_stillInitializes', async () => {
