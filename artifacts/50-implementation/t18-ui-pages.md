@@ -26,6 +26,7 @@
 | 设计系统文件 | 3 | `common/theme/{AppTheme,AppEnums,ShellTheme}.ets` |
 | 新增 i18n 资源键 | 326（净增） | zh-CN 543 / en-US 545（含 2 个英文 plural variant） |
 | 新增 host 测试 | 16 | `entry/src/test/host/UiPages.test.mjs`（总 672/672） |
+| 设备编译骨架 | 1 | `entry/src/ohosTest/ets/test/ui/UiPagesDevice.test.ets`（COMPILED_ONLY，BLOCKED） |
 
 ### 1.2 C-24 设计系统
 
@@ -153,7 +154,7 @@ TOTAL 59
 | 3 | `codelinter -c code-linter.json5 -p default .` | exit 0；**Errors 0 / Warns 25 / Suggestions 0**（均为自定义组件性能建议） | `entry/src/test/evidence/t18-codelinter.log` |
 | 4 | `entry/src/test/run-host-tests.sh` | **672/672 PASS**，fail 0 / skipped 0（新增 T18 16 条） | `entry/src/test/evidence/t18-host-node-tests.tap` |
 | 5 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | exit 0；**blockingFailures=0 / missingKeys=0**；warnings=134（既有 C-16/C-20/Mock 与本次技术枚举字符串）；hardcoded=77 条 warning 均为技术状态/枚举，不是用户文案 | `entry/src/test/evidence/t18-i18n-checker.log` |
-| 6 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon`（附加） | **BUILD SUCCESSFUL in 11 s 70 ms**（仅编译，不代表设备执行） | `entry/src/test/evidence/t18-ohosTest-assemble.log` |
+| 6 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon`（附加） | **BUILD SUCCESSFUL**（仅编译，不代表设备执行）；新增 `ui/UiPagesDevice.test.ets` 把全部页面/组件纳入 ohosTest 编译图 | `entry/src/test/evidence/t18-ohosTest-assemble.log` |
 
 ### 4.1 Host 新增覆盖（16 条）
 

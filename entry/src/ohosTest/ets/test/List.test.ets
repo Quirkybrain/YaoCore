@@ -17,6 +17,7 @@ import gatewayTransportDeviceTest from './gateway/GatewayTransportDevice.test';
 import i18nDeviceTest from './i18n/I18nDevice.test';
 import securityDeviceTest from './security/SecurityDevice.test';
 import storageDeviceTest from './storage/StorageDevice.test';
+import uiPagesDeviceTest from './ui/UiPagesDevice.test';
 
 export default function testsuite() {
   baselineTest();
@@ -29,4 +30,5 @@ export default function testsuite() {
   authInviteDeviceTest();
   cloudDeviceTest();
   viewModelsDeviceTest();
+  uiPagesDeviceTest();
 }
