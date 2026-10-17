@@ -51,7 +51,7 @@ const listener = () => {
 test('C19_BleProvisioningService_happyPathV21', async () => {
   const ctx = makeService();
   const events = listener();
-  const request = createRequest({ device: makeDevice() });
+  const request = createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID });
   const result = await ctx.service.provision(request, events.listener);
   assert.equal(result.identity.version, IdentityVersion.V21);
   assert.equal(result.identity.gatewayId, GATEWAY_ID);
@@ -81,7 +81,7 @@ test('C19_BleProvisioningService_happyPathV21', async () => {
 
 test('C19_BleProvisioningService_v20FallbackUsesHmacProfile', async () => {
   const ctx = makeService({ gateway: new FakeGateway({ identityMode: 'v20' }) });
-  const request = createRequest({ device: makeDevice() });
+  const request = createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID });
   const result = await ctx.service.provision(request, listener().listener);
   assert.equal(result.identity.version, IdentityVersion.V20);
   assert.equal(result.identity.tls, undefined);
@@ -129,7 +129,8 @@ test('C19_BleProvisioningService_scanPermissionAndBluetoothFailClosed', async ()
 
 test('C19_BleProvisioningService_deviceSelection', async () => {
   const single = makeService({ devices: [makeDevice()] });
-  const result = await single.service.provision(createRequest(), listener().listener);
+  const result = await single.service.provision(
+    createRequest({ expectedGatewayId: GATEWAY_ID }), listener().listener);
   assert.equal(result.identity.gatewayId, GATEWAY_ID);
   assert.equal(single.transport.connectCalls, 1);
 
@@ -138,12 +139,14 @@ test('C19_BleProvisioningService_deviceSelection', async () => {
       makeDevice({ deviceId: 'AA:00:00:00:00:02' })],
     transportOptions: { scanFinishes: false },
   });
-  await expectCode(() => multiple.service.provision(createRequest(), listener().listener),
-    'PROVISIONING_MULTIPLE_DEVICES');
+  await expectCode(() => multiple.service.provision(
+    createRequest({ expectedGatewayId: GATEWAY_ID }), listener().listener),
+  'PROVISIONING_MULTIPLE_DEVICES');
 
   const none = makeService({ devices: [] });
-  await expectCode(() => none.service.provision(createRequest(), listener().listener),
-    'PROVISIONING_DEVICE_NOT_FOUND');
+  await expectCode(() => none.service.provision(
+    createRequest({ expectedGatewayId: GATEWAY_ID }), listener().listener),
+  'PROVISIONING_DEVICE_NOT_FOUND');
 });
 
 test('C19_BleProvisioningService_permissionAndBluetoothProvisionFailClosed', async () => {
@@ -151,12 +154,12 @@ test('C19_BleProvisioningService_permissionAndBluetoothProvisionFailClosed', asy
     transportOptions: { permissionError: new AppError('PROVISIONING_PERMISSION_DENIED',
       'PROVISIONING', 'x', false) },
   });
-  await expectCode(() => denied.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => denied.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_PERMISSION_DENIED');
   assert.equal(denied.service.state, ProvisioningState.FAILED);
 
   const off = makeService({ transportOptions: { bluetoothEnabled: false } });
-  await expectCode(() => off.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => off.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_BLUETOOTH_OFF');
 });
 
@@ -165,12 +168,12 @@ test('C19_BleProvisioningService_connectAndMtuFailuresCleanUp', async () => {
     transportOptions: { connectError: new AppError('PROVISIONING_CONNECT_FAILED',
       'PROVISIONING', 'x', true) },
   });
-  await expectCode(() => connect.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => connect.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_CONNECT_FAILED');
 
   const mtu = makeService({ connectionOptions: { mtu: 246 } });
   const events = listener();
-  await expectCode(() => mtu.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => mtu.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     events.listener), 'PROVISIONING_MTU_TOO_SMALL');
   assert.equal(mtu.service.state, ProvisioningState.FAILED);
   assert.equal(mtu.connection.disconnectCalls >= 1, true);
@@ -181,10 +184,10 @@ test('C19_BleProvisioningService_gattIncompleteFailures', async () => {
   const missing = makeService({ connectionOptions: { endpoints: [
     'proto-ver', 'prov-session', 'prov-config', 'prov-ctrl', 'yaocore-id',
   ] } });
-  await expectCode(() => missing.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => missing.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_GATT_INCOMPLETE');
   const readOnly = makeService({ connectionOptions: { readOnlyCharacteristic: true } });
-  await expectCode(() => readOnly.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => readOnly.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_GATT_INCOMPLETE');
 });
 
@@ -196,12 +199,12 @@ test('C19_BleProvisioningService_capabilityAndPopFailures', async () => {
       })),
     }),
   });
-  await expectCode(() => capability.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => capability.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_CAPABILITY_UNSUPPORTED');
 
   const pop = makeService({ gateway: new FakeGateway({ pop: 'device-pop' }) });
   const events = listener();
-  await expectCode(() => pop.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => pop.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     events.listener), 'PROVISIONING_POP_INVALID');
   assert.equal(pop.service.state, ProvisioningState.FAILED);
   assert.equal(pop.connection.disconnectCalls >= 1, true);
@@ -210,7 +213,7 @@ test('C19_BleProvisioningService_capabilityAndPopFailures', async () => {
 
 test('C19_BleProvisioningService_identityAndExpectedIdFailures', async () => {
   const invalid = makeService({ gateway: new FakeGateway({ identityMode: 'invalid' }) });
-  await expectCode(() => invalid.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => invalid.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_IDENTITY_INVALID');
   assert.deepEqual(invalid.gateway.identityRequests, ['2.1', '2.0']);
 
@@ -224,33 +227,33 @@ test('C19_BleProvisioningService_wifiAuthNetworkAndTimeoutClassification', async
   const auth = makeService({ gateway: new FakeGateway({
     statusSequence: [{ state: 'failed', reason: 'auth' }],
   }) });
-  await expectCode(() => auth.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => auth.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_WIFI_AUTH_ERROR');
   const network = makeService({ gateway: new FakeGateway({
     statusSequence: [{ state: 'failed', reason: 'network' }],
   }) });
-  await expectCode(() => network.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => network.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_WIFI_NETWORK_NOT_FOUND');
   const timeout = makeService({ gateway: new FakeGateway({
     statusSequence: [{ state: 'connecting' }],
   }) });
-  await expectCode(() => timeout.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => timeout.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_WIFI_TIMEOUT');
 });
 
 test('C19_BleProvisioningService_scanAndDoneFailures', async () => {
   const scan = makeService({ gateway: new FakeGateway({ scanPolls: 100000 }) });
-  await expectCode(() => scan.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => scan.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_WIFI_SCAN_FAILED');
   const done = makeService({ gateway: new FakeGateway({ doneBody: utf8('{"ok":false}') }) });
-  await expectCode(() => done.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => done.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_DONE_REJECTED');
 });
 
 test('C19_BleProvisioningService_cancelIsTerminalAndCleansUp', async () => {
   const ctx = makeService();
   const events = listener();
-  const promise = ctx.service.provision(createRequest({ device: makeDevice() }), events.listener);
+  const promise = ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }), events.listener);
   await ctx.service.cancel();
   await expectCode(() => promise, 'PROVISIONING_CANCELLED');
   assert.equal(ctx.service.state, ProvisioningState.CANCELLED);
@@ -266,24 +269,24 @@ test('C19_BleProvisioningService_preCancelledTokenRejectsBeforeConnect', async (
       throw new AppError('PROVISIONING_CANCELLED', 'PROVISIONING', 'x', true);
     },
   };
-  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener, cancellation), 'PROVISIONING_CANCELLED');
   assert.equal(ctx.transport.connectCalls, 0);
 });
 
 test('C19_BleProvisioningService_probeFailuresNeverBind', async () => {
   const mismatch = makeService({ gatewayClientOptions: { probeGatewayId: 'gateway_02' } });
-  await expectCode(() => mismatch.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => mismatch.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_BINDING_IDENTITY_MISMATCH');
   assert.equal(mismatch.gatewayClient.probeCalls, 1);
 
   const unreachable = makeService({ gatewayClientOptions: { failProbes: 5 } });
-  await expectCode(() => unreachable.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => unreachable.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_BINDING_PROBE_FAILED');
   assert.equal(unreachable.gatewayClient.probeCalls, 5);
 
   const led = makeService({ gatewayClientOptions: { boardLed: false } });
-  await expectCode(() => led.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => led.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_BOARD_LED_UNCONFIRMED');
   assert.equal(led.gatewayClient.probeCalls, 1);
 });
@@ -292,7 +295,7 @@ test('C19_BleProvisioningService_tlsPinMismatchNeverBinds', async () => {
   const ctx = makeService({
     gatewayClientOptions: { tlsPinMatchedOverride: 'b'.repeat(64) },
   });
-  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_BINDING_PROBE_FAILED');
   assert.equal(ctx.gatewayClient.probeCalls, 5);
 });
@@ -320,18 +323,113 @@ test('C19_BleProvisioningService_draftLifecycleOnSuccessAndFailure', async () =>
 
 test('C19_BleProvisioningService_missingExistingCredentialFailsClosed', async () => {
   const ctx = makeService({ credentialsSecretHex: '' });
-  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_CREDENTIAL_MISSING');
+});
+
+test('C19_BleProvisioningService_latestScanWinsWhenDeviceOmitted', async () => {
+  const deviceA = makeDevice({ deviceId: 'AA:00:00:00:00:01' });
+  const deviceB = makeDevice({ deviceId: 'AA:00:00:00:00:02' });
+  const ctx = makeService({ devices: [deviceA], transportOptions: { scanFinishes: false } });
+  const filter = new BleScanFilter(serviceUuid, 'YaoCore-GW-', 20);
+  const noopScan = {
+    onDeviceFound: () => {},
+    onScanFinished: () => {},
+    onScanError: () => {},
+  };
+  await ctx.service.startScan(filter, noopScan);
+  await ctx.service.stopScan();
+  ctx.transport.devices = [deviceB];
+  await ctx.service.startScan(filter, noopScan);
+  await ctx.service.stopScan();
+
+  const result = await ctx.service.provision(
+    createRequest({ expectedGatewayId: GATEWAY_ID }), listener().listener);
+  assert.equal(ctx.transport.connectCalls, 1);
+  assert.equal(ctx.transport.connectedDeviceId, 'AA:00:00:00:00:02',
+    'omitting request.device must connect the most recent scan, not the first');
+  assert.equal(result.identity.gatewayId, GATEWAY_ID);
+});
+
+test('C19_BleProvisioningService_emptyDraftRequiresExpectedGatewayId', async () => {
+  const missing = makeService();
+  await expectCode(() => missing.service.provision(
+    createRequest({ device: makeDevice() }), listener().listener), 'CONFIGURATION_ERROR');
+  assert.equal(missing.transport.connectCalls, 0);
+  assert.equal(missing.credentials.calls, 0);
+
+  // A draft identifies a new binding and does not require expectedGatewayId.
+  const draft = makeService();
+  const draftId = putDraft(draft.drafts, SECRET_HEX);
+  const result = await draft.service.provision(
+    createRequest({ device: makeDevice(), draftId }), listener().listener);
+  assert.equal(result.identity.gatewayId, GATEWAY_ID);
+});
+
+test('C19_BleProvisioningService_postProbeListenerFailureDestroysReissuedDraft', async () => {
+  const ctx = makeService();
+  const originalId = putDraft(ctx.drafts, SECRET_HEX);
+  const throwing = {
+    onStage: () => {},
+    onStateChanged: () => {},
+    onCompleted: () => {
+      throw new Error('listener boom');
+    },
+  };
+  await expectCode(() => ctx.service.provision(
+    createRequest({ device: makeDevice(), draftId: originalId }), throwing), 'INTERNAL_ERROR');
+  assert.equal(ctx.gatewayClient.probeCalls, 1);
+  assert.equal(ctx.drafts.size(), 0,
+    'the re-issued draft must not survive a post-probe listener failure (SC-06)');
+});
+
+test('C19_BleProvisioningService_listenerExceptionsDoNotLockRunning', async () => {
+  const ctx = makeService();
+  let stageThrew = false;
+  const stageListener = {
+    onStage: () => {
+      if (!stageThrew) {
+        stageThrew = true;
+        throw new Error('stage boom');
+      }
+    },
+    onStateChanged: () => {},
+    onError: () => {},
+  };
+  await expectCode(() => ctx.service.provision(
+    createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
+    stageListener), 'INTERNAL_ERROR');
+
+  let stateCalls = 0;
+  const stateListener = {
+    onStage: () => {},
+    onStateChanged: () => {
+      stateCalls++;
+      if (stateCalls === 1) {
+        throw new Error('state boom');
+      }
+    },
+    onError: () => {},
+  };
+  await expectCode(() => ctx.service.provision(
+    createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
+    stateListener), 'INTERNAL_ERROR');
+
+  const result = await ctx.service.provision(
+    createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
+    listener().listener);
+  assert.equal(result.identity.gatewayId, GATEWAY_ID,
+    'a throwing listener must not leave the service locked in running state');
 });
 
 test('C19_BleProvisioningService_retryUsesNewSessionAndKeypair', async () => {
   const gateway = new FakeGateway({ pop: 'wrong-pop' });
   const ctx = makeService({ gateway });
-  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice() }),
+  await expectCode(() => ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener), 'PROVISIONING_POP_INVALID');
   assert.equal(ctx.crypto.keyPairCalls, 1);
   gateway.pop = 'pop';
-  const result = await ctx.service.provision(createRequest({ device: makeDevice() }),
+  const result = await ctx.service.provision(createRequest({ device: makeDevice(), expectedGatewayId: GATEWAY_ID }),
     listener().listener);
   assert.equal(result.identity.gatewayId, GATEWAY_ID);
   assert.equal(ctx.crypto.keyPairCalls, 2);

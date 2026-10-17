@@ -299,8 +299,9 @@ export class IdentityNegotiator {
     if (value === undefined || value.kind !== JsonKind.STRING) {
       return undefined;
     }
-    const bytes = Utf8.encode(value.stringValue);
-    if (bytes.length < 1 || bytes.length > 63) {
+    // identity schema maxLength counts characters, not UTF-8 bytes: a legal
+    // 22-character Chinese name is 66 bytes and must be accepted (F-01).
+    if (value.stringValue.length < 1 || value.stringValue.length > 63) {
       return undefined;
     }
     return value.stringValue;

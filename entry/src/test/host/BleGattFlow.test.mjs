@@ -12,7 +12,11 @@ import { AppError } from '../../main/ets/common/types/AppError.ets';
 import { BleDescriptorRef } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
 import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
 import { GattRequestQueue } from '../../main/ets/service/ble/GattRequestQueue.ets';
+import { GattChannel } from '../../main/ets/service/ble/GattChannel.ets';
 import { ProtoVerParser } from '../../main/ets/service/ble/ProtoVerParser.ets';
+import {
+  Security1Session,
+} from '../../main/ets/service/ble/Security1Session.ets';
 import {
   ProvisioningEvent,
   ProvisioningStateMachine,
@@ -38,6 +42,7 @@ import {
   FakeGatewayClient,
   GATEWAY_ID,
   GATEWAY_NAME,
+  NodeCryptoPort,
   PIN,
   SECRET_HEX,
   fakeDelay,
@@ -159,6 +164,21 @@ test('C19_ProtoVerParser_acceptsTopLevelSecVerAndStringYaoCore', () => {
   assert.equal(ProtoVerParser.parse(utf8(payload)).yaoCoreVersion, '2.0');
 });
 
+test('C19_ProtoVerParser_missingProvVerAndShapeFailCapabilityGate', () => {
+  const cases = [
+    // missing prov.ver
+    JSON.stringify({ prov: { sec_ver: 1, cap: ['wifi_scan'] }, yaocore: '2.0' }),
+    // prov is an array, not an object
+    JSON.stringify({ prov: [], sec_ver: 1, yaocore: '2.0' }),
+    // missing sec_ver
+    JSON.stringify({ prov: { ver: 'v1.1', cap: ['wifi_scan'] }, yaocore: '2.0' }),
+  ];
+  for (const payload of cases) {
+    expectCodeSync(() => ProtoVerParser.parse(utf8(payload)),
+      'PROVISIONING_CAPABILITY_UNSUPPORTED');
+  }
+});
+
 test('C19_ProtoVerParser_downgradeAndMissingCapabilitiesFailClosed', () => {
   const cases = [
     JSON.stringify({ prov: { ver: 'v1.1', cap: ['wifi_scan'], no_sec: true }, sec_ver: 1, yaocore: '2.0' }),
@@ -202,6 +222,90 @@ test('C19_GattRequestQueue_timeoutAndDestroyFailClosed', async () => {
   const destroyed = new GattRequestQueue(100);
   destroyed.destroy();
   await expectCode(() => destroyed.run(async () => 1), 'PROVISIONING_GATT_BUSY');
+});
+
+test('C19_GattRequestQueue_timeoutNeverStartsConcurrentOperation', async () => {
+  const queue = new GattRequestQueue(10);
+  const events = [];
+  const first = queue.run(async () => {
+    events.push('a-start');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    events.push('a-end');
+    return 'a';
+  });
+  const second = queue.run(async () => {
+    events.push('b-start');
+    return 'b';
+  });
+  await expectCode(() => first, 'PROVISIONING_GATT_BUSY');
+  await expectCode(() => second, 'PROVISIONING_GATT_BUSY');
+  assert.deepEqual(events, ['a-start'],
+    'a queued request must not start while the timed-out operation is still running');
+  await expectCode(() => queue.run(async () => 1), 'PROVISIONING_GATT_BUSY');
+  await new Promise((resolve) => setTimeout(resolve, 60));
+  assert.deepEqual(events, ['a-start', 'a-end']);
+  queue.destroy();
+});
+
+// ---- GattChannel GATT busy policy (F-04) ----------------------------------
+
+test('C19_GattChannel_writeBusyRetriesOnceWithSameBytes', async () => {
+  const gateway = new FakeGateway();
+  const connection = new FakeBleConnection(gateway, { writeBusyOnce: true });
+  const { characteristics, descriptors } = await validMap(connection);
+  const map = GattEndpointMap.build(characteristics, descriptors);
+  const clock = new FakeClock();
+  const channel = new GattChannel(connection, map, new GattRequestQueue(1000),
+    fakeDelay(clock));
+  const response = await channel.requestPlain('proto-ver', utf8('ESP'));
+  assert.equal(Buffer.from(response).toString('utf8').includes('"prov"'), true);
+  assert.equal(connection.writeAttempts.length, 2);
+  assert.equal(connection.writes.length, 1);
+  assert.deepEqual(connection.writeAttempts[0].value, connection.writeAttempts[1].value);
+  assert.equal(clock.nowMs() - FakeClockBase(), 50);
+});
+
+test('C19_GattChannel_readBusyIsTerminalWithoutResend', async () => {
+  const gateway = new FakeGateway();
+  const connection = new FakeBleConnection(gateway, { readBusyOnce: true });
+  const { characteristics, descriptors } = await validMap(connection);
+  const map = GattEndpointMap.build(characteristics, descriptors);
+  const clock = new FakeClock();
+  const channel = new GattChannel(connection, map, new GattRequestQueue(1000),
+    fakeDelay(clock));
+  await expectCode(() => channel.requestPlain('proto-ver', utf8('ESP')),
+    'PROVISIONING_GATT_BUSY');
+  assert.equal(connection.writeAttempts.length, 1,
+    'a read busy must not resend the already delivered write');
+  assert.equal(connection.readAttempts, 1);
+});
+
+test('C19_GattChannel_writeBusyRetryPreservesCtrStream', async () => {
+  const gateway = new FakeGateway();
+  const session = new Security1Session(new NodeCryptoPort(), {
+    async nextBytes(length) {
+      return new Uint8Array(length).fill(5);
+    },
+  }, utf8('pop'));
+  const step0 = await session.createStep0();
+  const response0 = await gateway.handle('prov-session', step0);
+  const step1 = await session.handleStep0Response(response0);
+  const response1 = await gateway.handle('prov-session', step1);
+  await session.handleStep1Response(response1);
+
+  const connection = new FakeBleConnection(gateway, { writeBusyOnce: true });
+  const { characteristics, descriptors } = await validMap(connection);
+  const map = GattEndpointMap.build(characteristics, descriptors);
+  const clock = new FakeClock();
+  const channel = new GattChannel(connection, map, new GattRequestQueue(1000),
+    fakeDelay(clock));
+  channel.setSession(session);
+  const response = await channel.request('prov-config', ProtocommCodec.encodeGetStatus());
+  assert.equal(ProtocommCodec.decodeWifiStatus(response).ip4, '192.168.1.50');
+  assert.equal(connection.writeAttempts.length, 2);
+  assert.deepEqual(connection.writeAttempts[0].value, connection.writeAttempts[1].value,
+    'the retry must reuse the single encrypted frame; re-encrypting would desync CTR');
+  session.destroy();
 });
 
 // ---- ProvisioningStateMachine --------------------------------------------
@@ -387,6 +491,41 @@ test('C19_WifiProvisioningFlow_scanTimeoutAndInvalidStartFailClosed', async () =
   await expectCode(() => flow.scan(badStart), 'PROVISIONING_WIFI_SCAN_FAILED');
 });
 
+test('C19_WifiProvisioningFlow_scanPagesShareFifteenSecondDeadline', async () => {
+  const many = [];
+  for (let index = 0; index < 8; index++) {
+    many.push({
+      ssid: 'ap-' + String(index),
+      bssid: [index + 1, index + 1, index + 1, index + 1, index + 1, index + 1],
+      channel: 1 + index,
+      rssi: -40 - index,
+      auth: 3,
+    });
+  }
+  const clock = new FakeClock();
+  let pages = 0;
+  const channel = new FakeSecureChannel(async (_endpoint, payload) => {
+    const fields = readFields(payload);
+    const message = fieldVarint(fields, 1, 0);
+    if (message === 0) {
+      return scanStartResponse();
+    }
+    if (message === 2) {
+      return scanStatusResponse(true, many.length);
+    }
+    pages++;
+    clock.advance(16000);
+    const command = readFields(fieldBytes(fields, 14));
+    const start = fieldVarint(command, 1, 0);
+    const count = fieldVarint(command, 2, 0);
+    return scanResultResponse(start, count, many);
+  });
+  const flow = new WifiProvisioningFlow(clock, fakeDelay(clock));
+  await expectCode(() => flow.scan(channel), 'PROVISIONING_WIFI_SCAN_FAILED');
+  assert.equal(pages, 1,
+    'the page loop must stop at the same 15s deadline as status polling');
+});
+
 test('C19_WifiProvisioningFlow_applySendsSetThenApply', async () => {
   const channel = new FakeSecureChannel(async (_endpoint, payload) => {
     const fields = readFields(payload);
@@ -556,6 +695,53 @@ test('C19_BindingProber_transientProbeFailuresRetryThenSucceed', async () => {
     undefined, makeDraftStore(clock));
   assert.equal(outcome.boardLedConfirmed, true);
   assert.equal(client.probeCalls, 3);
+});
+
+test('C19_BindingProber_firstRetryWaits500msAndExhausts7500ms', async () => {
+  const transientClock = new FakeClock();
+  const transient = new FakeGatewayClient({ failProbes: 1 });
+  const transientProber = new BindingProber(transient, new FakeCredentials(), transientClock,
+    undefined, fakeDelay(transientClock));
+  const transientStart = transientClock.nowMs();
+  const outcome = await transientProber.probe(v20Identity(), '192.168.1.50', 'family-01',
+    undefined, makeDraftStore(transientClock));
+  assert.equal(outcome.boardLedConfirmed, true);
+  assert.equal(transientClock.nowMs() - transientStart, 500,
+    'the first retry is 500ms (ProbeBackoff is 1-based)');
+
+  const exhaustClock = new FakeClock();
+  const failing = new FakeGatewayClient({ failProbes: 5 });
+  const failingProber = new BindingProber(failing, new FakeCredentials(), exhaustClock,
+    undefined, fakeDelay(exhaustClock));
+  const exhaustStart = exhaustClock.nowMs();
+  await expectCode(() => failingProber.probe(v20Identity(), '192.168.1.50', 'family-01',
+    undefined, makeDraftStore(exhaustClock)), 'PROVISIONING_BINDING_PROBE_FAILED');
+  assert.equal(failing.probeCalls, 5);
+  assert.equal(exhaustClock.nowMs() - exhaustStart, 7500,
+    'retry delays are 500 + 1000 + 2000 + 4000 ms');
+});
+
+test('C19_BindingProber_enforcesThirtySecondTotalBudget', async () => {
+  const clock = new FakeClock();
+  class SlowFailingClient extends FakeGatewayClient {
+    constructor() {
+      super({ failProbes: 99 });
+    }
+
+    async probe(target, credentials) {
+      clock.advance(7000);
+      return await super.probe(target, credentials);
+    }
+  }
+  const client = new SlowFailingClient();
+  const prober = new BindingProber(client, new FakeCredentials(), clock, undefined,
+    fakeDelay(clock));
+  const start = clock.nowMs();
+  await expectCode(() => prober.probe(v20Identity(), '192.168.1.50', 'family-01',
+    undefined, makeDraftStore(clock)), 'PROVISIONING_BINDING_PROBE_FAILED');
+  assert.equal(client.probeCalls, 4,
+    'the fifth attempt must not start after the 30s budget is spent');
+  assert.equal(clock.nowMs() - start >= 30000, true);
 });
 
 test('C19_BindingProber_boardLedFailuresNeverBind', async () => {

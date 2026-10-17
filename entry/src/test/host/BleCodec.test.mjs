@@ -208,6 +208,31 @@ test('C19_ProtobufReader_rejectsTruncationOverlongAndBadWireTypes', () => {
   expectCode(() => new ProtobufWriter().varint(1, -1), 'PROTOCOL_INVALID_JSON');
 });
 
+test('C19_ProtobufReader_rejectsLengthVarintAbove32Bits', () => {
+  // Field 1, wire type 2, length varint = 2^32: the low 32 bits are zero, so
+  // a low-bits-only reader would silently accept an empty field (F-11).
+  expectCode(() => {
+    const reader = new ProtobufReader(
+      new Uint8Array([0x0a, 0x80, 0x80, 0x80, 0x80, 0x10]));
+    reader.readTag();
+    reader.readBytes();
+  }, 'PROTOCOL_INVALID_JSON');
+  // A full 10-byte length varint is likewise rejected, not truncated to 32 bits.
+  expectCode(() => {
+    const reader = new ProtobufReader(new Uint8Array([
+      0x0a, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x01,
+    ]));
+    reader.readTag();
+    reader.readBytes();
+  }, 'PROTOCOL_INVALID_JSON');
+  // A legitimate small length still round-trips.
+  const writer = new ProtobufWriter();
+  writer.bytes(1, utf8('ok'));
+  const reader = new ProtobufReader(writer.toBytes());
+  reader.readTag();
+  assert.equal(Buffer.from(reader.readBytes()).toString('utf8'), 'ok');
+});
+
 test('C19_ProtocommCodec_customJsonHasNoFrameHeader', () => {
   const json = '{"op":"finish","protocolVersion":"2.0"}';
   assert.equal(hex(ProtocommCodec.encodeCustomJson(json)), hex(utf8(json)));

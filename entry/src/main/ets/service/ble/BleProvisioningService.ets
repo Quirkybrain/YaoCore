@@ -136,7 +136,10 @@ export class BleProvisioningService implements IBleProvisioningClient {
     }
     await this.ensureReady();
     this.stopPublicScan(false);
+    // A new public scan replaces the previous selection: only the latest scan
+    // may satisfy an omitted request.device (F-02).
     this.scannedDevices.clear();
+    this.lastDevice = undefined;
     this.publicScanListener = listener;
     this.publicScanActive = true;
     const seen: Map<string, boolean> = new Map<string, boolean>();
@@ -150,9 +153,9 @@ export class BleProvisioningService implements IBleProvisioningClient {
         }
         seen.set(device.deviceId, true);
         this.scannedDevices.set(device.deviceId, device);
-        if (this.lastDevice === undefined) {
-          this.lastDevice = device;
-        }
+        // Keep the latest unique candidate; resolveDevice still rejects when
+        // more than one device was seen in this scan.
+        this.lastDevice = device;
         listener.onDeviceFound(device);
       },
       onScanFinished: (): void => {
@@ -200,18 +203,30 @@ export class BleProvisioningService implements IBleProvisioningClient {
     if (this.running) {
       throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'provisioningActive')]);
     }
+    // DES-A §16.8-4118: an empty draft means "re-provision an already-bound
+    // gateway using its stored command secret", which is only valid when the
+    // caller names the expected gateway. A new binding must pass a draft.
+    if ((request.credentialDraftId === undefined || request.credentialDraftId.length === 0) &&
+      request.expectedGatewayId === undefined) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'expectedGatewayId')]);
+    }
     this.running = true;
     this.cancelled = false;
     this.activeListener = listener;
-    this.stopPublicScan(false);
-    this.stateMachine.reset();
-    this.emitStage(listener, BleProvisioningStage.CONNECTING);
-    const popCopy = BytesUtil.copyOf(request.pop);
-    const passwordCopy = BytesUtil.copyOf(request.wifiPassword);
+    let popCopy: Uint8Array = new Uint8Array(0);
+    let passwordCopy: Uint8Array = new Uint8Array(0);
     let identity: BleProvisioningIdentity | undefined = undefined;
     let resultIp: string = '';
+    let issuedDraftId: string | undefined = undefined;
     let completed = false;
     try {
+      this.stopPublicScan(false);
+      this.stateMachine.reset();
+      popCopy = BytesUtil.copyOf(request.pop);
+      passwordCopy = BytesUtil.copyOf(request.wifiPassword);
+      // Listener callbacks run inside the guarded flow so a throwing callback
+      // cannot leave `running`/`activeListener` locked (F-10).
+      this.emitStage(listener, BleProvisioningStage.CONNECTING);
       this.transition(ProvisioningEvent.START);
       this.emitState(listener, ProvisioningState.PERMISSION);
       this.checkCancelled(cancellation);
@@ -273,6 +288,12 @@ export class BleProvisioningService implements IBleProvisioningClient {
         throw AppErrors.internal('bleIdentity');
       }
       const outcome = await this.probeBinding(identity, resultIp, request, cancellation);
+      // The probe consumed the original one-shot draft and re-issued a fresh
+      // id. From here until the result is delivered, this new id is owned by
+      // the failed path and must be destroyed on any error (SC-06 / F-07).
+      if (outcome.credentialDraftId.length > 0) {
+        issuedDraftId = outcome.credentialDraftId;
+      }
       this.transition(ProvisioningEvent.BINDING_OK);
 
       const port = identity.tls === undefined ? ProtocolConstants.DEFAULT_GATEWAY_PORT :
@@ -288,12 +309,11 @@ export class BleProvisioningService implements IBleProvisioningClient {
       return result;
     } catch (error) {
       const typed = error as Error;
+      this.destroyDraft(issuedDraftId);
       if (this.cancelled || isCode(typed, 'PROVISIONING_CANCELLED')) {
         this.safeTransition(ProvisioningEvent.CANCEL);
         this.emitState(listener, ProvisioningState.CANCELLED);
-        if (request.credentialDraftId !== undefined) {
-          this.drafts.destroy(request.credentialDraftId);
-        }
+        this.destroyDraft(request.credentialDraftId);
         throw AppErrors.of('PROVISIONING_CANCELLED', []);
       }
       this.safeTransition(ProvisioningEvent.FAIL);
@@ -302,19 +322,24 @@ export class BleProvisioningService implements IBleProvisioningClient {
       if (listener.onError !== undefined) {
         listener.onError(mapped);
       }
-      if (request.credentialDraftId !== undefined) {
-        this.drafts.destroy(request.credentialDraftId);
-      }
+      this.destroyDraft(request.credentialDraftId);
       throw mapped;
     } finally {
-      BytesUtil.zeroize(popCopy);
-      BytesUtil.zeroize(passwordCopy);
-      await this.teardownBle();
-      if (!completed && request.credentialDraftId !== undefined) {
-        this.drafts.destroy(request.credentialDraftId);
+      // Even if teardown or draft cleanup throws, the service must not stay
+      // locked: `running` and `activeListener` are reset in an inner finally
+      // (F-10).
+      try {
+        BytesUtil.zeroize(popCopy);
+        BytesUtil.zeroize(passwordCopy);
+        await this.teardownBle();
+        if (!completed) {
+          this.destroyDraft(request.credentialDraftId);
+          this.destroyDraft(issuedDraftId);
+        }
+      } finally {
+        this.running = false;
+        this.activeListener = undefined;
       }
-      this.running = false;
-      this.activeListener = undefined;
     }
   }
 
@@ -582,6 +607,13 @@ export class BleProvisioningService implements IBleProvisioningClient {
   }
 
   // ---- Cleanup ------------------------------------------------------------
+
+  /** Destroys a one-shot draft if the flow still owns it; idempotent. */
+  private destroyDraft(draftId: string | undefined): void {
+    if (draftId !== undefined) {
+      this.drafts.destroy(draftId);
+    }
+  }
 
   private async teardownBle(): Promise<void> {
     const connection = this.connection;

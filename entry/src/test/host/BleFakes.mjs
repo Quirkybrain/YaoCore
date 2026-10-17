@@ -573,6 +573,10 @@ export class FakeBleConnection {
     this.mtu = options.mtu ?? 512;
     this.mtuRequests = [];
     this.writes = [];
+    this.writeAttempts = [];
+    this.readAttempts = 0;
+    this.writeBusyRemaining = options.writeBusyOnce === true ? 1 : 0;
+    this.readBusyRemaining = options.readBusyOnce === true ? 1 : 0;
     this.disconnectCalls = 0;
     this.pending = undefined;
     this.serviceUuid = GattEndpointMap.SERVICE_UUID;
@@ -633,11 +637,21 @@ export class FakeBleConnection {
 
   async writeCharacteristic(reference, value) {
     const endpoint = reference.characteristicUuid.substring('char-'.length);
+    this.writeAttempts.push({ endpoint, value: new Uint8Array(value) });
+    if (this.writeBusyRemaining > 0) {
+      this.writeBusyRemaining--;
+      throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
+    }
     this.writes.push({ endpoint, value: new Uint8Array(value) });
     this.pending = await this.gateway.handle(endpoint, value);
   }
 
   async readCharacteristic() {
+    this.readAttempts++;
+    if (this.readBusyRemaining > 0) {
+      this.readBusyRemaining--;
+      throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
+    }
     if (this.pending === undefined) {
       throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
     }

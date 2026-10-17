@@ -53,8 +53,10 @@ export class ProtoVerParser {
     if (prov === undefined || prov.kind !== JsonKind.OBJECT) {
       unsupported('prov');
     }
-    const provVersionNode = prov.require('ver');
-    if (provVersionNode.kind !== JsonKind.STRING ||
+    // A missing `prov.ver` is a capability failure, not a generic protocol
+    // missing-field error (DES-A §16.3-3926; F-06).
+    const provVersionNode = prov.get('ver');
+    if (provVersionNode === undefined || provVersionNode.kind !== JsonKind.STRING ||
       !V11_PATTERN.test(provVersionNode.stringValue)) {
       unsupported('prov.ver');
     }

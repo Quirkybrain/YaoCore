@@ -7,6 +7,12 @@
  * requests (proto-ver) and secure requests share the same single-flight queue;
  * no notification subscription is used. Encryption and decryption happen
  * inside the queue slot so concurrent callers cannot interleave stream bytes.
+ *
+ * GATT busy policy (DES-A §16.2-3911): a platform busy on the write retries
+ * once after 50ms with the same bytes; a secure retry reuses the already
+ * encrypted frame so the client CTR stream is not advanced twice. A busy on
+ * the read is never retried (the write may have been delivered); the caller
+ * tears down the session/connection and restarts from Security1 step0.
  */
 import { AppErrors } from '../../common/types/AppError';
 import { defaultBleDelay, isCode, mapProvisioningError } from './BleSupport';
@@ -80,6 +86,8 @@ export class GattChannel implements SecureGattChannel {
         });
       } catch (error) {
         const typed = error as Error;
+        // Retry only when the operation never started (queue acquisition
+        // timeout); a started operation already owns the CTR/command state.
         if (isCode(typed, 'PROVISIONING_GATT_BUSY') && !started && attempt === 0) {
           await Promise.resolve(this.delay(50));
           continue;
@@ -90,9 +98,27 @@ export class GattChannel implements SecureGattChannel {
     throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
   }
 
+  /**
+   * One write-with-response followed by one read. A busy on the write is the
+   * only retryable failure: the value was rejected, and retrying the exact
+   * same bytes cannot advance the Security1 CTR stream twice. A busy on the
+   * read is ambiguous (the write may have been delivered), so it is terminal.
+   */
   private async writeRead(endpoint: string, value: Uint8Array): Promise<Uint8Array> {
     const characteristic: BleCharacteristicRef = this.endpoints.get(endpoint);
-    await this.connection.writeCharacteristic(characteristic, value);
-    return await this.connection.readCharacteristic(characteristic);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await this.connection.writeCharacteristic(characteristic, value);
+      } catch (error) {
+        const typed = error as Error;
+        if (attempt === 0 && isCode(typed, 'PROVISIONING_GATT_BUSY')) {
+          await Promise.resolve(this.delay(50));
+          continue;
+        }
+        throw typed;
+      }
+      return await this.connection.readCharacteristic(characteristic);
+    }
+    throw AppErrors.of('PROVISIONING_GATT_BUSY', []);
   }
 }

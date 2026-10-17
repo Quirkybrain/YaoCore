@@ -270,6 +270,39 @@ test('C19_IdentityNegotiator_v20ConstantsAndBoundsAreStrict', () => {
   expectCodeSync(() => negotiator.parseV20(utf8(notObject)), 'PROVISIONING_IDENTITY_INVALID');
 });
 
+test('C19_IdentityNegotiator_gatewayNameUsesCharacterLength', async () => {
+  const negotiator = new IdentityNegotiator();
+  const v20 = (name) => JSON.stringify({
+    protocolVersion: '2.0',
+    serviceId: 'YaoCoreGateway',
+    gatewayId: 'gateway_01',
+    gatewayName: name,
+  });
+  // 63 ASCII characters pass; 64 characters fail.
+  assert.equal(negotiator.parseV20(utf8(v20('a'.repeat(63)))).gatewayName.length, 63);
+  expectCodeSync(() => negotiator.parseV20(utf8(v20('a'.repeat(64)))),
+    'PROVISIONING_IDENTITY_INVALID');
+  // 22 Chinese characters are 66 UTF-8 bytes but only 22 characters; the
+  // schema maxLength is in characters, so this must be accepted (F-01).
+  const chinese22 = '网'.repeat(22);
+  assert.equal(Buffer.byteLength(chinese22, 'utf8'), 66);
+  assert.equal(negotiator.parseV20(utf8(v20(chinese22))).gatewayName, chinese22);
+  assert.equal(negotiator.parseV20(utf8(v20('网'.repeat(63)))).gatewayName,
+    '网'.repeat(63));
+  expectCodeSync(() => negotiator.parseV20(utf8(v20('网'.repeat(64)))),
+    'PROVISIONING_IDENTITY_INVALID');
+  // v2.1 shares the same character-length check.
+  const v21 = JSON.stringify({
+    protocolVersion: '2.1',
+    serviceId: 'YaoCoreGateway',
+    gatewayId: 'gateway_01',
+    gatewayName: chinese22,
+  });
+  const identity = await negotiator.negotiate(established, scriptedSend([v21]).send);
+  assert.equal(identity.version, IdentityVersion.V21);
+  assert.equal(identity.gatewayName, chinese22);
+});
+
 test('C19_IdentityNegotiator_pinValidationIsFailClosed', async () => {
   const uppercasePin = JSON.stringify({
     protocolVersion: '2.1',

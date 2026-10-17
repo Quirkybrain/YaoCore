@@ -176,12 +176,23 @@ export class BindingProber {
     const probeCredentials: GatewayCredentialPort = draftPort === undefined ?
       this.credentials : draftPort;
     const backoff = ProbeBackoff.forBindingProbe();
+    // Hard total budget (DES-A §16.8-4123 / §19): 5 attempts with
+    // 500/1000/2000/4000 ms between them must finish within 30s.
+    const deadline = this.clock.nowMs() + ProbeBackoff.bindingProbeTotalBudgetMs();
     try {
       let verified = false;
       for (let attempt = 1; attempt <= MAX_PROBE_ATTEMPTS; attempt++) {
         throwIfCancelled(cancellation);
+        if (this.clock.nowMs() >= deadline) {
+          throw AppErrors.of('PROVISIONING_BINDING_PROBE_FAILED', []);
+        }
         if (attempt > 1) {
-          await Promise.resolve(this.delay(backoff.nextDelayMs(attempt)));
+          // ProbeBackoff is 1-based: the first retry waits 500ms (attempt - 1).
+          const delayMs = backoff.nextDelayMs(attempt - 1);
+          if (this.clock.nowMs() + delayMs > deadline) {
+            throw AppErrors.of('PROVISIONING_BINDING_PROBE_FAILED', []);
+          }
+          await Promise.resolve(this.delay(delayMs));
           throwIfCancelled(cancellation);
         }
         try {

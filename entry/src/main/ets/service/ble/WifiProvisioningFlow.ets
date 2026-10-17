@@ -79,6 +79,11 @@ export class WifiProvisioningFlow {
       const collected: WifiScanResult[] = [];
       for (let startIndex = 0; startIndex < total; startIndex += SCAN_PAGE_SIZE) {
         throwIfCancelled(cancellation);
+        // Page requests share the same 15s scan budget as status polling
+        // (DES-A §16.7-4078); a slow finished-scan read cannot extend it.
+        if (this.clock.nowMs() >= deadline) {
+          throw AppErrors.of('PROVISIONING_WIFI_SCAN_FAILED', []);
+        }
         const count = Math.min(SCAN_PAGE_SIZE, total - startIndex);
         const pagePayload = await channel.request(GattEndpointMap.PROV_SCAN,
           ProtocommCodec.encodeScanResult(startIndex, count));

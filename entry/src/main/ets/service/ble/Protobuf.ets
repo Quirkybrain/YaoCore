@@ -216,8 +216,43 @@ export class ProtobufReader {
     return value === 1;
   }
 
+  /**
+   * Reads a length prefix. Unlike `readUnsigned` (which keeps the low 32 bits
+   * for int32 two's complement), a wire length must fit in 32 bits; a varint
+   * whose value exceeds 0xFFFFFFFF is a malformed frame (F-11).
+   */
+  readLength(): number {
+    let low = 0;
+    let shift = 0;
+    for (let index = 0; index < VARINT_MAX_BYTES; index++) {
+      if (this.offset >= this.data.length) {
+        fail('truncated');
+      }
+      const byte = this.data[this.offset];
+      this.offset += 1;
+      const payload = byte & 0x7F;
+      if (shift < 28) {
+        low = (low | (payload << shift)) >>> 0;
+      } else if (shift === 28) {
+        if ((payload & 0x70) !== 0) {
+          fail('length');
+        }
+        low = (low | (payload << 28)) >>> 0;
+      } else if (payload !== 0) {
+        // Continuation bytes above bit 31 can only be zero; otherwise the
+        // length cannot be represented as an unsigned 32-bit value.
+        fail('length');
+      }
+      if ((byte & 0x80) === 0) {
+        return low >>> 0;
+      }
+      shift += 7;
+    }
+    fail('length');
+  }
+
   readBytes(): Uint8Array {
-    const length = this.readUnsigned();
+    const length = this.readLength();
     if (length > this.data.length - this.offset) {
       fail('length');
     }
