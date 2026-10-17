@@ -113,10 +113,10 @@
 | 命令 | 结果 | 证据 |
 |---|---|---|
 | `ohpm install` | `install completed in 0s 48ms` | `artifacts/50-implementation/evidence/t13-family/ohpm-install.log` |
-| `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL in 4 s 979 ms`；35 tasks；未配置签名（WARN，预期） | `.../hvigor-assemble-hap.log` |
+| `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL`（35 tasks；未配置签名 WARN，预期；见日志） | `.../hvigor-assemble-hap.log` |
 | `codelinter -c code-linter.json5 -p default .` | `No defects found in your code.` | `.../codelinter.log` |
 | `entry/src/test/run-host-tests.sh` | **469 tests / 469 pass / 0 fail**（含本次新增 18） | `.../host-tests.log` |
-| `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon` | `BUILD SUCCESSFUL in 7 s 202 ms`（仅编译，不执行） | `.../ohostest-compile.log` |
+| `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon` | `BUILD SUCCESSFUL`（仅编译，不执行；见日志） | `.../ohostest-compile.log` |
 
 设备侧 `ohosTest` **未执行**：本环境无设备/模拟器/签名配置；`AuthInviteDevice.test.ets` 仅编译（已由上述 ohosTest HAP 编译验证 `List.test.ets` 注册），不得报告为 PASS。设备骨架覆盖真实平台 PBKDF2/X25519/AES-256-GCM + `AuthService.registerMigrations`；C-13 容器 codec 的严格路径由 host 套件覆盖（若在 ohosTest 直接 import `InviteCodec`，会触发 `common/utils/Base64Url.ets` 既有的 ArkTS 严格编译问题，该文件不在 T-13 写范围，见 T13-R-10）。
 
