@@ -1,0 +1,15 @@
+check_layering: files=209 violations=0 exceptions_used=13 pending=13
+  PENDING D-12 entry/src/main/ets/pages/DeviceControlPage.ets -> entry/src/main/ets/repository/DomainModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/HomePage.ets -> entry/src/main/ets/repository/DomainModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/RoomsPage.ets -> entry/src/main/ets/repository/DomainModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/ScenePage.ets -> entry/src/main/ets/repository/DomainModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/ScenePage.ets -> entry/src/main/ets/repository/DomainModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/FamilyManagePage.ets -> entry/src/main/ets/service/family/FamilyModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/FamilyManagePage.ets -> entry/src/main/ets/service/family/FamilyModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/ProfilePage.ets -> entry/src/main/ets/service/family/FamilyModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/ProvisioningPage.ets -> entry/src/main/ets/service/ble/BleProvisioningPorts.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/ProvisioningPage.ets -> entry/src/main/ets/service/ble/BleProvisioningPorts.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/RoomManagePage.ets -> entry/src/main/ets/service/room/RoomService.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/SettingsPage.ets -> entry/src/main/ets/service/cloud/CloudModels.ets (pending-T-20)
+  PENDING D-12 entry/src/main/ets/pages/SettingsPage.ets -> entry/src/main/ets/service/cloud/CloudModels.ets (pending-T-20)
+check_layering: PASS

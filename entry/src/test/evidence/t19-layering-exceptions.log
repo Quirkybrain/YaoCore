@@ -1,0 +1,13 @@
+D-12	entry/src/main/ets/pages/DeviceControlPage.ets	entry/src/main/ets/repository/DomainModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-10 DTO type import; not yet enumerated in DES-B §2.3 D-12.
+D-12	entry/src/main/ets/pages/HomePage.ets	entry/src/main/ets/repository/DomainModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-10 DTO type import.
+D-12	entry/src/main/ets/pages/RoomsPage.ets	entry/src/main/ets/repository/DomainModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-10 DTO type import.
+D-12	entry/src/main/ets/pages/ScenePage.ets	entry/src/main/ets/repository/DomainModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-11 DTO type imports.
+D-12	entry/src/main/ets/pages/ScenePage.ets	entry/src/main/ets/repository/DomainModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-11 enum type import.
+D-12	entry/src/main/ets/pages/FamilyManagePage.ets	entry/src/main/ets/service/family/FamilyModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-08 view/DTO type imports.
+D-12	entry/src/main/ets/pages/FamilyManagePage.ets	entry/src/main/ets/service/family/FamilyModels.ets	pending-T-20	T-18 R3-01: existing pages value imports of C-08 input class/enum for form state.
+D-12	entry/src/main/ets/pages/ProfilePage.ets	entry/src/main/ets/service/family/FamilyModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-08 view type import.
+D-12	entry/src/main/ets/pages/ProvisioningPage.ets	entry/src/main/ets/service/ble/BleProvisioningPorts.ets	pending-T-20	T-18 R3-01: existing pages value imports of C-19 DTO/enums for wizard rendering.
+D-12	entry/src/main/ets/pages/ProvisioningPage.ets	entry/src/main/ets/service/ble/BleProvisioningPorts.ets	pending-T-20	T-18 R3-01: existing pages read-only C-19 progress type import.
+D-12	entry/src/main/ets/pages/RoomManagePage.ets	entry/src/main/ets/service/room/RoomService.ets	pending-T-20	T-18 R3-01: existing pages read-only C-09 deletion preview type import.
+D-12	entry/src/main/ets/pages/SettingsPage.ets	entry/src/main/ets/service/cloud/CloudModels.ets	pending-T-20	T-18 R3-01: existing pages value import of C-15 transport-state enum for UI branching.
+D-12	entry/src/main/ets/pages/SettingsPage.ets	entry/src/main/ets/service/cloud/CloudModels.ets	pending-T-20	T-18 R3-01: existing pages read-only C-15 config view type import.

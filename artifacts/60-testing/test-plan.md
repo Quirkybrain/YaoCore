@@ -3,7 +3,7 @@
 - **Artifact ID**: TEST-001
 - **Producer**: agent:test-engineer
 - **Type**: Test Plan / Test Harness Baseline / Measurement Contract
-- **Status**: Proposed（待 G-008 Artifact Validation Gate）
+- **Status**: **Accepted @ G-008**（`fa21c67`）；**T-19 执行结果见 §14**（2026-10-18，`wp-082-verify`，不改写 §0..§13 的既有语义）
 - **Date**: 2026-10-17
 - **Task**: `wp-010-test-plan`（T-05；task 分支 `task/wp-010-test-plan`，父分支 `feat/yaocore-app`，base commit `1c44503e0720c0305ab5d1d0d894af09ea06a009`）
 - **Workflow**: STANDARD / GATED_AUTO
@@ -595,3 +595,49 @@ python3 tools/simulator/gateway_contract_server.py --host 127.0.0.1 --port 9443 
 ---
 
 *TEST-001 结束。所有命令在 `task/wp-010-test-plan`、base `1c44503` 上执行；测试资产来源/哈希与限制见各目录 README 及本文件 §3/§9/§11。*
+
+---
+
+## 14. T-19 全量执行结果（2026-10-18，wp-082-verify）
+
+> 执行 revision：`task/wp-082-verify` @ base `4f7c26be664a8db8aaba136fce1f128ccc72223a`；最终 commit 由 `swe_guard finish` 记录。完整分层表、FR/NFR 矩阵、安全负例与限制见 [`test-report.md`](test-report.md)（TEST-REPORT-001）。
+
+### 14.1 状态更新（追加，不改变既有条目语义）
+
+| 层/项 | T-05 状态 | T-19 当前状态 | 证据 |
+|---|---|---|---|
+| Host 纯逻辑 | PASS 15/15 | **PASS 696/696**（新增 2 条 R3-01 并发/失败隔离） | `entry/src/test/evidence/t19-host-node-tests.tap` |
+| 构建 | PASS | **PASS**（`BUILD SUCCESSFUL`，unsigned） | `t19-clean-assemble.log` |
+| `codelinter` | PASS | **PASS（0 error / 25 warning）** | `t19-codelinter.log` |
+| 测试 HAP | PASS（编译） | **COMPILED_ONLY**（编译成功，未执行） | `t19-ohosTest-assemble.log` |
+| 契约 crosscheck | PASS 66/66 | **PASS 66/66** | `t19-crosscheck.log` |
+| 仿真器套件 | PASS 20/20 | **PASS 20/20**（`no_proxy` 受控重跑；默认代理首跑 FAIL_ENV） | `t19-simulator-contract.log`、`t19-simulator-contract-proxy-fail.log` |
+| i18n CHK-01..09 | NOT_APPLICABLE（资源未建） | **PASS**；blocking 0 / missing 0 / warnings 121 / hardcoded 82 | `t19-i18n-report.json` |
+| 分层检查器（C-29） | 未实现 | **PASS 0 violation**；13 条 R3-01 `pending-T-20` 例外可见；fixture 4/4 | `t19-layering.json`、`t19-layering-fixture-tests.log` |
+| 安全负例矩阵 | 部分（仿真器） | **SEC-N01..N26 均有当前证据**；设备相关项仍 BLOCKED | `t19-security-negative.tap`、`test-report.md` §4 |
+| NFR 4.3 | harness PASS / 数值 UNAVAILABLE | 55ms **PASS**；ACK p95 **MOCK_ONLY 0.601ms**；真实 p95/60/120fps **UNAVAILABLE** | `t19-ack-p95-mock.json` |
+| 设备/UI/BLE/LAN/云 | BLOCKED/UNAVAILABLE | **不变：BLOCKED/UNAVAILABLE** | `test-report.md` §7 |
+
+### 14.2 CQG / 阶段状态
+
+- **C-01..C-29 组件级证据**：T-06..T-18 CQG 已记录；T-19 未重新授予 CQG，只补充全量执行证据。
+- **IG-4（全量测试）**：证据就绪（构建/静态/host/契约/仿真/i18n/分层/安全/性能口径），但设备矩阵仍 BLOCKED；**IG-3 仍 NOT READY**，不得因本报告宣布 Stage Gate PASS。
+- **T-20 输入**：`test-report.md` §3.2 的 13 条 R3-01 `pending-T-20` 例外、端口位置例外、SEC-N26 常数时间复核。
+- **GAP-T18-01 / R4-01**：仍为 T-18 遗留；Stage Gate 必须记录，本任务未关闭。
+
+### 14.3 新增/变更测试资产
+
+| 路径 | 变更 |
+|---|---|
+| `entry/src/test/host/ViewModelDevice.test.mjs` | +2 用例（R3-01：跨设备同时在途、单侧失败隔离）；原 694 条全部保留 |
+| `tools/contract/check_layering.py` | C-29 分层检查器（D-01/02/03/05/06/08/09/11/12/13/17） |
+| `tools/contract/layering_allowlist.json` | 文件/符号级例外；13 条 R3-01 pending-T-20 |
+| `tools/contract/fixtures/layering/**` | 合法/违规 fixture |
+| `tools/contract/test_check_layering.py` | 4 条 fixture 自测 |
+| `tools/contract/measure_ack_latency.py` | MOCK_ONLY ACK p95 测量 harness（NFR 4.3 口径，不代表产品验收） |
+
+### 14.4 结论
+
+- 当前集成候选的**主机可执行证据充分**：696 host、66/66 契约、20/20 仿真器、i18n 0 blocking、分层 0 violation、构建/lint 通过。
+- **不得声称**：设备/UI/BLE/LAN/TLS/云/视觉/fps 通过；ACK p95 达到 NFR 4.3；R3-01 已关闭；IG-3 已 READY。
+- **下一步**：T-20 独立评审（含 R3-01/端口位置收口、SEC-N26、Mock 排除复核）→ T-21 README/维护计划 → T-22 IG-4/G-014。

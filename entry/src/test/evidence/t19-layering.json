@@ -1,0 +1,208 @@
+{
+  "tool": "check_layering.py",
+  "producer": "agent:test-engineer",
+  "task": "T-19 / wp-082-verify",
+  "root": "/home/quirkybrain/code/harmony-projects/YaoCore",
+  "main_root": "entry/src/main/ets",
+  "rules_checked": [
+    "D-01",
+    "D-02",
+    "D-03",
+    "D-05",
+    "D-06",
+    "D-08",
+    "D-09",
+    "D-11",
+    "D-12",
+    "D-13",
+    "D-17"
+  ],
+  "rules_delegated": [
+    "D-04/D-10 host-safe imports -> check_host_safe_imports.py (T-20)",
+    "D-07/D-14 production mock exclusion -> check_production_mock_exclusion.py (T-20); current evidence: host TransportBoundary.test.mjs",
+    "D-15 cloud HTTP isolation -> review/static scan (not implemented)",
+    "D-16 i18n hardcoded strings -> entry/src/test/i18n/check_i18n.py --strict-ui"
+  ],
+  "file_count": 209,
+  "violation_count": 0,
+  "violations": [],
+  "exceptions": [
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/DeviceControlPage.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "DeviceRecord"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-10 DTO type import; not yet enumerated in DES-B §2.3 D-12.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01; t18-review-d.md",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/HomePage.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "DeviceRecord"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-10 DTO type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/RoomsPage.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "DeviceRecord"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-10 DTO type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/ScenePage.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "SceneExecutionProgress",
+        "SceneExecutionResult",
+        "SceneStepResult"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-11 DTO type imports.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/ScenePage.ets",
+      "import": "entry/src/main/ets/repository/DomainModels.ets",
+      "symbols": [
+        "SceneRunState"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-11 enum type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/FamilyManagePage.ets",
+      "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+      "symbols": [
+        "FamilyMemberView",
+        "InvitationView",
+        "InviteCreation"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-08 view/DTO type imports.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/FamilyManagePage.ets",
+      "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+      "symbols": [
+        "CreateInvitationInput",
+        "FamilyJoinPhase"
+      ],
+      "type_only": false,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages value imports of C-08 input class/enum for form state.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/ProfilePage.ets",
+      "import": "entry/src/main/ets/service/family/FamilyModels.ets",
+      "symbols": [
+        "FamilyMemberView"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-08 view type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
+      "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+      "symbols": [
+        "BleProvisioningDevice",
+        "ProvisioningState",
+        "WifiAp"
+      ],
+      "type_only": false,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages value imports of C-19 DTO/enums for wizard rendering.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
+      "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
+      "symbols": [
+        "ProvisioningProgress"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-19 progress type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/RoomManagePage.ets",
+      "import": "entry/src/main/ets/service/room/RoomService.ets",
+      "symbols": [
+        "RoomDeletionPreview"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-09 deletion preview type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/SettingsPage.ets",
+      "import": "entry/src/main/ets/service/cloud/CloudModels.ets",
+      "symbols": [
+        "CloudTransportState"
+      ],
+      "type_only": false,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages value import of C-15 transport-state enum for UI branching.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    },
+    {
+      "rule": "D-12",
+      "from": "entry/src/main/ets/pages/SettingsPage.ets",
+      "import": "entry/src/main/ets/service/cloud/CloudModels.ets",
+      "symbols": [
+        "CloudConfigView"
+      ],
+      "type_only": true,
+      "status": "pending-T-20",
+      "reason": "T-18 R3-01: existing pages read-only C-15 config view type import.",
+      "evidence": "artifacts/70-review/t18-review-c.md §R3-01",
+      "used": 1
+    }
+  ],
+  "unused_exceptions": []
+}
