@@ -13,51 +13,124 @@
  * limitations under the License.
  */
 
+/*
+ * YaoCore C-28 EntryAbility.
+ * Producer: agent:implementation-engineer | Task: T-17 / wp-067-ui-shell
+ * Contract: DES-B §17.1.4, §17.3; DES-B-C28-API
+ *
+ * onCreate builds the one AppCompositionRoot + AppContext and starts
+ * AppContext.initialize() without blocking or leaking an unhandled rejection.
+ * onWindowStageCreate loads pages/Index only after initialization settles; the
+ * context/error travel through one LocalStorage bootstrap. No auto discovery,
+ * auto cloud polling or auto unlock happens at startup.
+ */
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { AppError, AppErrors } from '../common/types/AppError';
+import { AppContext } from '../app/AppContext';
+import { AppCompositionRoot } from '../app/AppCompositionRoot';
+import { ShellBootstrap } from '../app/ShellBootstrap';
 
 const DOMAIN = 0x0000;
+const TAG = 'YaoCore';
 
 export default class EntryAbility extends UIAbility {
+  private root: AppCompositionRoot | undefined = undefined;
+  private appContext: AppContext | undefined = undefined;
+  private bootstrapError: AppError | undefined = undefined;
+  private initPromise: Promise<void> = Promise.resolve();
+  private windowStage: window.WindowStage | undefined = undefined;
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-    } catch (err) {
-      hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
+      this.context.getApplicationContext().setColorMode(
+        ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+    } catch (error) {
+      hilog.error(DOMAIN, TAG, '%{public}s', 'set_color_mode_failed');
     }
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    try {
+      this.root = AppCompositionRoot.create(this.context);
+      this.appContext = this.root.appContext;
+      this.initPromise = this.appContext.initialize();
+    } catch (error) {
+      this.bootstrapError = EntryAbility.asAppError(error as Error);
+      hilog.error(DOMAIN, TAG, '%{public}s', 'composition_root_create_failed');
+    }
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onCreate');
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onDestroy');
+    const root = this.root;
+    this.root = undefined;
+    this.appContext = undefined;
+    if (root !== undefined) {
+      root.dispose().catch((error: Object): void => {
+        hilog.warn(DOMAIN, TAG, '%{public}s', 'dispose_failed');
+      });
+    }
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    // Main window is created, set main page for this ability
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-
-    windowStage.loadContent('pages/Index', (err) => {
-      if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
-        return;
-      }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onWindowStageCreate');
+    this.windowStage = windowStage;
+    this.initPromise.then((): void => {
+      this.loadIndex(windowStage);
+    }).catch((): void => {
+      this.loadIndex(windowStage);
     });
   }
 
   onWindowStageDestroy(): void {
-    // Main window is destroyed, release UI related resources
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onWindowStageDestroy');
+    this.windowStage = undefined;
   }
 
   onForeground(): void {
-    // Ability has brought to foreground
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onForeground');
+    const context = this.appContext;
+    if (context !== undefined) {
+      context.onForeground().catch((error: Object): void => {
+        hilog.warn(DOMAIN, TAG, '%{public}s', 'on_foreground_failed');
+      });
+    }
   }
 
   onBackground(): void {
-    // Ability has back to background
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    hilog.info(DOMAIN, TAG, '%{public}s', 'onBackground');
+    const context = this.appContext;
+    if (context !== undefined) {
+      context.onBackground().catch((error: Object): void => {
+        hilog.warn(DOMAIN, TAG, '%{public}s', 'on_background_failed');
+      });
+    }
+  }
+
+  private loadIndex(windowStage: window.WindowStage): void {
+    if (this.windowStage !== windowStage) {
+      return;
+    }
+    try {
+      const storage = new LocalStorage();
+      storage.setOrCreate('bootstrap',
+        new ShellBootstrap(this.appContext, this.bootstrapError));
+      windowStage.loadContent('pages/Index', storage, (err): void => {
+        if (err.code) {
+          hilog.error(DOMAIN, TAG, '%{public}s', 'load_content_failed');
+          return;
+        }
+        hilog.info(DOMAIN, TAG, '%{public}s', 'load_content_ok');
+      });
+    } catch (error) {
+      hilog.error(DOMAIN, TAG, '%{public}s', 'load_content_threw');
+    }
+  }
+
+  private static asAppError(error: Error): AppError {
+    if (error instanceof AppError) {
+      return error as AppError;
+    }
+    return AppErrors.of('INTERNAL_ERROR', []);
   }
 }

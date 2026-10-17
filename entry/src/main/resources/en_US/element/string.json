@@ -99,6 +99,118 @@
     {
       "name": "settings_language_en_us",
       "value": "English"
+    },
+    {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_rooms",
+      "value": "Rooms"
+    },
+    {
+      "name": "tab_scenes",
+      "value": "Scenes"
+    },
+    {
+      "name": "tab_profile",
+      "value": "Profile"
+    },
+    {
+      "name": "shell_app_title",
+      "value": "YaoCore"
+    },
+    {
+      "name": "shell_no_family",
+      "value": "No family selected"
+    },
+    {
+      "name": "home_add_gateway",
+      "value": "Add gateway"
+    },
+    {
+      "name": "rooms_manage",
+      "value": "Manage rooms"
+    },
+    {
+      "name": "placeholder_message",
+      "value": "This page will be implemented in a later task."
+    },
+    {
+      "name": "page_device_control",
+      "value": "Device control"
+    },
+    {
+      "name": "page_family",
+      "value": "Family and access"
+    },
+    {
+      "name": "page_room_manage",
+      "value": "Room management"
+    },
+    {
+      "name": "page_provisioning",
+      "value": "Add device"
+    },
+    {
+      "name": "page_settings",
+      "value": "Settings"
+    },
+    {
+      "name": "page_about",
+      "value": "About"
+    },
+    {
+      "name": "session_no_profile_title",
+      "value": "No local profile"
+    },
+    {
+      "name": "session_no_profile_message",
+      "value": "Create or join a family to get started."
+    },
+    {
+      "name": "session_locked_title",
+      "value": "Locked"
+    },
+    {
+      "name": "session_locked_message",
+      "value": "Choose a profile and enter its password."
+    },
+    {
+      "name": "session_profile_prompt",
+      "value": "Choose a profile"
+    },
+    {
+      "name": "session_password_placeholder",
+      "value": "Password"
+    },
+    {
+      "name": "session_unlock",
+      "value": "Unlock"
+    },
+    {
+      "name": "session_lock",
+      "value": "Lock"
+    },
+    {
+      "name": "startup_error_title",
+      "value": "Startup failed"
+    },
+    {
+      "name": "startup_error_message",
+      "value": "The app could not initialize. Retry or exit."
+    },
+    {
+      "name": "route_unknown_title",
+      "value": "Page unavailable"
+    },
+    {
+      "name": "route_unknown_message",
+      "value": "The requested page does not exist or its parameters are missing."
+    },
+    {
+      "name": "permission_bluetooth_reason",
+      "value": "Used to discover and provision nearby YaoCore gateways."
     }
   ]
 }

@@ -99,6 +99,118 @@
     {
       "name": "settings_language_en_us",
       "value": "English"
+    },
+    {
+      "name": "tab_home",
+      "value": "首页"
+    },
+    {
+      "name": "tab_rooms",
+      "value": "房间"
+    },
+    {
+      "name": "tab_scenes",
+      "value": "场景"
+    },
+    {
+      "name": "tab_profile",
+      "value": "我的"
+    },
+    {
+      "name": "shell_app_title",
+      "value": "YaoCore"
+    },
+    {
+      "name": "shell_no_family",
+      "value": "未选择家庭"
+    },
+    {
+      "name": "home_add_gateway",
+      "value": "添加网关"
+    },
+    {
+      "name": "rooms_manage",
+      "value": "管理房间"
+    },
+    {
+      "name": "placeholder_message",
+      "value": "此页面将在后续任务中实现。"
+    },
+    {
+      "name": "page_device_control",
+      "value": "设备控制"
+    },
+    {
+      "name": "page_family",
+      "value": "家庭成员与权限"
+    },
+    {
+      "name": "page_room_manage",
+      "value": "房间管理"
+    },
+    {
+      "name": "page_provisioning",
+      "value": "添加设备"
+    },
+    {
+      "name": "page_settings",
+      "value": "设置"
+    },
+    {
+      "name": "page_about",
+      "value": "关于"
+    },
+    {
+      "name": "session_no_profile_title",
+      "value": "尚无本地档案"
+    },
+    {
+      "name": "session_no_profile_message",
+      "value": "创建或加入家庭后即可开始使用。"
+    },
+    {
+      "name": "session_locked_title",
+      "value": "已锁定"
+    },
+    {
+      "name": "session_locked_message",
+      "value": "选择档案并输入密码解锁。"
+    },
+    {
+      "name": "session_profile_prompt",
+      "value": "选择档案"
+    },
+    {
+      "name": "session_password_placeholder",
+      "value": "密码"
+    },
+    {
+      "name": "session_unlock",
+      "value": "解锁"
+    },
+    {
+      "name": "session_lock",
+      "value": "锁定"
+    },
+    {
+      "name": "startup_error_title",
+      "value": "启动失败"
+    },
+    {
+      "name": "startup_error_message",
+      "value": "应用无法完成初始化。请重试或退出。"
+    },
+    {
+      "name": "route_unknown_title",
+      "value": "页面不可用"
+    },
+    {
+      "name": "route_unknown_message",
+      "value": "请求的页面不存在或参数缺失。"
+    },
+    {
+      "name": "permission_bluetooth_reason",
+      "value": "用于发现并配置附近的 YaoCore 网关。"
     }
   ]
 }

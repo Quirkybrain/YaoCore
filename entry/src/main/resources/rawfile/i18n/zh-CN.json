@@ -302,5 +302,16 @@
     "room": {
       "all": "全部房间"
     }
+  },
+  "brand": {
+    "gree": "格力",
+    "haier": "海尔",
+    "midea": "美的",
+    "generic": "通用"
+  },
+  "settings": {
+    "cloud": {
+      "single_gateway_required": "v1 仅支持单网关联云。请先移除多余网关或清除云配置。"
+    }
   }
 }

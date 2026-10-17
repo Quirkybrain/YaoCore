@@ -1,6 +1,23 @@
 {
   "entries": [],
-  "keyEntries": [],
+  "keyEntries": [
+    {
+      "key": "brand.gree",
+      "reason": "F-05 fixed top-level brand key returned by C-16 and consumed by C-24/C-27; not a dynamic t() call site"
+    },
+    {
+      "key": "brand.haier",
+      "reason": "F-05 fixed top-level brand key returned by C-16 and consumed by C-24/C-27; not a dynamic t() call site"
+    },
+    {
+      "key": "brand.midea",
+      "reason": "F-05 fixed top-level brand key returned by C-16 and consumed by C-24/C-27; not a dynamic t() call site"
+    },
+    {
+      "key": "brand.generic",
+      "reason": "F-05 fixed top-level brand key returned by C-16 and consumed by C-24/C-27; not a dynamic t() call site"
+    }
+  ],
   "keyPrefixes": [
     {
       "prefix": "common_",
