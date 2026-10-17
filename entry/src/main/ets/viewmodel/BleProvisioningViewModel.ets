@@ -21,6 +21,7 @@ import {
   BleProvisioningRequest,
   BleProvisioningStage,
   BleScanFilter,
+  BleWifiScanRequest,
   ProvisioningProgress,
   ProvisioningState,
   WifiAp
@@ -133,6 +134,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   private revision: number = 0;
   private disposed: boolean = false;
   private submitting: boolean = false;
+  private preparing: boolean = false;
   private scanTimerId: number | undefined = undefined;
   /** F-03: invalidates a late startScan continuation after back/cancel/dispose. */
   private scanGeneration: number = 0;
@@ -252,8 +254,65 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       this.state.permission, undefined, this.state.draftReady, true, device));
   }
 
+  /**
+   * F-08: C-23 exposes the C-28 permission gate's "open settings" recovery.
+   * The port is optional so older test harnesses keep their narrow shape.
+   */
+  async openSettings(): Promise<void> {
+    if (this.permissions.openSettings === undefined) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'openSettings')]);
+    }
+    await this.permissions.openSettings();
+  }
+
+  /**
+   * F-07: real handshake + AP scan for step 3. The aggregated submit() below
+   * still performs the authoritative flow when credentials are applied.
+   */
+  async prepareWifi(pop: string, expectedGatewayId?: string): Promise<void> {
+    if (this.preparing || this.submitting) {
+      return;
+    }
+    if (this.selectedDevice === undefined) {
+      this.failWith(AppErrors.of('PROVISIONING_DEVICE_NOT_FOUND', []), this.state.step,
+        this.state.provisioning);
+      return;
+    }
+    if (pop.length === 0) {
+      this.failWith(AppErrors.of('PROVISIONING_POP_INVALID', []), this.state.step,
+        this.state.provisioning);
+      return;
+    }
+    let popBytes: Uint8Array = new Uint8Array(0);
+    this.preparing = true;
+    try {
+      popBytes = Utf8.encode(pop);
+      const request = new BleWifiScanRequest(popBytes, this.selectedDevice, expectedGatewayId);
+      this.publish(new BleProvisioningViewState(LoadPhase.READY,
+        WizardStep.STEP_2_HANDSHAKE, ProvisioningState.CONNECTING, this.state.permission,
+        this.state.scanResults, this.selectedDevice, [], undefined, undefined, undefined,
+        undefined, false, true, this.revision + 1));
+      const accessPoints = await this.ble.scanWifiAccessPoints(request,
+        new WizardProgressListener(this));
+      if (this.disposed) {
+        return;
+      }
+      this.publish(new BleProvisioningViewState(LoadPhase.READY,
+        WizardStep.STEP_3_WIFI_SELECT, ProvisioningState.AP_SCANNING, this.state.permission,
+        this.state.scanResults, this.selectedDevice, accessPoints, this.state.selectedSsid,
+        undefined, undefined, undefined, false, true, this.revision + 1));
+    } catch (error) {
+      if (!this.disposed) {
+        this.handleProvisionFailure(error as Object);
+      }
+    } finally {
+      BytesUtil.zeroize(popBytes);
+      this.preparing = false;
+    }
+  }
+
   async submit(pop: string, ssid: string, wifiPassword: string,
-    commandSecretHex?: string): Promise<void> {
+    commandSecretHex?: string, expectedGatewayId?: string): Promise<void> {
     if (this.submitting) {
       return;
     }
@@ -292,7 +351,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
       popBytes = Utf8.encode(pop);
       passwordBytes = Utf8.encode(wifiPassword);
       const request = new BleProvisioningRequest(ssid, passwordBytes, popBytes,
-        this.selectedDevice, this.requestDraftId, this.familyId);
+        this.selectedDevice, this.requestDraftId, this.familyId, expectedGatewayId);
       this.submitting = true;
       this.publish(new BleProvisioningViewState(LoadPhase.READY,
         WizardStep.STEP_2_HANDSHAKE, ProvisioningState.CONNECTING,

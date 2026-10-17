@@ -381,6 +381,7 @@ export struct RoomManagePage {
                 localeRevision: this.localeRevision,
                 records: this.rooms.unassignedRecords,
                 rooms: this.rooms.rooms,
+                canAssign: this.isAdmin(),
                 onAssign: (key: DeviceKey, roomId: string): void => {
                   this.assignDevice(key, roomId);
                 },

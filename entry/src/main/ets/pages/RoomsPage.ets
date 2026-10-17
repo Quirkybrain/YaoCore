@@ -16,6 +16,7 @@ import {
   AppSpacing,
   AppTypography
 } from '../common/theme/AppTheme';
+import { MemberRole } from '../model/FamilyModels';
 import type { Room } from '../model/FamilyModels';
 import { DeviceKey } from '../model/DeviceKey';
 import type { DeviceRecord } from '../repository/DomainModels';
@@ -179,6 +180,12 @@ export struct RoomsPage {
     this.navigation.push(AppRoute.ROOM_MANAGE, new AppRouteParams({ roomId: roomId }));
   }
 
+  /** F-03: room/pool management is ADMIN-only (service also refuses). */
+  private isAdmin(): boolean {
+    const session = this.appContext.session;
+    return session !== undefined && session.role === MemberRole.ADMIN;
+  }
+
   build() {
     Scroll() {
       Column({ space: AppSpacing.md }) {
@@ -188,6 +195,8 @@ export struct RoomsPage {
           familyName: this.appContext.activeFamilyName,
           gateway: undefined,
           cloud: CloudLinkState.UNKNOWN,
+          // F-16: Rooms has no gateway status source; do not claim "no gateway".
+          showGateway: false,
           isRefreshing: this.refreshing,
           onFamilyClick: (): void => {
             this.navigation.push(AppRoute.FAMILY);
@@ -237,6 +246,7 @@ export struct RoomsPage {
                     room: room,
                     deviceCount: UiMapping.roomDeviceCount(this.devices.records, room.roomId),
                     unassignedCount: this.rooms.unassignedRecords.length,
+                    canManage: this.isAdmin(),
                     onOpen: (): void => {
                       this.selectedRoomId = room.roomId;
                     },
@@ -255,18 +265,20 @@ export struct RoomsPage {
             .width('100%')
           }
 
-          Row({ space: AppSpacing.sm }) {
-            PrimaryButton({
-              i18n: this.i18n,
-              localeRevision: this.localeRevision,
-              labelKey: 'rooms.add_room',
-              fullWidth: true,
-              onTap: (): void => {
-                this.navigation.push(AppRoute.ROOM_MANAGE);
-              }
-            })
+          if (this.isAdmin()) {
+            Row({ space: AppSpacing.sm }) {
+              PrimaryButton({
+                i18n: this.i18n,
+                localeRevision: this.localeRevision,
+                labelKey: 'rooms.add_room',
+                fullWidth: true,
+                onTap: (): void => {
+                  this.navigation.push(AppRoute.ROOM_MANAGE);
+                }
+              })
+            }
+            .width('100%')
           }
-          .width('100%')
 
           if (this.selectedRoomId.length > 0) {
             SectionHeader({
@@ -311,6 +323,7 @@ export struct RoomsPage {
             localeRevision: this.localeRevision,
             records: this.rooms.unassignedRecords,
             rooms: this.rooms.rooms,
+            canAssign: this.isAdmin(),
             onAssign: (key: DeviceKey, roomId: string): void => {
               this.assignDevice(key, roomId);
             },

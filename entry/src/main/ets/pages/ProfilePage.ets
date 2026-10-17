@@ -22,7 +22,12 @@ import {
 import { MemberRole } from '../model/FamilyModels';
 import type { FamilyMemberView } from '../service/family/FamilyModels';
 import { FamilyViewState, FamilyViewModel } from '../viewmodel/FamilyViewModel';
-import { LoadingSkeleton, PrimaryButton, SectionHeader } from '../components/CommonControls';
+import {
+  ErrorState,
+  LoadingSkeleton,
+  PrimaryButton,
+  SectionHeader
+} from '../components/CommonControls';
 import { UiMapping } from '../components/support/UiMapping';
 
 @Component
@@ -172,6 +177,20 @@ export struct ProfilePage {
 
         if (this.family.phase === 'LOADING' && this.family.members.length === 0) {
           LoadingSkeleton({ rows: 2, cardHeight: 56 })
+        } else if (this.family.phase === 'ERROR') {
+          // F-12: family read failure must be visible, not an empty shell.
+          ErrorState({
+            i18n: this.i18n,
+            localeRevision: this.localeRevision,
+            messageKey: this.family.error === undefined
+              ? 'common.refresh_failed' : this.family.error.i18nKey,
+            onRetry: (): void => {
+              const vm = this.familyVm;
+              if (vm !== undefined) {
+                vm.refresh().catch((): void => undefined);
+              }
+            }
+          })
         }
 
         SectionHeader({
@@ -195,9 +214,11 @@ export struct ProfilePage {
         this.entry('profile.about', (): void => {
           this.navigation.push(AppRoute.ABOUT);
         })
-        this.entry('profile.provisioning', (): void => {
-          this.navigation.push(AppRoute.PROVISIONING);
-        })
+        if (this.isAdmin()) {
+          this.entry('profile.provisioning', (): void => {
+            this.navigation.push(AppRoute.PROVISIONING);
+          })
+        }
 
         PrimaryButton({
           i18n: this.i18n,

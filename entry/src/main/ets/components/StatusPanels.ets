@@ -27,6 +27,7 @@ export struct StatusBanner {
   @Prop familyName: string = '';
   @Prop gateway: GatewayStatus | undefined = undefined;
   @Prop cloud: CloudLinkState = CloudLinkState.UNKNOWN;
+  @Prop showGateway: boolean = true;
   @Prop isRefreshing: boolean = false;
   onFamilyClick: () => void = (): void => {};
   onGatewayClick: () => void = (): void => {};
@@ -99,47 +100,49 @@ export struct StatusBanner {
       }
       .width('100%')
 
-      Row({ space: AppSpacing.xs }) {
-        Row({ space: AppSpacing.xxs }) {
-          Ellipse()
-            .width(8)
-            .height(8)
-            .fill(this.lanColor())
-          Text(this.i18n.t(this.lanKey()))
+      if (this.showGateway) {
+        Row({ space: AppSpacing.xs }) {
+          Row({ space: AppSpacing.xxs }) {
+            Ellipse()
+              .width(8)
+              .height(8)
+              .fill(this.lanColor())
+            Text(this.i18n.t(this.lanKey()))
+              .fontSize(AppTypography.label)
+              .fontColor(AppColors.inkSoft())
+            if (this.gateway !== undefined && this.gateway.latencyMs !== undefined) {
+              Text(this.i18n.t('home.metric.rtt_ms',
+                new I18nParams([new NameValue('value', String(this.gateway.latencyMs))])))
+                .fontSize(AppTypography.caption)
+                .fontColor(AppColors.muted())
+            }
+          }
+          .height(44)
+          .onClick((): void => {
+            this.onGatewayClick();
+          })
+          Text('·')
+            .fontSize(AppTypography.caption)
+            .fontColor(AppColors.mutedLight())
+          Text(this.i18n.t(this.cloudKey()))
             .fontSize(AppTypography.label)
-            .fontColor(AppColors.inkSoft())
-          if (this.gateway !== undefined && this.gateway.latencyMs !== undefined) {
-            Text(this.i18n.t('home.metric.rtt_ms',
-              new I18nParams([new NameValue('value', String(this.gateway.latencyMs))])))
+            .fontColor(AppColors.muted())
+          Blank()
+          if (this.gateway !== undefined && this.gateway.gatewayName.length > 0) {
+            Text(this.gateway.gatewayName)
               .fontSize(AppTypography.caption)
               .fontColor(AppColors.muted())
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
         }
-        .height(44)
-        .onClick((): void => {
-          this.onGatewayClick();
-        })
-        Text('·')
-          .fontSize(AppTypography.caption)
-          .fontColor(AppColors.mutedLight())
-        Text(this.i18n.t(this.cloudKey()))
-          .fontSize(AppTypography.label)
-          .fontColor(AppColors.muted())
-        Blank()
-        if (this.gateway !== undefined && this.gateway.gatewayName.length > 0) {
-          Text(this.gateway.gatewayName)
+        .width('100%')
+        .padding({ top: AppSpacing.xs, bottom: AppSpacing.xs })
+        if (this.gateway !== undefined && this.gateway.warningKey !== undefined) {
+          Text(this.i18n.t(this.gateway.warningKey))
             .fontSize(AppTypography.caption)
-            .fontColor(AppColors.muted())
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .fontColor(AppColors.amber())
         }
-      }
-      .width('100%')
-      .padding({ top: AppSpacing.xs, bottom: AppSpacing.xs })
-      if (this.gateway !== undefined && this.gateway.warningKey !== undefined) {
-        Text(this.i18n.t(this.gateway.warningKey))
-          .fontSize(AppTypography.caption)
-          .fontColor(AppColors.amber())
       }
     }
     .width('100%')

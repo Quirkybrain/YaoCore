@@ -63,6 +63,7 @@ export struct SettingsPage {
   @State selectedGatewayId: string = '';
   @State localErrorKey: string = '';
   @State cloudTested: boolean = false;
+  @State cloudTestOk: boolean = false;
 
   private settingsVm: SettingsViewModel | undefined = undefined;
   private unsubscribeSettings: (() => void) | undefined = undefined;
@@ -155,7 +156,12 @@ export struct SettingsPage {
       return;
     }
     this.cloudTested = true;
-    vm.testCloudConnection().catch((): void => undefined);
+    this.cloudTestOk = false;
+    vm.testCloudConnection().then((ok: boolean): void => {
+      this.cloudTestOk = ok;
+    }).catch((): void => {
+      this.cloudTestOk = false;
+    });
   }
 
   private clearToken(): void {
@@ -364,7 +370,12 @@ export struct SettingsPage {
           })
       }
       .width('100%')
-      if (this.cloudTested && this.settings.cloud !== undefined &&
+      if (this.cloudTested && this.cloudTestOk) {
+        // F-17: success is explicit; a state refresh alone was ambiguous.
+        Text(this.i18n.t('errors.gateway.success'))
+          .fontSize(AppTypography.caption)
+          .fontColor(AppColors.green())
+      } else if (this.cloudTested && this.settings.cloud !== undefined &&
         this.settings.cloud.lastError !== undefined) {
         Text(this.i18n.t(this.settings.cloud.lastError.i18nKey))
           .fontSize(AppTypography.caption)
@@ -620,7 +631,9 @@ export struct SettingsPage {
               this.sectionButton(SettingsSection.LANGUAGE, 'settings.section.language')
               this.sectionButton(SettingsSection.CLOUD, 'settings.section.cloud')
               this.sectionButton(SettingsSection.SECURITY, 'settings.section.security')
-              this.sectionButton(SettingsSection.ADVANCED, 'settings.section.advanced')
+              if (this.isAdmin()) {
+                this.sectionButton(SettingsSection.ADVANCED, 'settings.section.advanced')
+              }
               this.sectionButton(SettingsSection.NOTIFICATIONS,
                 'settings.section.behaviour')
               this.sectionButton(SettingsSection.ABOUT, 'settings.section.about')
@@ -652,7 +665,7 @@ export struct SettingsPage {
               this.cloudSection()
             } else if (this.section === SettingsSection.SECURITY) {
               this.securitySection()
-            } else if (this.section === SettingsSection.ADVANCED) {
+            } else if (this.section === SettingsSection.ADVANCED && this.isAdmin()) {
               this.advancedSection()
             } else if (this.section === SettingsSection.NOTIFICATIONS) {
               this.behaviourSection()

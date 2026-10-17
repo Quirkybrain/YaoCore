@@ -51,6 +51,7 @@ export struct ScenePage {
   @State showOverlay: boolean = false;
   @State editNotice: boolean = false;
   @State busy: boolean = false;
+  @State canExecuteScene: boolean = false;
 
   private sceneVm: SceneViewModel | undefined = undefined;
   private lastShownRunId: string = '';
@@ -59,6 +60,9 @@ export struct ScenePage {
   aboutToAppear(): void {
     const vm = this.vmFactory.createSceneViewModel();
     this.sceneVm = vm;
+    // F-02: capability comes from the same C-12 policy port used by the
+    // service; GUEST/unlocked-without-policy renders a disabled entry.
+    this.canExecuteScene = vm.canExecuteScene();
     this.unsubscribeScenes = vm.subscribe((state: SceneViewState): void => {
       this.scenes = state;
       let runId = '';
@@ -91,7 +95,7 @@ export struct ScenePage {
 
   private runScene(scene: Scene): void {
     const vm = this.sceneVm;
-    if (vm === undefined || this.busy) {
+    if (vm === undefined || this.busy || !this.canExecuteScene) {
       return;
     }
     this.busy = true;
@@ -287,6 +291,7 @@ export struct ScenePage {
                 localeRevision: this.localeRevision,
                 scene: scene,
                 isRunning: this.scenes.runningSceneId === scene.sceneId,
+                canRun: this.canExecuteScene,
                 lastResult: this.scenes.lastResult !== undefined &&
                   this.scenes.lastResult.sceneId === scene.sceneId
                   ? this.scenes.lastResult : undefined,

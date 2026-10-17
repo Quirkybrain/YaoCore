@@ -56,6 +56,8 @@ export struct ProvisioningPage {
   @State ssid: string = '';
   @State wifiPassword: string = '';
   @State busy: boolean = false;
+  @State cancelled: boolean = false;
+  @State blocked: boolean = false;
   @State errorKey: string = '';
 
   private provisioningVm: BleProvisioningViewModel | undefined = undefined;
@@ -69,6 +71,14 @@ export struct ProvisioningPage {
       if (state.step === WizardStep.STEP_5_BOUND && state.result !== undefined) {
         this.localStep = 5;
         this.busy = false;
+      } else if (state.step > this.localStep && state.step < WizardStep.STEP_5_BOUND &&
+        !this.cancelled) {
+        // F-07: the VM publishes the real handshake/AP-scan progression. Only
+        // advance; explicit user navigation owns backward movement.
+        this.localStep = state.step;
+        if (state.accessPoints.length > 0 && state.step === WizardStep.STEP_3_WIFI_SELECT) {
+          this.busy = false;
+        }
       }
       if (state.error !== undefined) {
         this.errorKey = state.error.i18nKey;
@@ -76,6 +86,16 @@ export struct ProvisioningPage {
         this.busy = false;
       }
     });
+    if (this.params.mode === 'ROTATE_SECRET' || this.params.mode === 'RECONFIGURE') {
+      if (this.params.expectedGatewayId === undefined ||
+        this.params.expectedGatewayId.length === 0) {
+        // F-09: a rotation/reconfiguration without a target is unsafe; refuse
+        // to present the wizard rather than silently bind another gateway.
+        this.blocked = true;
+        this.errorKey = 'provisioning.error.credential_missing';
+        return;
+      }
+    }
     const familyId = this.appContext.activeFamilyId;
     if (familyId === undefined) {
       this.errorKey = 'family.none_message';
@@ -85,6 +105,7 @@ export struct ProvisioningPage {
   }
 
   aboutToDisappear(): void {
+    this.clearSecrets();
     if (this.unsubscribeProvisioning !== undefined) {
       this.unsubscribeProvisioning();
       this.unsubscribeProvisioning = undefined;
@@ -93,6 +114,17 @@ export struct ProvisioningPage {
       this.provisioningVm.dispose();
       this.provisioningVm = undefined;
     }
+  }
+
+  /** F-20: never leave PoP/SSID/Wi-Fi password in page state after exit. */
+  private clearSecrets(): void {
+    this.pop = '';
+    this.ssid = '';
+    this.wifiPassword = '';
+  }
+
+  private expectedGatewayId(): string | undefined {
+    return this.params.expectedGatewayId;
   }
 
   private requestPermissionAndScan(): void {
@@ -137,12 +169,23 @@ export struct ProvisioningPage {
   }
 
   private nextFromHandshake(): void {
+    const vm = this.provisioningVm;
+    if (vm === undefined || this.busy || this.blocked) {
+      return;
+    }
     if (this.pop.trim().length === 0) {
       this.errorKey = 'provisioning.error.pop_invalid';
       return;
     }
     this.errorKey = '';
-    this.localStep = 3;
+    this.busy = true;
+    // F-07: run the real Security1 handshake and AP scan before step 3; the
+    // page no longer asks for SSID without the gateway's AP list.
+    vm.prepareWifi(this.pop, this.expectedGatewayId()).then((): void => {
+      this.busy = false;
+    }).catch((): void => {
+      this.busy = false;
+    });
   }
 
   private nextFromWifi(): void {
@@ -156,7 +199,13 @@ export struct ProvisioningPage {
 
   private applyCredentials(): void {
     const vm = this.provisioningVm;
-    if (vm === undefined || this.busy) {
+    if (vm === undefined || this.busy || this.blocked) {
+      return;
+    }
+    const expected = this.expectedGatewayId();
+    if ((this.params.mode === 'ROTATE_SECRET' || this.params.mode === 'RECONFIGURE') &&
+      (expected === undefined || expected.length === 0)) {
+      this.errorKey = 'provisioning.error.credential_missing';
       return;
     }
     if (this.pop.trim().length === 0 || this.ssid.trim().length === 0 ||
@@ -166,7 +215,10 @@ export struct ProvisioningPage {
     }
     this.busy = true;
     this.errorKey = '';
-    vm.submit(this.pop, this.ssid.trim(), this.wifiPassword).then((): void => {
+    // F-09: pass the expected gateway so C-19 validates identity before
+    // binding; ROTATE_SECRET/RECONFIGURE are refused above when absent.
+    vm.submit(this.pop, this.ssid.trim(), this.wifiPassword, undefined,
+      this.expectedGatewayId()).then((): void => {
       this.busy = false;
     }).catch((): void => {
       this.busy = false;
@@ -175,14 +227,24 @@ export struct ProvisioningPage {
 
   private cancel(): void {
     const vm = this.provisioningVm;
+    this.clearSecrets();
+    this.errorKey = '';
     if (vm !== undefined) {
       vm.cancel().then((): void => {
-        this.navigation.pop();
+        // F-20: show the explicit cancelled state instead of popping silently.
+        this.cancelled = true;
       }).catch((): void => {
-        this.navigation.pop();
+        this.cancelled = true;
       });
     } else {
-      this.navigation.pop();
+      this.cancelled = true;
+    }
+  }
+
+  private openSettings(): void {
+    const vm = this.provisioningVm;
+    if (vm !== undefined) {
+      vm.openSettings().catch((): void => undefined);
     }
   }
 
@@ -245,6 +307,19 @@ export struct ProvisioningPage {
         Text(this.i18n.t('provisioning.error.bluetooth_off'))
           .fontSize(AppTypography.label)
           .fontColor(AppColors.amber())
+      }
+      if (this.view.permission === ProvisioningPermissionState.DENIED ||
+        this.view.permission === ProvisioningPermissionState.BLUETOOTH_OFF) {
+        // F-08: terminal permission states need a recovery path.
+        Button(this.i18n.t('profile.settings'))
+          .height(44)
+          .fontSize(AppTypography.label)
+          .fontColor(AppColors.primary())
+          .backgroundColor(AppColors.field())
+          .borderRadius(AppRadius.button)
+          .onClick((): void => {
+            this.openSettings();
+          })
       }
       PrimaryButton({
         i18n: this.i18n,
@@ -363,11 +438,17 @@ export struct ProvisioningPage {
         i18n: this.i18n,
         localeRevision: this.localeRevision,
         labelKey: 'common.next',
-        isEnabled: this.pop.trim().length > 0,
+        loading: this.busy,
+        isEnabled: this.pop.trim().length > 0 && !this.busy,
         onTap: (): void => {
           this.nextFromHandshake();
         }
       })
+      if (this.busy) {
+        Text(this.i18n.t('provisioning.progress.security_handshake'))
+          .fontSize(AppTypography.caption)
+          .fontColor(AppColors.muted())
+      }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -522,62 +603,101 @@ export struct ProvisioningPage {
               .fontWeight(AppTypography.weightBold)
               .fontColor(AppColors.ink())
               .layoutWeight(1)
-            Button(this.i18n.t('provisioning.cancel'))
-              .height(44)
-              .fontSize(AppTypography.label)
-              .fontColor(AppColors.red())
-              .backgroundColor(Color.Transparent)
-              .enabled(this.view.canCancel || this.localStep < 5)
-              .onClick((): void => {
-                this.cancel();
-              })
+            if (!this.cancelled && !this.blocked) {
+              Button(this.i18n.t('provisioning.cancel'))
+                .height(44)
+                .fontSize(AppTypography.label)
+                .fontColor(AppColors.red())
+                .backgroundColor(Color.Transparent)
+                .enabled((this.view.canCancel || this.localStep < 5) && !this.busy)
+                .onClick((): void => {
+                  this.cancel();
+                })
+            }
           }
           .width('100%')
-          this.stepIndicator()
-          if (this.localStep < 5 && this.params.mode === 'ROTATE_SECRET') {
-            Text(this.i18n.t('provisioning.rotate.hint'))
-              .fontSize(AppTypography.caption)
-              .fontColor(AppColors.amber())
-          }
-          if (this.errorKey.length > 0) {
-            Text(this.i18n.t(this.errorKey))
-              .fontSize(AppTypography.label)
-              .fontColor(AppColors.red())
-              .width('100%')
-              .padding(AppSpacing.sm)
-              .backgroundColor(AppColors.surface())
-              .borderRadius(AppRadius.button)
-          }
-          if (this.localStep === 0) {
-            this.stepPermission()
-          } else if (this.localStep === 1) {
-            this.stepScan()
-          } else if (this.localStep === 2) {
-            this.stepHandshake()
-          } else if (this.localStep === 3) {
-            this.stepWifi()
-          } else if (this.localStep === 4) {
-            this.stepApply()
-          } else {
-            this.stepBound()
-          }
-          if (this.localStep > 1 && this.localStep < 5) {
-            Button(this.i18n.t('common.previous'))
-              .height(44)
-              .fontSize(AppTypography.label)
-              .fontColor(AppColors.inkSoft())
-              .backgroundColor(AppColors.field())
-              .borderRadius(AppRadius.button)
-              .enabled(!this.busy)
-              .onClick((): void => {
-                if (this.localStep === 4) {
-                  this.localStep = 3;
-                } else if (this.localStep === 3) {
-                  this.localStep = 2;
-                } else {
-                  this.localStep = 1;
+          if (this.blocked) {
+            Column({ space: AppSpacing.sm }) {
+              Text(this.i18n.t(this.errorKey))
+                .fontSize(AppTypography.body)
+                .fontColor(AppColors.red())
+              PrimaryButton({
+                i18n: this.i18n,
+                localeRevision: this.localeRevision,
+                labelKey: 'common.close',
+                onTap: (): void => {
+                  this.navigation.pop();
                 }
               })
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Start)
+          } else if (this.cancelled) {
+            Column({ space: AppSpacing.sm }) {
+              Text(this.i18n.t('provisioning.error.cancelled'))
+                .fontSize(AppTypography.body)
+                .fontColor(AppColors.amber())
+              PrimaryButton({
+                i18n: this.i18n,
+                localeRevision: this.localeRevision,
+                labelKey: 'common.close',
+                onTap: (): void => {
+                  this.navigation.pop();
+                }
+              })
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Start)
+          } else {
+            this.stepIndicator()
+            if (this.localStep < 5 && (this.params.mode === 'ROTATE_SECRET' ||
+              this.params.mode === 'RECONFIGURE')) {
+              Text(this.i18n.t('provisioning.rotate.hint'))
+                .fontSize(AppTypography.caption)
+                .fontColor(AppColors.amber())
+            }
+            if (this.errorKey.length > 0) {
+              Text(this.i18n.t(this.errorKey))
+                .fontSize(AppTypography.label)
+                .fontColor(AppColors.red())
+                .width('100%')
+                .padding(AppSpacing.sm)
+                .backgroundColor(AppColors.surface())
+                .borderRadius(AppRadius.button)
+            }
+            if (this.localStep === 0) {
+              this.stepPermission()
+            } else if (this.localStep === 1) {
+              this.stepScan()
+            } else if (this.localStep === 2) {
+              this.stepHandshake()
+            } else if (this.localStep === 3) {
+              this.stepWifi()
+            } else if (this.localStep === 4) {
+              this.stepApply()
+            } else {
+              this.stepBound()
+            }
+            if (this.localStep > 1 && this.localStep < 5) {
+              Button(this.i18n.t('common.previous'))
+                .height(44)
+                .fontSize(AppTypography.label)
+                .fontColor(AppColors.inkSoft())
+                .backgroundColor(AppColors.field())
+                .borderRadius(AppRadius.button)
+                .enabled(!this.busy)
+                .onClick((): void => {
+                  if (this.localStep === 4) {
+                    this.localStep = 3;
+                  } else if (this.localStep === 3) {
+                    this.localStep = 2;
+                  } else if (this.localStep === 2) {
+                    this.localStep = 1;
+                  } else {
+                    this.localStep = 1;
+                  }
+                })
+            }
           }
         }
         .width('100%')

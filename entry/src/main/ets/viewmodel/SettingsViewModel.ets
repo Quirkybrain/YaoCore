@@ -354,6 +354,12 @@ export class SettingsViewModel implements ViewModelBase<SettingsViewState> {
   async probeManualAddress(gatewayId: string, ip: string, port: number):
     Promise<ManualAddressResult> {
     try {
+      // F-03: manual gateway address probing is ADMIN-only, matching the
+      // hidden Settings entry. Hide-if-and-enforce-here is defense in depth.
+      const session = this.auth.getActiveSession();
+      if (session === undefined || !this.auth.canManageFamily(session).allowed) {
+        throw AppErrors.of('AUTH_RBAC_DENIED', []);
+      }
       if (!IpAddressUtil.isAllowedLanIpv4(ip.trim()) || !IpAddressUtil.isValidPort(port)) {
         throw AppErrors.of('MANUAL_ADDRESS_REJECTED', []);
       }

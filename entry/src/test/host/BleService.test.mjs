@@ -10,7 +10,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { AppError } from '../../main/ets/common/types/AppError.ets';
-import { BleScanFilter, ProvisioningState } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
+import {
+  BleScanFilter,
+  BleWifiScanRequest,
+  ProvisioningState
+} from '../../main/ets/service/ble/BleProvisioningPorts.ets';
 import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
 import { IdentityVersion } from '../../main/ets/model/ProvisioningModels.ets';
 import {
@@ -439,4 +443,20 @@ test('C19_BleProvisioningService_retryUsesNewSessionAndKeypair', async () => {
   assert.equal(step0Writes.length, 4);
   assert.notEqual(step0Writes[0], step0Writes[2],
     'a retry must not reuse the previous Security1 keypair/state');
+});
+
+test('T18_C19_scanWifiAccessPointsHandshakesWithoutApplyingCredentials', async () => {
+  const ctx = makeService();
+  const events = listener();
+  const aps = await ctx.service.scanWifiAccessPoints(
+    new BleWifiScanRequest(utf8('pop'), makeDevice(), GATEWAY_ID), events.listener);
+  assert.equal(aps.length, 2);
+  assert.equal(events.aps.length, 2);
+  assert.deepEqual(events.stages, ['CONNECTING', 'SECURITY', 'IDENTITY', 'WIFI_SCAN']);
+  assert.equal(events.states.includes(ProvisioningState.AP_SCANNING), true);
+  assert.equal(ctx.gateway.applied, false);
+  assert.equal(ctx.gateway.config, undefined);
+  assert.equal(ctx.connection.disconnectCalls >= 1, true);
+  // The BLE link is torn down after the preview scan.
+  assert.equal(ctx.service.running, false);
 });

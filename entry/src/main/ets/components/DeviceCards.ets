@@ -13,20 +13,17 @@ import type { Scene } from '../model/FamilyModels';
 import type { Room } from '../model/FamilyModels';
 import type { AcViewState } from '../service/ac/AcModels';
 import { AcMode } from '../model/DeviceTypes';
-import {
-  ControlPhase,
-  ControlUiState
-} from '../viewmodel/core/ViewModelCore';
-import {
-  DoorLockState,
-  DoorUiState
-} from '../viewmodel/core/DoorConfirmationTracker';
+import { ControlPhase } from '../viewmodel/core/ViewModelCore';
+import type { ControlUiState } from '../viewmodel/core/ViewModelCore';
+import { DoorLockState } from '../viewmodel/core/DoorConfirmationTracker';
+import type { DoorUiState } from '../viewmodel/core/DoorConfirmationTracker';
 import { DeviceKey } from '../model/DeviceKey';
 import { CardVisualState } from '../common/theme/AppEnums';
 import { I18nParams } from '../service/i18n/I18nModels';
 import { NameValue } from '../common/types/NameValue';
 import {
   AppColors,
+  AppMotionTokens,
   AppRadius,
   AppSpacing,
   AppTypography
@@ -50,6 +47,10 @@ export struct LightCard {
 
   private visual(): CardVisualState {
     return UiMapping.visualState(this.record, this.control);
+  }
+
+  private controlsEnabled(): boolean {
+    return UiMapping.controlsEnabled(this.record);
   }
 
   build() {
@@ -76,11 +77,20 @@ export struct LightCard {
           .fontColor(AppColors.muted())
       }
       Row({ space: AppSpacing.xs }) {
-        Text(this.i18n.t(UiMapping.powerValue(this.record, this.control)
-          ? 'common.on' : 'common.off'))
+        Button(this.i18n.t(UiMapping.powerValue(this.record, this.control)
+          ? 'common.off' : 'common.on'))
+          .height(44)
           .fontSize(AppTypography.label)
-          .fontColor(UiMapping.powerValue(this.record, this.control)
+          .fontColor(Color.White)
+          .backgroundColor(UiMapping.powerValue(this.record, this.control)
             ? AppColors.primary() : AppColors.muted())
+          .borderRadius(AppRadius.chip)
+          .enabled(this.controlsEnabled())
+          .accessibilityText(this.i18n.t(UiMapping.powerValue(this.record, this.control)
+            ? 'common.off' : 'common.on'))
+          .onClick((): void => {
+            this.onToggle();
+          })
         Blank()
         Button(this.i18n.t('common.view'))
           .height(44)
@@ -109,8 +119,10 @@ export struct LightCard {
             .layoutWeight(1)
             .selectedColor(AppColors.primary())
             .trackColor(AppColors.line())
-            .enabled(this.record.isControlAllowed &&
-              this.visual() !== CardVisualState.PENDING)
+            // F-04: PENDING must keep receiving drag input. The VM's
+            // ThrottleGate/TouchUp and same-action de-duplication own
+            // idempotency; disabling the slider here breaks 55ms tracking.
+            .enabled(this.controlsEnabled())
             .onChange((value: number, mode: SliderChangeMode): void => {
               if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
                 this.onBrightnessCommit(value);
@@ -129,7 +141,7 @@ export struct LightCard {
                 .backgroundColor(color)
                 .borderRadius(22)
                 .border({ width: 1, color: AppColors.edge() })
-                .enabled(this.record.isControlAllowed)
+                .enabled(this.controlsEnabled())
                 .accessibilityText(color)
                 .onClick((): void => {
                   this.onColor(color);
@@ -154,7 +166,7 @@ export struct LightCard {
       offsetY: 8
     })
     .animation({
-      duration: this.motionEnabled ? 220 : 0,
+      duration: this.motionEnabled ? AppMotionTokens.FADE_MS : 0,
       curve: Curve.EaseInOut
     })
   }
@@ -169,6 +181,7 @@ export struct ClimateCard {
   @Require control: ControlUiState;
   @Prop roomName: string = '';
   @Prop compact: boolean = false;
+  @Prop motionEnabled: boolean = true;
   onPower: () => void = (): void => {};
   onMode: (mode: AcMode) => void = (mode: AcMode): void => {};
   onTemperatureChange: (value: number) => void = (value: number): void => {};
@@ -177,6 +190,10 @@ export struct ClimateCard {
 
   private visual(): CardVisualState {
     return UiMapping.visualState(this.record, this.control);
+  }
+
+  private controlsEnabled(): boolean {
+    return UiMapping.controlsEnabled(this.record);
   }
 
   build() {
@@ -209,7 +226,7 @@ export struct ClimateCard {
           .backgroundColor(UiMapping.powerValue(this.record, this.control)
             ? AppColors.primary() : AppColors.muted())
           .borderRadius(AppRadius.chip)
-          .enabled(this.record.isControlAllowed)
+          .enabled(this.controlsEnabled())
           .accessibilityText(this.i18n.t(UiMapping.powerValue(this.record, this.control)
             ? 'common.on' : 'common.off'))
           .onClick((): void => {
@@ -238,7 +255,7 @@ export struct ClimateCard {
           .width('100%')
           .selectedColor(AppColors.primary())
           .trackColor(AppColors.line())
-          .enabled(this.record.isControlAllowed)
+          .enabled(this.controlsEnabled())
           .onChange((value: number, mode: SliderChangeMode): void => {
             if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
               this.onTemperatureCommit(value);
@@ -257,7 +274,7 @@ export struct ClimateCard {
               .backgroundColor(this.ac.mode.mode === mode
                 ? AppColors.primary() : AppColors.field())
               .borderRadius(AppRadius.chip)
-              .enabled(this.record.isControlAllowed)
+              .enabled(this.controlsEnabled())
               .onClick((): void => {
                 this.onMode(mode);
               })
@@ -280,6 +297,10 @@ export struct ClimateCard {
       offsetX: 0,
       offsetY: 8
     })
+    .animation({
+      duration: this.motionEnabled ? AppMotionTokens.FADE_MS : 0,
+      curve: Curve.EaseInOut
+    })
   }
 }
 
@@ -292,6 +313,7 @@ export struct DoorCard {
   @Require control: ControlUiState;
   @Prop roomName: string = '';
   @Prop compact: boolean = false;
+  @Prop motionEnabled: boolean = true;
   onOpen: () => void = (): void => {};
   onClose: () => void = (): void => {};
   onConfigureLink: () => void = (): void => {};
@@ -302,20 +324,12 @@ export struct DoorCard {
     return UiMapping.visualState(this.record, this.control);
   }
 
+  private controlsEnabled(): boolean {
+    return UiMapping.controlsEnabled(this.record);
+  }
+
   private lockKey(): string {
-    if (this.door.lockState === DoorLockState.SECURED) {
-      return 'door.state.secured';
-    }
-    if (this.door.lockState === DoorLockState.UNCONFIRMED) {
-      return 'door.state.unconfirmed';
-    }
-    if (this.door.lockState === DoorLockState.OPEN) {
-      return 'device.door.stage.open';
-    }
-    if (this.door.lockState === DoorLockState.UNKNOWN) {
-      return 'door.state.unknown';
-    }
-    return 'door.link.unverified';
+    return UiMapping.lockKeyFor(this.door.lockState);
   }
 
   build() {
@@ -367,7 +381,7 @@ export struct DoorCard {
             .fontColor(Color.White)
             .backgroundColor(AppColors.primary())
             .borderRadius(AppRadius.button)
-            .enabled(this.record.isControlAllowed &&
+            .enabled(this.controlsEnabled() &&
               this.control.phase !== ControlPhase.PENDING)
             .onClick((): void => {
               this.onClose();
@@ -379,7 +393,7 @@ export struct DoorCard {
             .fontColor(AppColors.ink())
             .backgroundColor(AppColors.field())
             .borderRadius(AppRadius.button)
-            .enabled(this.record.isControlAllowed &&
+            .enabled(this.controlsEnabled() &&
               this.control.phase !== ControlPhase.PENDING)
             .onClick((): void => {
               this.onOpen();
@@ -428,6 +442,10 @@ export struct DoorCard {
       color: $r('app.color.shadow_base'),
       offsetX: 0,
       offsetY: 8
+    })
+    .animation({
+      duration: this.motionEnabled ? AppMotionTokens.FADE_MS : 0,
+      curve: Curve.EaseInOut
     })
   }
 }
@@ -494,6 +512,7 @@ export struct SceneCard {
   @Prop localeRevision: number = 0;
   @Require scene: Scene;
   @Prop isRunning: boolean = false;
+  @Prop canRun: boolean = false;
   @Prop lastResult: SceneExecutionResult | undefined = undefined;
   onRun: () => void = (): void => {};
   onEdit: () => void = (): void => {};
@@ -517,6 +536,11 @@ export struct SceneCard {
           .fontSize(AppTypography.caption)
           .fontColor(AppColors.amber())
       }
+      if (!this.canRun) {
+        Text(this.i18n.t('errors.app.auth_rbac_denied'))
+          .fontSize(AppTypography.caption)
+          .fontColor(AppColors.amber())
+      }
       if (this.lastResult !== undefined) {
         Text(this.i18n.t(UiMapping.sceneRunKey(this.lastResult.state)))
           .fontSize(AppTypography.label)
@@ -530,7 +554,8 @@ export struct SceneCard {
           .fontColor(Color.White)
           .backgroundColor(AppColors.primary())
           .borderRadius(AppRadius.button)
-          .enabled(!this.isRunning && this.scene.isEnabled && this.scene.actions.length > 0)
+          .enabled(!this.isRunning && this.scene.isEnabled &&
+            this.scene.actions.length > 0 && this.canRun)
           .onClick((): void => {
             this.onRun();
           })
@@ -568,6 +593,7 @@ export struct RoomCard {
   @Require room: Room;
   @Prop deviceCount: number = 0;
   @Prop unassignedCount: number = 0;
+  @Prop canManage: boolean = false;
   onOpen: () => void = (): void => {};
   onRename: () => void = (): void => {};
   onDelete: () => void = (): void => {};
@@ -601,23 +627,25 @@ export struct RoomCard {
           .onClick((): void => {
             this.onOpen();
           })
-        Button(this.i18n.t('common.edit'))
-          .height(44)
-          .fontSize(AppTypography.caption)
-          .fontColor(AppColors.inkSoft())
-          .backgroundColor(AppColors.field())
-          .borderRadius(AppRadius.button)
-          .onClick((): void => {
-            this.onRename();
-          })
-        Button(this.i18n.t('common.delete'))
-          .height(44)
-          .fontSize(AppTypography.caption)
-          .fontColor(AppColors.red())
-          .backgroundColor(Color.Transparent)
-          .onClick((): void => {
-            this.onDelete();
-          })
+        if (this.canManage) {
+          Button(this.i18n.t('common.edit'))
+            .height(44)
+            .fontSize(AppTypography.caption)
+            .fontColor(AppColors.inkSoft())
+            .backgroundColor(AppColors.field())
+            .borderRadius(AppRadius.button)
+            .onClick((): void => {
+              this.onRename();
+            })
+          Button(this.i18n.t('common.delete'))
+            .height(44)
+            .fontSize(AppTypography.caption)
+            .fontColor(AppColors.red())
+            .backgroundColor(Color.Transparent)
+            .onClick((): void => {
+              this.onDelete();
+            })
+        }
       }
       .width('100%')
     }

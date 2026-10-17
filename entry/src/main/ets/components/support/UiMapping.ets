@@ -62,6 +62,57 @@ export class UiMapping {
   }
 
   /**
+   * DES-B §13.1.4 / §14.3(3): offline, disabled and read-only devices may be
+   * viewed but never controlled. PENDING is deliberately allowed: the user is
+   * still dragging the 55ms slider, and the VM de-duplicates same-action
+   * commands instead of freezing the control.
+   */
+  static controlsEnabled(record: DeviceRecord | undefined): boolean {
+    const visual = UiMapping.visualState(record, undefined);
+    return visual !== CardVisualState.DISABLED && visual !== CardVisualState.OFFLINE &&
+      visual !== CardVisualState.READ_ONLY;
+  }
+
+  /**
+   * Four-stage door progress. UNVERIFIED/UNCONFIRMED/WAITING_CONTACT stop at
+   * stage 3; FAILED/UNKNOWN must not render a completed fourth stage (SC-14:
+   * no evidence => never look "secured").
+   */
+  static doorStageProgress(stage: DoorStage): number {
+    switch (stage) {
+      case DoorStage.PENDING:
+        return 1;
+      case DoorStage.GATEWAY_CONFIRMED:
+        return 2;
+      case DoorStage.WAITING_CONTACT:
+      case DoorStage.UNCONFIRMED:
+      case DoorStage.UNVERIFIED:
+        return 3;
+      case DoorStage.SECURED:
+      case DoorStage.OPEN:
+        return 4;
+      case DoorStage.FAILED:
+      case DoorStage.UNKNOWN:
+      default:
+        return 0;
+    }
+  }
+
+  /** UNKNOWN_INITIAL is "unknown", never "door link unverified". */
+  static lockKeyFor(lockState: DoorLockState): string {
+    if (lockState === DoorLockState.SECURED) {
+      return 'door.state.secured';
+    }
+    if (lockState === DoorLockState.UNCONFIRMED) {
+      return 'door.state.unconfirmed';
+    }
+    if (lockState === DoorLockState.OPEN) {
+      return 'device.door.stage.open';
+    }
+    return 'door.state.unknown';
+  }
+
+  /**
    * DES-B §13.3(4): control phase maps IDLE/PENDING/COMMITTED/REVERT; device
    * offline/disabled/read-only always overrides the control phase.
    */

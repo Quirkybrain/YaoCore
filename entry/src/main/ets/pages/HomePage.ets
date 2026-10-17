@@ -12,6 +12,7 @@ import { AppContext } from '../app/AppContext';
 import { AppRoute, AppRouteParams, NavigationService } from '../app/NavigationService';
 import type { PageVmFactoryPort } from '../app/PageVmFactory';
 import { DeviceType } from '../common/constants/DeviceConstants';
+import { MemberRole } from '../model/FamilyModels';
 import {
   AppColors,
   AppSpacing,
@@ -152,6 +153,12 @@ export struct HomePage {
     this.navigation.openRoomsWithHighlight(roomId);
   }
 
+  /** F-03: gateway binding is ADMIN-only; MEMBER/GUEST never see the entry. */
+  private isAdmin(): boolean {
+    const session = this.appContext.session;
+    return session !== undefined && session.role === MemberRole.ADMIN;
+  }
+
   private openDevice(record: DeviceRecord): void {
     this.navigation.push(AppRoute.DEVICE_CONTROL, new AppRouteParams({
       gatewayId: record.state.key.gatewayId,
@@ -227,7 +234,8 @@ export struct HomePage {
           cloud: this.cloudState(),
           isRefreshing: this.refreshing,
           onFamilyClick: (): void => {
-            this.navigation.push(AppRoute.FAMILY);
+            this.navigation.push(AppRoute.FAMILY,
+              new AppRouteParams({ section: 'FAMILY' }));
           },
           onGatewayClick: (): void => {
             this.navigation.push(AppRoute.SETTINGS);
@@ -309,18 +317,20 @@ export struct HomePage {
                 }
               })
             }
-            Row({ space: AppSpacing.sm }) {
-              PrimaryButton({
-                i18n: this.i18n,
-                localeRevision: this.localeRevision,
-                labelKey: 'home.add_gateway',
-                fullWidth: true,
-                onTap: (): void => {
-                  this.navigation.push(AppRoute.PROVISIONING);
-                }
-              })
+            if (this.isAdmin()) {
+              Row({ space: AppSpacing.sm }) {
+                PrimaryButton({
+                  i18n: this.i18n,
+                  localeRevision: this.localeRevision,
+                  labelKey: 'home.add_gateway',
+                  fullWidth: true,
+                  onTap: (): void => {
+                    this.navigation.push(AppRoute.PROVISIONING);
+                  }
+                })
+              }
+              .width('100%')
             }
-            .width('100%')
             Text(this.i18n.t('home.grid.hint'))
               .fontSize(AppTypography.caption)
               .fontColor(AppColors.muted())

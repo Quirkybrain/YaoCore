@@ -8,10 +8,7 @@ import { DeviceType } from '../common/constants/DeviceConstants';
 import type { DeviceRecord } from '../repository/DomainModels';
 import type { Room } from '../model/FamilyModels';
 import type { DeviceKey } from '../model/DeviceKey';
-import {
-  ControlPhase,
-  ControlUiState
-} from '../viewmodel/core/ViewModelCore';
+import type { ControlUiState } from '../viewmodel/core/ViewModelCore';
 import {
   AppColors,
   AppRadius,
@@ -73,6 +70,7 @@ export struct DeviceGrid {
               control: this.controlOf(record) as ControlUiState,
               roomName: UiMapping.roomNameFor(record, this.rooms),
               compact: true,
+              motionEnabled: this.motionEnabled,
               onPower: (): void => {
                 this.onQuickToggle(record.state.key);
               },
@@ -90,6 +88,7 @@ export struct DeviceGrid {
               control: this.controlOf(record) as ControlUiState,
               roomName: UiMapping.roomNameFor(record, this.rooms),
               compact: true,
+              motionEnabled: this.motionEnabled,
               onOpenDetail: (): void => {
                 this.onOpen(record.state.key);
               }
@@ -122,6 +121,7 @@ export struct UnassignedPool {
   @Prop rooms: ReadonlyArray<Room> = [];
   @Prop motionEnabled: boolean = true;
   @Prop allowDelete: boolean = false;
+  @Prop canAssign: boolean = false;
   @State assigningKey: string = '';
   @State selectedRoomId: string = '';
   onAssign: (key: DeviceKey, roomId: string) => void =
@@ -169,17 +169,19 @@ export struct UnassignedPool {
             }
             .alignItems(HorizontalAlign.Start)
             .layoutWeight(1)
-            Button(this.i18n.t('room.assign.action'))
-              .height(44)
-              .fontSize(AppTypography.caption)
-              .fontColor(Color.White)
-              .backgroundColor(AppColors.primary())
-              .borderRadius(AppRadius.button)
-              .enabled(this.rooms.length > 0)
-              .onClick((): void => {
-                this.assigningKey = record.state.key.globalId();
-                this.selectedRoomId = this.rooms.length > 0 ? this.rooms[0].roomId : '';
-              })
+            if (this.canAssign) {
+              Button(this.i18n.t('room.assign.action'))
+                .height(44)
+                .fontSize(AppTypography.caption)
+                .fontColor(Color.White)
+                .backgroundColor(AppColors.primary())
+                .borderRadius(AppRadius.button)
+                .enabled(this.rooms.length > 0)
+                .onClick((): void => {
+                  this.assigningKey = record.state.key.globalId();
+                  this.selectedRoomId = this.rooms.length > 0 ? this.rooms[0].roomId : '';
+                })
+            }
             if (this.allowDelete) {
               Button(this.i18n.t('common.delete'))
                 .height(44)
@@ -192,7 +194,7 @@ export struct UnassignedPool {
             }
           }
           .width('100%')
-          if (this.assigningKey === record.state.key.globalId()) {
+          if (this.canAssign && this.assigningKey === record.state.key.globalId()) {
             Scroll() {
               Row({ space: AppSpacing.xs }) {
                 ForEach(this.rooms.slice(), (room: Room): void => {

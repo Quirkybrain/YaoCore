@@ -10,6 +10,7 @@ import { newDomainHarness } from '../domain/DomainHarness.ets';
 import { DiscoverApplyOptions } from '../../main/ets/repository/DomainModels.ets';
 import { SceneService, SceneInput } from '../../main/ets/service/scene/SceneService.ets';
 import { RoomService, RoomDeletionConfirmation } from '../../main/ets/service/room/RoomService.ets';
+import { PolicyDecision } from '../../main/ets/service/auth/AuthModels.ets';
 import { DeviceKey } from '../../main/ets/model/DeviceKey.ets';
 import { DeviceAction, DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets';
 import { StateVerification } from '../../main/ets/model/ControlModels.ets';
@@ -24,6 +25,14 @@ import {
 } from './domain-helpers.mjs';
 
 const tick = () => new Promise((resolve) => setImmediate(resolve));
+
+/** F-02: role matrix is injected; production uses AuthService.canExecuteScene. */
+function authorizer(role) {
+  return {
+    canExecuteScene: () => role === 'ADMIN' || role === 'MEMBER'
+      ? PolicyDecision.allow() : PolicyDecision.deny('RBAC_DENIED')
+  };
+}
 
 async function setup() {
   const h = await newDomainHarness();
@@ -40,7 +49,7 @@ async function setup() {
     await h.devices.assignRoom(familyId, new DeviceKey(GATEWAY_ID, id), room.roomId);
   }
   const service = new SceneService(h.scenes, h.devices, h.control, h.routes, h.clock,
-    h.timer, h.ids, h.logger, h.metrics, h.rdb, h.gate);
+    h.timer, h.ids, h.logger, h.metrics, h.rdb, h.gate, authorizer('ADMIN'));
   await service.initialize();
   return { h, familyId, room, service };
 }
@@ -361,4 +370,35 @@ test('T09_C11_throwingProgressAndEventListenersDoNotFailRun', async () => {
   assert.equal(result.state, 'SUCCEEDED');
   assert.equal(h.control.commands.length, 1);
   assert.ok(h.logger.entries.includes('W SceneService scene_listener_failed'));
+});
+
+test('T18_C11_sceneRunRbacMatrixAdminMemberGuestAndMissingPolicy', async () => {
+  const { h, familyId } = await setup();
+  const actions = [sceneAction(GATEWAY_ID, 'Light_01', DeviceAction.TURN_ON, true)];
+  const matrix = [
+    { role: 'ADMIN', allowed: true },
+    { role: 'MEMBER', allowed: true },
+    { role: 'GUEST', allowed: false }
+  ];
+  for (const entry of matrix) {
+    const service = new SceneService(h.scenes, h.devices, h.control, h.routes, h.clock,
+      h.timer, h.ids, h.logger, h.metrics, h.rdb, h.gate, authorizer(entry.role));
+    await service.initialize();
+    const scene = await service.createScene(new SceneInput(familyId,
+      'Matrix-' + entry.role, 'scene.icons.movie', actions, true));
+    if (entry.allowed) {
+      const result = await service.run(scene.sceneId);
+      assert.equal(result.state, 'SUCCEEDED', entry.role);
+    } else {
+      await assert.rejects(service.run(scene.sceneId),
+        (error) => error.code === 'AUTH_RBAC_DENIED', entry.role);
+    }
+  }
+  // Fail closed when the composition root forgot to supply C-12 policy.
+  const unguarded = new SceneService(h.scenes, h.devices, h.control, h.routes, h.clock,
+    h.timer, h.ids, h.logger, h.metrics, h.rdb, h.gate);
+  await unguarded.initialize();
+  const scene = await unguarded.listScenes(familyId);
+  await assert.rejects(unguarded.run(scene[0].sceneId),
+    (error) => error.code === 'AUTH_RBAC_DENIED');
 });

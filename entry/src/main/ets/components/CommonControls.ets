@@ -84,7 +84,10 @@ export struct PrimaryButton {
 
   build() {
     Button(this.i18n.t(this.labelKey))
-      .width(this.fullWidth ? '100%' : 168)
+      // I18N-07: no fixed pixel width; long English labels may wrap instead of
+      // being clipped. Full-width buttons still fill their parent.
+      .width(this.fullWidth ? '100%' : 'auto')
+      .constraintSize({ minWidth: this.fullWidth ? 0 : 168 })
       .height(48)
       .fontSize(AppTypography.body)
       .fontColor(Color.White)

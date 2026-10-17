@@ -172,3 +172,47 @@ test('T09_C09_throwingListenerDoesNotFailRoomDeletion', async () => {
   assert.equal(await h.rooms.exists(room.roomId), false);
   assert.ok(h.logger.entries.includes('W RoomService room_listener_failed'));
 });
+
+test('T18_C09_roomMutationsRequireAdminActorMatrix', async () => {
+  const { h, familyId } = await setup();
+  const room = await h.rooms.createRoom(familyId, 'Living');
+  const admin = new FamilyMember('member-admin', familyId, 'member-admin', 'Owner',
+    MemberRole.ADMIN, MemberStatus.ACTIVE, '20261017T080000Z', []);
+  const member = new FamilyMember('member-user', familyId, 'member-user', 'Bob',
+    MemberRole.MEMBER, MemberStatus.ACTIVE, '20261017T080000Z', []);
+  const guest = new FamilyMember('member-guest', familyId, 'member-guest', 'Eve',
+    MemberRole.GUEST, MemberStatus.ACTIVE, '20261017T080000Z', [room.roomId],
+    '20271017T080000Z');
+  await h.families.upsertMember(admin);
+  await h.families.upsertMember(member);
+  await h.families.upsertMember(guest);
+  const actors = {
+    async getMember(targetFamilyId, memberId) {
+      if (targetFamilyId !== familyId) { return undefined; }
+      if (memberId === admin.memberId) { return admin; }
+      if (memberId === member.memberId) { return member; }
+      if (memberId === guest.memberId) { return guest; }
+      return undefined;
+    }
+  };
+  const service = new RoomService(h.rooms, h.devices, h.families, h.rdb, h.clock,
+    h.logger, h.gate, h.devices, actors);
+  const key = await addDevice(h, familyId);
+  // ADMIN can assign; MEMBER/GUEST are refused by the service, not just UI.
+  await service.assignDevice(familyId, key, room.roomId, admin.memberId);
+  await assert.rejects(service.assignDevice(familyId, key, room.roomId, member.memberId),
+    (error) => error.code === 'AUTH_RBAC_DENIED');
+  await assert.rejects(service.assignDevice(familyId, key, room.roomId, guest.memberId),
+    (error) => error.code === 'AUTH_RBAC_DENIED');
+  await assert.rejects(service.deleteRoom(room.roomId,
+    new RoomDeletionConfirmation(true, 1), member.memberId),
+  (error) => error.code === 'AUTH_RBAC_DENIED');
+  await assert.rejects(service.createRoom(familyId, 'Denied', undefined, guest.memberId),
+    (error) => error.code === 'AUTH_RBAC_DENIED');
+  // The admin deletion still works and moves the device to the pool.
+  const result = await service.deleteRoom(room.roomId,
+    new RoomDeletionConfirmation(true, 1), admin.memberId);
+  assert.equal(result.deleted, true);
+  const record = await h.devices.getRecord(key);
+  assert.equal(record.state.isUnassigned, true);
+});

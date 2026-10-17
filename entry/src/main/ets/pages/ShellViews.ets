@@ -95,7 +95,7 @@ export struct SessionGateView {
               })
           }
           if (ShellGateRouting.hasEntry(this.gate, ShellGateEntry.JOIN_FAMILY)) {
-            Button(this.i18n.t('family.switch'))
+            Button(this.i18n.t('onboarding.join.title'))
               .width('100%')
               .fontSize(ShellTheme.FONT_BODY)
               .fontColor($r('app.color.shell_ink'))

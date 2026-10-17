@@ -206,12 +206,50 @@ export class BleProvisioningRequest {
   }
 }
 
+/**
+ * F-07 / CQG-T18: pre-wifi handshake + AP scan request. The page can show the
+ * real AP list in step 3 instead of collecting SSID blindly before the
+ * aggregated provision() call. PoP is a caller-owned byte buffer; the service
+ * copies and zeroizes it. The later provision() re-runs the same handshake.
+ */
+export class BleWifiScanRequest {
+  readonly pop: Uint8Array;
+  readonly device?: BleProvisioningDevice;
+  readonly expectedGatewayId?: string;
+
+  constructor(pop: Uint8Array, device?: BleProvisioningDevice,
+    expectedGatewayId?: string) {
+    if (pop.length === 0 || pop.length > 64) {
+      throw AppErrors.protocol('PROTOCOL_VALUE_OUT_OF_RANGE', 'pop');
+    }
+    if (expectedGatewayId !== undefined) {
+      if (expectedGatewayId.length === 0 ||
+        expectedGatewayId.length > ProtocolConstants.MAX_DEVICE_ID_LENGTH ||
+        expectedGatewayId.indexOf(':') >= 0 ||
+        !ProtocolConstants.DEVICE_ID_PATTERN.test(expectedGatewayId)) {
+        throw AppErrors.protocol('PROTOCOL_INVALID_IDENTIFIER', 'expectedGatewayId');
+      }
+    }
+    this.pop = pop;
+    this.device = device;
+    this.expectedGatewayId = expectedGatewayId;
+  }
+}
+
 export interface IBleProvisioningClient {
   startScan(filter: BleScanFilter, listener: BleScanListener): Promise<void>;
   stopScan(): Promise<void>;
   provision(request: BleProvisioningRequest,
     listener: BleProvisioningProgressListener,
     cancellation?: CancellationToken): Promise<BleProvisioningResult>;
+  /**
+   * F-07 additive seam: connect, Security1 handshake and identity negotiation,
+   * then return the Wi-Fi AP list for the wizard's step 3. The call tears the
+   * BLE link down; provision() still owns the authoritative aggregated flow.
+   */
+  scanWifiAccessPoints(request: BleWifiScanRequest,
+    listener: BleProvisioningProgressListener,
+    cancellation?: CancellationToken): Promise<ReadonlyArray<WifiAp>>;
   cancel(): Promise<void>;
 }
 

@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 
 import { SceneViewModel } from '../../main/ets/viewmodel/SceneViewModel.ets';
 import { Scene } from '../../main/ets/model/FamilyModels.ets';
+import { PolicyDecision } from '../../main/ets/service/auth/AuthModels.ets';
 import { FakeI18n, FakeLogger } from './viewmodel-helpers.mjs';
 
 const SCENE_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
@@ -102,9 +103,14 @@ class FakeSceneService {
   }
 }
 
-function setup() {
+function allowAll() {
+  return { canExecuteScene: () => PolicyDecision.allow() };
+}
+
+function setup(authorization = allowAll()) {
   const service = new FakeSceneService();
-  const vm = new SceneViewModel(service, {}, new FakeI18n(), new FakeLogger());
+  const vm = new SceneViewModel(service, {}, new FakeI18n(), new FakeLogger(),
+    authorization);
   return { service, vm };
 }
 
@@ -195,4 +201,37 @@ test('T16_Scene_clearResultKeepsScenes', async () => {
   h.vm.clearResult();
   assert.equal(h.vm.getState().lastResult, undefined);
   assert.equal(h.vm.getState().scenes.length, 1);
+});
+
+test('T18_SceneViewModel_capabilityAndRunRbacMatrix', async () => {
+  const matrix = [
+    { role: 'ADMIN', allowed: true },
+    { role: 'MEMBER', allowed: true },
+    { role: 'GUEST', allowed: false }
+  ];
+  for (const entry of matrix) {
+    const authorization = {
+      canExecuteScene: () => entry.allowed
+        ? PolicyDecision.allow() : PolicyDecision.deny('RBAC_DENIED')
+    };
+    const h = setup(authorization);
+    await h.vm.initialize('family-1');
+    assert.equal(h.vm.canExecuteScene(), entry.allowed, entry.role);
+    if (entry.allowed) {
+      h.service.result = result('SUCCEEDED', []);
+      const final = await h.vm.run(SCENE_ID);
+      assert.equal(final.state, 'SUCCEEDED', entry.role);
+    } else {
+      await assert.rejects(h.vm.run(SCENE_ID),
+        (error) => error.code === 'AUTH_RBAC_DENIED', entry.role);
+      assert.equal(h.service.progress, undefined, entry.role);
+      assert.equal(h.vm.getState().error.error.code, 'AUTH_RBAC_DENIED', entry.role);
+    }
+  }
+  // Missing policy is fail-closed even before a service call.
+  const noPolicy = new SceneViewModel(new FakeSceneService(), {}, new FakeI18n(),
+    new FakeLogger());
+  assert.equal(noPolicy.canExecuteScene(), false);
+  await assert.rejects(noPolicy.run(SCENE_ID),
+    (error) => error.code === 'AUTH_RBAC_DENIED');
 });

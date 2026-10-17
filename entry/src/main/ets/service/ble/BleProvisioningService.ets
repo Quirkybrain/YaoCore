@@ -39,6 +39,7 @@ import {
   BleProvisioningRequest,
   BleProvisioningStage,
   BleScanFilter,
+  BleWifiScanRequest,
   ProvisioningProgress,
   ProvisioningState
 } from './BleProvisioningPorts';
@@ -47,7 +48,8 @@ import type {
   BleProvisioningProgressListener,
   BleScanListener,
   BleTransport,
-  IBleProvisioningClient
+  IBleProvisioningClient,
+  WifiAp
 } from './BleProvisioningPorts';
 import {
   defaultBleDelay,
@@ -258,7 +260,7 @@ export class BleProvisioningService implements IBleProvisioningClient {
       this.transition(ProvisioningEvent.PERMISSION_GRANTED);
 
       this.emitState(listener, ProvisioningState.SCANNING);
-      const device = await this.resolveDevice(request, cancellation);
+      const device = await this.resolveDevice(request.device, cancellation);
       this.transition(ProvisioningEvent.DEVICE_FOUND);
       this.emitState(listener, ProvisioningState.CONNECTING);
       await this.connect(device.deviceId, cancellation);
@@ -367,6 +369,89 @@ export class BleProvisioningService implements IBleProvisioningClient {
     }
   }
 
+  /**
+   * F-07: step 2/3 seam. Performs the real Security1 handshake and identity
+   * negotiation, then returns the gateway AP list so the wizard can render
+   * step 3 before credentials are sent. The link is torn down afterwards; the
+   * authoritative aggregated provision() repeats the handshake when applying
+   * credentials. No SSID/password is sent here.
+   */
+  async scanWifiAccessPoints(request: BleWifiScanRequest,
+    listener: BleProvisioningProgressListener,
+    cancellation?: CancellationToken): Promise<ReadonlyArray<WifiAp>> {
+    if (this.running) {
+      throw AppErrors.of('CONFIGURATION_ERROR', [new NameValue('field', 'provisioningActive')]);
+    }
+    this.running = true;
+    this.cancelled = false;
+    this.activeListener = listener;
+    let popCopy: Uint8Array = new Uint8Array(0);
+    try {
+      this.stopPublicScan(false);
+      this.stateMachine.reset();
+      popCopy = BytesUtil.copyOf(request.pop);
+      this.emitStage(listener, BleProvisioningStage.CONNECTING);
+      this.transition(ProvisioningEvent.START);
+      this.emitState(listener, ProvisioningState.PERMISSION);
+      this.checkCancelled(cancellation);
+      await this.ensureReady();
+      this.transition(ProvisioningEvent.PERMISSION_GRANTED);
+
+      this.emitState(listener, ProvisioningState.SCANNING);
+      const device = await this.resolveDevice(request.device, cancellation);
+      this.transition(ProvisioningEvent.DEVICE_FOUND);
+      this.emitState(listener, ProvisioningState.CONNECTING);
+      await this.connect(device.deviceId, cancellation);
+      this.transition(ProvisioningEvent.CONNECTED);
+
+      this.emitState(listener, ProvisioningState.DISCOVERING);
+      await this.discover();
+      this.transition(ProvisioningEvent.DISCOVERED);
+
+      this.emitState(listener, ProvisioningState.CAPABILITY_CHECK);
+      await this.checkCapability();
+      this.transition(ProvisioningEvent.CAPABILITY_OK);
+
+      this.emitStage(listener, BleProvisioningStage.SECURITY);
+      this.emitState(listener, ProvisioningState.SECURITY_HANDSHAKE);
+      await this.handshake(popCopy);
+      this.transition(ProvisioningEvent.SECURITY_OK);
+
+      this.emitStage(listener, BleProvisioningStage.IDENTITY);
+      this.emitState(listener, ProvisioningState.SECURE_IDENTITY);
+      await this.negotiateIdentity(request.expectedGatewayId, listener);
+      this.transition(ProvisioningEvent.IDENTITY_OK);
+
+      this.emitStage(listener, BleProvisioningStage.WIFI_SCAN);
+      this.emitState(listener, ProvisioningState.AP_SCANNING);
+      const accessPoints = await this.scanAccessPoints(listener, cancellation);
+      this.transition(ProvisioningEvent.AP_SELECTED);
+      return accessPoints;
+    } catch (error) {
+      const typed = error as Error;
+      if (this.cancelled || isCode(typed, 'PROVISIONING_CANCELLED')) {
+        this.safeTransition(ProvisioningEvent.CANCEL);
+        this.emitState(listener, ProvisioningState.CANCELLED);
+        throw AppErrors.of('PROVISIONING_CANCELLED', []);
+      }
+      this.safeTransition(ProvisioningEvent.FAIL);
+      const mapped = this.mapFailure(typed);
+      this.emitState(listener, ProvisioningState.FAILED, mapped);
+      if (listener.onError !== undefined) {
+        listener.onError(mapped);
+      }
+      throw mapped;
+    } finally {
+      try {
+        BytesUtil.zeroize(popCopy);
+        await this.teardownBle();
+      } finally {
+        this.running = false;
+        this.activeListener = undefined;
+      }
+    }
+  }
+
   async cancel(): Promise<void> {
     this.cancelled = true;
     const listener = this.activeListener;
@@ -396,12 +481,12 @@ export class BleProvisioningService implements IBleProvisioningClient {
     }
   }
 
-  private async resolveDevice(request: BleProvisioningRequest,
+  private async resolveDevice(selected: BleProvisioningDevice | undefined,
     cancellation?: CancellationToken): Promise<BleProvisioningDevice> {
     this.checkCancelled(cancellation);
-    if (request.device !== undefined) {
-      this.lastDevice = request.device;
-      return request.device;
+    if (selected !== undefined) {
+      this.lastDevice = selected;
+      return selected;
     }
     if (this.lastDevice !== undefined && this.scannedDevices.size <= 1) {
       return this.lastDevice;
@@ -587,13 +672,14 @@ export class BleProvisioningService implements IBleProvisioningClient {
   }
 
   private async scanAccessPoints(listener: BleProvisioningProgressListener,
-    cancellation?: CancellationToken): Promise<void> {
+    cancellation?: CancellationToken): Promise<ReadonlyArray<WifiAp>> {
     const channel = this.requireChannel();
     const flow = new WifiProvisioningFlow(this.clock, this.delay);
     const accessPoints = await flow.scan(channel, cancellation);
     if (listener.onAccessPoints !== undefined) {
       listener.onAccessPoints(accessPoints);
     }
+    return accessPoints;
   }
 
   private async applyCredentials(ssid: string, password: Uint8Array,

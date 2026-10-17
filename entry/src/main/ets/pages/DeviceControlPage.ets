@@ -68,6 +68,7 @@ export struct DeviceControlPage {
   private unsubscribeClimate: (() => void) | undefined = undefined;
   private unsubscribeDoor: (() => void) | undefined = undefined;
   private loadedDetail: boolean = false;
+  private doorGuideDismissed: boolean = false;
 
   aboutToAppear(): void {
     const key = this.deviceKey();
@@ -169,7 +170,11 @@ export struct DeviceControlPage {
       this.doorVm = vm;
       this.unsubscribeDoor = vm.subscribe((state: DoorViewState): void => {
         this.door = state;
-        this.doorGuideVisible = UiMapping.doorNeedsLinkGuide(state.door);
+        // F-19: the link guide is one-shot; a later VM publish must not
+        // resurrect it after the user configured or skipped it.
+        if (!this.doorGuideDismissed) {
+          this.doorGuideVisible = UiMapping.doorNeedsLinkGuide(state.door);
+        }
       });
       vm.load(key).catch((): void => undefined);
     }
@@ -190,23 +195,8 @@ export struct DeviceControlPage {
     if (this.door === undefined) {
       return 0;
     }
-    switch (this.door.door.stage) {
-      case DoorStage.PENDING:
-        return 1;
-      case DoorStage.GATEWAY_CONFIRMED:
-        return 2;
-      case DoorStage.WAITING_CONTACT:
-        return 3;
-      case DoorStage.SECURED:
-      case DoorStage.OPEN:
-      case DoorStage.UNCONFIRMED:
-      case DoorStage.UNKNOWN:
-      case DoorStage.UNVERIFIED:
-      case DoorStage.FAILED:
-        return 4;
-      default:
-        return 0;
-    }
+    // F-10: UNVERIFIED/FAILED/UNKNOWN never light the fourth (secured) stage.
+    return UiMapping.doorStageProgress(this.door.door.stage);
   }
 
   private configureDoorLink(): void {
@@ -219,9 +209,12 @@ export struct DeviceControlPage {
       const candidate = this.devices.records[index];
       if (candidate.state.snapshot.deviceType === DeviceType.SENSOR) {
         vm.configureLink(new DoorLinkConfig(DoorLinkMode.CONTACT_SENSOR,
-          candidate.state.key, record.state.snapshot.updatedAt))
-          .catch((): void => undefined);
-        this.doorGuideVisible = false;
+          candidate.state.key, record.state.snapshot.updatedAt)).then((): void => {
+          this.doorGuideVisible = false;
+          this.doorGuideDismissed = true;
+        }).catch((): void => {
+          // Keep the guide visible so the user can retry.
+        });
         return;
       }
     }
@@ -323,6 +316,7 @@ export struct DeviceControlPage {
           control: this.climate.control,
           roomName: UiMapping.roomNameById(record.state.roomId, this.devices.rooms),
           compact: false,
+          motionEnabled: this.motionEnabled,
           onPower: (): void => {
             const vm = this.climateVm;
             if (vm !== undefined) {
@@ -378,6 +372,7 @@ export struct DeviceControlPage {
           control: this.door.control,
           roomName: UiMapping.roomNameById(record.state.roomId, this.devices.rooms),
           compact: false,
+          motionEnabled: this.motionEnabled,
           onOpen: (): void => {
             const vm = this.doorVm;
             if (vm !== undefined) {
@@ -391,7 +386,9 @@ export struct DeviceControlPage {
             }
           },
           onConfigureLink: (): void => {
-            this.doorGuideVisible = true;
+            if (!this.doorGuideDismissed) {
+              this.doorGuideVisible = true;
+            }
           },
           onDismissAlert: (): void => {
             const vm = this.doorVm;
@@ -466,6 +463,7 @@ export struct DeviceControlPage {
                 .backgroundColor(AppColors.field())
                 .borderRadius(AppRadius.button)
                 .onClick((): void => {
+                  this.doorGuideDismissed = true;
                   this.doorGuideVisible = false;
                 })
             }

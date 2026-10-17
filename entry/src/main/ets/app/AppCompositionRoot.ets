@@ -89,6 +89,9 @@ import type {
 import {
   ActiveFamilyAdapter,
   ManualDiscoveryAdapter,
+  RoomActorLookupAdapter,
+  RoomSessionAdapter,
+  SceneExecutionAuthAdapter,
   SessionGateAuthAdapter
 } from './AppContextAdapters';
 import { ActiveCloudScope } from './ActiveCloudScope';
@@ -197,6 +200,9 @@ export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort
   private readonly vmPermissionGate: BleViewModelPermissionGate;
   private readonly vmTimer: VmTimerPort;
   private readonly sceneTimer: SceneTimerPort;
+  private readonly sceneAuthAdapter: SceneExecutionAuthAdapter;
+  private readonly roomSessionAdapter: RoomSessionAdapter;
+  private readonly roomActorAdapter: RoomActorLookupAdapter;
 
   private initPromise: Promise<void> | undefined = undefined;
   private initialized: boolean = false;
@@ -269,6 +275,11 @@ export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort
       AuthPolicy.defaults());
     this.sessionAuthAdapter = new SessionGateAuthAdapter(this.authService);
     this.activeFamilyAdapter = new ActiveFamilyAdapter(this.familyRepositoryValue);
+    // F-02/F-03 (CQG-T18): UI capability and service refusal share the same
+    // C-12 policy/member source.
+    this.sceneAuthAdapter = new SceneExecutionAuthAdapter(this.authService);
+    this.roomSessionAdapter = new RoomSessionAdapter(this.authService);
+    this.roomActorAdapter = new RoomActorLookupAdapter(this.familyRepositoryValue);
 
     this.constructionTrace.record(ConstructionStep.INVITE_SERVICE);
     this.inviteService = new InviteService(this.crypto, this.secretStore,
@@ -283,7 +294,7 @@ export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort
     this.onboardingService = new OnboardingService(this.familyService, this.authService);
     this.roomService = new RoomService(this.roomRepository, this.deviceRepository,
       this.familyRepositoryValue, this.rdbAdapter, this.clock, this.loggerPort,
-      this.operationGate, this.deviceRepository);
+      this.operationGate, this.deviceRepository, this.roomActorAdapter);
 
     // 14-16. Transport and the two client profiles.
     this.constructionTrace.record(ConstructionStep.GATEWAY_TRANSPORT);
@@ -308,7 +319,8 @@ export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort
     this.sceneTimer = new SystemSceneTimer();
     this.sceneService = new SceneService(this.sceneRepository, this.deviceRepository,
       this.backgroundClient, this.gatewayRepository, this.clock, this.sceneTimer,
-      this.ids, this.loggerPort, this.metrics, this.rdbAdapter, this.operationGate);
+      this.ids, this.loggerPort, this.metrics, this.rdbAdapter, this.operationGate,
+      this.sceneAuthAdapter);
 
     // 17. Discovery. PB-01 leaves the mDNS service type/TXT schema unresolved;
     // production passes no mDNS/UDP transport rather than guessing (DES-A §15.4).
@@ -510,12 +522,12 @@ export class AppCompositionRoot implements AppContextRootPort, PageVmFactoryPort
 
   createRoomViewModel(): RoomViewModel {
     return new RoomViewModel(this.roomService, this.deviceRepository, this.i18nService,
-      this.clock, this.loggerPort);
+      this.clock, this.loggerPort, this.roomSessionAdapter);
   }
 
   createSceneViewModel(): SceneViewModel {
     return new SceneViewModel(this.sceneService, this.deviceRepository, this.i18nService,
-      this.loggerPort);
+      this.loggerPort, this.sceneAuthAdapter);
   }
 
   createBleProvisioningViewModel(): BleProvisioningViewModel {

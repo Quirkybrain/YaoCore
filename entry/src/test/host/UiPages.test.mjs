@@ -334,3 +334,150 @@ test('T18_pagesUseExplicitPropsAndNoProvideConsume', () => {
     }
   });
 });
+
+test('T18_controlEnabled_allowsPendingButRejectsOfflineReadOnlyDisabled', () => {
+  const light = record({ brightness: 30 });
+  assert.equal(UiMapping.controlsEnabled(light), true);
+  const pending = control(light.state.key, ControlPhase.PENDING, 30, 40);
+  assert.equal(UiMapping.visualState(light, pending), CardVisualState.PENDING);
+  assert.equal(UiMapping.controlsEnabled(light), true);
+  assert.equal(UiMapping.controlsEnabled(record({ isOnline: false })), false);
+  assert.equal(UiMapping.controlsEnabled(record({ isSupported: false,
+    deviceType: 'switch' })), false);
+  assert.equal(UiMapping.controlsEnabled(record({ isEnabled: false })), false);
+  assert.equal(UiMapping.controlsEnabled(record({ isUnassigned: true, roomId: '' })), false);
+  assert.equal(UiMapping.controlsEnabled(undefined), false);
+});
+
+test('T18_doorStageProgressNeverLightsSecuredWithoutEvidence', () => {
+  assert.equal(UiMapping.doorStageProgress(DoorStage.IDLE), 0);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.PENDING), 1);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.GATEWAY_CONFIRMED), 2);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.WAITING_CONTACT), 3);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.UNVERIFIED), 3);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.UNCONFIRMED), 3);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.SECURED), 4);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.OPEN), 4);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.UNKNOWN), 0);
+  assert.equal(UiMapping.doorStageProgress(DoorStage.FAILED), 0);
+  assert.equal(UiMapping.lockKeyFor(DoorLockState.UNKNOWN_INITIAL), 'door.state.unknown');
+  assert.equal(UiMapping.lockKeyFor(DoorLockState.SECURED), 'door.state.secured');
+  assert.equal(UiMapping.lockKeyFor(DoorLockState.UNCONFIRMED), 'door.state.unconfirmed');
+  assert.equal(UiMapping.lockKeyFor(DoorLockState.OPEN), 'device.door.stage.open');
+});
+
+function readUiSource(relativePath) {
+  return import('node:fs').then(({ readFileSync }) => readFileSync(
+    new URL('../../main/ets/' + relativePath, import.meta.url), 'utf8'));
+}
+
+test('T18_lightCardWiresPowerToggleAndKeepsPendingSliderLive', async () => {
+  const source = await readUiSource('components/DeviceCards.ets');
+  const lightStart = source.indexOf('export struct LightCard');
+  const lightEnd = source.indexOf('@Component', lightStart + 1);
+  assert.ok(lightStart >= 0 && lightEnd > lightStart);
+  const light = source.slice(lightStart, lightEnd);
+  assert.ok(light.includes('this.onToggle()'), 'LightCard must invoke onToggle');
+  assert.ok(light.includes('.accessibilityText'),
+    'power toggle must expose an accessibility label');
+  assert.ok(light.includes('.enabled(this.controlsEnabled())'),
+    'slider/colour controls use the non-PENDING-gated control check');
+  assert.ok(!light.includes('this.visual() !== CardVisualState.PENDING'),
+    'PENDING must not disable the slider (F-04)');
+  assert.ok(!/\.enabled\(this\.record\.isControlAllowed\)/.test(light),
+    'offline/read-only must gate controls (F-05)');
+});
+
+test('T18_nonAdminRoomPoolAndGatewayEntriesAreHidden', async () => {
+  const rooms = await readUiSource('pages/RoomsPage.ets');
+  assert.ok(rooms.includes('canManage: this.isAdmin()'));
+  assert.ok(rooms.includes('canAssign: this.isAdmin()'));
+  assert.ok(rooms.includes("if (this.isAdmin())"));
+  const roomManage = await readUiSource('pages/RoomManagePage.ets');
+  assert.ok(roomManage.includes('canAssign: this.isAdmin()'));
+  const home = await readUiSource('pages/HomePage.ets');
+  assert.ok(home.includes('if (this.isAdmin())'));
+  assert.ok(home.includes("section: 'FAMILY'"));
+  const profile = await readUiSource('pages/ProfilePage.ets');
+  assert.ok(profile.includes('if (this.isAdmin())'));
+  const settingsPage = await readUiSource('pages/SettingsPage.ets');
+  assert.ok(settingsPage.includes('SettingsSection.ADVANCED && this.isAdmin()'));
+});
+
+test('T18_scenePageAndServiceUseTheSameRbacGate', async () => {
+  const page = await readUiSource('pages/ScenePage.ets');
+  assert.ok(page.includes('vm.canExecuteScene()'));
+  assert.ok(page.includes('canRun: this.canExecuteScene'));
+  const service = await readUiSource('service/scene/SceneService.ets');
+  assert.ok(service.includes('this.authorizeExecution();'));
+  assert.ok(service.includes('AUTH_RBAC_DENIED'));
+  const room = await readUiSource('service/room/RoomService.ets');
+  assert.ok(room.includes('await this.requireAdmin('));
+  const composition = await readUiSource('app/AppCompositionRoot.ets');
+  assert.ok(composition.includes('new SceneExecutionAuthAdapter(this.authService)'));
+  assert.ok(composition.includes('new RoomActorLookupAdapter(this.familyRepositoryValue)'));
+});
+
+test('T18_provisioningSeamsAndRecoveryAreWired', async () => {
+  const page = await readUiSource('pages/ProvisioningPage.ets');
+  assert.ok(page.includes('vm.prepareWifi(this.pop, this.expectedGatewayId())'));
+  assert.ok(page.includes('this.openSettings()'));
+  assert.ok(page.includes('this.expectedGatewayId()'));
+  assert.ok(page.includes('this.clearSecrets()'));
+  assert.ok(page.includes('provisioning.error.cancelled'));
+  const vm = await readUiSource('viewmodel/BleProvisioningViewModel.ets');
+  assert.ok(vm.includes('scanWifiAccessPoints'));
+  assert.ok(vm.includes('expectedGatewayId'));
+  assert.ok(vm.includes('openSettings'));
+});
+
+test('T18_lowRiskUiGuards_sourceLevel', async () => {
+  const controls = await readUiSource('components/CommonControls.ets');
+  assert.ok(controls.includes('.constraintSize({ minWidth: this.fullWidth ? 0 : 168 })'));
+  assert.ok(!controls.includes(".width(this.fullWidth ? '100%' : 168)"));
+  const shell = await readUiSource('pages/ShellViews.ets');
+  assert.ok(shell.includes("this.i18n.t('onboarding.join.title')"));
+  assert.ok(!shell.includes("this.i18n.t('family.switch')"));
+  const rooms = await readUiSource('pages/RoomsPage.ets');
+  assert.ok(rooms.includes('showGateway: false'));
+  const door = await readUiSource('pages/DeviceControlPage.ets');
+  assert.ok(door.includes('UiMapping.doorStageProgress'));
+  assert.ok(door.includes('this.doorGuideDismissed = true'));
+});
+
+test('T18_pagesAndComponentsRespectLayeringGuards', async () => {
+  return import('node:fs').then(({ readFileSync, readdirSync }) => {
+    const root = new URL('../../main/ets/', import.meta.url);
+    const collect = (relativeDirectory) => {
+      const files = [];
+      const walk = (directory) => {
+        for (const entry of readdirSync(directory, { withFileTypes: true })) {
+          const child = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
+          if (entry.isDirectory()) {
+            walk(child);
+          } else if (entry.name.endsWith('.ets')) {
+            files.push(child);
+          }
+        }
+      };
+      walk(new URL(relativeDirectory, root));
+      return files;
+    };
+    const pages = collect('pages/');
+    for (const file of pages) {
+      const text = readFileSync(file, 'utf8');
+      assert.ok(!/new\s+(RoomService|SceneService|DeviceRepository|RoomRepository|FamilyRepository|AuthService|DeviceViewModel|HomeViewModel|RoomViewModel|SceneViewModel)\b/.test(text),
+        'pages must not construct services/repositories/VMs: ' + file.pathname);
+      assert.ok(!/from '\.\.\/repository\/(?!DomainModels|DomainPorts)/.test(text),
+        'pages may only use read-only DTOs from repository: ' + file.pathname);
+    }
+    const components = collect('components/');
+    for (const file of components) {
+      const text = readFileSync(file, 'utf8');
+      assert.ok(!/new\s+(RoomService|SceneService|DeviceRepository|RoomRepository|FamilyRepository|AuthService)\b/.test(text),
+        'components must not construct services: ' + file.pathname);
+      assert.ok(!/from '\.\.\/viewmodel\/(DeviceViewModel|HomeViewModel|RoomViewModel|SceneViewModel|FamilyViewModel|SettingsViewModel|BleProvisioningViewModel)'/.test(text),
+        'components must not import concrete view models: ' + file.pathname);
+    }
+  });
+});

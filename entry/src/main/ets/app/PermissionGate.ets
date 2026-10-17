@@ -151,4 +151,9 @@ export class BleViewModelPermissionGate implements ViewModelPermissionPort {
         ? AppErrors.of('PROVISIONING_PERMISSION_DENIED', []) : result.error;
     }
   }
+
+  /** F-08: terminal denial recovery used by C-23's PermissionPort. */
+  openSettings(): Promise<void> {
+    return this.gate.openSettings();
+  }
 }

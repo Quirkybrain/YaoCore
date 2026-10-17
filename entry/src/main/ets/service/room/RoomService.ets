@@ -16,16 +16,27 @@ import { AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import type { ClockPort, LoggerPort } from '../../common/types/Ports';
 import type { RdbStore, RdbTransaction } from '../storage/RdbStore';
-import { Room } from '../../model/FamilyModels';
+import { MemberStatus, Room } from '../../model/FamilyModels';
+import type { FamilyMember } from '../../model/FamilyModels';
 import { DeviceKey } from '../../model/DeviceKey';
 import { DeviceState } from '../../model/DeviceState';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
 import { RoomRepository } from '../../repository/RoomRepository';
+import { FamilyRbac } from '../family/FamilyRbac';
 import type {
   DeviceAssignmentPort,
   MemberRoomGrantPort,
   RoomDeviceNamePort
 } from '../../repository/DomainPorts';
+
+/**
+ * F-03 / CQG-T18: narrow actor lookup used by RoomService to enforce ADMIN for
+ * every room/pool mutation. C-12 still owns session policy at the call site;
+ * the service refuses a supplied non-admin actor instead of trusting the UI.
+ */
+export interface RoomActorLookupPort {
+  getMember(familyId: string, memberId: string): Promise<FamilyMember | undefined>;
+}
 
 export enum RoomChangeEventType {
   ROOM_CREATED = 'ROOM_CREATED',
@@ -96,11 +107,12 @@ export class RoomService {
   private readonly logger: LoggerPort;
   private readonly gate: DomainOperationGate;
   private readonly deviceNames?: RoomDeviceNamePort;
+  private readonly actors?: RoomActorLookupPort;
   private readonly listeners: Array<(event: RoomChangeEvent) => void> = [];
 
   constructor(rooms: RoomRepository, devices: DeviceAssignmentPort, grants: MemberRoomGrantPort,
     rdb: RdbStore, clock: ClockPort, logger: LoggerPort, gate?: DomainOperationGate,
-    deviceNames?: RoomDeviceNamePort) {
+    deviceNames?: RoomDeviceNamePort, actors?: RoomActorLookupPort) {
     this.rooms = rooms;
     this.devices = devices;
     this.grants = grants;
@@ -109,19 +121,27 @@ export class RoomService {
     this.logger = logger;
     this.gate = gate === undefined ? new DomainOperationGate() : gate;
     this.deviceNames = deviceNames;
+    this.actors = actors;
   }
 
   async listRooms(familyId: string): Promise<ReadonlyArray<Room>> {
     return this.rooms.listRoomsOrdered(familyId);
   }
 
-  async createRoom(familyId: string, roomName: string, icon?: string): Promise<Room> {
+  async createRoom(familyId: string, roomName: string, icon?: string,
+    actorMemberId?: string): Promise<Room> {
+    await this.requireAdmin(familyId, actorMemberId);
     const room = await this.rooms.createRoom(familyId, roomName, icon);
     this.emit(new RoomChangeEvent(RoomChangeEventType.ROOM_CREATED, room.roomId));
     return room;
   }
 
-  async renameRoom(roomId: string, roomName: string): Promise<Room> {
+  async renameRoom(roomId: string, roomName: string, actorMemberId?: string): Promise<Room> {
+    const existing = await this.rooms.getRoom(roomId);
+    if (existing === undefined) {
+      throw AppErrors.of('ROOM_NOT_FOUND', []);
+    }
+    await this.requireAdmin(existing.familyId, actorMemberId);
     await this.rooms.updateRoomName(roomId, roomName);
     const room = await this.rooms.getRoom(roomId);
     if (room === undefined) {
@@ -131,11 +151,19 @@ export class RoomService {
     return room;
   }
 
-  async setIcon(roomId: string, icon: string | undefined): Promise<void> {
+  async setIcon(roomId: string, icon: string | undefined,
+    actorMemberId?: string): Promise<void> {
+    const existing = await this.rooms.getRoom(roomId);
+    if (existing === undefined) {
+      throw AppErrors.of('ROOM_NOT_FOUND', []);
+    }
+    await this.requireAdmin(existing.familyId, actorMemberId);
     await this.rooms.updateRoomIcon(roomId, icon);
   }
 
-  async reorderRooms(familyId: string, orderedRoomIds: ReadonlyArray<string>): Promise<void> {
+  async reorderRooms(familyId: string, orderedRoomIds: ReadonlyArray<string>,
+    actorMemberId?: string): Promise<void> {
+    await this.requireAdmin(familyId, actorMemberId);
     await this.rooms.updateOrder(familyId, orderedRoomIds);
     this.emit(new RoomChangeEvent(RoomChangeEventType.ROOM_REORDERED, ''));
   }
@@ -157,14 +185,15 @@ export class RoomService {
     return new RoomDeletionPreview(room, count, limited);
   }
 
-  async deleteRoom(roomId: string,
-    confirmation: RoomDeletionConfirmation): Promise<RoomDeletionResult> {
-    if (!confirmation.confirmed) {
-      throw AppErrors.of('ROOM_DELETE_NOT_CONFIRMED', []);
-    }
+  async deleteRoom(roomId: string, confirmation: RoomDeletionConfirmation,
+    actorMemberId?: string): Promise<RoomDeletionResult> {
     const initial = await this.rooms.getRoom(roomId);
     if (initial === undefined) {
       throw AppErrors.of('ROOM_NOT_FOUND', []);
+    }
+    await this.requireAdmin(initial.familyId, actorMemberId);
+    if (!confirmation.confirmed) {
+      throw AppErrors.of('ROOM_DELETE_NOT_CONFIRMED', []);
     }
     const initialCount = await this.devices.countByRoom(initial.familyId, initial.roomId);
     if (initialCount !== confirmation.userAcknowledgedDeviceCount) {
@@ -200,9 +229,11 @@ export class RoomService {
     });
   }
 
-  async assignDevice(familyId: string, key: DeviceKey, roomId: string): Promise<DeviceState> {
+  async assignDevice(familyId: string, key: DeviceKey, roomId: string,
+    actorMemberId?: string): Promise<DeviceState> {
+    await this.requireAdmin(familyId, actorMemberId);
     if (roomId.length === 0) {
-      return this.unassignDevice(familyId, key);
+      return this.unassignDevice(familyId, key, actorMemberId);
     }
     const room = await this.rooms.getRoom(roomId);
     if (room === undefined) {
@@ -216,14 +247,17 @@ export class RoomService {
     return state;
   }
 
-  async unassignDevice(familyId: string, key: DeviceKey): Promise<DeviceState> {
+  async unassignDevice(familyId: string, key: DeviceKey,
+    actorMemberId?: string): Promise<DeviceState> {
+    await this.requireAdmin(familyId, actorMemberId);
     const state = await this.devices.unassignDevice(familyId, key);
     this.emit(new RoomChangeEvent(RoomChangeEventType.DEVICE_ASSIGNED, '', key));
     return state;
   }
 
-  async moveDevice(familyId: string, key: DeviceKey, targetRoomId: string): Promise<DeviceState> {
-    return this.assignDevice(familyId, key, targetRoomId);
+  async moveDevice(familyId: string, key: DeviceKey, targetRoomId: string,
+    actorMemberId?: string): Promise<DeviceState> {
+    return this.assignDevice(familyId, key, targetRoomId, actorMemberId);
   }
 
   subscribe(listener: (event: RoomChangeEvent) => void): () => void {
@@ -238,6 +272,26 @@ export class RoomService {
 
   dispose(): void {
     this.listeners.splice(0, this.listeners.length);
+  }
+
+  /**
+   * F-03: a supplied actor must exist, be ACTIVE and be ADMIN. Omitting the
+   * actor is the v1 local-admin composition path (same convention as
+   * FamilyService.requireAdmin); C-12 still applies session policy at the
+   * call site, while the VM always supplies the active member id.
+   */
+  private async requireAdmin(familyId: string, actorMemberId?: string): Promise<void> {
+    if (actorMemberId === undefined) {
+      return;
+    }
+    if (this.actors === undefined) {
+      throw AppErrors.of('AUTH_RBAC_DENIED', []);
+    }
+    const actor = await this.actors.getMember(familyId, actorMemberId);
+    if (actor === undefined || actor.status !== MemberStatus.ACTIVE) {
+      throw AppErrors.of('AUTH_RBAC_DENIED', []);
+    }
+    FamilyRbac.requireAdmin(actor.role);
   }
 
   private emit(event: RoomChangeEvent): void {
