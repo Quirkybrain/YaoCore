@@ -2,18 +2,18 @@
 
 - **Artifact ID**: MAINTENANCE-PLAN-001
 - **Producer**: agent:technical-writer
-- **文档版本**: MAINTENANCE-PLAN-001 v1.0（初始版本，T-21）
+- **文档版本**: MAINTENANCE-PLAN-001 v1.1（2026-10-18 documentation 收尾；v1.0 初始于 T-21）
 - **Type**: Maintenance Plan / Backlog / Risk Acceptance Register / Verification Matrix
-- **Status**: ACTIVE（T-21 交付；供 G-013/G-014 与后续维护轮次消费；不授予任何 Gate PASS）
+- **Status**: ACTIVE（G-018 documentation 收尾；G-015/G-016/G-017 均为 `PASS_WITH_ACCEPTED_RISKS`；本计划不授予任何 Gate PASS）
 - **Date**: 2026-10-18
-- **Task**: `wp-086-docs`（T-21；task 分支 `task/wp-086-docs`，父分支 `feat/yaocore-app`，base commit `13dc839`）
+- **Task**: `wp-110-documentation`（G-018；task 分支 `task/wp-110-documentation`，父分支 `feat/yaocore-app`，base commit `422c687`；v1.0 为 `wp-086-docs`/T-21）
 - **Workflow**: STANDARD / GATED_AUTO
-- **Target Stage**: `implementation`
-- **Upstream**: `README.md` @ T-21 基线；`artifacts/60-testing/test-report.md`（TEST-REPORT-001，T-19）；`artifacts/70-review/final-system-review.md`（REV-001-FINAL-SYSTEM，T-20）；`artifacts/60-testing/tooling-cleanup-report.md`（TOOLING-CLEANUP-REPORT-001，T-20）；`artifacts/20-architecture/contract-baseline.md` §5.2/§8.7/§10/§11；`artifacts/20-architecture/project-constraints.md`；`artifacts/40-detailed-design/des-001a-foundation-transport.md` §27.6；`config/project.md`
-- **写范围**: `README.md`、`artifacts/80-maintenance/`。未修改代码、构建配置、契约、测试或 `input/`。
-- **权威边界**: 本计划只登记待办、责任、风险与验证矩阵；不改变需求、契约、ADR、测试结论或 Gate 判定。`input/` 为冻结语料，**不得直接修改**；所有补丁 / 勘误均以提案形式登记，由对应 owner 走 Change Impact。
+- **Target Stage**: `documentation`
+- **Upstream**: `README.md`（README-001 v1.1）；`artifacts/60-testing/testing-stage-report.md`（TEST-002 @ `e74a181`）；`artifacts/65-acceptance/acceptance-report.md`（ACCEPT-001 @ `d649ac7`）；`artifacts/60-testing/test-report.md`（TEST-REPORT-001，历史 @ `4f7c26b`）；`artifacts/70-review/final-system-review.md`（REV-001-FINAL-SYSTEM，T-20）；`artifacts/90-integration/integration-report.md`（INTEGRATION-REPORT-001 + §16/§17）；`artifacts/60-testing/tooling-cleanup-report.md`；`artifacts/20-architecture/contract-baseline.md` §5.2/§8.7/§10/§11；`artifacts/20-architecture/project-constraints.md`；`artifacts/40-detailed-design/des-001a-foundation-transport.md` §27.6；G-015/G-016/G-017；`config/project.md`
+- **写范围**: `README.md`、`artifacts/50-implementation/`、`artifacts/60-testing/`、`artifacts/80-maintenance/`、`artifacts/90-integration/`。未修改代码、构建配置、契约、测试断言或 `input/`。
+- **权威边界**: 本计划只登记待办、责任、风险与验证矩阵；不改变需求、契约、ADR、测试结论或 Gate 判定。`input/` 为冻结语料，**不得直接修改**；所有补丁 / 勘误均以提案形式登记，由对应 owner 走 Change Impact。历史 Gate（G-013/G-014 等）与历史报告数字不回写；以 G-015/G-016/G-017、TEST-002 与本计划当前状态为准。
 
-> **结论先行**：v1 代码级交付已具备可复现的构建、Host 测试、契约 / 仿真器、i18n 与分层证据；剩余工作集中在**真实设备 / 真实网络验证（用户执行）**、**端口位置迁移与契约清理**、**i18n 历史文案收口**、**固件协同项**与**文档维护**。本计划不把任何 `BLOCKED` / `MOCK_ONLY` / `PENDING` 项写成完成，也不把 `check_layering` 的 0 violation 解释为端口位置合规。
+> **结论先行**：v1 代码级交付已具备可复现的构建、Host 测试、契约 / 仿真器、i18n、分层与 triage 证据；**端口迁移（16/17 关闭）与 i18n triage 已完成**。剩余工作集中在**真实设备 / 真实网络验证（用户执行）**、**PORT-LOC-01 与 i18n 残余人工收口**、**固件协同项**、**维护债务**与**发布授权**。本计划不把任何 `BLOCKED` / `MOCK_ONLY` / `PENDING` 项写成完成，也不把 `check_layering` 的 0 violation 解释为 100% 端口位置合规。
 
 ---
 
@@ -81,14 +81,17 @@
 
 | 文档 | 当前基线 | 维护 owner | 下次触发 |
 |---|---|---|---|
-| `README.md` | README-001 v1.0 @ T-21 | `technical-writer` | 代码 / 契约 / 命令 / 设备状态变化；每个 Gate 前 |
+| `README.md` | README-001 v1.1 @ G-018 | `technical-writer` | 代码 / 契约 / 命令 / 设备状态变化；每个 Gate 前 |
 | `artifacts/20-architecture/contract-baseline.md` | CONTRACT-BASELINE-001 v1.0（G-004 批准） | `solution-architect` | P/E 提案、固件协同、协议变更 |
 | `artifacts/20-architecture/project-constraints.md` | PROJECT-CONSTRAINTS-001 v1.0 | `solution-architect` | 新约束 / 豁免 / 风险评估 |
 | `artifacts/20-architecture/adr-001..004` | Accepted（G-004） | `solution-architect` | 契约 / 安全 / 数据边界变化 |
-| `artifacts/40-detailed-design/des-001a/b` | G-006 / G-007 | `solution-architect` | 端口迁移、增量契约、Change Impact |
-| `artifacts/60-testing/test-plan.md` / `test-report.md` | TEST-001 / TEST-REPORT-001 | `test-engineer` | 测试范围 / 运行器 / 证据变化 |
+| `artifacts/40-detailed-design/des-001a/b` | G-006 / G-007；T-23 §27.6.4 状态表 | `solution-architect` | 端口迁移、增量契约、Change Impact |
+| `artifacts/60-testing/test-plan.md` / `test-report.md` | TEST-001 / TEST-REPORT-001（历史 @ `4f7c26b`） | `test-engineer` | 测试范围 / 运行器 / 证据变化 |
+| `artifacts/60-testing/testing-stage-report.md` | TEST-002 @ `e74a181`（最终测试候选） | `test-engineer` | 最终候选变更、设备证据回填 |
+| `artifacts/65-acceptance/acceptance-report.md` | ACCEPT-001 @ `d649ac7`（G-017 输入） | `system-verifier` | 验收结论 / 用户决定 / 新证据 |
 | `artifacts/70-review/*` | 各任务评审 | `quality-reviewer` | 新 revision / 复审请求 |
-| `artifacts/80-maintenance/maintenance-plan.md` | 本文件 | `technical-writer` | 上游变更、固件协同、安全修复、每个 Gate 前 |
+| `artifacts/80-maintenance/maintenance-plan.md` | 本文件 v1.1 | `technical-writer` | 上游变更、固件协同、安全修复、每个 Gate 前 |
+| `artifacts/90-integration/integration-report.md` | INTEGRATION-REPORT-001 + §16/§17 | `repository-manager` / `technical-writer` | 合并、Gate、文档收尾 |
 
 ### 2.5 更新节奏与触发条件
 
@@ -119,39 +122,56 @@
 
 ### 3.2 端口位置迁移（DES-A §27.6.3，阶段 P1-P4）
 
-**现状**：DES-A 名义位置为 `entry/src/main/ets/contracts/**`，仓库中尚无 `contracts/`；端口实际位于 `common/types/Ports.ets`、`service/{storage,crypto,ble,gateway,cloud,i18n,scene}/**`、`repository/{DomainPorts,GatewayPorts}.ets`、`viewmodel/ViewModelPorts.ets` 等。T-20 已把 17 条 `port_location_exceptions` 写入 `tools/contract/layering_allowlist.json`，并让检查器读取该登记；**迁移本身尚未执行**。
+**现状（T-23 / wp-090 + wp-093 后）**：`entry/src/main/ets/contracts/**` 已建立（20 个文件），`model/**` 承接 17 个 DTO / 枚举文件。T-20 登记的 17 条 `port_location_exceptions` 中 **16 条关闭**；仅 **PORT-LOC-01** 保留（`ClockPort`/`IdPort` 仍在 `common/types/Ports.ets`）。live `layering_allowlist.json` 的 `port_location_exceptions` 为 **1 条**，`port_exceptions_used=0`、`violations=0`。DES-A §27.6.4 为权威状态表。
 
 | 阶段 | 内容 | 状态 | owner | 验收 / 关闭条件 |
 |---|---|---|---|---|
-| **P1** | 纯端口文件迁移到 `contracts/**`：`common/types/Ports.ets`、`service/storage/{RdbStore,PreferencesStore,SecretStore,SecretDraftPort,MigrationPort}.ets`、`service/cloud/CloudPorts.ets`、`service/i18n/I18nPorts.ets`、`service/scene/SceneTimerPort.ets`、`service/crypto/CryptoPort.ets`、`repository/{DomainPorts,GatewayPorts}.ets`、`viewmodel/ViewModelPorts.ets` | **未开始** | `solution-architect`（布局）+ `implementation-engineer`（迁移） | 方法名 / 参数 / 返回 / 错误语义不变；imports 更新；全量回归；D-03 获得真实输入 |
-| **P2** | 拆分混合文件：`BleProvisioningPorts.ets`、`GatewayTransportPorts.ets`、`DiscoveryModels.ets` → `contracts/**`（端口）与 `model/**`（DTO / 枚举）；页面 / VM 改 import `model/**` | **未开始**（依赖 P1） | `solution-architect` + `implementation-engineer` | 13 条 D-12 中值 import 例外可删除；页面不再 import service / repository DTO |
-| **P3** | `GattEndpointMap.ets` 迁到 `common/**` / `model/**`，或把 VM 所需常量下沉到 VM 本地 | **未开始**（依赖 P2） | `implementation-engineer` | `GattEndpointMap` 不再被当作端口；检查器无例外 |
-| **P4** | 检查器读取 `port_location_exceptions`，未登记路径 / 符号越界 / 非 `accepted-location-exception` fail-closed | **已完成（T-20）** | `test-engineer` | `check_layering` 读取 allowlist；fixture 覆盖合法 / 未登记 / 符号越界 / pending；T-20 证据见 `t20-layering*` |
+| **P1** | 纯端口文件迁移到 `contracts/**`：`common/types/Ports.ets`（拆分后仅 `ClockPort`/`IdPort` 保留）、`service/storage/*Port`、`service/cloud/CloudPorts.ets`、`service/i18n/I18nPorts.ets`、`service/scene/SceneTimerPort.ets`、`service/crypto/CryptoPort.ets`、`repository/{DomainPorts,GatewayPorts}.ets`、`viewmodel/ViewModelPorts.ets` | **已完成（T-23 / wp-090；wp-093 修复）** | `solution-architect` + `implementation-engineer` | 方法名 / 参数 / 返回 / 错误语义不变；imports 更新；全量回归；D-03 获得真实输入 |
+| **P2** | 拆分混合文件：`BleProvisioningPorts.ets`、`GatewayTransportPorts.ets`、`DiscoveryModels.ets` → `contracts/**`（端口）与 `model/**`（DTO / 枚举）；页面 / VM 改 import `model/**` | **已完成（T-23）** | `solution-architect` + `implementation-engineer` | 旧 D-12 值 import 条目退休；页面不再 import service / repository DTO |
+| **P3** | `GattEndpointMap.ets` 迁到 `model/**`（纯映射，非端口） | **已完成（T-23）** | `implementation-engineer` | `GattEndpointMap` 不再被当作端口；检查器无对应例外 |
+| **P4** | 检查器读取 `port_location_exceptions`，未登记路径 / 符号越界 / 非 `accepted-location-exception` fail-closed | **已完成（T-20；T-23 wp-093 硬化）** | `test-engineer` | `check_layering` 读取 allowlist；fixture 覆盖合法 / 未登记 / 符号越界 / pending；当前 27/27 |
 
-**关闭标准**：P1-P3 完成后，`port_exceptions_used` 逐条归零，删除 `port_location_exceptions` 条目并更新 DES-A §2.1/§3.7；`check_layering` 仍为 0 violation；Stage Gate 记录“端口位置合规”。**在新的迁移任务完成前，0 violation 不代表位置合规。**
+**保留项：PORT-LOC-01（OPEN）**
+
+| 项 | 内容 |
+|---|---|
+| 位置 | `entry/src/main/ets/common/types/Ports.ets` 的 `ClockPort`、`IdPort` |
+| 原因 | 冻结签名 `DateTimeUtil.nowUtcCompact(clock: ClockPort)`、`UuidUtil.newUuid(ids: IdPort)` 位于 `common/utils/**`；D-01 规定 `common/**` 不得 import `contracts/**`；DES-A §27.6.3 禁止复制端口 |
+| 当前影响 | live `port_location_exceptions=1`；`port_exceptions_used=0`（`common` 目标不受 D-09/D-11 限制）；`check_layering` 仍为 0 violation |
+| 关闭条件 | 由 `solution-architect` 批准修改 D-01 或冻结签名（允许 `common/**` type-only import `contracts/**`，或调整工具签名），迁移后删除最后一条登记并更新 DES-A §27.6.4 |
+| 禁止声明 | 不得写成“17 条全部关闭”或“端口位置已 100% 合规” |
+
+**关闭标准**：P1-P3 已完成，16/17 条关闭；PORT-LOC-01 按上表关闭条件处理。`check_layering` 0 violation 仍不代表所有端口位置合规。
 
 ### 3.3 R3-01 / D-12 例外清理
 
-**现状**：T-20 已按 DES-B §2.3/§18.1 把 13 条 `T20-D12-01..13` 状态改为 `accepted`，检查器对 `used && status != accepted` fail-closed；当前 `pending=0`、`exceptions_used=13`。这完成了“登记”，**未完成“迁移”**。
+**现状（T-23 / wp-093 后）**：T-20 按 DES-B §2.3/§18.1 把 13 条 `T20-D12-01..13` 状态改为 `accepted`；T-23 迁移后旧路径已拆分 / 删除，`T20-D12-01..05/09/10` **7 条正式退休**，live allowlist 仅保留 **6 条 active**（`T20-D12-06/07/08/11/12/13`，其中 2 条值 import：07、12）。当前 `pending=0`、`exceptions_used=6`、`unused_exceptions=[]`。历史条目仅在 DES-B §18.1 与 Git 历史中保留，**不得复用 ID 或改回 `pending-*`**。
 
 | 项 | 内容 | owner | 优先级 | 关闭条件 |
 |---|---|---|---|---|
-| D-12 值 import | `FamilyManagePage` 的 `CreateInvitationInput` / `FamilyJoinPhase`；`ProvisioningPage` 的 `BleProvisioningDevice` / `ProvisioningState` / `WifiAp`；`SettingsPage` 的 `CloudTransportState` | `solution-architect` + `implementation-engineer` | P2 | 迁移到 `model/**` 或由架构 owner 正式登记为“页面本地表单状态 / UI 枚举，无 I/O”；删除对应 allowlist 条目 |
-| D-12 类型 import | 其余 10 条 `type_only` 的 pages → service / repository 只读 DTO / 枚举 | `solution-architect` | P2 | 纳入 `model/**` 或保留为文件 / 符号级、永不目录级放宽；`exceptions_used` 下降 |
-| 检查器回归 | 13 条全部命中且仅命中一次；`pending=0`；`unused_exceptions=[]` | `test-engineer` | P1（已满足） | 每次迁移后重跑 `check_layering` 与 fixture；不得放宽 D-12 规则 |
+| D-12 active 值 import（07/12） | `FamilyManagePage` 的 `CreateInvitationInput` / `FamilyJoinPhase`；`SettingsPage` 的 `CloudTransportState` | `solution-architect` + `implementation-engineer` | P2 | 迁移到 `model/**` 或由架构 owner 正式登记为“页面本地表单状态 / UI 枚举，无 I/O”；删除对应 allowlist 条目 |
+| D-12 active 类型 import（06/08/11/13） | `FamilyManagePage` / `ProfilePage` / `RoomManagePage` / `SettingsPage` 的只读 DTO / 枚举 | `solution-architect` | P2 | 纳入 `model/**` 或保留为文件 / 符号级、永不目录级放宽；`exceptions_used` 下降 |
+| 已退休 7 条 | `T20-D12-01..05/09/10`：旧 `repository/DomainModels`、`service/ble/BleProvisioningPorts` 路径已拆分 / 删除 | `solution-architect` | — | 保持 retired；不重新启用；DES-B §18.1 历史表保留 |
+| 检查器回归 | 6 条 active 全部命中且仅命中一次；`pending=0`；`unused_exceptions=[]`；fixture 27/27 | `test-engineer` | P1（已满足） | 每次迁移后重跑 `check_layering` 与 fixture；不得放宽 D-12 规则 |
 
 > 禁止把整目录 `service/**` / `repository/**` 放宽；每条例外必须有精确路径与符号子集。
 
-### 3.4 i18n 596 条迁移
+### 3.4 i18n 历史文案 triage（已完成，残余人工收口）
 
-**现状**：`entry/src/test/i18n/legacy-migration.csv` 共 615 条；A 类 606 条中 10 条 `ACCEPTED`，**596 条 `PENDING_REVIEW`**；另有 `B_REWRITE_REQUIRED=11`、`SAFETY_RECHECK=2`。T-18 已新增 326 个净键并按页面语义重写大量 UI 文案（可直接核对 59 条），但**没有**回填 CSV，避免把未人工复核的条目标成 `ACCEPTED`。当前 `--strict-ui` 为 0 blocking，不代表 596 条已全部签署。
+**现状（T-24 / wp-096 + wp-098 后）**：`entry/src/test/i18n/legacy-migration.csv` 共 615 行，`triage_legacy.py --check` 通过。A 类 606 行的构成为 **10 `ACCEPTED` + 46 `MIGRATED` + 6 `PENDING_REVIEW` + 544 `OBSOLETE_LEGACY` + 0 `INLINE_LITERAL`**（46 + 6 + 544 = 596，即旧口径的“非 ACCEPTED 总数”）；另有 **11 条 `B_REWRITE_REQUIRED`**（全部落在 `OBSOLETE_LEGACY`）、**C 类 6 条**（4 条 `RECHECK_REQUIRED` + 2 条 `SAFETY_RECHECK_REQUIRED`）、**D 类 3 条**（品牌数据排除）。
 
-| 工作项 | 内容 | owner | 优先级 | 关闭条件 |
+> **口径纪律**：`MIGRATED` 是“旧中文在当前 zh-CN 资源中恰好出现一次”的机器证据，**不等于人工签收**；`OBSOLETE_LEGACY` 是“无精确当前引用”，**不是删除清单**，可能因 T-18 非逐字重写而误判。旧口径把 596 条非 `ACCEPTED` 总数误标为 `PENDING_REVIEW`，该口径已作废；当前 `PENDING_REVIEW` 仅 6 条。`--strict-ui` 为 0 blocking，不代表 615 行已全部人工复核。
+
+| 工作项 | 内容 | owner | 优先级 | 状态 / 关闭条件 |
 |---|---|---|---|---|
-| 逐条 triage | 596 条按页面 / 组件 / 技术字符串分类；B 类 11 条重写；C 类 2 条安全复核 | `implementation-engineer` + `technical-writer` | P2 | CSV 每行有明确状态 / 目标键 / 证据；不得批量误标 |
-| 回填与 parity | 把已落地的页面文案回填为 `ACCEPTED`；检查 en/zh parity、plural、插值 | `implementation-engineer` + `test-engineer` | P2 | `check_i18n.py --strict-ui` 0 blocking / 0 missing；parity 100% |
-| 工具路径 | `T10-EX-01`：检查器仍在 `entry/src/test/i18n/`，未迁移到 `tools/i18n/` | `test-engineer` | P3 | 迁移或正式登记；命令与文档同步 |
-| 告警 triage | 16 条 hardcoded（AC 品牌名 / Mock 文案 / 颜色注释）逐条确认非 UI 或移入 allowlist | `implementation-engineer` | P3 | 0 真实硬编码 UI；allowlist 有理由 |
+| 逐条 triage | 615 行按页面 / 组件 / 技术字符串分类；B 类 11 条重写；C 类 6 条复核 | `implementation-engineer` + `technical-writer` | P2 | **已完成（T-24）**；CSV 状态 / 目标键 / 证据一致 |
+| `PENDING_REVIEW` 6 条 | `关闭` / `刷新` / `添加网关` / `执行中` / `简体中文` / `语言` 存在多键歧义 | `implementation-engineer` + `technical-writer` | P2 | 人工选择语义键并回填；不得按出现顺序猜键 |
+| `B_REWRITE_REQUIRED` 11 条 | “本机档案”相关文案；当前 en-US 无精确对应 | `implementation-engineer` + `technical-writer` | P2 | 按页面语义重写并回填；保留 B 标记证据 |
+| C 类复核 6 条 | 4 条版本 / 关于文案 `RECHECK_REQUIRED`；2 条模拟器拒收 `SAFETY_RECHECK_REQUIRED` | `implementation-engineer` + `quality-reviewer` | P2 | 已复核并记录理由；安全文案不得弱化 |
+| D 类排除 3 条 | `Gree/格力`、`Haier/海尔`、`Midea/美的` 品牌数据 | `technical-writer` | P3 | 保持排除；不进入普通 UI 文案迁移 |
+| 回填与 parity | 已落地的页面文案回填为 `ACCEPTED`；检查 en/zh parity、plural、插值 | `implementation-engineer` + `test-engineer` | P2 | `check_i18n.py --strict-ui` 0 blocking / 0 missing；parity 100% |
+| 工具路径 | triage 工具已在 `tools/i18n/`；检查器仍在 `entry/src/test/i18n/`（`T10-EX-01`） | `test-engineer` | P3 | 迁移检查器或正式登记；命令与文档同步 |
+| 告警 triage | 16 条 hardcoded（主题颜色注释 / AC 品牌 CJK / Mock 文案） | `implementation-engineer` | P3 | 0 真实硬编码 UI；allowlist 有理由 |
 
 ### 3.5 P-01..P-17 补丁提案（契约基线 §10）
 
@@ -232,7 +252,7 @@
 | M-07 | `tools/build/README.md` 仍描述脚手架时点（“No defects found”、host 测试未建立） | T-21 复核 | **Stale** | `technical-writer` + `implementation-engineer` | P2 |
 | M-08 | 测试源码未纳入 lint；无行 / 分支覆盖率 | T-19 §8.2；T-20 §8 | Known gap | `test-engineer` | P2 |
 | M-09 | 25 条 lint warning（23 条自定义组件性能建议 + 2 条 loop 警告） | T-20 §8 | Accepted（非阻断） | `implementation-engineer` | P3 |
-| M-10 | `T10-EX-01` i18n 检查器路径未迁移 | T-10/T-20 | Known deviation | `test-engineer` | P3 |
+| M-10 | `T10-EX-01` i18n 检查器路径未迁移（triage 工具已在 `tools/i18n/`） | T-10/T-20/T-24 | Known deviation | `test-engineer` | P3 |
 | M-11 | 16 条 hardcoded 技术字符串告警（strict 模式下仍为非阻断；需逐条 triage） | T-20 §5 | Recorded | `implementation-engineer` | P3 |
 | M-12 | ADR 文件头 Status 行同步（P2 提案） | T-21 原 DoD | 提案待执行 | `solution-architect` | P3 |
 | M-13 | DEFERRED：扫码 / 相机二维码、设备删除 / 改名、场景编辑、通知系统权限状态 | T-18 §6.2 | Deferred（v1） | `implementation-engineer` | P3 |
@@ -244,11 +264,11 @@
 
 | 窗口 | 建议纳入 | 门禁影响 |
 |---|---|---|
-| **G-013 / G-014 前** | README / 本计划 / 风险登记 / Checkpoint / Gate 记录；**不启动端口迁移**（避免与 T-22 集成窗口冲突） | 文档与风险记录是 Stage Gate 输入；端口迁移不得被当作 Gate 前置 |
-| **下一个维护窗口** | P1 端口迁移、M-07 工具文档刷新、596 条 i18n triage、M-08 测试 lint / 覆盖率方案 | 每项完成后重跑对应检查；不改变 v1 契约语义 |
+| **G-013 / G-014（历史，已关闭）** | README / 本计划 / 风险登记 / Checkpoint / Gate 记录 | 历史 Gate 文本保留；当前数字以 G-015/G-016/G-017 为准 |
+| **下一个维护窗口** | i18n 残余（6 PENDING + 11 B + 6 C + 3 D）人工收口、M-07 工具文档刷新、M-08 测试 lint / 覆盖率方案、M-03 邀请能力、`T10-EX-01` 检查器路径 | 每项完成后重跑对应检查；不改变 v1 契约语义 |
 | **固件 v2.1 / 设备可用后** | FC-01/FC-02/FC-06、BLK-02..BLK-08、真实 p95 / fps | 真实 TLS / 云 / 设备声明以用户证据为准；未执行项保持 BLOCKED |
 | **持续** | 安全修复、依赖升级、文档卫生、失效链接 / 计数 | 安全 / 依赖升级触发全量回归；文档卫生不替代 Gate |
-| **后续版本** | P2 端口拆分、D-12 值 import 迁移、FC-03..FC-05、M-03 邀请能力 | 需 ADR / Change Impact；不得在本版本静默扩展 |
+| **后续版本** | PORT-LOC-01（需 D-01/冻结签名变更）、D-12 active 6 条迁移、FC-03..FC-05 | 需 ADR / Change Impact；不得在本版本静默扩展 |
 
 ---
 
@@ -293,6 +313,8 @@
 
 ### 5.1 已接受 / 已登记风险
 
+> **历史 Gate 注记**：G-014 的 RA-03（端口 / D-12 例外未迁移）与 RA-04（i18n 596 条历史文案，旧 `PENDING_REVIEW` 口径）记录的是 2026-10-18 之前的状态，**不回写历史 Gate**。当前状态：RA-03 已由 T-23 取代（16/17 端口关闭、D-12 6 active / 7 retired、PORT-LOC-01 OPEN）；RA-04 已完成 triage（6 PENDING + 11 B + 6 C + 3 D 残余）。下表对应行以当前状态登记。
+
 | ID | 风险 | 影响 | 补偿控制 / 现状 | 接受主体 | 复审触发 |
 |---|---|---|---|---|---|
 | **D-030 / GAP-T18-01** | `FamilyRepository.addGatewayToFamily` 无 actor / RBAC | 服务层网关管理授权缺口；内部 API 边界 | UI ADMIN 门 + BLE PoP 前置 + 内部 API 边界；**未关闭** | Orchestrator（v1 风险接受，D-030） | G-014、C-22/C-09/C-15 变更、下个 release |
@@ -300,14 +322,14 @@
 | **A-CB-1** | IoTDA REST 错误体 / 影子字段未在冻结语料定义 | 云错误分类 / 影子解析偏差 | `ShadowDtoAdapter` 容忍已知形态，未知形态 `CLOUD_SHADOW_INVALID` fail-closed；真实云验证 | `solution-architect`（假设登记） | 真实 IoTDA 联调、SR / CC schema 更新 |
 | **PB-02** | `DeviceInventoryJson` 字段级结构未决 | 外部模块云完成判定不完整 | 内置 `LastRequestId/LastSeq` 路径完整；inventory 路径 `UNSUPPORTED`；固件提案 `PROPOSAL-PB02-1` | `solution-architect` + 固件维护者 | 固件 schema 冻结 / 云联调 |
 | **P-HMAC 边界** | P-HMAC 无机密性 | LAN 载荷可被同网段观察 | 如实标注；TLS 需固件 v2.1；pin 失败 P-BLOCKED 不回退；GCM 归档 | 用户 / G-004（ADR-002） | 固件 v2.1、用户要求机密性 |
-| **端口位置例外** | 17 条端口不在 `contracts/**`；10 条当前被使用 | 0 violation 不等于位置合规；未来端口可能绕过 Change Impact | T-20 allowlist + fail-closed；迁移计划 §3.2 | Stage Gate 记录（P2） | 迁移完成 / 新增端口 |
-| **R3-01 D-12** | 13 条 pages DTO / 枚举 import | 契约登记已 accepted，但迁移未完成 | 文件 / 符号级 allowlist；禁止目录级放宽 | Stage Gate 记录（P2） | P2 迁移完成 |
+| **RA-03 / 端口位置例外** | 17 条登记中 **16 条已迁移**；仅 `PORT-LOC-01`（`ClockPort`/`IdPort`）OPEN，`port_exceptions_used=0` | 0 violation 仍不等于 100% 位置合规；未来端口可能绕过 Change Impact | T-23 `contracts/**` + 版本化 allowlist + fail-closed；迁移计划 §3.2 | Stage Gate 记录 | D-01 / 冻结签名变更；新增端口 |
+| **RA-04 / i18n 历史文案** | triage 已完成；残余 **6 PENDING + 11 B_REWRITE + 6 C + 3 D** | 46 `MIGRATED` 仅为机器证据；544 `OBSOLETE_LEGACY` 不是删除清单 | 615 行 `--check` 一致；当前 UI 0 blocking；§3.4 人工收口 | Stage Gate 记录（P2） | 维护轮次 |
+| **R3-01 D-12** | 6 条 active pages DTO / 枚举 import（2 条值 import）；7 条已退休 | 契约登记 accepted，但仍有 6 条未迁移 | 文件 / 符号级 allowlist；禁止目录级放宽；退休条目不复用 | Stage Gate 记录（P2） | active 迁移完成 / 新增 import |
 | **设备 / 真实环境 BLOCKED** | BLE/LAN/TLS/云/视觉/fps 未验证 | 用户侧验收未完成 | 按 §4 由用户执行；Mock/Host 证据不外推 | Orchestrator（CP-03/D-018） | 用户提供设备结果 |
 | **NFR 4.1/4.2/4.3 partial** | 传输机密性、设备存储、真实 p95/fps 缺证据 | NFR 未全部验收 | 证据边界如实标注；真实环境补齐 | Stage Gate 记录 | 设备 / 真实网络验证 |
-| **ACK p95 MOCK_ONLY** | localhost 约 0.6 ms（T-19/T-20 0.598 ms；T-21 复跑 0.589 ms）不能外推 | 性能验收缺失 | 测量脚本 + 限制说明；真实 p95 由用户执行 | Stage Gate 记录 | BLK-07 执行 |
-| **i18n 596 / 工具债务** | 历史文案未逐条签署；检查器路径偏差 | 文案质量 / 维护成本 | 当前 0 blocking；§3.4 收口 | Stage Gate 记录（P2） | 维护轮次 |
+| **ACK p95 MOCK_ONLY** | localhost 约 0.6 ms（TEST-002 复核 0.609 ms）不能外推 | 性能验收缺失 | 测量脚本 + 限制说明；真实 p95 由用户执行；数值随环境波动 | Stage Gate 记录 | BLK-07 执行 |
 | **测试源码 lint / 覆盖率缺失** | 测试代码仅 Node 解析 / 编译门禁 | 测试质量盲区 | 已知 gap；独立 lint / 覆盖率任务 | Stage Gate 记录（P2） | CI / 测试基础设施变更 |
-| **UI 视觉 / A11y 未验收** | 仅源码级 + Host VM 证据 | 可用性 / 无障碍风险 | §4.2 设备抽查 | 用户 / Stage Gate | 设备可用 |
+| **UI 视觉 / A11y 未验收** | 仅源码级 + Host VM 证据；GAP-AC-01..03 待用户决定 | 可用性 / 无障碍风险 | §4.2 设备抽查；UI 偏离需接受或 bounded fix | 用户 / Stage Gate | 设备可用 / 用户决定 |
 | **许可证 TODO** | 项目级许可证未声明 | 再分发 / 合规不确定 | README 明确 TODO；不假设可再分发 | 项目所有者 | 首次公开发布前 |
 
 ### 5.2 交付计划风险表现状（R-01..R-17）
@@ -323,7 +345,7 @@
 | R-07 PB-02 | 仍 `UNRESOLVED`；外部模块云完成 `UNSUPPORTED` | §5.1 PB-02 |
 | R-08 PB-01 / UDP / mDNS | 手动 / 上次地址路径存在；真实发现未验证 | 真实网关发现（BLK-04） |
 | R-09 UI / VM 范围 | 代码落地；视觉 / 设备 BLOCKED | BLK-06 / §4.2 |
-| R-10 i18n 迁移成本 | 596 条 PENDING_REVIEW | §3.4 |
+| R-10 i18n 迁移成本 | triage 完成；残余 6 PENDING / 11 B / 6 C / 3 D | §3.4 |
 | R-11 覆盖不足 | 697 Host 用例；无覆盖率；设备 BLOCKED | §3.9 M-08 |
 | R-12 用户覆盖 / 固件变化 | 无用户覆盖；FC-01..FC-06 待固件 | §3.7 / Change Impact |
 | R-13 串行 / 上下文 | 已通过任务拆分与 Checkpoint 控制 | 保持单任务交接 |
@@ -342,13 +364,17 @@
 2. **核对**：文档版本头、`适用 revision`、命令结果、测试 / 评审证据、失效链接。
 3. **分类**：P0 / P1 立即处理；P2 / P3 排期；新增风险登记到 §5。
 4. **修订**：仅改授权范围；`input/` 走提案；代码 / 契约变更走 Change Impact。
-5. **验证**：至少重跑构建、Host、layering、i18n、crosscheck；设备相关项保持 `BLOCKED` 或记录用户证据。
+5. **验证**：至少重跑 Host、layering、i18n、crosscheck 与 triage；构建 / lint 可引用“产品代码未变”的 TEST-002 证据并写明适用 revision；设备相关项保持 `BLOCKED` 或记录用户证据。
 6. **记录**：更新版本头、变更记录、本计划状态、Gate / Checkpoint；提交并 `finish`。
 7. **关闭条件**：所有声明与证据一致；无未登记 `STALE`；无被误写为 PASS 的 `BLOCKED` / `MOCK_ONLY`；`git diff --cached --check` 通过。
 
-**本轮（T-21）已完成**：README 从脚手架状态更新为已实现 App 状态；关键命令复跑；P/E/FC、端口迁移、i18n 596、WP2-F04、R2 残余、风险接受与设备矩阵登记；`input/` 未修改。
+**历史轮次（T-21，v1.0）已完成**：README 从脚手架状态更新为已实现 App 状态；关键命令复跑；P/E/FC、端口迁移、i18n 596、WP2-F04、R2 残余、风险接受与设备矩阵登记；`input/` 未修改。
 
-**本轮未做 / 不得声称**：未执行端口迁移；未关闭 GAP-T18-01 / R4-01 / PB-02 / A-CB-1；未完成 596 条 i18n 迁移；未执行真实设备 / 网络 / 云 / 视觉 / fps 验证；未判定 G-013/G-014；未声明 release 或生产就绪。
+**历史轮次（T-21）未做 / 不得声称**：当时未执行端口迁移；未关闭 GAP-T18-01 / R4-01 / PB-02 / A-CB-1；未完成 i18n triage；未执行真实设备 / 网络 / 云 / 视觉 / fps 验证；未声明 release 或生产就绪。
+
+**本轮（2026-10-18 documentation 收尾，wp-110）已完成**：README v1.1 / 本计划 v1.1 同步 T-23 端口迁移（16/17 关闭、PORT-LOC-01 OPEN）、D-12 6 active / 7 retired、i18n triage 与 TEST-002/G-015..G-017 阶段状态；TEST-REPORT-001 追加历史注记并修正 15/7 计数；RR-03（T-23 报告）勘误；集成报告追加 §17；复跑 Host 697/697、crosscheck 66/66、layering 221 files/0 violation、fixture 27/27、i18n 0 blocking、triage 615 行、仿真器 20/20。`input/` 未修改。
+
+**本轮未做 / 不得声称**：未执行用户验收 / 设备矩阵；未关闭 GAP-AC-01..03 / D-030 / R4-01 / PB-02 / A-CB-1 / PORT-LOC-01；未完成 i18n 6 PENDING + 11 B + 6 C + 3 D 的人工收口；未签名、未发布、未推送；未判定 G-018（由 Orchestrator 判定）。
 
 ---
 
@@ -357,14 +383,50 @@
 | 项 | 映射 |
 |---|---|
 | 文档版本机制 | 契约基线 §8.7（C-013）；P-16 |
-| 端口迁移 | DES-A §27.6.3；`tools/contract/layering_allowlist.json`；TOOLING-CLEANUP-REPORT-001 §1/§5 |
-| D-12 / R3-01 | DES-B §2.3/§18.1；`t18-review-c.md` §R3-01；T-20 F-02 |
-| i18n | I18N-DESIGN §5；`legacy-migration.csv`；`t10-i18n.md` / `t10-fix-report.md`；T-18 §3.1 |
+| 端口迁移 | DES-A §27.6.3/§27.6.4；`tools/contract/layering_allowlist.json`；T-23 `t23-ports-migration.md`（含 wp-110 勘误）；TOOLING-CLEANUP-REPORT-001 §1/§5 |
+| D-12 / R3-01 | DES-B §2.3/§18.1；`t18-review-c.md` §R3-01；T-20 F-02；T-23 F-07 / wp-093 |
+| i18n | I18N-DESIGN §5；`legacy-migration.csv`；`t24-i18n-triage.md`；`tools/i18n/triage_legacy.py`；T-24 / wp-098 |
 | P / E / FC | 契约基线 §5.2/§10/§11 |
 | WP2-F04 | 契约基线 §7.2；`tools/test-fixtures/iotda/product-profile.json` |
-| 测试 / 评审 | TEST-REPORT-001；REV-001-FINAL-SYSTEM；TOOLING-CLEANUP-REPORT-001 |
-| 设备矩阵 | T-19 §7（BLK-01..08）；T-18 §5 |
-| 风险 | `state/project-state.md` D-030；`t18-review-d.md` R4-01；契约基线 A-CB-1/PB-02；交付计划 §8.1 |
+| 测试 / 评审 | TEST-002 @ `e74a181`；TEST-REPORT-001（历史 @ `4f7c26b`）；REV-001-FINAL-SYSTEM；TOOLING-CLEANUP-REPORT-001 |
+| 验收 / Gate | ACCEPT-001；G-015/G-016/G-017；G-018 由 Orchestrator 判定 |
+| 设备矩阵 | T-19 §7（BLK-01..08）；T-18 §5；ACCEPT-001 §3.2 |
+| 风险 | `state/project-state.md` D-030；`t18-review-d.md` R4-01；契约基线 A-CB-1/PB-02；交付计划 §8.1；G-014 RA-03/RA-04（历史，当前状态见 §5.1） |
+
+---
+
+## 8. 2026-10-18 收尾记录（G-018 documentation 输入）
+
+### 8.1 阶段结论链
+
+| Gate | Revision | Verdict | 备注 |
+|---|---|---|---|
+| G-015 review | `09e1b46` | **PASS_WITH_ACCEPTED_RISKS** | 变更覆盖、独立评审、回归与残余登记；RR-03 转 documentation |
+| G-016 testing | `1cccec5` | **PASS_WITH_ACCEPTED_RISKS** | TEST-002 @ `e74a181`；11 项矩阵 exit 0；FR 24 covered / 2 partial / 0 gap |
+| G-017 acceptance | `4faf3e3` | **PASS_WITH_ACCEPTED_RISKS（acceptance readiness）** | 代码级验收就绪；用户验收未执行；D-AC-01..08 + RR-03 转 documentation |
+| G-018 documentation | 本任务基线 `422c687` | 待 Orchestrator 判定 | 本轮完成 README/维护/测试/集成文档同步；不自行宣告 Gate PASS |
+
+### 8.2 本轮关闭与勘误
+
+| 项 | 结果 | 证据 |
+|---|---|---|
+| 端口迁移 P1-P3 | **16/17 关闭**；`contracts/**` 20 个文件；`port_exceptions_used=0` | T-23 `t23-ports-migration.md` §10；DES-A §27.6.4 |
+| PORT-LOC-01 | **仍 OPEN**；`ClockPort`/`IdPort` 留在 `common/types/Ports.ets`；需 D-01 / 冻结签名变更 | 本计划 §3.2；`layering_allowlist.json` |
+| D-12 | **6 active / 7 retired**；`exceptions_used=6`、`unused_exceptions=[]` | DES-B §18.1；T-23 F-07；`check_layering` |
+| i18n triage | **615 行一致**；10 ACCEPTED / 46 MIGRATED / 6 PENDING / 0 INLINE / 544 OBSOLETE；11 B / 6 C / 3 D | `triage_legacy.py --check/--summary` |
+| RR-01 / RR-02 / RR-04 | **CLOSED @ `16b0f7c`** | G-015；`wp-101-checker-rr` |
+| RR-03（T-23 报告旧口径） | **已勘误（wp-110）**：标题、§1、§5.2、§6、§7.2 与 §10 状态对齐；保留原 Producer 与 §10 执行记录 | `t23-ports-migration.md` 文首/文末勘误说明 |
+| TEST-REPORT-001 计数 | **已注记**：历史 @ `4f7c26b`；`T09_C11_*` 15、`T16_Scene_*` 7（原 16/8 为计数错误）；最终候选以 TEST-002 为准 | `test-report.md` 文首注记与 §5 勘误标记 |
+| 历史 Gate（G-013/G-014） | **不回写**；RA-03/RA-04 旧口径在本计划 §5.1 注记为历史 | 本计划 §5.1；G-015/G-016/G-017 |
+
+### 8.3 残余与后续维护窗口
+
+1. **用户验收 / 设备矩阵**：BLK-01..08 未执行；签名、`hdc` target、真实 BLE/LAN/TLS/云/硬件/视觉/A11y/fps 仍 `BLOCKED` / `UNAVAILABLE`。
+2. **UI 子句偏离**：GAP-AC-01..03 需用户书面接受为 v1 简化，或派发 bounded fix 并重跑相关测试。
+3. **i18n 残余**：6 `PENDING_REVIEW` + 11 `B_REWRITE_REQUIRED` + 6 C 复核 + 3 D 排除；`MIGRATED` 46 条仍需人工语义确认，544 `OBSOLETE_LEGACY` 不得直接删除。
+4. **端口 / D-12**：PORT-LOC-01 需 D-01 或冻结签名裁定；6 条 active D-12 可在后续版本迁移。
+5. **维护债务**：M-07 工具文档、M-08 测试 lint / 覆盖率、M-03 邀请能力、M-10 检查器路径、M-11 16 条 hardcoded triage。
+6. **release**：未授权；签名、推送 / PR/MR、`main` 合并与发布策略需用户决定。`main_merge_mode: review_request_when_remote`，禁止擅自本地直并 main。
 
 ---
 
