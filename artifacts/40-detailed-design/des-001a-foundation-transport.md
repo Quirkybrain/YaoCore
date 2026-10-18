@@ -3,10 +3,10 @@
 - **Artifact ID**: DES-001A
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；**T-18 裁定同步（2026-10-18）见 §0.7/§27.5**；**T-20 收口（2026-10-18）见 §0.8/§2.1/§3.7/§27.6**（F-01 端口物理位置例外登记；不改变冻结签名与 G-004 语义）；**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）见 §27.6.4/附录 E**（F-01 TimerPort 归属：保留 C-15 云 `TimerPort`，退休未实现的 DES-B `EXT-DES-B-01` 并由 `EXT-DES-B-33` `VmTimerPort` 取代；F-02 D-03 允许 `contracts/**` 内 type-only 且无环；F-05 勘误；不改变已实现冻结签名/G-004 语义）；冻结签名未变更）
+- **Status**: Accepted（G-006 PASS @ `6c186f0`；2026-10-17 依 G-007 增量同步 §27.4；T-12 裁定同步（2026-10-17）见 §0.5；T-13 裁定同步（2026-10-17）见 §0.6；**T-18 裁定同步（2026-10-18）见 §0.7/§27.5**；**T-20 收口（2026-10-18）见 §0.8/§2.1/§3.7/§27.6**（F-01 端口物理位置例外登记；不改变冻结签名与 G-004 语义）；**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）见 §27.6.4/附录 E**（F-01 TimerPort 归属：保留 C-15 云 `TimerPort`，退休未实现的 DES-B `EXT-DES-B-01` 并由 `EXT-DES-B-33` `VmTimerPort` 取代；F-02 D-03 允许 `contracts/**` 内 type-only 且无环；F-05 勘误；不改变已实现冻结签名/G-004 语义）；**T-23 F-03 落地状态同步（2026-10-18，`wp-104-des-sync`）**：C-23 符号重命名已由 `wp-093-t23-fixes` @ `cc2233d` 落地（`ProvisioningPermissionPort`/`ProvisioningPermissionKind`；C-28 app seam 未变），独立复审 `wp-094-t23-rereview` PASS；§27.6.4 `PORT-LOC-17` 同步为 CLOSED，`PORT-LOC-01` 仍 OPEN；RR-01/RR-02 checker 缺口已由 `wp-101-checker-rr` @ `16b0f7c` 修复。仅状态同步，不改变冻结签名/G-004 语义）
 - **Gate**: G-006 PASS（Accepted @ 6c186f0）；已扩展：DES-001B §23（G-007 批准，2026-10-17）
-- **Date**: 2026-10-17
-- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-19 `scanWifiAccessPoints`/`BleWifiScanRequest`（`EXT-DES-B-29`）与 C-09/C-11/C-23/C-28 增量边界；见 §0.7/§27.5；不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/§7.2 建立端口物理位置例外登记（§27.6；16 个端口声明文件 + 1 个纯映射 seam），并把 17 条机器可读条目规范纳入 `tools/contract/layering_allowlist.json` 的 `port_location_exceptions`；明确 `check_layering` 0 violation ≠ 端口位置合规；只登记现状、关闭条件与迁移建议，不迁移代码、不改变冻结签名/G-004 语义。**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）**：依据 `artifacts/70-review/t23-review.md`（commit `f290f69`）与 `artifacts/50-implementation/t23-ports-migration.md`，裁定 F-01 采用方案 B——`contracts/TimerPort.ets` 保持 C-15 云 `sleep/cancel` 端口，正式退休从未实现的 DES-B `EXT-DES-B-01`（`scheduleOnce/scheduleRepeating/cancel` + `TimerHandle`），并以 `EXT-DES-B-33` 登记实际 VM seam `VmTimerPort`（`viewmodel/core/ViewModelCore.ets`，`setTimer/clearTimer`）；F-02 采用方案 A——D-03 允许 `contracts/**` 同层 **type-only** 依赖并要求无环，checker 精确执行；F-03 将 C-23 VM-facing 契约符号改为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`，`PermissionResult` 保留为 app 层 C-28 类型；F-04 checker 硬化 `owner`/`close_condition`/`evidence` 与 `pending-*`；F-05/F-06/F-07 勘误；§27.6 更新为 16 CLOSED / 1 OPEN（PORT-LOC-01）。**变更依据**：`EXT-DES-B-01` 从未有生产实现，实际冻结代码为 `VmTimerPort`；本次仅修正设计文本与文件头，不改变任何已实现签名、错误码、C-15/C-29 调用方或 G-004 语义。详见附录 E。
+- **Date**: 2026-10-17；**Last Updated**: 2026-10-18（T-23 F-03 落地状态同步，§27.6.4/附录 E §E.10；不改变冻结签名/G-004 语义）
+- **Revision**: T-12 裁定同步（2026-10-17，`wp-046-t12-rulings`）：R-1 草稿重签、R-2/D-4 错误码唯一命名、R3-01 歧义写失败码；依据 REV-T12-001/002/003。仅澄清契约，未改变冻结签名或 G-004 语义。格式修复（2026-10-17，`wp-048-des-format-fix`）：§3.2.3 行级注记移出 code 单元格，恢复 T-10 解析器兼容（96 行）；裁定语义不变，见附录 D。T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）：正式化 `YCP1` canonical 回执信封（F-07）并裁定 GUEST 场景 fail-closed（F-08）；家庭行导入（F-02）与账本并发措辞（F-04）同步至 DES-B；依据 `artifacts/70-review/t13-review.md`；冻结签名与 G-004 语义不变。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-19 `scanWifiAccessPoints`/`BleWifiScanRequest`（`EXT-DES-B-29`）与 C-09/C-11/C-23/C-28 增量边界；见 §0.7/§27.5；不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/§7.2 建立端口物理位置例外登记（§27.6；16 个端口声明文件 + 1 个纯映射 seam），并把 17 条机器可读条目规范纳入 `tools/contract/layering_allowlist.json` 的 `port_location_exceptions`；明确 `check_layering` 0 violation ≠ 端口位置合规；只登记现状、关闭条件与迁移建议，不迁移代码、不改变冻结签名/G-004 语义。**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）**：依据 `artifacts/70-review/t23-review.md`（commit `f290f69`）与 `artifacts/50-implementation/t23-ports-migration.md`，裁定 F-01 采用方案 B——`contracts/TimerPort.ets` 保持 C-15 云 `sleep/cancel` 端口，正式退休从未实现的 DES-B `EXT-DES-B-01`（`scheduleOnce/scheduleRepeating/cancel` + `TimerHandle`），并以 `EXT-DES-B-33` 登记实际 VM seam `VmTimerPort`（`viewmodel/core/ViewModelCore.ets`，`setTimer/clearTimer`）；F-02 采用方案 A——D-03 允许 `contracts/**` 同层 **type-only** 依赖并要求无环，checker 精确执行；F-03 将 C-23 VM-facing 契约符号改为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`，`PermissionResult` 保留为 app 层 C-28 类型；F-04 checker 硬化 `owner`/`close_condition`/`evidence` 与 `pending-*`；F-05/F-06/F-07 勘误；§27.6 更新为 16 CLOSED / 1 OPEN（PORT-LOC-01）。**变更依据**：`EXT-DES-B-01` 从未有生产实现，实际冻结代码为 `VmTimerPort`；本次仅修正设计文本与文件头，不改变任何已实现签名、错误码、C-15/C-29 调用方或 G-004 语义。详见附录 E。**T-23 F-03 落地状态同步（2026-10-18，`wp-104-des-sync`）**：仅同步状态——F-03 的 `ProvisioningPermissionPort`/`ProvisioningPermissionKind` 已由 `wp-093-t23-fixes` @ `cc2233d` 落地并经 `wp-094-t23-rereview` PASS；§27.6.4 `PORT-LOC-17` 为 CLOSED，`PORT-LOC-01` 仍 OPEN；RR-01/RR-02 checker 缺口已由 `wp-101-checker-rr` @ `16b0f7c` 修复。未改变冻结签名/G-004 语义，D-03 规则文本未变。
 - **Task**: `wp-008-des-a`（T-03；task 分支 `task/wp-008-des-a`，父分支 `feat/yaocore-app`，base commit `fad8856`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md`）
 - **Target Stage**: `implementation`
@@ -278,7 +278,7 @@ entry/src/main/ets/
 │   ├── GatewayTransportPorts.ets            # HttpTransport/TlsPinVerifier/IGatewayClient
 │   ├── I18nPorts.ets                        # I18nResourceLoaderPort/LocaleApplierPort
 │   ├── MigrationPort.ets                    # MigrationSink/MigrationRegistryPort
-│   ├── PermissionPort.ets                   # C-23 VM-facing PermissionPort（T-23 裁定后符号见附录 E）
+│   ├── PermissionPort.ets                   # C-23 VM-facing ProvisioningPermissionPort（T-23 已落地，见附录 E §E.4/§E.10）
 │   ├── Ports.ets                            # RandomPort/LoggerPort/MetricsPort/HmacSignerPort
 │   ├── PreferencesStore.ets
 │   ├── RdbStore.ets                         # RdbValue/RdbRow/RdbTransaction/RdbStore
@@ -5618,14 +5618,14 @@ export interface IBleProvisioningClient {
 }
 ```
 
-> **落地说明（T-23 后）**：`tools/contract/check_layering.py` 已实现 `load_port_location_exceptions()` 并替换全部硬编码端口路径放行；live registry 现为 **1 条**。T-23 的 checker 仍允许 `contracts/** → contracts/**` 的 **type-only** 边，但尚未强制 type-only/无环（F-02 的精确规则见 §2.2 与附录 E §E.3）；`owner`/`close_condition`/`evidence` 非空与未使用 `pending-*` 失败也属于同一后续工具任务（F-04，附录 E §E.5）。在这些实现落地前，本 JSON 是架构侧期望状态，不替代实现证据。
+> **落地说明（T-23 后；2026-10-18 状态更新）**：`tools/contract/check_layering.py` 已实现 `load_port_location_exceptions()` 并替换全部硬编码端口路径放行；live registry 现为 **1 条**。以下硬化均已完成：F-02 的 `contracts/**` 同层 **type-only** + 无环精确执行、F-04 的 `owner`/`close_condition`/`evidence` 非空与任何 `pending-*` 失败，由 `wp-093-t23-fixes` @ `cc2233d` 落地（附录 E §E.3/§E.5）；RR-01/RR-02 的再导出覆盖与诊断行号由 `wp-101-checker-rr` @ `16b0f7c` 补齐。本 JSON 仍以实现/复审证据为准，不单独构成 Gate 证据。
 
 #### 27.6.3 T-23 执行结果与残余（P1-P4）
 
 1. **P1（已完成）**：纯端口文件已迁入 `contracts/**`；`common/types/Ports.ets` 拆分后仅保留 `ClockPort`/`IdPort`，其余 C-01 端口在 `contracts/Ports.ets`。方法名/参数/返回/错误语义未变（复审 51 接口/24 值类归一化一致）。
 2. **P2（已完成）**：`BleProvisioningPorts`、`GatewayTransportPorts`、`DiscoveryModels` 已拆为 `contracts/**`（端口）与 `model/**`（DTO/枚举）；pages/VM 改为 import `model/**`。
 3. **P3（已完成）**：`GattEndpointMap` 迁至 `model/GattEndpointMap.ets`，不再作为端口放行。
-4. **P4（已完成基础切换，残余硬化）**：`check_layering.py` 已删除 `_is_storage_port_path`/`_is_viewmodel_service_port` 硬编码，改为读取 `port_location_exceptions`；未登记端口路径按 D-09/D-11 失败；symbols 子集匹配与 `pending-*` 失败已实现。**残余**：F-02（contracts 同层 type-only + 无环的精确执行与 fixture）与 F-04（`owner`/`close_condition`/`evidence` 非空、未使用 `pending-*` 也失败）由紧随的工具任务完成；见附录 E §E.3/§E.5。
+4. **P4（已完成基础切换与残余硬化）**：`check_layering.py` 已删除 `_is_storage_port_path`/`_is_viewmodel_service_port` 硬编码，改为读取 `port_location_exceptions`；未登记端口路径按 D-09/D-11 失败；symbols 子集匹配与 `pending-*` 失败已实现。**残余已关闭**：F-02（contracts 同层 type-only + 无环的精确执行与 fixture）与 F-04（`owner`/`close_condition`/`evidence` 非空、未使用 `pending-*` 也失败）由 `wp-093-t23-fixes` @ `cc2233d` 完成；RR-01/RR-02（再导出覆盖与诊断行号）由 `wp-101-checker-rr` @ `16b0f7c` 补齐；见附录 E §E.3/§E.5/§E.10。
 5. **验收（T-23 实测）**：host 697/697、clean `assembleHap` BUILD SUCCESSFUL、codelinter 0 error/25 warn、`check_layering` files=221 violations=0 exceptions_used=6 port_exceptions_used=0、fixture 12/12、i18n blocking=0/missing=0、crosscheck hard ALL PASS。live `port_location_exceptions` 为 1 条；Stage Gate 以 §27.6.4 为准，并记录“16 CLOSED / 1 OPEN（PORT-LOC-01）”。
 6. **D-03 已真正生效**：`contracts/**` 创建后 D-03 不再面对空集。现有 4 条同层 import 均为 `import type`，按 T-23 方案 A 合法；checker 必须精确执行 type-only + 无环，详见 §2.2 与附录 E §E.3。
 
@@ -5653,9 +5653,11 @@ export interface IBleProvisioningClient {
 | `PORT-LOC-14` | **CLOSED** | `contracts/SceneTimerPort.ets`（保留独立 C-11 delay seam） | 同上；F-01 三分裁定 | 无 |
 | `PORT-LOC-15` | **CLOSED** | `contracts/RoomPorts.ets` + `contracts/ScenePorts.ets` + `contracts/DevicePorts.ets` | 同上；4 条 type-only 边之二/三（`RoomPorts.ets:9`、`ScenePorts.ets:9`） | 无 |
 | `PORT-LOC-16` | **CLOSED** | `contracts/GatewayPorts.ets` + `model/InvitedGateway.ets` | 同上 | 无 |
-| `PORT-LOC-17` | **CLOSED（位置）** | `contracts/ControlPorts.ets` + `contracts/PermissionPort.ets` + `contracts/DiscoveryTransport.ets` | 同上；F-03 裁定：符号重命名待实现任务 | 无位置条件；F-03 符号重命名与 `PermissionResult` 归属按附录 E §E.4 执行 |
+| `PORT-LOC-17` | **CLOSED（位置 + 符号）** | `contracts/ControlPorts.ets` + `contracts/PermissionPort.ets`（`ProvisioningPermissionPort`/`ProvisioningPermissionKind`）+ `contracts/DiscoveryTransport.ets` | 同上；F-03 符号重命名已由 `wp-093-t23-fixes` @ `cc2233d` 落地；复审 `wp-094-t23-rereview` PASS | 无（符号已落地；C-28 app seam 未变，`PermissionResult` 归属按附录 E §E.4） |
 
 > **状态纪律**：① 已 CLOSED 的 ID 不得复用，也不得重新加入 live registry；② `PORT-LOC-01` 是唯一允许的 live 端口位置例外，`owner`/`close_condition`/`evidence` 必须非空；③ 任何 `pending-*` 条目（无论是否 used）必须使 Gate 失败；④ `VmTimerPort` 不属于本表；⑤ 若未来移动 `ClockPort`/`IdPort`，必须先获得 D-01/冻结签名变更批准，再更新本表与 live registry，不得以复制端口规避。
+
+> **F-03 落地与 checker 同步（2026-10-18，`wp-104-des-sync`）**：上表 `PORT-LOC-17` 的 F-03 符号重命名已由 `wp-093-t23-fixes` @ `cc2233d` 落地（`ProvisioningPermissionPort`/`ProvisioningPermissionKind`，C-28 app seam 未变；复审 `wp-094-t23-rereview` PASS），`PORT-LOC-01` 仍为唯一 OPEN 条目。RR-01/RR-02 的 checker 缺口（`export * from` 等再导出形式的 D-03/环覆盖、诊断行号精度）已由 `wp-101-checker-rr` @ `16b0f7c` 修复并经 `t25-checker-review.md` PASS；D-03 规则文本未变。
 
 ---
 
@@ -5751,6 +5753,7 @@ export interface IBleProvisioningClient {
 - [ ] 与 DES-001B 的共享类型边界显式（§27）。
 - [x] T-20 收口（§0.8/§27.6）：端口物理位置例外 17 条逐文件/符号登记；明确 0 violation ≠ 位置合规；未改冻结签名/G-004 语义。
 - [x] T-23 裁定同步（§27.6.4/附录 E）：F-01 采用方案 B（C-15 云 `TimerPort` 保留、`EXT-DES-B-01` 退休、`VmTimerPort` 登记为 `EXT-DES-B-33`）；F-02 方案 A（contracts 同层 type-only + 无环）；F-03/F-04/F-05/F-06/F-07 裁定/勘误；§27.6 状态 16 CLOSED / 1 OPEN；未改已实现冻结签名/G-004 语义。
+- [x] T-23 F-03 落地状态同步（2026-10-18，`wp-104-des-sync`）：`ProvisioningPermissionPort`/`ProvisioningPermissionKind` 已由 `wp-093-t23-fixes` @ `cc2233d` 落地；§27.6.4 `PORT-LOC-17` 更新为 CLOSED（位置 + 符号），`PORT-LOC-01` 仍 OPEN；RR-01/RR-02 checker 缺口由 `wp-101-checker-rr` @ `16b0f7c` 修复；仅状态同步，未改冻结签名/D-03 规则/G-004 语义。
 - [ ] 无新增架构裁定；所有语义引用 G-004 路径+章节。
 - [ ] 未修改 `input/`、代码、契约基线；只写本文。
 
@@ -5942,7 +5945,7 @@ contracts/** 允许：
 4. `entry/src/test/host/ViewModelBle.test.mjs`：import 改为 `ProvisioningPermissionKind`。
 5. 全仓搜索 `from '../contracts/PermissionPort'` / `from '../../main/ets/contracts/PermissionPort.ets'`，更新所有剩余引用；不得保留 `export interface PermissionPort`/`export enum PermissionKind` 于 contracts 文件。
    **import 变更清单（精确）**：`entry/src/main/ets/viewmodel/BleProvisioningViewModel.ets` 使用 `import type { ProvisioningPermissionPort } from '../contracts/PermissionPort';` 与 `import { ProvisioningPermissionKind } from '../contracts/PermissionPort';`；`entry/src/main/ets/app/PermissionGate.ets` 使用 `import type { ProvisioningPermissionPort as ViewModelPermissionPort } from '../contracts/PermissionPort';` 与 `import { ProvisioningPermissionKind as ViewModelPermissionKind } from '../contracts/PermissionPort';`；`entry/src/test/host/ViewModelBle.test.mjs` 使用 `import { ProvisioningPermissionKind } from '../../main/ets/contracts/PermissionPort.ets';`。
-6. DES-B §23.1 `EXT-DES-B-22` 标记为历史/SUPERSEDED，`EXT-DES-B-34` 登记重命名后的 C-23 契约；§23.7 债务状态改为“RULED（wp-092，2026-10-18）；代码重命名待 bounded implementation task；落地前不得宣称无同名冲突”。
+6. DES-B §23.1 `EXT-DES-B-22` 标记为历史/SUPERSEDED，`EXT-DES-B-34` 登记重命名后的 C-23 契约；§23.7 债务状态在 wp-092 时改为“RULED（2026-10-18）；代码重命名待 bounded implementation task”。**该重命名已由 `wp-093-t23-fixes` @ `cc2233d` 落地（复审 `wp-094-t23-rereview` PASS）；§23.7/§12.1.1 现为 CLOSED，C-28 app seam 未变。**
 7. 验收：`grep -R "export interface PermissionPort\|export enum PermissionKind" entry/src/main/ets/contracts` 无命中；host 697/697、clean build、codelinter 0 error；`BleViewModelPermissionGate` 的 manifest/request 单一所有权保持。
 
 ### E.5 F-04 裁定：例外元数据与 `pending-*`
@@ -5982,6 +5985,8 @@ contracts/** 允许：
 
 ### E.8 实现任务清单（后续 bounded task）
 
+> **历史状态（2026-10-18，`wp-104-des-sync`）**：下表是 wp-092 时点的任务清单。#3..#6 的 F-03 符号重命名已由 `wp-093-t23-fixes` @ `cc2233d` 落地；#7..#9 的 checker/allowlist 硬化已由 `wp-093` 与 `wp-101-checker-rr` @ `16b0f7c` 完成。保留本表作为审计记录，不再表示待办。
+
 | # | 文件 | 变更 | 验收 |
 |---|---|---|---|
 | 1 | `entry/src/main/ets/contracts/TimerPort.ets` | 仅注释：去掉 `EXT-DES-B-01`；指向 §8.1.7/§23.1 `EXT-DES-B-33` | `TimerPort`/`sleep`/`cancel` 签名不变；grep 无 `scheduleOnce`/`TimerHandle` |
@@ -6016,6 +6021,24 @@ python3 tools/contract/check_layering.py --report /tmp/layering.json
 期望：前两条无产品/测试命中；`exceptions_used=6`、`port_exceptions_used=0`、`port_pending=0`、`violations=0`；host 697/697；clean build SUCCESSFUL；codelinter 0 error；i18n blocking=0/missing=0。
 
 **不得**：以文档裁定替代实现/复审/Stage Gate；把 `EXT-DES-B-01` 的退休写成“已实现签名变更”；把 `check_layering` 0 violation 写成 D-12 完全收口；把 `PORT-LOC-01` 写成可无条件永久接受。
+
+### E.10 状态同步（wp-104，2026-10-18）
+
+> **性质**：仅状态同步，不新增裁定、不改变 D-03 规则文本、不改变冻结签名/G-004 语义。编号说明：本附录已有 E.9（验证要求），故新增节使用 E.10。
+
+| 位置 | 变更 |
+|---|---|
+| 文件头 Status/Revision/Last Updated | 追加 `wp-104-des-sync` 同步说明（2026-10-18）；明确仅状态同步 |
+| §2.1 `contracts/**` 树注记 | C-23 符号标为 `ProvisioningPermissionPort`（T-23 已落地） |
+| §27.6.2 落地说明 | 删除“F-02/F-04 尚未强制”的旧状态；注明由 `wp-093-t23-fixes` @ `cc2233d` 完成，RR-01/RR-02 由 `wp-101-checker-rr` @ `16b0f7c` 补齐 |
+| §27.6.3 P4 | 残余硬化标记为已关闭 |
+| §27.6.4 `PORT-LOC-17` | `CLOSED（位置）` → `CLOSED（位置 + 符号）`；证据 `cc2233d` + 复审 PASS；残余条件改为“无（C-28 app seam 未变）” |
+| §27.6.4 状态纪律后注 | 登记 F-03 落地与 RR-01/RR-02 checker 修复；`PORT-LOC-01` 保持 OPEN |
+| §E.4 第 6 步 | 保留 wp-092 历史指令并注明已由 `cc2233d` 落地 |
+| §E.8 任务清单 | 标注为历史清单；F-03 与 checker 项已完成 |
+| §29 收口清单 | 新增本条勾选项 |
+
+**证据**：`artifacts/50-implementation/t23-ports-migration.md` §10（`wp-093-t23-fixes`）、`artifacts/70-review/t23-rereview.md`（`cc2233d` PASS）、`artifacts/70-review/t25-checker-review.md`（`16b0f7c` RR-01/RR-02/RR-04 PASS）。**边界**：`PORT-LOC-01`（`ClockPort`/`IdPort`）仍 OPEN；设备验证、Stage Gate 与合并批准不由本节宣告。
 
 ---
 
