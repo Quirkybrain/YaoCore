@@ -809,3 +809,73 @@
 2. 未修改产品代码、测试断言、工具、构建配置、契约或 `input/`；未改写 §1–§16 的历史 Gate/数字。
 3. 未执行设备 / 真实 BLE / LAN / TLS / 云 / 视觉 / A11y / fps；相关项继续 `BLOCKED` / `UNAVAILABLE`。
 4. 历史 Gate（G-013/G-014）与历史报告（TEST-REPORT-001、T-23 原始段落）保留原文；当前数字以 G-015/G-016/G-017、TEST-002 与本节为准。
+
+---
+
+## 18. documentation 合并记录（2026-10-18，wp-111）
+
+> 本节由 `repository-manager` 在合并任务 `wp-111-merge-docs` 中追加，记录 `task/wp-110-documentation` → `feat/yaocore-app` 的本地合并与合并后复验。§17 是 `technical-writer` 的 documentation 收尾内容；本节只记录该内容已进入集成分支并重新执行检查，**不新增裁定、不宣告 G-018、用户验收、产品验收、设备验收或 release PASS**。
+
+### 18.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-110-documentation` @ `83beda0ce343a3ca16f48e39482dda865dfe388c`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `422c687de68b39a203cd3a868cdb85cb29a71a81`（合并前 = handoff `base_commit`；G-017 acceptance Stage Gate PASS） |
+| 合并基 | `422c687`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `6dc380876e6dedf97ca93a59d9d69e9191976d46`（`chore(merge): 合并 documentation 文档收尾`） |
+| 父提交 | `422c687`（目标，第一父）+ `83beda0`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 6dc3808 83beda0` 退出 0 |
+| 合并范围 | 6 个路径（+308 / −110）：`README.md`、`artifacts/50-implementation/t23-ports-migration.md`、`artifacts/60-testing/test-report.md`、`artifacts/60-testing/testing-stage-report.md`、`artifacts/80-maintenance/maintenance-plan.md`、`artifacts/90-integration/integration-report.md`；全部落在 handoff `writes` 内；未改 `input/`、产品代码、测试断言、工具、契约或构建配置 |
+
+源提交（`422c687..83beda0`，1 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `83beda0ce343a3ca16f48e39482dda865dfe388c` | docs(stage): 同步 README 与维护/测试/集成报告 |
+
+门禁证据：`README.md`（来源分支 blob sha256 `c73f8c0f01e06fae2023b68055c025c86205c74f6a7c9729c3532de1cc532acb` = handoff `gate_evidence_path_sha256`）。该文件是 documentation 阶段的 Gate 输入之一，**不是独立审查报告**；本节不据此宣告 Gate PASS。
+
+### 18.2 合并后验证矩阵（在 `6dc3808` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `PYTHONDONTWRITEBYTECODE=1 entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；`duration_ms 3288.402978` | 0 |
+| 2 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **`hard checks: ALL PASS`**：66 条 `[PASS]` / 0 条 `[FAIL]`；14 条既有 frozen-input `FINDING`（非阻塞） | 0 |
+| 3 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+| 4 | i18n strict-ui | `PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui` | **CHK-01..09 PASS**；`blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16` | 0 |
+| 5 | i18n triage 一致性 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check` | `615 rows`；`OK: CSV matches computed triage; invariants pass` | 0 |
+
+补充：五项检查均在合并提交的干净工作树上运行，与 §17.3 的 documentation 阶段复跑结果一致（host 697/697、crosscheck 66/66、layering `files=221 / 0 violation`、i18n 0 blocking、triage 615 行一致）。命令统一设置 `PYTHONDONTWRITEBYTECODE=1`；运行后 `git status --porcelain` 无输出，`__pycache__` 已在证据提交前清理。完整日志暂存于 `/tmp/opencode/wp111/`（未提交）。构建 / lint 未在本次合并中重跑，仍引用 TEST-002 @ `e74a181` 的 `BUILD SUCCESSFUL` 与 `codelinter 0 error / 25 warning`。
+
+### 18.3 G-018 documentation 同步范围
+
+| 文件 | 来源变更 | 对应输入 |
+|---|---|---|
+| `README.md` | v1.1：阶段状态、221 files / 0 violation / 6 D-12 / 1 port exception / fixture 27、i18n triage 新口径、`PORT-LOC-01` OPEN、`MOCK_ONLY` 性能口径、`no_proxy` 仿真器命令、`contracts/**` 仓库结构 | D-AC-01/02/03/08；TEST-002；G-015..G-017 |
+| `artifacts/80-maintenance/maintenance-plan.md` | v1.1：§3.2 P1-P3 完成 / `PORT-LOC-01` OPEN；§3.3 D-12 6 active / 7 retired；§3.4 triage 完成与残余；§5.1 RA-03/RA-04 当前状态；追加 §8 收尾记录 | D-AC-02/03；T-23；TEST-002 |
+| `artifacts/60-testing/test-report.md` | 追加历史注记；`T09_C11_*` / `T16_Scene_*` 由 16/8 勘误为 15/7；D-03 / D-12 历史快照注记；末尾指向 TEST-002 | D-AC-04 |
+| `artifacts/60-testing/testing-stage-report.md` | 追加文档注记：测试证据仍针对 `e74a181`；README 旧口径 596 条已在 documentation 阶段关闭 | wp-110 文档同步 |
+| `artifacts/50-implementation/t23-ports-migration.md` | 文首/文末“文档勘误（agent:technical-writer，wp-110）”：标题、§1、§5.2、§5.3、§6、§7.2 与 §10 状态对齐；保留原 Producer 与 §10 | D-AC-06 / RR-03 |
+| `artifacts/90-integration/integration-report.md` | 追加 §17（documentation 收尾）；不改写 §1–§16 | G-018 收尾 |
+
+范围声明：上述提交只改文档与报告；`git diff 422c687 6dc3808 -- entry/src tools contracts input` 为空（产品代码、测试、工具、契约与 `input/` 未变）。
+
+### 18.4 残余与去向
+
+| 项 | 状态 | 去向 |
+|---|---|---|
+| G-018 documentation | 文档同步完成并已合并；**待 Orchestrator 判定** | G-018 Gate 记录 |
+| i18n 残余 | 615 行一致：10 ACCEPTED / 46 MIGRATED / 6 PENDING_REVIEW / 0 INLINE / 544 OBSOLETE_LEGACY；另 11 B / 6 C / 3 D 待处理；分类有证据不等于业务语义已签署 | 维护计划 §3.4；后续维护轮 |
+| 端口位置 | **16/17 CLOSED；`PORT-LOC-01` OPEN**（`ClockPort`/`IdPort` 仍在 `common/types/Ports.ets`）；0 violation 不代表端口位置完全合规 | DES-A §27.6.4；维护计划 §3.2 |
+| D-12 | **6 active / 7 retired**；`exceptions_used=6`、`unused_exceptions=[]` | DES-B §18.1；T-23 F-07 |
+| UI 偏离 | `GAP-AC-01..03` 待用户书面接受或 bounded fix | ACCEPT-001 §4.3 |
+| 用户 / 设备验收 | 用户验收未执行；设备/真实 BLE/LAN/TLS/云/视觉/fps 仍 `BLOCKED` / `UNAVAILABLE`；ACK p95 仅 `MOCK_ONLY` | BLK-01..08；维护计划 §4 |
+| 构建 / 发布 | unsigned HAP；`signingConfigs: []`；release 未授权 | 需用户签名 / 推送 / PR/MR / main 合并决策 |
+
+### 18.5 工作树与边界声明
+
+1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §18.2 的五项检查；不构成 G-018、Component Quality、独立评审、用户验收、产品验收、设备验收或 release PASS。
+2. 合并与验证均在本地完成：按任务“仅本地”要求未 fetch、未 pull、未 push、未 rebase，未改写任何已评审提交；未切换分支；`task/wp-110-documentation` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-111-merge-report.md`；handoff 为 `state/handoffs/wp-111-merge-docs.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 documentation 合并证据`。
