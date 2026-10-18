@@ -1,7 +1,7 @@
 # 旧 615 条内联字典迁移边界（T-10）
 
 - **Producer**: agent:implementation-engineer
-- **Task**: T-10 / `wp-031-i18n`
+- **Task**: T-10 / `wp-031-i18n`；证据化 triage `wp-096-i18n-triage`
 - **上游**: I18N-DESIGN §5；DES-B §7.4.3；CB 术语表；`artifacts/00-project-intake/inventory.md` L170/L259
 - **源文件**: `input/existing/original_app/service/I18nService.ets`
   （SHA-256 `dc8e5e4dcbb299d2aa5fdafb270b1d431a20f1b3bc26f18b2b82993fa8fd2c44`，685 行 / 615 case）
@@ -30,21 +30,54 @@
 | 设备离线 | A | `rawfile/i18n` | `errors.gateway.device_offline` |
 | Wi-Fi 认证失败，请检查密码 | A | `rawfile/i18n` | `provisioning.error.auth_error` |
 
-## 3. 剩余批次（登记表统计）
+## 3. 证据化 triage 结果（wp-096，2026-10-18）
 
-| 分类 | 数量 | 处置 |
-|---|---|---|
-| A 迁移 | 606 | 含 T-10 已落地 10 条（`ACCEPTED`）与 **596 条 `PENDING_REVIEW`**；按页面/组件抽取语义键 |
-| C 废弃（启发式） | 6 | 版本/关于/旧版本机/模拟器关键词；T-17/T-18 复核后仅存档 |
-| D 排除（品牌） | 3 | Gree/格力、Haier/海尔、Midea/美的 |
-| **合计** | **615** | |
+登记表已由 `tools/i18n/triage_legacy.py` 逐条重算；615 行每行都有 `审查结论` 与非空 `备注` 证据。
+本次 triage **只做证据分类，不做批量签收**。
 
-负责人分布：T-17 = 521，T-18 = 75，T-10 = 10，LEGACY-001（C/D）= 9。
+| 分类 | 数量 | 审查结论分布 | 处置 |
+|---|---:|---|---|
+| A 迁移 | 606 | `ACCEPTED` 10；`MIGRATED` 46；`PENDING_REVIEW` 6；`INLINE_LITERAL` 0；`OBSOLETE_LEGACY` 544 | 见 §3.1–§3.3 |
+| C 废弃（启发式） | 6 | `DEPRECATED (heuristic)` 6 | 保持原证据；仅存档，不自动删除 |
+| D 排除（品牌） | 3 | `EXCLUDED (brand data)` 3 | 品牌名按数据显示，不进入资源包 |
+| **合计** | **615** | | |
 
-### 3.1 A/B 子审查（B 不是独立顶层分类）
+负责人分布：T-17 = 521，T-18 = 75，T-10 = 10，LEGACY-001（C/D）= 9。triage 不改变负责人/批次；
+`OBSOLETE_LEGACY` 行保留原 owner，供 T-17/T-18 做语义确认。
 
-I18N-DESIGN §5.2 的 B 类（重译）是对 A 类英文质量的子审查，不改变“A 迁移”工作量。登记表新增
-`重译审查` 列：
+### 3.1 状态语义与 `ACCEPTED` 保留说明
+
+- `ACCEPTED`：已人工复核并签署。当前仅 T-10 的 10 条；本次 triage **不得新增** `ACCEPTED`。
+  工具用固定基线校验这 10 条的 owner/batch 与 `B_REVIEWED_ACCEPTED`。
+- `MIGRATED`：旧中文 trim 后与当前 zh 值（`rawfile/i18n/zh-CN.json` 或
+  `base/element/string.json`）**精确且唯一**匹配；写 `目标存储`/`目标键`，`备注` 为
+  `zh value match: <key> @ <file>`。这是机器证据，**不等于人工签收**；英文仍按 `重译审查` 列处理。
+- `PENDING_REVIEW`：同一旧中文命中多个当前键（跨存储或同存储多键），必须按页面/组件上下文人工择一；
+  `备注` 列出全部候选键与文件。
+- `INLINE_LITERAL`：无 locale 键，但旧中文仍作为字面量出现在 `entry/src/main/ets/**` 或
+  `entry/src/main/resources/**`；需抽取为语义键。本次为 0 条。
+- `OBSOLETE_LEGACY`：当前 locale 与源码/资源均无**精确**引用；`备注` 固定包含
+  `no current locale/source reference`。注意：T-18 曾按语义非逐字重写大量旧文案，因此该状态只表示
+  “无精确引用”，**不是业务废弃证明**；T-17/T-18 归档前必须做语义确认。
+- C/D 状态保持 `DEPRECATED (heuristic)` / `EXCLUDED (brand data)`，证据不删除。
+
+### 3.2 残余 `PENDING_REVIEW`（6 条，逐条人工择一）
+
+| 旧中文 | 旧英文 | 候选键（存储） | 需人工判断点 |
+|---|---|---|---|
+| 关闭 | close | `common.close`（rawfile）；`common_close`（string.json） | 动态对话框/组件用 `t()`，静态壳用 `$r()`；确认该旧文案原属哪个入口 |
+| 刷新 | Refresh | `common.refresh`（rawfile）；`common_refresh`（string.json） | `common.refresh` 当前被组件使用；`common_refresh` 未被产品代码引用 |
+| 添加网关 | Add gateway | `profile.provisioning`（rawfile）；`provisioning.title`（rawfile）；`home_add_gateway`（string.json） | 入口按钮/页面标题/首页静态文案三义，按原页面位置择一 |
+| 执行中 | Executing | `card.state.pending`（rawfile）；`scene.running`（rawfile）；`scene.step.running`（rawfile） | 设备卡片状态/场景整体/场景步骤三义，按原上下文择一 |
+| 简体中文 | Simplified Chinese | `settings.language.zh_cn`（rawfile）；`settings_language_zh_cn`（string.json） | 语言选项动态标签与静态 `$r` 标签同时存在；需确认是否应消除重复存储 |
+| 语言 | Language | `settings.section.language`（rawfile）；`settings_language_title`（string.json） | 设置分区标题（动态）与静态标题；`settings_language_title` 当前未被产品代码引用 |
+
+`INLINE_LITERAL` 残余为 0；扫描范围为 `entry/src/main/ets/**` 与 `entry/src/main/resources/**`。
+
+### 3.3 B 重译子审查（11 条，保持 `B_REWRITE_REQUIRED`）
+
+I18N-DESIGN §5.2 的 B 类（重译）是 A 类英文质量的子审查，不改变“A 迁移”工作量。登记表
+`重译审查` 列现状：
 
 | 值 | 数量 | 含义 |
 |---|---:|---|
@@ -53,11 +86,14 @@ I18N-DESIGN §5.2 的 B 类（重译）是对 A 类英文质量的子审查，�
 | `B_REWRITE_REQUIRED` | 11 | 已识别的机翻/术语错误（`档案` → `file(s)`/`machine`），必须重写英文 |
 | `NOT_APPLICABLE` | 9 | C/D 类 |
 
-因此 **待迁移/待审查合计仍为 596 条**（585 条 `B_PENDING` + 11 条 `B_REWRITE_REQUIRED`）。
+11 条 `B_REWRITE_REQUIRED` 的旧英文仍含 `file(s)`/`machine` 术语；当前 en-US locale 的
+`machine`/`file(s)` 出现次数为 0（已使用 `profile` 术语）。这 11 条在本次 triage 中均无精确当前键，
+`审查结论=OBSOLETE_LEGACY`、`目标键` 为空；若后续复用其文案，必须先按 CB 术语表重译。逐条清单见
+`artifacts/50-implementation/t24-i18n-triage.md`。
 
-### 3.2 C 类安全文案复核标记
+### 3.4 C 类安全文案复核标记
 
-登记表新增 `复核标记` 列。6 条 C 类全部为 `RECHECK_REQUIRED`，其中 2 条模拟器/DEV-ONLY 文案为
+`复核标记` 列保持：4 条 `RECHECK_REQUIRED`；2 条模拟器/DEV-ONLY 文案为
 `SAFETY_RECHECK_REQUIRED`：
 
 - `检测到开发协议模拟器，拒绝其控制响应`；
@@ -68,8 +104,17 @@ I18N-DESIGN §5.2 的 B 类（重译）是对 A 类英文质量的子审查，�
 
 - **T-17**：首页/房间/设备/门锁/空调/场景/家庭/成员/邀请/配网等页面与组件。
 - **T-18**：设置/语言/通知/权限/我的/云端/远程连接/安全配置/账号/档案等应用壳与设置。
-- `目标存储` 为启发式建议：错误/状态/数据驱动标签 → `rawfile/i18n`；纯静态 UI 字面量 → `string.json`。
-- 所有未落地行 `审查结论=PENDING_REVIEW`；不得把本表当成已完成迁移。
+- `目标存储` 对未命中行保留原启发式建议：错误/状态/数据驱动标签 → `rawfile/i18n`；纯静态 UI
+  字面量 → `string.json`。该列在 `MIGRATED` 行被替换为实际命中存储。
+- 未人工复核行不得标 `ACCEPTED`；`MIGRATED`/`PENDING_REVIEW`/`INLINE_LITERAL`/`OBSOLETE_LEGACY`
+  都不是人工签收状态。
+
+工具命令：
+
+```bash
+python3 tools/i18n/triage_legacy.py --check    # 只读重算，CSV 漂移/不变量失败时非零退出
+python3 tools/i18n/triage_legacy.py --summary  # 计数与 PENDING/INLINE_LITERAL/B 明细
+```
 
 ## 4. 完成判据
 
@@ -83,5 +128,6 @@ I18N-DESIGN §5.2 的 B 类（重译）是对 A 类英文质量的子审查，�
 ## 5. 说明
 
 - 本表由脚本从源文件逐行提取并按关键词启发式生成；C/D 分类与 owner 需 T-17/T-18 逐条复核；B 类为 A 类英文子审查，已登记于 `重译审查` 列。
-- 登记表落在 `entry/src/test/i18n/`：`wp-031-i18n` handoff 的写范围未授权 `tools/`，属于写范围收窄例外；
-  DES-B §7.4.4 的契约路径 `tools/i18n/legacy_migration.csv` 待后续工具任务迁移（命令/列语义不变）。
+- 登记表仍落在 `entry/src/test/i18n/legacy-migration.csv`（检查器/测试引用该路径）；证据化 triage 工具已落在
+  契约目录 `tools/i18n/triage_legacy.py`。DES-B §7.4.4 的 `tools/i18n/legacy_migration.csv` 路径迁移仍未执行，
+  `T10-EX-01` 继续有效；命令/列语义不变。
