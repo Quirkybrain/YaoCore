@@ -1,45 +1,41 @@
-# Checkpoint CP-013 — release 准备完成，PAUSED_AT_STAGE
+# Checkpoint CP-014 — 设备验收包就绪，等待用户执行
 
 ```text
-Checkpoint ID: CP-013
-时间: 2026-10-18
-Repository revision / working-tree state: feat/yaocore-app @ e998cc6（干净；无活动交接）
-Current Stage: release（准备完成）
-Target Stage: release（准备范围；发布未授权）
+Checkpoint ID: CP-014
+时间: 2026-10-19
+Repository revision / working-tree state: feat/yaocore-app @ 3c4fb11（干净；无活动交接）
+Current Stage: acceptance（设备验收，用户执行）
+Target Stage: release（准备完成；发布未授权）
 Workflow and Execution Modes: STANDARD / GATED_AUTO
 Active Task: 无
 ```
 
-## 本轮完成（自 CP-012）
+## 本轮完成
 
 | 工作 | 结果 | 证据 |
 |---|---|---|
-| Release 目标扩展 | `config/project.md` Target Stage → release；登记发布未授权边界 | `6cd9a88` |
-| RELEASE-001 发布计划 + 检查单 | 版本/构建/签名/远端/回滚/Gate 判据；release 模式 HAP 1,616,146 B / `1602110d…` | `560d08a`/`972f177`/`3501f5e` |
-| 公开旧版本对照（F-01） | `origin/main` 1.0.0（`io.github.quirkybrain.yaocore`、Apache-2.0+NOTICE）A/B/C 选项，待用户决定 | `972f177` |
-| CHANGELOG + Release Notes | v1.0.0 草案（`DRAFT/NOT_READY`，B-01..B-09） | `63d2235`/`19df893` |
-| 独立评审 | 首次 CHANGES_REQUIRED（F-01 High）→ 修正 → **复评 PASS** | `f1fbe0d`/`1e955a8` |
-| G-019 release 准备 Gate | **NOT_READY（publish）**；准备工作完成 | `state/gates/G-019-release-preparation-gate.md` |
+| 决策登记 | 设备验收优先；**不使用原仓库**（不 fetch/push/PR/MR）；本地身份 `com.example.yaocore` | `938867e` |
+| 设备验收包 | 31 用例 `DA-001..DA-031`（BLK-01..08 + U-01..U-12 + 26 FR/NFR）；计划/CSV/缺陷模板/证据目录 | `7b0ab0c` |
+| 校验工具 | `tools/acceptance/validate_device_evidence.py`：模板/结果/秘密扫描/self-test 18/18 | `7b0ab0c` |
+| 合并 | `51ac14c` + 证据 `3c4fb11`；host 697/697、layering 0、模板 31/31 NOT_RUN | wp-122 |
 
-集成提交：`40fe2a8`/`b716207`（计划）、`21c601d`/`e998cc6`（文档与修正）。
+## 设备验收边界
 
-## 最终验证（代码基线 `e74a181`，未变）
-
-host **697/697**；crosscheck **66/66**；layering **0 violation**；fixtures **27/27**；i18n **0 blocking**；triage 615 行；发布文档 4 份存在、B-01..B-09 一致、53 链接 0 broken、无越界表述。
-
-## 发布阻塞（B-01..B-09）
-
-B-01 许可证/身份 A/B/C｜B-02 签名｜B-03 设备/用户验收｜B-04 GAP-AC-01..03｜B-05 远端/通道授权｜B-06 身份/版本冻结｜B-07 CHANGELOG/Notes 签核｜B-08 残余风险签核｜B-09 API 14 兼容/混淆裁剪决策。
+- 设备测试**未执行**（当前环境 `hdc` 无目标）；不得宣称设备 PASS。
+- 需要用户：签名证书/Profile、真机、网关/固件、网络、云 token、硬件。
+- `DA-002`（覆盖升级）仅在身份 A 下执行；B/C 记 `BLOCKED`（不适用）。
+- 证据必须脱敏（Wi-Fi 密码/PoP/HMAC key/IAM token/私钥/完整邀请凭据）。
 
 ## 待用户决定
 
-1. 身份/版本/许可证：A 沿用旧身份 + versionCode >1000000 + Apache-2.0/NOTICE；B 保留 `com.example.yaocore` 独立应用；C 混合/迁移。
-2. B-09：API 14 运行时验证、混淆/裁剪/符号化。
-3. P1/P2 回滚阈值批准。
-4. 签名材料、设备矩阵、远端/发布授权。
-5. GAP-AC-01..03 接受或修复。
+1. 身份/版本/许可证 A/B/C（影响 DA-002 与安装/升级）。
+2. GAP-AC-01..03（视觉/交互断言）。
+3. P-HMAC/TLS 范围、B-09（API 14/混淆裁剪）、残余风险签核。
+4. 签名与设备执行；发布/远端仍不授权。
 
 ## Next ready action
 
-- **PAUSED_AT_STAGE**：不启动签名/推送/PR/MR/tag/发布。
-- 恢复：`python3 scripts/swe_guard.py status` → 核对 HEAD `e998cc6` → 读 CP-013 / `state/project-state.md` / G-019。
+1. 用户按 `artifacts/75-device-acceptance/device-acceptance-plan.md` 准备签名 HAP 与设备。
+2. 执行 DA-001..DA-031，回填 `device-evidence-template.csv`，证据放 `evidence/<case_id>/`。
+3. 运行 `python3 tools/acceptance/validate_device_evidence.py <csv>`；将结果/证据交回 Agent 分析。
+4. 结果分析后更新 B-03、设备验收报告与 Gate；发布仍需授权。

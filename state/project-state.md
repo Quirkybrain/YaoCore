@@ -1,7 +1,7 @@
 # YaoCore Project State（最终：PAUSED_AT_STAGE）
 
 - **Project**: YaoCore (爻构) — HarmonyOS NEXT 原生智能家居应用 (ArkTS)
-- **Project Status**: ACTIVE（用户指令：先进行设备验收；不使用原仓库）
+- **Project Status**: ACTIVE（设备验收包就绪，等待用户执行）
 - **Current Stage**: implementation（Target Stage 已达成并通过 G-014 Stage Gate）
 - **Target Stage**: release（用户 2026-10-18 选择「Release 准备（不发布）」；push/PR/MR/发布仍需显式授权）
 - **Project Workflow Level**: STANDARD
@@ -97,3 +97,10 @@ D-030/GAP-T18-01 服务层 RBAC 缺口（v1 接受）｜R4-01 durable 取消边�
 - **不使用原仓库**：`origin`（Quirkybrain/YaoCore）不作为基线、不 fetch/push/PR/MR；设备包使用本地构建与本地身份 `com.example.yaocore`（B-01 最终身份 A/B/C 仍待定，设备结果可能需按最终身份复验安装/升级）。
 - release 准备保持完成状态；发布/签名/远端仍**未授权**。
 - 计划：验收包（BLK-01..08 用例/步骤/证据模板/校验脚本）→ 用户执行 → 回填证据 → Agent 分析并产出设备验收报告 → 更新 B-03 与风险。
+
+## 设备验收包就绪（2026-10-19）
+
+- 31 用例 `DA-001..DA-031`，覆盖 BLK-01..08、U-01..U-12、26 FR/NFR；校验工具 self-test 18/18、模板 31/31 NOT_RUN、secret clean。
+- 合并 `51ac14c` / 证据 `3c4fb11`；host 697/697、layering 0 violation。
+- **设备执行未发生**；不使用原仓库；本地身份 `com.example.yaocore`；发布/签名仍未授权。
+- 下一步：用户签名构建 → 安装 → 执行用例 → 回填 CSV/证据 → Agent 分析 → 更新 B-03。
