@@ -75,9 +75,10 @@ python3 entry/src/test/i18n/check_i18n.py \
 - 正负夹具：`entry/src/test/i18n/fixtures/good|bad/`；host 测试断言 good=0、bad=1 且 CHK-01/02/03/04/06/07/08/09 阻断；
   bad 夹具同时验证 `string.json` 的 `TODO` 与未闭合括号会被 CHK-04 命中。`fixtures/short-ui/` 专门验证
   `--strict-ui` 将短英文 UI 从 warning 提升为 blocking（默认 exit 0，strict exit 1）。
-- 当前生产树：0 阻断；CHK-07 不再对状态常量（如 `'LOADING'`/`'RECONFIGURE'`）误报，当前短英文 UI 告警为 0；
-  `--strict-ui` 用于门禁时仍会阻断未来真实短文案回归。CHK-05 的 0 告警依赖 keyPrefixes 与动态前缀，
-  不等于“无未使用键”。
+- 当前生产树（2026-10-18 实测）：`blockingFailures=0` / `missingKeys=0`；总 warnings=73（其中 CHK-07 16 条）。
+  `--strict-ui` 用于门禁时仍会阻断未来真实短文案回归。CHK-05 未使用键告警：**无 allowlist 57 条**；
+  **带 `allowlist.json` 39 条**（总 warnings=55）。该计数是当前基线，会随 key 引用变化，不等于
+  “无未使用键”；`--strict-ui` 下 CHK-05 仍为 warning，不阻断门禁。
 
 > **路径偏差（正式例外 T10-EX-01）**：DES-B §7.4.4 / delivery-plan 指定 `tools/i18n/check_i18n.py`、
 > `tools/i18n/allowlist.json`、`tools/i18n/legacy_migration.csv`、`reports/i18n/*`；`wp-031-i18n` handoff 的
@@ -100,9 +101,11 @@ python3 entry/src/test/i18n/check_i18n.py \
 - B 类（重译）是 A 类的英文子审查，登记于 `重译审查` 列：11 条已识别 `B_REWRITE_REQUIRED`（`档案` →
   `file(s)`/`machine`），585 条 `B_PENDING`；10 条 `B_REVIEWED_ACCEPTED`。这 11 条旧英文仍含
   machine/file(s) 术语，当前 en-US 已不使用该术语（使用 `profile`）；triage 未改其 `审查结论` 为
-  `ACCEPTED`。C 类模拟器/DEV-ONLY 两条标记 `SAFETY_RECHECK_REQUIRED`，不得按关键词删除。
-- 工具命令：`python3 tools/i18n/triage_legacy.py --check`（只读重算，CSV 漂移/不变量失败非零退出）与
-  `--summary`（状态计数 + `PENDING_REVIEW`/`INLINE_LITERAL`/B 明细）；工具默认写入登记表。
+  `ACCEPTED`。B 行 `备注` 保留 `07895fd` 基线中的原备注，并在其后追加机器证据。C 类模拟器/DEV-ONLY
+  两条标记 `SAFETY_RECHECK_REQUIRED`，不得按关键词删除。
+- 工具命令：`python3 tools/i18n/triage_legacy.py --check`（只读重算；CSV 漂移、`旧中文/旧英文` 基线与
+  615 行/唯一性不变量、C/D `复核标记` 非法值均非零退出）与 `--summary`（状态计数 +
+  `PENDING_REVIEW`/`INLINE_LITERAL`/B 明细）；工具默认写入登记表。
 - 迁移完成判据：CHK-01..09 全通过、零硬编码、旧字典无构建引用、术语符合 CB 术语表。
 
 ## 6. 测试与设备限制

@@ -59,7 +59,9 @@
 - `OBSOLETE_LEGACY`：当前 locale 与源码/资源均无**精确**引用；`备注` 固定包含
   `no current locale/source reference`。注意：T-18 曾按语义非逐字重写大量旧文案，因此该状态只表示
   “无精确引用”，**不是业务废弃证明**；T-17/T-18 归档前必须做语义确认。
-- C/D 状态保持 `DEPRECATED (heuristic)` / `EXCLUDED (brand data)`，证据不删除。
+- C/D 状态保持 `DEPRECATED (heuristic)` / `EXCLUDED (brand data)`，证据不删除；C 的 `复核标记`
+  必须为 `RECHECK_REQUIRED`/`SAFETY_RECHECK_REQUIRED`，D 必须为 `NONE`。缺失/非法值由 `--check`
+  直接报错，不会被静默规范化。
 
 ### 3.2 残余 `PENDING_REVIEW`（6 条，逐条人工择一）
 
@@ -88,8 +90,9 @@ I18N-DESIGN §5.2 的 B 类（重译）是 A 类英文质量的子审查，不�
 
 11 条 `B_REWRITE_REQUIRED` 的旧英文仍含 `file(s)`/`machine` 术语；当前 en-US locale 的
 `machine`/`file(s)` 出现次数为 0（已使用 `profile` 术语）。这 11 条在本次 triage 中均无精确当前键，
-`审查结论=OBSOLETE_LEGACY`、`目标键` 为空；若后续复用其文案，必须先按 CB 术语表重译。逐条清单见
-`artifacts/50-implementation/t24-i18n-triage.md`。
+`审查结论=OBSOLETE_LEGACY`、`目标键` 为空；若后续复用其文案，必须先按 CB 术语表重译。B 行 `备注`
+保留 `07895fd` 预 triage 基线中的原备注，并在其后追加机器证据（术语/当前 en-US 命中），不覆盖原文。
+逐条清单见 `artifacts/50-implementation/t24-i18n-triage.md`。
 
 ### 3.4 C 类安全文案复核标记
 
@@ -112,7 +115,7 @@ I18N-DESIGN §5.2 的 B 类（重译）是 A 类英文质量的子审查，不�
 工具命令：
 
 ```bash
-python3 tools/i18n/triage_legacy.py --check    # 只读重算，CSV 漂移/不变量失败时非零退出
+python3 tools/i18n/triage_legacy.py --check    # 只读重算；含 07895fd 旧文案基线、615 行/唯一性、C/D 标记校验
 python3 tools/i18n/triage_legacy.py --summary  # 计数与 PENDING/INLINE_LITERAL/B 明细
 ```
 

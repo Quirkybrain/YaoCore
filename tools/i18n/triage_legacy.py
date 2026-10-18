@@ -22,6 +22,12 @@ Status semantics:
                     of business obsolescence: T-18 rewrote many legacy texts
                     non-verbatim. T-17/T-18 must confirm before archival.
 
+Integrity baseline:
+  --check/--write verify the immutable 旧中文/旧英文 columns against the
+  pre-triage CSV from commit 07895fd (see LEGACY_BASELINE_COMMIT and
+  legacy_text_digest). The 615-row count and 旧中文 uniqueness are checked
+  too. C/D 复核标记 values are validated, never silently normalized.
+
 Usage:
   python3 tools/i18n/triage_legacy.py --write
   python3 tools/i18n/triage_legacy.py --check
@@ -37,10 +43,12 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -110,6 +118,30 @@ EXPECTED_B_REWRITE = {
     "解锁本机档案",
     "锁定本机档案",
 }
+
+# Immutable legacy-text baseline (review finding F-03). The baseline is the
+# pre-triage CSV from commit 07895fd; 旧中文/旧英文 are source evidence and
+# must never be rewritten by triage. Digest algorithm, in file order:
+#   sha256( NFC(旧中文) + U+001F + NFC(旧英文 with CRLF/CR -> LF) + U+001E ... )
+# NFC and newline normalization are the only transformations: no trim, no
+# punctuation folding. Changing either column (or row order) fails --check.
+LEGACY_BASELINE_COMMIT = "07895fd98b222264aec566cefd43a0ee9cb10f5e"
+LEGACY_TEXT_BASELINE_SHA256 = (
+    "ff9bb3f450c3e68b891ef1c0b9db96104d2cde1141ee39d611a14861f5c3c3f5"
+)
+LEGACY_ROW_COUNT = 615
+
+# Original B-row remarks from 07895fd (review finding F-02). Triage keeps the
+# human note verbatim and appends machine evidence instead of replacing it.
+B_ORIGINAL_REMARK_FILE = (
+    "待 T-17/T-18 按页面/组件抽取语义化键; "
+    "旧英文机翻/术语错误（file/machine），B 类重译"
+)
+B_ORIGINAL_REMARK_FILES = (
+    "待 T-17/T-18 按页面/组件抽取语义化键; "
+    "旧英文机翻/术语错误（files/machine file），B 类重译"
+)
+B_FILES_REMARK_LEGACY = {"解锁本机档案", "锁定本机档案"}
 
 RAW_ZH = "entry/src/main/resources/rawfile/i18n/zh-CN.json"
 RAW_EN = "entry/src/main/resources/rawfile/i18n/en-US.json"
@@ -430,6 +462,30 @@ def load_csv(path: Path):
     return rows
 
 
+def normalize_legacy_text(value: str) -> str:
+    """Normalize only line endings and Unicode form; never trim."""
+    return unicodedata.normalize(
+        "NFC", value.replace("\r\n", "\n").replace("\r", "\n")
+    )
+
+
+def legacy_text_digest(rows) -> str:
+    """SHA-256 over the immutable 旧中文/旧英文 columns in file order."""
+    digest = hashlib.sha256()
+    for row in rows:
+        digest.update(normalize_legacy_text(row["旧中文"]).encode("utf-8"))
+        digest.update(b"\x1f")
+        digest.update(normalize_legacy_text(row["旧英文"]).encode("utf-8"))
+        digest.update(b"\x1e")
+    return digest.hexdigest()
+
+
+def b_original_remark(legacy: str) -> str:
+    if legacy in B_FILES_REMARK_LEGACY:
+        return B_ORIGINAL_REMARK_FILES
+    return B_ORIGINAL_REMARK_FILE
+
+
 def write_csv(path: Path, rows):
     before = [(row["旧中文"], row["旧英文"]) for row in rows]
     temp_path = path.with_name(path.name + ".tmp")
@@ -518,9 +574,8 @@ def triage_rows(rows, zh_index, source_index, resource_index, en_entries):
             results.append(result)
             continue
         if category.startswith("C"):
+            # Do not repair a missing/illegal 复核标记: validate() reports it.
             computed["审查结论"] = STATUS_DEPRECATED
-            if computed["复核标记"].strip() not in C_RECHECK_FLAGS:
-                computed["复核标记"] = "RECHECK_REQUIRED"
             if not computed["备注"].strip():
                 raise ToolError("C row has an empty remark")
             result.status = STATUS_DEPRECATED
@@ -581,16 +636,24 @@ def triage_rows(rows, zh_index, source_index, resource_index, en_entries):
                     "rewrites possible); T-17/T-18 semantic confirmation required "
                     "before archival"
                 )
+        remark = base
         if row["重译审查"].strip() == "B_REWRITE_REQUIRED":
             terms, evidence = b_rewrite_evidence(row, matches, en_entries)
             result.b_terms = terms
             result.en_evidence = evidence
-            base += (
-                "; B_REWRITE_REQUIRED: legacy English contains "
+            b_evidence = (
+                "B_REWRITE_REQUIRED: legacy English contains "
                 f"{', '.join(terms) if terms else 'no machine/file term'}; "
                 f"{evidence}"
             )
-        computed["备注"] = base
+            # F-02: preserve the pre-triage human remark and append evidence.
+            original = b_original_remark(legacy)
+            remark = (
+                f"{original}; {base}; {b_evidence}"
+                if original
+                else f"{base}; {b_evidence}"
+            )
+        computed["备注"] = remark
         result.status = status
         results.append(result)
     return results
@@ -598,10 +661,28 @@ def triage_rows(rows, zh_index, source_index, resource_index, en_entries):
 
 def validate(rows, results):
     errors: list[str] = []
-    if len(rows) != 615:
-        errors.append(f"expected 615 rows, found {len(rows)}")
+    if len(rows) != LEGACY_ROW_COUNT:
+        errors.append(
+            f"expected {LEGACY_ROW_COUNT} rows, found {len(rows)}"
+        )
     if len(results) != len(rows):
         errors.append("internal error: result count differs from row count")
+    digest = legacy_text_digest(rows)
+    if digest != LEGACY_TEXT_BASELINE_SHA256:
+        errors.append(
+            "旧中文/旧英文 digest differs from the pre-triage baseline "
+            f"{LEGACY_BASELINE_COMMIT}: expected "
+            f"{LEGACY_TEXT_BASELINE_SHA256}, found {digest}"
+        )
+    legacy_counts = Counter(row["旧中文"] for row in rows)
+    duplicates = sorted(
+        value for value, count in legacy_counts.items() if count > 1
+    )
+    if duplicates:
+        errors.append(
+            "旧中文 must be unique across all rows; "
+            f"duplicates={duplicates!r}"
+        )
     accepted = 0
     accepted_legacy = set()
     b_legacy = set()
@@ -645,7 +726,9 @@ def validate(rows, results):
                 errors.append(f"line {line_number}: illegal C status {status!r}")
             if computed["复核标记"].strip() not in C_RECHECK_FLAGS:
                 errors.append(
-                    f"line {line_number}: C row must keep a recheck flag"
+                    f"line {line_number}: C row has missing/illegal 复核标记 "
+                    f"{computed['复核标记']!r}; expected one of "
+                    f"{sorted(C_RECHECK_FLAGS)!r}"
                 )
             if computed["目标存储"].strip() or computed["目标键"].strip():
                 errors.append(
@@ -658,6 +741,11 @@ def validate(rows, results):
         elif category.startswith("D"):
             if status not in D_STATUSES:
                 errors.append(f"line {line_number}: illegal D status {status!r}")
+            if computed["复核标记"].strip() != "NONE":
+                errors.append(
+                    f"line {line_number}: D row has missing/illegal 复核标记 "
+                    f"{computed['复核标记']!r}; expected 'NONE'"
+                )
             if computed["目标存储"].strip() or computed["目标键"].strip():
                 errors.append(
                     f"line {line_number}: D row must not carry a target store/key"
@@ -710,7 +798,7 @@ def compare(rows, results):
         fields = set(owned_fields)
         if computed["审查结论"] == STATUS_MIGRATED:
             fields.add("目标存储")
-        if computed["分类"].strip().startswith("C"):
+        if computed["分类"].strip().startswith(("C", "D")):
             fields.add("复核标记")
         for field in sorted(fields):
             if row[field] != computed[field]:

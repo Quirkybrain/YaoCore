@@ -1,10 +1,11 @@
 # T-24 证据化 i18n 615 条登记表 triage
 
 - **Producer**: agent:implementation-engineer
-- **Task**: `wp-096-i18n-triage`
-- **Branch / base**: `task/wp-096-i18n-triage` @ `07895fd98b222264aec566cefd43a0ee9cb10f5e`
+- **Task**: `wp-096-i18n-triage`；复审修正 `wp-098-i18n-fix`
+- **Branch / base**: `task/wp-096-i18n-triage` @ `07895fd98b222264aec566cefd43a0ee9cb10f5e`；
+  复审基线 `818cb79`；本修正任务 `wp-098-i18n-fix`
 - **Date**: 2026-10-18
-- **Status**: `COMPLETE`（实现与本地验证完成；待独立质量复审，不自我签署）
+- **Status**: `COMPLETE`（实现与本地验证完成；`wp-098` 已修正 F-01..F-05，待聚焦独立复审，不自我签署）
 - **上游**: `artifacts/80-maintenance/maintenance-plan.md` §3.4；`entry/src/test/i18n/migration-boundary.md`；
   `check_i18n.py`；I18N-DESIGN §5；DES-B §7.4.3/§7.4.4
 
@@ -33,13 +34,30 @@
 > **与任务预期的重要偏差**：交接说明预期“`MIGRATED` 占多数”。按任务规定的**精确匹配**规则，
 > 实际只有 46/606 条 A 类可唯一映射；544 条无精确当前引用。这不是工具失败，也不是批量判废：
 > 当前 zh-CN 两个存储共 526 个不同值，旧字典 615 条中包含大量 v1 未实现的旧功能文案；
-> T-18 报告也明确记载“59 条可自动核对，另有大量旧文案按页面语义重写（非逐字）”。本次 46 条
-> `MIGRATED` + 6 条多键 `PENDING_REVIEW` + 7 条 T-10 精确匹配 = **59 条**，与 T-18 的 59 条
-> 记录一致。未为提高 `MIGRATED` 比例放宽匹配或伪造目标键。
+> T-18 报告也明确记载“59 条可自动核对，另有大量旧文案按页面语义重写（非逐字）”。
+
+**与 T-18 的 59 条对账（F-01 修正）**：`artifacts/50-implementation/t18-ui-pages.md` §3.1 的 59 条
+按当前 triage 状态实际构成为 **41 `MIGRATED` + 6 `PENDING_REVIEW` + 9 `ACCEPTED` +
+3 `OBSOLETE_LEGACY` = 59**，按匹配方式为 **53 exact + 6 normalized**。当前 46 条 `MIGRATED`
+中有 **5 条 `string.json` 行**（场景/房间/首页/添加设备/我的）不在 T-18 的 59 条清单内；T-10 的
+10 条 `ACCEPTED` 中精确匹配为 **6 条**，另 4 条仅差末尾句号 `。`（Wi-Fi 认证失败…、保存失败，请重试、
+设备离线、刷新失败，请重试）；T-10 在 T-18 清单中只出现 9 条（未列 `保存失败，请重试`）。因此：
+
+- T-18 的 59 = 53 exact + 6 normalized；其中 41 MIGRATED + 6 PENDING + 6 exact ACCEPTED = 53 exact，
+  3 条 T-10 normalized + 3 条 normalized-only OBSOLETE = 6 normalized；
+- 当前精确规则下的 exact 行 = 46 MIGRATED + 6 PENDING + 6 exact ACCEPTED = 58；
+- 原报告“46 + 6 + 7 = 59 与 T-18 一致”不成立：7 条 T-10 精确匹配实为 6 条；46 条 MIGRATED 含 5 条
+  T-18 之外的 `string.json` 行；同时漏计 3 条 normalized-only OBSOLETE。总数相同是**巧合**，
+  不是同一集合。
+
+结论：**T-18 的 59 条全部可核对（53 exact + 6 normalized）；当前 triage 另有 5 条 `string.json`
+精确匹配**。证据来源：`t18-ui-pages.md` §3.1（59 行清单）；`legacy-migration.csv` 当前状态；
+本报告 §7.3 的逐条对账。未为提高 `MIGRATED` 比例放宽匹配或伪造目标键。
 
 ## 2. 工具与方法
 
-**工具**：`tools/i18n/triage_legacy.py`（新增，SHA-256
+**工具**：`tools/i18n/triage_legacy.py`（本修正后 SHA-256
+`48c5b502ecceb6c12facc236aa2865ea8211219810966179b31391d8a57c60cb`；`wp-096` 首版为
 `c577dae2055f1f529787c11bd1e92084f4cd9caef464b61c4c9d7d2bc873de4e`）。
 
 输入：
@@ -66,19 +84,27 @@
      `entry/src/main/resources/**` 文本/JSON 值；命中 → `INLINE_LITERAL` 并记录 `file:line` 或
      `file#key`；仍无命中 → `OBSOLETE_LEGACY`，证据固定包含
      `no current locale/source reference`。
-3. `B_REWRITE_REQUIRED` 行：保持 `重译审查=B_REWRITE_REQUIRED`；追加旧英文 `machine/file(s)` 术语
-   证据、当前 en-US 同键值/全局术语出现次数；若唯一命中当前键则同时写 `目标键`。
-4. C/D 行：保持 `DEPRECATED (heuristic)` / `EXCLUDED (brand data)` 与原备注；C 类缺失复核标记时
-   明确为 `RECHECK_REQUIRED`（本次 6 条已有明确标记，无实际变更）。
+3. `B_REWRITE_REQUIRED` 行：保持 `重译审查=B_REWRITE_REQUIRED`；**保留 `07895fd` 基线中的原备注**
+   （F-02），在其后追加旧英文 `machine/file(s)` 术语证据、当前 en-US 同键值/全局术语出现次数；
+   若唯一命中当前键则同时写 `目标键`。原备注不再被整体替换。
+4. C/D 行：保持 `DEPRECATED (heuristic)` / `EXCLUDED (brand data)` 与原备注；C 的 `复核标记` 必须为
+   `RECHECK_REQUIRED`/`SAFETY_RECHECK_REQUIRED`，D 必须为 `NONE`。缺失或非法值不再静默规范化，
+   而是由 `--check` 明确报错（F-04；本次 6 条 C、3 条 D 均合法，数据未改）。
 5. `ACCEPTED` 行：完全保留；工具用 T-10 固定基线（10 条旧中文、owner/batch、`B_REVIEWED_ACCEPTED`）
    校验，**不新增、不改写**。
 6. `--check` 只读重算，比对工具拥有的字段（`审查结论`、`目标键`、`备注`；MIGRATED 的
-   `目标存储`；C 的 `复核标记`）并执行不变量断言；`--summary` 输出计数与残余明细；默认写入时
-   先写临时文件、重读校验旧中文/旧英文未变，再原子替换。
+   `目标存储`；C/D 的 `复核标记`）并执行不变量断言。不可变列额外校验（F-03）：
+   - `旧中文`/`旧英文` 规范化 SHA-256 必须等于 `07895fd` 预 triage 基线常量
+     `ff9bb3f450c3e68b891ef1c0b9db96104d2cde1141ee39d611a14861f5c3c3f5`；
+   - 行数必须为 615，`旧中文` 必须 615/615 唯一。
+   算法记录在工具 `legacy_text_digest()`：按文件顺序对每行
+   `NFC(旧中文) + U+001F + NFC(旧英文，CRLF/CR→LF) + U+001E` 求 SHA-256；只做 NFC 与换行规范化，
+   不 trim、不做标点折叠。`--summary` 输出计数与残余明细；默认写入时先写临时文件、重读校验
+   旧中文/旧英文未变，再原子替换；基线/行数/唯一性/标记不变量失败时拒绝写入。
 
 写入保证：列顺序固定为
 `旧中文,旧英文,分类,目标存储,目标键,审查结论,负责人,批次,备注,重译审查,复核标记`；
-UTF-8 无 BOM；LF；旧中文/旧英文原文逐字节不变（工具写入前后自校验；manifest 基线哈希见上）。
+UTF-8 无 BOM；LF；旧中文/旧英文原文逐字节不变（工具写入前后自校验；`07895fd` 基线摘要见上）。
 
 ## 3. 状态统计
 
@@ -185,6 +211,7 @@ UTF-8 无 BOM；LF；旧中文/旧英文原文逐字节不变（工具写入前�
 
 当前 en-US locale 的 `machine`/`file(s)` 出现次数为 **0**（已使用 `profile` 术语）。11 条旧英文
 仍含 `file(s)`/`machine`；本次 triage 均无精确当前键，故 `审查结论=OBSOLETE_LEGACY`、`目标键` 为空。
+11 条 B 行 `备注` 均保留 `07895fd` 基线中的原备注，并在其后追加术语/当前 en-US 证据（F-02）。
 若复用其文案，必须先按 CB 术语表重写英文。
 
 | # | 旧中文 | 旧英文 | 旧英文术语 | 审查结论 | owner |
@@ -224,13 +251,18 @@ C 类 6 条中 4 条 `RECHECK_REQUIRED`、2 条 `SAFETY_RECHECK_REQUIRED`；D �
 | # | 命令 | 结果 | Exit |
 |---:|---|---|---:|
 | 1 | `python3 -m py_compile tools/i18n/triage_legacy.py` | `COMPILE_OK` | 0 |
-| 2 | `python3 tools/i18n/triage_legacy.py --check` | `OK: CSV matches computed triage; invariants pass` | 0 |
-| 3 | `python3 tools/i18n/triage_legacy.py --summary` | 615 行；`ACCEPTED=10`、`MIGRATED=46`、`PENDING_REVIEW=6`、`INLINE_LITERAL=0`、`OBSOLETE_LEGACY=544`、C=6、D=3 | 0 |
-| 4 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | `blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16`；CHK-01/02/03/04/06/08/09 PASS | 0 |
-| 5 | `python3 entry/src/test/i18n/check_i18n.py --root . --allowlist entry/src/test/i18n/allowlist.json --strict-ui` | `blockingFailures=0 warnings=55 missingKeys=0 hardcoded=16` | 0 |
-| 6 | `entry/src/test/run-host-tests.sh` | `# tests 697`、`# pass 697`、`# fail 0` | 0 |
-| 7 | `python3 tools/contract/check_layering.py` | `files=221 violations=0 ... PASS` | 0 |
-| 8 | 独立断言脚本（见下） | `ASSERTIONS_OK rows=615`；`accepted_new=0`；`b_rewrite_required=11` | 0 |
+| 2 | `python3 tools/i18n/triage_legacy.py --check`（第 1 次） | `615 rows`；`OK: CSV matches computed triage; invariants pass` | 0 |
+| 3 | `python3 tools/i18n/triage_legacy.py --check`（第 2 次） | 同上；CSV SHA-256 前后均为 `75b2cba0…b77e79` | 0 |
+| 4 | `python3 tools/i18n/triage_legacy.py --summary` | 615 行；`ACCEPTED=10`、`MIGRATED=46`、`PENDING_REVIEW=6`、`INLINE_LITERAL=0`、`OBSOLETE_LEGACY=544`、C=6、D=3 | 0 |
+| 5 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | `blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16`；CHK-01/02/03/04/06/08/09 PASS；CHK-05 57 findings | 0 |
+| 6 | `python3 entry/src/test/i18n/check_i18n.py --root . --allowlist entry/src/test/i18n/allowlist.json --strict-ui` | `blockingFailures=0 warnings=55 missingKeys=0 hardcoded=16`；CHK-05 39 findings | 0 |
+| 7 | `entry/src/test/run-host-tests.sh` | `# tests 697`、`# pass 697`、`# fail 0`、`# skipped 0` | 0 |
+| 8 | `python3 tools/contract/check_layering.py` | `files=221 violations=0 exceptions_used=6 pending=0`；`PASS` | 0 |
+| 9 | 独立断言脚本（见 §6.2） | `ASSERTIONS_OK rows=615`；`legacy_digest=ff9bb3…c3c3f5`；`b_original_remarks_preserved=true` | 0 |
+| 10 | 临时副本篡改 `旧中文` 后 `--check` | `INVARIANT 旧中文/旧英文 digest differs from the pre-triage baseline 07895fd…` | 1 |
+| 11 | 临时副本篡改 `审查结论` 后 `--check` | `DIFF row 62 [审查结论]`；`FAIL: 1 difference(s)` | 1 |
+| 12 | 临时副本删除 C 行 `复核标记` 后 `--check` | `INVARIANT line 33: C row has missing/illegal 复核标记 ''` | 1 |
+| 13 | 临时副本删除 D 行 `复核标记` 后 `--check` | `INVARIANT line 13: D row has missing/illegal 复核标记 ''; expected 'NONE'` | 1 |
 
 ### 6.1 `--check` 幂等与只读证明
 
@@ -244,24 +276,39 @@ i18n legacy triage check: 615 rows
 OK: CSV matches computed triage; invariants pass
 
 CSV sha256 before/after both checks:
-efaf44fe61aa900883b7c6450d50b248409c7ceeb80087f59a14f3803d50c67d
+75b2cba0a8a27639ed5506804f0a8eb07a066dd6bb3e114557bb95f796b77e79
 ```
 
-重新执行 `--write` 后 CSV sha256 仍为同一值，证明写入也是幂等的。
+`wp-098` 的第一次 `--write` 把 11 条 B 行恢复为“原备注 + 追加证据”，CSV 从
+`efaf44fe…50c67d` 变为 `75b2cba0…b77e79`；再次执行 `--write` 后 SHA-256 保持不变，证明写入幂等。
+逐字段核对：相对 `2d45628` 仅 11 个 `备注` 字段变化（CSV 行 44/46/48/49/52/53/69/79/104/144/347），
+状态计数与全部映射字段不变。
 
 ### 6.2 独立断言脚本
 
 ```python
-import csv
+import csv, hashlib, unicodedata
 from collections import Counter
 rows = list(csv.DictReader(open('entry/src/test/i18n/legacy-migration.csv', encoding='utf-8', newline='')))
 assert len(rows) == 615
 assert len({r['旧中文'] for r in rows}) == 615
+
+def norm(v):
+    return unicodedata.normalize('NFC', v.replace('\r\n', '\n').replace('\r', '\n'))
+
+h = hashlib.sha256()
+for r in rows:
+    h.update(norm(r['旧中文']).encode('utf-8')); h.update(b'\x1f')
+    h.update(norm(r['旧英文']).encode('utf-8')); h.update(b'\x1e')
+assert h.hexdigest() == 'ff9bb3f450c3e68b891ef1c0b9db96104d2cde1141ee39d611a14861f5c3c3f5'
+
 accepted_expected = {
     'Wi-Fi 认证失败，请检查密码','保存失败，请重试','编辑','查看','成功',
     '删除','设备离线','失败','取消','刷新失败，请重试',
 }
 a_statuses = {'ACCEPTED','MIGRATED','PENDING_REVIEW','INLINE_LITERAL','OBSOLETE_LEGACY'}
+b_file = '待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（file/machine），B 类重译'
+b_files = '待 T-17/T-18 按页面/组件抽取语义化键; 旧英文机翻/术语错误（files/machine file），B 类重译'
 for i, r in enumerate(rows, 2):
     assert r['审查结论'].strip() and r['备注'].strip()
     assert r['旧中文'].strip() and r['旧英文'].strip()
@@ -280,17 +327,22 @@ for i, r in enumerate(rows, 2):
         assert r['复核标记'] in {'RECHECK_REQUIRED','SAFETY_RECHECK_REQUIRED'}
     elif cat.startswith('D'):
         assert status == 'EXCLUDED (brand data)'
+        assert r['复核标记'] == 'NONE'
     else:
         raise AssertionError((i, cat))
 accepted = {r['旧中文'] for r in rows if r['审查结论'] == 'ACCEPTED'}
 assert accepted == accepted_expected
-assert len([r for r in rows if r['重译审查'] == 'B_REWRITE_REQUIRED']) == 11
-assert all('B_REWRITE_REQUIRED' in r['备注'] for r in rows if r['重译审查'] == 'B_REWRITE_REQUIRED')
+b_rows = [r for r in rows if r['重译审查'] == 'B_REWRITE_REQUIRED']
+assert len(b_rows) == 11
+assert all('B_REWRITE_REQUIRED' in r['备注'] for r in b_rows)
+assert all(r['备注'].startswith(b_files if r['旧中文'] in {'解锁本机档案','锁定本机档案'} else b_file) for r in b_rows)
 print('ASSERTIONS_OK rows=615')
 print('status_counts=' + str(dict(Counter(r['审查结论'] for r in rows))))
+print('legacy_digest=' + h.hexdigest())
 print('accepted_set_is_T10_baseline=true')
 print('accepted_new=0')
 print('b_rewrite_required=11')
+print('b_original_remarks_preserved=true')
 print('a_migrated_targets_complete=true')
 ```
 
@@ -299,11 +351,26 @@ print('a_migrated_targets_complete=true')
 ```text
 ASSERTIONS_OK rows=615
 status_counts={'OBSOLETE_LEGACY': 544, 'EXCLUDED (brand data)': 3, 'ACCEPTED': 10, 'DEPRECATED (heuristic)': 6, 'MIGRATED': 46, 'PENDING_REVIEW': 6}
+legacy_digest=ff9bb3f450c3e68b891ef1c0b9db96104d2cde1141ee39d611a14861f5c3c3f5
 accepted_set_is_T10_baseline=true
 accepted_new=0
 b_rewrite_required=11
+b_original_remarks_preserved=true
 a_migrated_targets_complete=true
 ```
+
+### 6.3 负例验证（临时副本，不入库）
+
+负例均在 `/tmp/opencode/wp098-neg/` 的 CSV 副本上执行，仓库文件未被篡改：
+
+| 负例 | 实际输出（摘要） | Exit |
+|---|---|---:|
+| 修改一条 `旧中文`（追加 `TAMPER`） | `INVARIANT 旧中文/旧英文 digest differs from the pre-triage baseline 07895fd…: expected ff9bb3…, found 80a48d…` | 1 |
+| 把一条 `MIGRATED` 改为 `OBSOLETE_LEGACY` | `DIFF row 62 [审查结论]: csv='OBSOLETE_LEGACY' computed='MIGRATED'`；`FAIL: 1 difference(s)` | 1 |
+| 删除 C 行 `复核标记` | `INVARIANT line 33: C row has missing/illegal 复核标记 ''; expected one of ['RECHECK_REQUIRED', 'SAFETY_RECHECK_REQUIRED']` | 1 |
+| 删除 D 行 `复核标记` | `INVARIANT line 13: D row has missing/illegal 复核标记 ''; expected 'NONE'` | 1 |
+
+负例证明 F-03/F-04 的校验实际生效，且 `--check` 对不可变列与状态字段均返回 exit 1。
 
 ## 7. 诚实边界与残余风险
 
@@ -316,7 +383,27 @@ a_migrated_targets_complete=true
 3. **实际分布与交接预期不一致**：交接预期“`MIGRATED` 占多数”，实际 46/606（7.6%），544 条
    `OBSOLETE_LEGACY`。原因见 §1：旧字典包含大量 v1 未实现的旧功能/旧版本/旧配网/旧云文案；
    当前 526 个不同 zh 值不可能与 615 条旧字符串多数一一对应。工具没有放宽匹配或批量签收。
-   59 条精确可核对（46+6+7）与 T-18 报告一致。
+
+   **T-18 的 59 条逐条对账（F-01 修正）**：
+
+   | T-18 §3.1 组成 | 数量 | 当前 CSV 状态 | 说明 |
+   |---|---:|---|---|
+   | rawfile exact | 41 | `MIGRATED` | 与当前 41 条 rawfile MIGRATED 一一对应 |
+   | pending exact | 6 | `PENDING_REVIEW` | 6 条全部对应 |
+   | T-10 exact | 6 | `ACCEPTED` | 编辑/查看/成功/删除/失败/取消 |
+   | T-10 normalized | 3 | `ACCEPTED` | Wi-Fi 认证失败…/设备离线/刷新失败，请重试 |
+   | normalized-only | 3 | `OBSOLETE_LEGACY` | 操作失败，请重试/密码至少 8 位/未找到场景 |
+   | **合计** | **59** | | **53 exact + 6 normalized** |
+
+   当前 CSV 另有 5 条 `string.json` `MIGRATED` 不在 T-18 清单内：场景（`tab_scenes`）、房间
+   （`tab_rooms`）、首页（`tab_home`）、添加设备（`page_provisioning`）、我的（`tab_profile`）。
+   T-10 共 10 条 `ACCEPTED`：6 条 exact + 4 条仅句号归一化（Wi-Fi 认证失败…、保存失败，请重试、
+   设备离线、刷新失败，请重试）；T-18 清单只列其中 9 条，未列 `保存失败，请重试`。因此：
+   - T-18 的 59 = 53 exact + 6 normalized，全部可核对；
+   - 当前精确规则下的 exact 行 = 46 MIGRATED + 6 PENDING + 6 exact ACCEPTED = 58；
+   - “59 与 T-18 一致”只在总数上巧合，集合并不相同；当前 triage 比 T-18 多出 5 条 `string.json`
+     精确匹配，同时 T-18 有 3 条 normalized-only OBSOLETE 不在当前 exact 统计中。
+   证据见 §1 与 `artifacts/50-implementation/t18-ui-pages.md` §3.1。
 4. **源码扫描范围有限**：只扫描 `entry/src/main/ets/**` 与 `entry/src/main/resources/**`；
    不扫描 `input/`（旧 `I18nService.ets` 本身是待迁移源，扫描会自证）、`entry/src/test/**`、
    `artifacts/**`。若旧文案以拆分拼接、动态构造、注释或文档形式存在，当前工具不会发现。
@@ -336,22 +423,23 @@ a_migrated_targets_complete=true
    `artifacts/90-integration/integration-report.md` 仍写“596 条 PENDING_REVIEW”。它们不在本次
    写范围（`entry/src/test/i18n/`、`tools/`、`artifacts/50-implementation/`），需由对应 owner
    在后续文档/维护任务同步。`entry/src/test/i18n/migration-boundary.md` 与
-   `entry/src/test/i18n/README.md` 已同步本次 triage 结果。另：`entry/src/test/i18n/README.md`
-   §4 仍保留“CHK-05 的 0 告警”旧表述；本次实测无 allowlist 为 57 条、带 allowlist 为 39 条
-   CHK-05 告警（0 blocking / 0 missing），该既有基线漂移未在本任务改写。
-10. **工具不变量边界**：`--check` 比对工具拥有的字段并校验 T-10/T-18 基线；它不替代独立
-    quality-review，也不验证英文质量、语义正确性或 UI 上下文。`OBSOLETE_LEGACY` 的 `目标存储`
-    保留原启发式建议，`目标键` 为空；这是有意区分“未验证目标”与“已验证映射”。
+   `entry/src/test/i18n/README.md` 已同步本次 triage 结果；`README.md` §4 的 CHK-05 口径已在
+   `wp-098` 更新为当前实测：无 allowlist 57 条、带 allowlist 39 条（总 warnings 73/55；
+   0 blocking / 0 missing）。
+10. **工具不变量边界**：`--check` 比对工具拥有的字段，校验 T-10/T-18 基线、615 行与 `旧中文`
+    唯一性、`07895fd` 旧文案规范化 SHA-256（F-03），以及 C/D `复核标记` 合法性（F-04）；
+    它不替代独立 quality-review，也不验证英文质量、语义正确性或 UI 上下文。`OBSOLETE_LEGACY` 的
+    `目标存储` 保留原启发式建议，`目标键` 为空；这是有意区分“未验证目标”与“已验证映射”。
 
 ## 8. 变更文件与 traceability
 
 | 文件 | 变更 | 说明 |
 |---|---|---|
-| `entry/src/test/i18n/legacy-migration.csv` | 596 行更新 | `审查结论`/`目标存储`/`目标键`/`备注`；旧中文/旧英文原文不变；C/D/ACCEPTED 未变 |
-| `tools/i18n/triage_legacy.py` | 新增 | 可复现 triage/`--check`/`--summary`/T-10/T-18 基线不变量 |
-| `entry/src/test/i18n/migration-boundary.md` | 更新 §3/§5 | 新状态语义、统计、6 条 PENDING 清单、B/C/D 处置、工具路径 |
-| `entry/src/test/i18n/README.md` | 更新 §4/§5 | 登记表 triage 结果与工具路径 |
-| `artifacts/50-implementation/t24-i18n-triage.md` | 新增 | 本报告 |
+| `entry/src/test/i18n/legacy-migration.csv` | `wp-096`: 596 行更新；`wp-098`: 11 条 B 行 `备注` | `wp-096` 更新 `审查结论`/`目标存储`/`目标键`/`备注`；`wp-098` 仅恢复 11 条 B 行原备注并追加证据（F-02）；旧中文/旧英文原文不变；C/D/ACCEPTED 未变；状态计数不变 |
+| `tools/i18n/triage_legacy.py` | 新增；`wp-098` 修改 | 可复现 triage/`--check`/`--summary`/T-10/T-18 基线不变量；新增 `07895fd` 旧文案摘要、615 行/唯一性、C/D `复核标记` 校验与 B 原备注保留（F-02..F-04） |
+| `entry/src/test/i18n/migration-boundary.md` | 更新 §3/§5 | 新状态语义、统计、6 条 PENDING 清单、B/C/D 处置、工具路径与校验口径 |
+| `entry/src/test/i18n/README.md` | 更新 §4/§5 | 登记表 triage 结果、工具路径与 CHK-05 当前实测口径（F-05） |
+| `artifacts/50-implementation/t24-i18n-triage.md` | 新增；`wp-098` 修正 | 本报告；修正 T-18 59 条证据链（F-01）、B/C/D 与工具边界 |
 
 Traceability：
 
@@ -359,9 +447,14 @@ Traceability：
 - `migration-boundary.md` §3（分类/状态语义）→ 本报告 §2–§5；
 - I18N-DESIGN §5 / DES-B §7.4.3–§7.4.4 → `MIGRATED` 目标存储/键证据；
 - T-10 的 10 条 `ACCEPTED` → 工具固定基线 + 独立断言；
-- T-18 的“59 条可自动核对” → 本次 59 条精确匹配（46 MIGRATED + 6 PENDING + 7 T-10 精确行）；
+- T-18 的“59 条可自动核对” → 本报告 §1/§7.3 的逐条对账：41 MIGRATED + 6 PENDING +
+  9 ACCEPTED（6 exact + 3 normalized）+ 3 normalized-only OBSOLETE = 59（53 exact + 6 normalized）；
+  当前 triage 另有 5 条 T-18 之外的 `string.json` `MIGRATED`；
+- `artifacts/70-review/t24-i18n-review.md` F-01..F-05 → 本报告 §1/§2/§6/§7.3/§7.9/§7.10/§8、
+  `tools/i18n/triage_legacy.py`、`entry/src/test/i18n/README.md`；
 - B 类 11 条 → 本报告 §4 与 CSV `重译审查=B_REWRITE_REQUIRED`；
 - C/D 9 条 → 本报告 §5 与 CSV 原证据。
 
 **未做**：未修改任何 locale 值、UI 代码、DES/架构文档、allowlist、checker 或 host 测试；
-未切换分支、未 pull/merge/rebase/push；未把任何未人工复核行标 `ACCEPTED`。
+未切换分支、未 pull/merge/rebase/push；未把任何未人工复核行标 `ACCEPTED`；未改变 46/6/544/10/6/3
+计数或任何已核对映射。
