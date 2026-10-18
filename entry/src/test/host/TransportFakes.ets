@@ -8,20 +8,12 @@
  */
 import { AppErrors } from '../../main/ets/common/types/AppError';
 import { NameValue } from '../../main/ets/common/types/NameValue';
-import type { ClockPort, LoggerPort, MetricsPort, RandomPort } from '../../main/ets/common/types/Ports';
+import type { ClockPort } from '../../main/ets/common/types/Ports';
+import type { LoggerPort, MetricsPort, RandomPort } from '../../main/ets/contracts/Ports';
 import { GatewayAddress, GatewayRoute, TlsMaterial } from '../../main/ets/model/GatewayRoute';
-import type {
-  GatewayAddressPort,
-  GatewayCredentialPort,
-  GatewayRoutePort,
-  GatewaySequencePort
-} from '../../main/ets/repository/GatewayPorts';
-import {
-  HttpRequest,
-  HttpResponse,
-  TlsPolicy
-} from '../../main/ets/service/gateway/GatewayTransportPorts';
-import type { HttpTransport } from '../../main/ets/service/gateway/GatewayTransportPorts';
+import type { GatewayAddressPort, GatewayCredentialPort, GatewayRoutePort, GatewaySequencePort } from '../../main/ets/contracts/GatewayPorts';
+import { HttpRequest, HttpResponse, TlsPolicy } from '../../main/ets/model/GatewayTransportModels';
+import type { HttpTransport } from '../../main/ets/contracts/GatewayTransportPorts';
 
 export class FakeTransportClock implements ClockPort {
   value: number;

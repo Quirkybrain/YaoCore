@@ -31,9 +31,9 @@ import {
   DoorStage
 } from '../viewmodel/core/DoorConfirmationTracker';
 import { I18nKeys } from '../service/i18n/I18nKeys';
-import { I18nParams, I18nKey } from '../service/i18n/I18nModels';
+import { I18nParams, I18nKey } from '../model/I18nModels';
 import { NameValue } from '../common/types/NameValue';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import {
   EmptyState,
   ErrorState,

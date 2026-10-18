@@ -20,19 +20,10 @@ import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { AppError, AppErrors } from '../../../common/types/AppError';
 import { NameValue } from '../../../common/types/NameValue';
-import type { CancellationToken } from '../../../common/types/Ports';
+import type { CancellationToken } from '../../../common/types/CancellationToken';
 import { confirmedWriteBusy } from '../BleSupport';
-import {
-  BleCharacteristicRef,
-  BleConnection,
-  BleDescriptorRef,
-  BlePermissionGate,
-  BleProvisioningDevice,
-  BleScanFilter,
-  BleScanListener,
-  BleServiceRef,
-  BleTransport
-} from '../BleProvisioningPorts';
+import { BleConnection, BlePermissionGate, BleScanListener, BleTransport } from '../../../contracts/BleProvisioningPorts';
+import { BleCharacteristicRef, BleDescriptorRef, BleProvisioningDevice, BleScanFilter, BleServiceRef } from '../../../model/ProvisioningModels';
 
 const ACCESS_BLUETOOTH: Permissions = 'ohos.permission.ACCESS_BLUETOOTH';
 const CONNECT_TIMEOUT_MS: number = 12000;

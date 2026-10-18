@@ -28,7 +28,7 @@ import { SocketTlsPinVerifier } from '../../../../main/ets/service/gateway/adapt
 import {
   HttpRequest,
   TlsPolicy
-} from '../../../../main/ets/service/gateway/GatewayTransportPorts';
+} from '../../../../main/ets/model/GatewayTransportModels';
 
 const PIN_A: string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 

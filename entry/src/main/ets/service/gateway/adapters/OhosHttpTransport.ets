@@ -26,14 +26,9 @@ import { BytesUtil } from '../../../common/utils/BytesUtil';
 import { Utf8 } from '../../../common/utils/Utf8';
 import { IpAddressUtil } from '../../../common/utils/IpAddressUtil';
 import type { ClockPort } from '../../../common/types/Ports';
-import type { CryptoPort } from '../../crypto/CryptoPort';
-import {
-  HttpRequest,
-  HttpResponse,
-  HttpTransport,
-  TlsPolicy,
-  TlsVerification
-} from '../GatewayTransportPorts';
+import type { CryptoPort } from '../../../contracts/CryptoPort';
+import { HttpTransport } from '../../../contracts/GatewayTransportPorts';
+import { HttpRequest, HttpResponse, TlsPolicy, TlsVerification } from '../../../model/GatewayTransportModels';
 import { TlsPinCheck } from './TlsPinCheck';
 
 interface PlatformErrorLike {

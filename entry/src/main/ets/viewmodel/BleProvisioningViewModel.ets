@@ -12,37 +12,25 @@
 import { AppErrors } from '../common/types/AppError';
 import type { AppError } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { BytesUtil } from '../common/utils/BytesUtil';
 import { Utf8 } from '../common/utils/Utf8';
 import { SecureBytes } from '../common/types/SecureBytes';
-import {
-  BleProvisioningDevice,
-  BleProvisioningRequest,
-  BleProvisioningStage,
-  BleScanFilter,
-  BleWifiScanRequest,
-  ProvisioningProgress,
-  ProvisioningState,
-  WifiAp
-} from '../service/ble/BleProvisioningPorts';
-import type {
-  BleProvisioningProgressListener,
-  BleScanListener,
-  IBleProvisioningClient
-} from '../service/ble/BleProvisioningPorts';
-import { GattEndpointMap } from '../service/ble/GattEndpointMap';
+import { BleProvisioningDevice, BleProvisioningRequest, BleProvisioningStage, BleScanFilter, BleWifiScanRequest, ProvisioningProgress, ProvisioningState, WifiAp } from '../model/ProvisioningModels';
+import type { BleProvisioningProgressListener, BleScanListener, IBleProvisioningClient } from '../contracts/BleProvisioningPorts';
+import { GattEndpointMap } from '../model/GattEndpointMap';
 import type { BleProvisioningResult } from '../model/ProvisioningModels';
-import type { CryptoPort } from '../service/crypto/CryptoPort';
-import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
+import type { CryptoPort } from '../contracts/CryptoPort';
+import type { SecretDraftPort } from '../contracts/SecretDraftPort';
 import {
   LoadPhase,
   ViewModelError,
   ViewModelSupport
 } from './core/ViewModelCore';
 import type { ViewModelBase, VmTimerPort } from './core/ViewModelCore';
-import type { PermissionPort } from './ViewModelPorts';
-import { PermissionKind } from './ViewModelPorts';
+import type { ProvisioningPermissionPort } from '../contracts/PermissionPort';
+import { ProvisioningPermissionKind } from '../contracts/PermissionPort';
 import { I18nService } from '../service/i18n/I18nService';
 import { GatewayRepository } from '../repository/GatewayRepository';
 import { FamilyRepository } from '../repository/FamilyRepository';
@@ -122,7 +110,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   private readonly families: FamilyRepository;
   private readonly drafts: SecretDraftPort;
   private readonly crypto: CryptoPort;
-  private readonly permissions: PermissionPort;
+  private readonly permissions: ProvisioningPermissionPort;
   private readonly i18n: I18nService;
   private readonly clock: ClockPort;
   private readonly timer: VmTimerPort;
@@ -152,7 +140,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   constructor(ble: IBleProvisioningClient, gateways: GatewayRepository,
     families: FamilyRepository, drafts: SecretDraftPort, crypto: CryptoPort,
-    permissions: PermissionPort, i18n: I18nService, clock: ClockPort, timer: VmTimerPort,
+    permissions: ProvisioningPermissionPort, i18n: I18nService, clock: ClockPort, timer: VmTimerPort,
     logger: LoggerPort) {
     this.ble = ble;
     this.gateways = gateways;
@@ -191,7 +179,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   async requestPermission(): Promise<void> {
     const generation = this.cancelGeneration;
     try {
-      await this.permissions.ensure(PermissionKind.BLUETOOTH);
+      await this.permissions.ensure(ProvisioningPermissionKind.BLUETOOTH);
       if (this.isStale(generation)) {
         return;
       }

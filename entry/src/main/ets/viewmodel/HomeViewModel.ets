@@ -9,7 +9,8 @@
  */
 import { AppError } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { DeviceType } from '../common/constants/DeviceConstants';
 import { TransportProfile } from '../model/DeviceTypes';
 import { DeviceFilter, DeviceFilterKind, EnvironmentSummary, GatewayLinkState,
@@ -24,17 +25,17 @@ import { FamilyService } from '../service/family/FamilyService';
 import { RoomService } from '../service/room/RoomService';
 import { CloudService } from '../service/cloud/CloudService';
 import { DeviceRepository } from '../repository/DeviceRepository';
-import type { DeviceRecord, DiscoverApplyOptions } from '../repository/DomainModels';
-import { DiscoverApplyOptions as DiscoverApplyOptionsValue } from '../repository/DomainModels';
+import type { DeviceRecord, DiscoverApplyOptions } from '../model/DeviceRecord';
+import { DiscoverApplyOptions as DiscoverApplyOptionsValue } from '../model/DeviceRecord';
 import { GatewayAddress } from '../model/GatewayRoute';
 import type { GatewayRoute } from '../model/GatewayRoute';
-import { GatewayTarget } from '../service/gateway/GatewayTransportPorts';
-import type { IGatewayClient } from '../service/gateway/GatewayTransportPorts';
+import { GatewayTarget } from '../model/GatewayTransportModels';
+import type { IGatewayClient } from '../contracts/GatewayTransportPorts';
 import type { CloudConfigView } from '../service/cloud/CloudModels';
 import { CloudTransportState } from '../service/cloud/CloudModels';
 import type { Family, Room } from '../model/FamilyModels';
-import type { GatewayRoutePort } from '../repository/GatewayPorts';
-import type { ManualDiscoveryPort } from './ViewModelPorts';
+import type { GatewayRoutePort } from '../contracts/GatewayPorts';
+import type { ManualDiscoveryPort } from '../contracts/DiscoveryTransport';
 
 const TAG: string = 'HomeViewModel';
 

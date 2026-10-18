@@ -7,10 +7,10 @@
  * service rollback and `platformApplied=false` branches are host-observable.
  */
 import { NameValue } from '../../main/ets/common/types/NameValue';
-import type { LoggerPort } from '../../main/ets/common/types/Ports';
-import type { PreferencesStore } from '../../main/ets/service/storage/PreferencesStore';
-import { I18nResourceBundle, SupportedLocale } from '../../main/ets/service/i18n/I18nModels';
-import type { I18nResourceLoaderPort, LocaleApplierPort } from '../../main/ets/service/i18n/I18nPorts';
+import type { LoggerPort } from '../../main/ets/contracts/Ports';
+import type { PreferencesStore } from '../../main/ets/contracts/PreferencesStore';
+import { I18nResourceBundle, SupportedLocale } from '../../main/ets/model/I18nModels';
+import type { I18nResourceLoaderPort, LocaleApplierPort } from '../../main/ets/contracts/I18nPorts';
 
 export class FakeI18nLoader implements I18nResourceLoaderPort {
   private readonly bundles: Map<string, I18nResourceBundle> = new Map<string, I18nResourceBundle>();

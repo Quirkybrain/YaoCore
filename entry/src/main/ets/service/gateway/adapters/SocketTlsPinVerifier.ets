@@ -17,9 +17,9 @@
  */
 import { socket } from '@kit.NetworkKit';
 import { AppError, AppErrors } from '../../../common/types/AppError';
-import { TlsVerification } from '../GatewayTransportPorts';
-import type { TlsPinVerifier } from '../GatewayTransportPorts';
-import type { CryptoPort } from '../../crypto/CryptoPort';
+import { TlsVerification } from '../../../model/GatewayTransportModels';
+import type { TlsPinVerifier } from '../../../contracts/GatewayTransportPorts';
+import type { CryptoPort } from '../../../contracts/CryptoPort';
 import { TlsPinCheck } from './TlsPinCheck';
 
 interface PlatformErrorLike {

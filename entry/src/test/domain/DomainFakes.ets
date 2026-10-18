@@ -10,11 +10,12 @@ import { AppError, AppErrors } from '../../main/ets/common/types/AppError';
 import { NameValue } from '../../main/ets/common/types/NameValue';
 import { ProtocolConstants } from '../../main/ets/common/constants/ProtocolConstants';
 import { StorageConstants } from '../../main/ets/common/constants/StorageConstants';
-import type { ClockPort, LoggerPort, MetricsPort } from '../../main/ets/common/types/Ports';
+import type { ClockPort } from '../../main/ets/common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../../main/ets/contracts/Ports';
 import { DateTimeUtil } from '../../main/ets/common/utils/DateTimeUtil';
 import { TransportProfile } from '../../main/ets/model/DeviceTypes';
 import { GatewayRoute, GatewayRouteInit } from '../../main/ets/model/GatewayRoute';
-import type { GatewayRoutePort } from '../../main/ets/repository/GatewayPorts';
+import type { GatewayRoutePort } from '../../main/ets/contracts/GatewayPorts';
 import {
   InvitationRecord,
   InvitationStatus,
@@ -30,7 +31,7 @@ import {
 } from '../../main/ets/model/ControlModels';
 import { DeviceStatePatch, DeviceStatePatchInit } from '../../main/ets/model/DeviceState';
 import { GatewayResultClassifier } from '../../main/ets/common/types/GatewayResult';
-import type { DeviceControlPort } from '../../main/ets/repository/DomainPorts';
+import type { DeviceControlPort } from '../../main/ets/contracts/DevicePorts';
 import {
   AcceptInviteOptions,
   AcceptedInvitation,
@@ -42,7 +43,7 @@ import {
   RotationPlan
 } from '../../main/ets/service/family/FamilyModels';
 import type { FamilyAuthPort, InviteServicePort } from '../../main/ets/service/family/FamilyModels';
-import type { SceneTimerPort } from '../../main/ets/service/scene/SceneTimerPort';
+import type { SceneTimerPort } from '../../main/ets/contracts/SceneTimerPort';
 
 const FIXED_UTC: string = '20261017T080000Z';
 

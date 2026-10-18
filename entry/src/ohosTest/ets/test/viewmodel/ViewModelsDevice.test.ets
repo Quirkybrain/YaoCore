@@ -27,7 +27,7 @@ import {
   SettingsViewModel,
   SettingsViewState
 } from '../../../../main/ets/viewmodel/SettingsViewModel';
-import { SupportedLocale } from '../../../../main/ets/service/i18n/I18nModels';
+import { SupportedLocale } from '../../../../main/ets/model/I18nModels';
 import { DeviceControlCoordinator } from '../../../../main/ets/viewmodel/core/DeviceControlCoordinator';
 import { DoorConfirmationTracker } from '../../../../main/ets/viewmodel/core/DoorConfirmationTracker';
 import { ThrottleGate } from '../../../../main/ets/viewmodel/core/ThrottleGate';

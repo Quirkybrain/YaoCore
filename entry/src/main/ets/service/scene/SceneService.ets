@@ -14,26 +14,19 @@
 import { AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { UuidUtil } from '../../common/utils/UuidUtil';
-import type { CancellationToken, ClockPort, IdPort, LoggerPort, MetricsPort } from '../../common/types/Ports';
+import type { ClockPort, IdPort } from '../../common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import { Scene, SceneAction } from '../../model/FamilyModels';
-import type { RdbStore, RdbTransaction } from '../storage/RdbStore';
+import type { RdbStore, RdbTransaction } from '../../contracts/RdbStore';
 import { SceneRepository } from '../../repository/SceneRepository';
 import { DeviceRepository } from '../../repository/DeviceRepository';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
-import type { DeviceControlPort } from '../../repository/DomainPorts';
-import type { GatewayRoutePort } from '../../repository/GatewayPorts';
-import {
-  SceneExecutionEvent,
-  SceneExecutionEventType,
-  SceneExecutionPolicy,
-  SceneExecutionProgress,
-  SceneExecutionResult,
-  SceneRunState,
-  SceneStepResult,
-  SceneStepState
-} from '../../repository/DomainModels';
+import type { DeviceControlPort } from '../../contracts/DevicePorts';
+import type { GatewayRoutePort } from '../../contracts/GatewayPorts';
+import { SceneExecutionEvent, SceneExecutionEventType, SceneExecutionPolicy, SceneExecutionProgress, SceneExecutionResult, SceneRunState, SceneStepResult, SceneStepState } from '../../model/SceneExecutionModels';
 import { RunCancellation, SceneExecutor } from './SceneExecutor';
-import type { SceneTimerPort } from './SceneTimerPort';
+import type { SceneTimerPort } from '../../contracts/SceneTimerPort';
 import { SceneValidation } from './SceneValidation';
 import type { PolicyDecision } from '../auth/AuthModels';
 

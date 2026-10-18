@@ -16,8 +16,8 @@ import type {
   CryptoProvider,
   CryptoProviderAesCtrStream
 } from '../../main/ets/service/crypto/CryptoProvider';
-import { GcmCiphertext, X25519KeyPair } from '../../main/ets/service/crypto/CryptoPort';
-import type { X25519KeyHandle } from '../../main/ets/service/crypto/CryptoPort';
+import { GcmCiphertext, X25519KeyPair } from '../../main/ets/contracts/CryptoPort';
+import type { X25519KeyHandle } from '../../main/ets/contracts/CryptoPort';
 
 const SHA256_BLOCK: number = 64;
 

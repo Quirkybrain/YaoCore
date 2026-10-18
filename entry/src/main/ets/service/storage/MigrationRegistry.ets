@@ -11,8 +11,8 @@
  * previous revision. No downgrade and no data deletion on failure.
  */
 import { AppErrors } from '../../common/types/AppError';
-import type { MigrationRegistryPort } from './MigrationPort';
-import type { RdbStore, RdbTransaction } from './RdbStore';
+import type { MigrationRegistryPort } from '../../contracts/MigrationPort';
+import type { RdbStore, RdbTransaction } from '../../contracts/RdbStore';
 
 export class MigrationRegistry implements MigrationRegistryPort {
   private readonly statementsByVersion: Map<number, ReadonlyArray<string>> =

@@ -19,13 +19,9 @@ import {
 } from '../common/theme/AppTheme';
 import type { Scene } from '../model/FamilyModels';
 import { NameValue } from '../common/types/NameValue';
-import { I18nParams } from '../service/i18n/I18nModels';
-import type {
-  SceneExecutionProgress,
-  SceneExecutionResult,
-  SceneStepResult
-} from '../repository/DomainModels';
-import type { SceneRunState } from '../repository/DomainModels';
+import { I18nParams } from '../model/I18nModels';
+import type { SceneExecutionProgress, SceneExecutionResult, SceneStepResult } from '../model/SceneExecutionModels';
+import type { SceneRunState } from '../model/SceneExecutionModels';
 import { LoadPhase } from '../viewmodel/core/ViewModelCore';
 import { SceneViewState, SceneViewModel } from '../viewmodel/SceneViewModel';
 import {

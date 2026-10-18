@@ -9,10 +9,11 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import type { DeviceKey } from '../model/DeviceKey';
 import type { Room } from '../model/FamilyModels';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import type { RoomDeletionPreview, RoomDeletionResult } from '../service/room/RoomService';
 import { RoomDeletionConfirmation } from '../service/room/RoomService';
 import {

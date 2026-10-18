@@ -14,19 +14,14 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { DeviceAction } from '../../common/constants/DeviceConstants';
-import type { ClockPort, LoggerPort, MetricsPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../../contracts/Ports';
 import { DeviceControlCommand, ControlOutcome } from '../../model/ControlModels';
 import { DeviceKey } from '../../model/DeviceKey';
 import { DeviceRepository } from '../../repository/DeviceRepository';
-import type { DeviceControlPort } from '../../repository/DomainPorts';
+import type { DeviceControlPort } from '../../contracts/DevicePorts';
 import { ControlPolicy } from '../gateway/GatewayRequestPolicy';
-import {
-  ControlApplyContext,
-  ControlApplyResult,
-  DeviceCommandExecution,
-  DeviceCommandOptions,
-  DeviceRecord
-} from '../../repository/DomainModels';
+import { ControlApplyContext, ControlApplyResult, DeviceCommandExecution, DeviceCommandOptions, DeviceRecord } from '../../model/DeviceRecord';
 
 export class DeviceCommandRunner {
   private readonly port: DeviceControlPort;

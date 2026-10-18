@@ -13,8 +13,9 @@ import { BytesUtil } from '../../common/utils/BytesUtil';
 import { Utf8 } from '../../common/utils/Utf8';
 import { JsonKind } from '../../common/types/JsonNode';
 import { JsonParser } from '../../common/utils/JsonParser';
-import type { ClockPort, CancellationToken } from '../../common/types/Ports';
-import { WifiAp } from './BleProvisioningPorts';
+import type { ClockPort } from '../../common/types/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
+import { WifiAp } from '../../model/ProvisioningModels';
 import {
   defaultBleDelay,
   isCode,
@@ -22,7 +23,7 @@ import {
   throwIfCancelled
 } from './BleSupport';
 import type { BleDelay } from './BleSupport';
-import { GattEndpointMap } from './GattEndpointMap';
+import { GattEndpointMap } from '../../model/GattEndpointMap';
 import type { SecureGattChannel } from './GattChannel';
 import {
   ProtocommCodec,

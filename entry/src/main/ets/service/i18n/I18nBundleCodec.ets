@@ -15,7 +15,7 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { JsonKind, JsonNode } from '../../common/types/JsonNode';
 import { NameValue } from '../../common/types/NameValue';
 import { JsonLimits, JsonParser } from '../../common/utils/JsonParser';
-import { I18nResourceBundle, SupportedLocale } from './I18nModels';
+import { I18nResourceBundle, SupportedLocale } from '../../model/I18nModels';
 
 const MAX_BYTES = 2097152;
 const MAX_DEPTH = 8;

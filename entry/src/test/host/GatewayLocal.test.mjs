@@ -31,11 +31,7 @@ import {
   ControlPolicy,
 } from '../../main/ets/service/gateway/GatewayRequestPolicy.ets';
 import { LocalGatewayService } from '../../main/ets/service/gateway/LocalGatewayService.ets';
-import {
-  GatewayTarget,
-  HttpResponse,
-  TlsVerification,
-} from '../../main/ets/service/gateway/GatewayTransportPorts.ets';
+import { GatewayTarget, HttpResponse, TlsVerification } from '../../main/ets/model/GatewayTransportModels.ets';
 import {
   FakeHttpTransport,
   FakeTransportClock,

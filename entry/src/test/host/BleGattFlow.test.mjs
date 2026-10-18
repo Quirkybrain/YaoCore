@@ -10,8 +10,8 @@ import assert from 'node:assert/strict';
 
 import { AppError, AppErrors } from '../../main/ets/common/types/AppError.ets';
 import { NameValue } from '../../main/ets/common/types/NameValue.ets';
-import { BleDescriptorRef } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
-import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
+import { BleDescriptorRef } from '../../main/ets/model/ProvisioningModels.ets';
+import { GattEndpointMap } from '../../main/ets/model/GattEndpointMap.ets';
 import { GattRequestQueue } from '../../main/ets/service/ble/GattRequestQueue.ets';
 import { GattChannel } from '../../main/ets/service/ble/GattChannel.ets';
 import { ProtoVerParser } from '../../main/ets/service/ble/ProtoVerParser.ets';
@@ -22,7 +22,7 @@ import {
   ProvisioningEvent,
   ProvisioningStateMachine,
 } from '../../main/ets/service/ble/ProvisioningStateMachine.ets';
-import { ProvisioningState } from '../../main/ets/service/ble/BleProvisioningPorts.ets';
+import { ProvisioningState } from '../../main/ets/model/ProvisioningModels.ets';
 import { WifiProvisioningFlow } from '../../main/ets/service/ble/WifiProvisioningFlow.ets';
 import {
   ProtocommCodec,

@@ -19,7 +19,7 @@ import {
   AppTypography
 } from '../common/theme/AppTheme';
 import { DeviceKey } from '../model/DeviceKey';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import {
   CloudLinkState,
   DeviceFilter,

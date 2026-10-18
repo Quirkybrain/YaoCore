@@ -20,7 +20,7 @@ import {
   IdentityVersion,
   ProvisioningTlsMaterial
 } from '../../model/ProvisioningModels';
-import { GattEndpointMap } from './GattEndpointMap';
+import { GattEndpointMap } from '../../model/GattEndpointMap';
 import { Security1State } from './Security1Session';
 import type { Security1Session } from './Security1Session';
 

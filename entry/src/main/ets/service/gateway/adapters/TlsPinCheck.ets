@@ -12,7 +12,7 @@ import { cert } from '@kit.DeviceCertificateKit';
 import { AppErrors } from '../../../common/types/AppError';
 import { ProtocolConstants } from '../../../common/constants/ProtocolConstants';
 import { BytesUtil } from '../../../common/utils/BytesUtil';
-import type { CryptoPort } from '../../crypto/CryptoPort';
+import type { CryptoPort } from '../../../contracts/CryptoPort';
 
 export class TlsPinCheck {
   static validatePins(pins: ReadonlyArray<string>): void {

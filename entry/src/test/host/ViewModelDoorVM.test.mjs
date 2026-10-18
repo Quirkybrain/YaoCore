@@ -13,7 +13,7 @@ import {
   DoorLockState,
   DoorStage
 } from '../../main/ets/viewmodel/core/DoorConfirmationTracker.ets';
-import { DeviceChangeEvent, DeviceChangeEventType } from '../../main/ets/repository/DomainModels.ets';
+import { DeviceChangeEvent, DeviceChangeEventType } from '../../main/ets/model/DeviceRecord.ets';
 import { DeviceAction, DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets';
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 import { ControlPolicy } from '../../main/ets/service/gateway/GatewayRequestPolicy.ets';

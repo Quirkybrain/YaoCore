@@ -18,7 +18,7 @@ import {
 } from '../../main/ets/service/ble/Security1Session.ets';
 import { IdentityNegotiator } from '../../main/ets/service/ble/IdentityNegotiator.ets';
 import { IdentityVersion } from '../../main/ets/model/ProvisioningModels.ets';
-import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
+import { GattEndpointMap } from '../../main/ets/model/GattEndpointMap.ets';
 import {
   FakeGateway,
   NodeCryptoPort,

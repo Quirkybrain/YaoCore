@@ -14,15 +14,15 @@
 import cryptoFramework from '@ohos.security.cryptoFramework';
 import { classifyCryptoFailure, CryptoFailureStage } from './CryptoErrorClassifier';
 import { X25519KeyCodec } from './X25519KeyCodec';
-import { X25519KeyPair } from './CryptoPort';
-import type { X25519KeyHandle } from './CryptoPort';
+import { X25519KeyPair } from '../../contracts/CryptoPort';
+import type { X25519KeyHandle } from '../../contracts/CryptoPort';
 import {
   CryptoErrorKind,
   CryptoProviderAesCtrStream,
   CryptoProviderError
 } from './CryptoProvider';
 import type { CryptoProvider } from './CryptoProvider';
-import { GcmCiphertext } from './CryptoPort';
+import { GcmCiphertext } from '../../contracts/CryptoPort';
 
 class OhosX25519KeyHandle implements X25519KeyHandle {
   readonly algorithm: string = 'X25519';

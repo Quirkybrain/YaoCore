@@ -12,7 +12,7 @@ import { DeviceAction, DeviceConstants, DeviceType } from '../../common/constant
 import { DeviceKey } from '../../model/DeviceKey';
 import { Scene, SceneAction } from '../../model/FamilyModels';
 import { DeviceRepository } from '../../repository/DeviceRepository';
-import type { GatewayRoutePort } from '../../repository/GatewayPorts';
+import type { GatewayRoutePort } from '../../contracts/GatewayPorts';
 
 const COLOR_PATTERN: RegExp = /^#[0-9A-F]{6}$/;
 

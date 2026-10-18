@@ -22,7 +22,8 @@ import {
   ProvisioningTlsMaterial,
 } from '../../main/ets/model/ProvisioningModels.ets';
 import { GatewayRepository } from '../../main/ets/repository/GatewayRepository.ets';
-import { InvitedGateway } from '../../main/ets/repository/GatewayPorts.ets';
+
+import { InvitedGateway } from '../../main/ets/model/InvitedGateway.ets';
 import { MigrationRegistry } from '../../main/ets/service/storage/MigrationRegistry.ets';
 import { StorageService } from '../../main/ets/service/storage/StorageService.ets';
 import { SecretDraftStore } from '../../main/ets/service/storage/SecretDraftStore.ets';

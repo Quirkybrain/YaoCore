@@ -9,12 +9,9 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { LoggerPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import type { Scene } from '../model/FamilyModels';
-import {
-  SceneExecutionProgress,
-  SceneExecutionResult
-} from '../repository/DomainModels';
+import { SceneExecutionProgress, SceneExecutionResult } from '../model/SceneExecutionModels';
 import type { SceneInput } from '../service/scene/SceneService';
 import type { SceneExecutionAuthorizationPort } from '../service/scene/SceneService';
 import {

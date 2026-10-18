@@ -7,8 +7,8 @@
  * repository, transport or VM and never decide ACK/RBAC outcomes.
  */
 import type { I18nService } from '../service/i18n/I18nService';
-import type { DeviceRecord } from '../repository/DomainModels';
-import type { SceneExecutionResult } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
+import type { SceneExecutionResult } from '../model/SceneExecutionModels';
 import type { Scene } from '../model/FamilyModels';
 import type { Room } from '../model/FamilyModels';
 import type { AcViewState } from '../service/ac/AcModels';
@@ -19,7 +19,7 @@ import { DoorLockState } from '../viewmodel/core/DoorConfirmationTracker';
 import type { DoorUiState } from '../viewmodel/core/DoorConfirmationTracker';
 import { DeviceKey } from '../model/DeviceKey';
 import { CardVisualState } from '../common/theme/AppEnums';
-import { I18nParams } from '../service/i18n/I18nModels';
+import { I18nParams } from '../model/I18nModels';
 import { NameValue } from '../common/types/NameValue';
 import {
   AppColors,

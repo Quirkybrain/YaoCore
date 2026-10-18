@@ -13,9 +13,9 @@ import { SecureBytes } from '../../common/types/SecureBytes';
 import { Utf8 } from '../../common/utils/Utf8';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import type { ClockPort } from '../../common/types/Ports';
-import type { SecretStore } from '../storage/SecretStore';
-import type { PreferencesStore } from '../storage/PreferencesStore';
-import type { CloudCredentialPort } from './CloudPorts';
+import type { SecretStore } from '../../contracts/SecretStore';
+import type { PreferencesStore } from '../../contracts/PreferencesStore';
+import type { CloudCredentialPort } from '../../contracts/CloudPorts';
 
 const TOKEN_UPDATED_AT_KEY: string = 'app.cloud.tokenUpdatedAt';
 

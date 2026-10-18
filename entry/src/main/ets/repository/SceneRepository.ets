@@ -22,12 +22,12 @@ import { DateTimeUtil } from '../common/utils/DateTimeUtil';
 import type { ClockPort, IdPort } from '../common/types/Ports';
 import { Scene, SceneAction } from '../model/FamilyModels';
 import { DeviceKey } from '../model/DeviceKey';
-import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
-import type { MigrationSink } from '../service/storage/MigrationPort';
+import type { RdbRow, RdbStore, RdbTransaction } from '../contracts/RdbStore';
+import type { MigrationSink } from '../contracts/MigrationPort';
 import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
-import type { SceneReferencePort } from './DomainPorts';
-import { SceneCleanupSummary } from './DomainModels';
+import type { SceneReferencePort } from '../contracts/ScenePorts';
+import { SceneCleanupSummary } from '../model/DeviceRecord';
 import { SqlCells } from './SqlCells';
 
 const SCENE_COLUMNS: string = 'scene_id, family_id, scene_name, icon, actions_json, ' +

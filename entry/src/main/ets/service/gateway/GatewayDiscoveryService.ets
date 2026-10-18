@@ -14,20 +14,17 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { CancellationToken, ClockPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import { GatewayAddress, GatewayRoute } from '../../model/GatewayRoute';
 import { TransportProfile } from '../../model/DeviceTypes';
-import type { GatewayAddressPort, GatewayRoutePort } from '../../repository/GatewayPorts';
-import type { IGatewayClient, GatewayTarget, ProbeResult } from './GatewayTransportPorts';
-import { GatewayTarget as GatewayTargetValue } from './GatewayTransportPorts';
-import {
-  DiscoveryBeacon,
-  DiscoveryCandidate,
-  DiscoveryOptions,
-  DiscoveryReport,
-  DiscoverySource
-} from './DiscoveryModels';
-import type { DiscoveryTransport } from './DiscoveryModels';
+import type { GatewayAddressPort, GatewayRoutePort } from '../../contracts/GatewayPorts';
+import type { IGatewayClient } from '../../contracts/GatewayTransportPorts';
+import type { GatewayTarget, ProbeResult } from '../../model/GatewayTransportModels';
+import { GatewayTarget as GatewayTargetValue } from '../../model/GatewayTransportModels';
+import { DiscoveryBeacon, DiscoveryCandidate, DiscoveryOptions, DiscoveryReport, DiscoverySource } from '../../model/DiscoveryModels';
+import type { DiscoveryTransport } from '../../contracts/DiscoveryTransport';
 import { ManualAddressPolicy } from './ManualAddressPolicy';
 
 const DEFAULT_PROBE_TIMEOUT_MS: number = 1500;

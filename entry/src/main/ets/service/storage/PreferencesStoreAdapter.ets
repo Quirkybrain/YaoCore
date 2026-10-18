@@ -14,7 +14,7 @@ import { common } from '@kit.AbilityKit';
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { StorageConstants } from '../../common/constants/StorageConstants';
-import type { PreferencesStore } from './PreferencesStore';
+import type { PreferencesStore } from '../../contracts/PreferencesStore';
 
 interface PlatformErrorLike {
   code?: number;

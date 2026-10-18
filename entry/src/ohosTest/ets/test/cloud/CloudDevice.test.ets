@@ -27,7 +27,7 @@ import { RdbCloudConfigStore } from '../../../../main/ets/service/cloud/CloudCon
 import { AssetCloudCredentialStore } from '../../../../main/ets/service/cloud/CloudCredentialStore';
 import { OhosCloudHttpTransport } from '../../../../main/ets/service/cloud/adapters/OhosCloudHttpTransport';
 import { HttpHeaders } from '../../../../main/ets/common/types/HttpHeaders';
-import { HttpRequest, TlsPolicy } from '../../../../main/ets/service/gateway/GatewayTransportPorts';
+import { HttpRequest, TlsPolicy } from '../../../../main/ets/model/GatewayTransportModels';
 import { AppError } from '../../../../main/ets/common/types/AppError';
 
 const RDB_NAME: string = 'yaocore_t14_device.db';

@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-090-ports fixture",
+  "policy": "Post-migration fixture: contracts/** is the legal port location and the legacy port registry is empty.",
+  "entries": [],
+  "port_location_exceptions": []
+}

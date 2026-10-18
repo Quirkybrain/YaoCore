@@ -19,7 +19,7 @@ import {
   LoadPhase
 } from '../../main/ets/viewmodel/core/ViewModelCore.ets';
 import { DoorLinkConfig, DoorLinkMode, DoorStage, DoorLockState } from '../../main/ets/viewmodel/core/DoorConfirmationTracker.ets';
-import { SceneRunState, SceneStepState } from '../../main/ets/repository/DomainModels.ets';
+import { SceneRunState, SceneStepState } from '../../main/ets/model/SceneExecutionModels.ets';
 import { FamilyJoinPhase } from '../../main/ets/service/family/FamilyModels.ets';
 import { InviteMode, MemberRole, Room } from '../../main/ets/model/FamilyModels.ets';
 import { DeviceKey } from '../../main/ets/model/DeviceKey.ets';

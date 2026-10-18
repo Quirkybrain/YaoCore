@@ -21,14 +21,15 @@ import { FamilyRepository } from '../../../../main/ets/repository/FamilyReposito
 import { RoomRepository } from '../../../../main/ets/repository/RoomRepository';
 import { SceneRepository } from '../../../../main/ets/repository/SceneRepository';
 import { DeviceRepository } from '../../../../main/ets/repository/DeviceRepository';
-import { DiscoverApplyOptions } from '../../../../main/ets/repository/DomainModels';
+import { DiscoverApplyOptions } from '../../../../main/ets/model/DeviceRecord';
 import { RoomService, RoomDeletionConfirmation } from '../../../../main/ets/service/room/RoomService';
 import { DeviceKey } from '../../../../main/ets/model/DeviceKey';
 import { DeviceSnapshot, DeviceSnapshotInit } from '../../../../main/ets/model/DeviceState';
 import { DiscoverySnapshot, DiscoverySnapshotInit } from '../../../../main/ets/model/DiscoveryModels';
 import { DeviceType } from '../../../../main/ets/common/constants/DeviceConstants';
 import { NameValue } from '../../../../main/ets/common/types/NameValue';
-import type { ClockPort, IdPort, LoggerPort } from '../../../../main/ets/common/types/Ports';
+import type { ClockPort, IdPort } from '../../../../main/ets/common/types/Ports';
+import type { LoggerPort } from '../../../../main/ets/contracts/Ports';
 
 const NOW: number = Date.UTC(2026, 9, 17, 8, 0, 0);
 const GATEWAY: string = 'gw-device-1';

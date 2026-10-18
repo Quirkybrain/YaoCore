@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-090-ports fixture",
+  "policy": "Negative fixture: after migration, unregistered service port paths must fail D-09/D-11 and pages D-12.",
+  "entries": [],
+  "port_location_exceptions": []
+}

@@ -12,8 +12,8 @@ import { common } from '@kit.AbilityKit';
 import { i18n } from '@kit.LocalizationKit';
 import { AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import { SupportedLocale } from './I18nModels';
-import type { LocaleApplierPort } from './I18nPorts';
+import { SupportedLocale } from '../../model/I18nModels';
+import type { LocaleApplierPort } from '../../contracts/I18nPorts';
 
 export class OhosLocaleApplier implements LocaleApplierPort {
   private readonly context: common.ApplicationContext;

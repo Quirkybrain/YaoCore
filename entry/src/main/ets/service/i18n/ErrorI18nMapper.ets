@@ -12,7 +12,7 @@ import { GatewayResultClassifier } from '../../common/types/GatewayResult';
 import { NameValue } from '../../common/types/NameValue';
 import { TransportProfile } from '../../model/DeviceTypes';
 import { I18nKeys } from './I18nKeys';
-import { I18nKey } from './I18nModels';
+import { I18nKey } from '../../model/I18nModels';
 
 export class ErrorI18nMapper {
   static gatewayKey(resultCode: number, errorCode?: string): I18nKey {

@@ -23,8 +23,8 @@ import { abilityDelegatorRegistry } from '@kit.TestKit';
 import { PreferencesStoreAdapter } from '../../../../main/ets/service/storage/PreferencesStoreAdapter';
 import { RdbStoreAdapter } from '../../../../main/ets/service/storage/RdbStoreAdapter';
 import { AssetStoreSecretStore } from '../../../../main/ets/service/storage/AssetStoreSecretStore';
-import { SecretAlias } from '../../../../main/ets/service/storage/SecretStore';
-import { RdbTransaction } from '../../../../main/ets/service/storage/RdbStore';
+import { SecretAlias } from '../../../../main/ets/common/types/SecretAlias';
+import { RdbTransaction } from '../../../../main/ets/contracts/RdbStore';
 import { AppError } from '../../../../main/ets/common/types/AppError';
 import { SecureBytes } from '../../../../main/ets/common/types/SecureBytes';
 

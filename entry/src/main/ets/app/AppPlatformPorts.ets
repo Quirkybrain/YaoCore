@@ -9,9 +9,10 @@
  */
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { util } from '@kit.ArkTS';
-import type { ClockPort, IdPort, LoggerPort, MetricsPort } from '../common/types/Ports';
+import type { ClockPort, IdPort } from '../common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../contracts/Ports';
 import type { NameValue } from '../common/types/NameValue';
-import type { SceneTimerPort } from '../service/scene/SceneTimerPort';
+import type { SceneTimerPort } from '../contracts/SceneTimerPort';
 import type { VmTimerPort } from '../viewmodel/core/ViewModelCore';
 
 const DOMAIN: number = 0x0000;

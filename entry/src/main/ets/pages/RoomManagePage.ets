@@ -20,7 +20,7 @@ import {
 import { MemberRole } from '../model/FamilyModels';
 import type { Room } from '../model/FamilyModels';
 import { NameValue } from '../common/types/NameValue';
-import { I18nParams } from '../service/i18n/I18nModels';
+import { I18nParams } from '../model/I18nModels';
 import { DeviceKey } from '../model/DeviceKey';
 import type { RoomDeletionPreview } from '../service/room/RoomService';
 import { DeviceViewState, DeviceViewModel } from '../viewmodel/DeviceViewModel';

@@ -26,20 +26,13 @@ import { SecureBytes } from '../common/types/SecureBytes';
 import { TransportProfile } from '../model/DeviceTypes';
 import { GatewayAddress, GatewayRoute, GatewayRouteInit, TlsMaterial } from '../model/GatewayRoute';
 import { BleProvisioningResult } from '../model/ProvisioningModels';
-import type { PreferencesStore } from '../service/storage/PreferencesStore';
-import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
-import { SecretAlias } from '../service/storage/SecretStore';
-import type { SecretStore } from '../service/storage/SecretStore';
-import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
-import type {
-  GatewayAddressPort,
-  GatewayCredentialPort,
-  GatewayRoutePort,
-  GatewaySequencePort,
-  InvitationApplicationPort,
-  InvitedGateway,
-  SecretVerifier
-} from './GatewayPorts';
+import type { PreferencesStore } from '../contracts/PreferencesStore';
+import type { RdbRow, RdbStore, RdbTransaction } from '../contracts/RdbStore';
+import { SecretAlias } from '../common/types/SecretAlias';
+import type { SecretStore } from '../contracts/SecretStore';
+import type { SecretDraftPort } from '../contracts/SecretDraftPort';
+import type { GatewayAddressPort, GatewayCredentialPort, GatewayRoutePort, GatewaySequencePort, InvitationApplicationPort, SecretVerifier } from '../contracts/GatewayPorts';
+import type { InvitedGateway } from '../model/InvitedGateway';
 
 const ROUTE_COLUMNS: string = 'gateway_id, family_id, gateway_name, local_ip, port, ' +
   'profile, tls_enabled, pins_json, pin_alg, key_id, credential_alias, last_known_ip, ' +

@@ -12,7 +12,7 @@ import { JsonKind } from '../common/types/JsonNode';
 import type { JsonNode } from '../common/types/JsonNode';
 import { JsonParser, JsonLimits } from '../common/utils/JsonParser';
 import { JsonAtom } from '../common/utils/JsonAtom';
-import type { RdbRow } from '../service/storage/RdbStore';
+import type { RdbRow } from '../contracts/RdbStore';
 
 export class SqlCells {
   static requiredString(row: RdbRow, column: string): string {

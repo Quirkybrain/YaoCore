@@ -9,7 +9,7 @@
  * preserved verbatim.
  */
 import { AppErrors } from '../../common/types/AppError';
-import { ProvisioningState } from './BleProvisioningPorts';
+import { ProvisioningState } from '../../model/ProvisioningModels';
 
 export enum ProvisioningEvent {
   START = 'START',

@@ -4,7 +4,7 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { CancellationToken } from '../../common/types/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 
 /** Delay seam: production uses setTimeout, host tests advance a fake clock. */
 export type BleDelay = (delayMs: number) => Promise<void>;

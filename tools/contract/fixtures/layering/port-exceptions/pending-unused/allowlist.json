@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-093 fixture",
+  "policy": "F-04 pending fixture: an unused pending-* port exception must exit 1.",
+  "entries": [],
+  "port_location_exceptions": [
+    {
+      "id": "PORT-LOC-97",
+      "path": "entry/src/main/ets/service/ble/Ports.ets",
+      "symbols": [
+        "PortA"
+      ],
+      "kind": "port-only",
+      "status": "pending-T-23",
+      "owner": "fixture",
+      "reason": "fixture",
+      "close_condition": "fixture close",
+      "evidence": "fixture"
+    }
+  ]
+}

@@ -4,7 +4,7 @@
  * Contract: DES-B §8.1.7 (stopPolling/cancellation)
  */
 import { AppErrors } from '../../common/types/AppError';
-import type { CancellationToken } from '../../common/types/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 
 export class CloudCancellation implements CancellationToken {
   private cancelledFlag: boolean = false;

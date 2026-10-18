@@ -9,14 +9,13 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { HttpHeaders } from '../../common/types/HttpHeaders';
-import type { CancellationToken, ClockPort, LoggerPort } from '../../common/types/Ports';
-import type { CryptoPort } from '../crypto/CryptoPort';
-import {
-  HttpRequest,
-  HttpResponse
-} from '../gateway/GatewayTransportPorts';
-import type { HttpTransport } from '../gateway/GatewayTransportPorts';
-import type { CloudConfigStore, CloudCredentialPort } from './CloudPorts';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
+import type { CryptoPort } from '../../contracts/CryptoPort';
+import { HttpRequest, HttpResponse } from '../../model/GatewayTransportModels';
+import type { HttpTransport } from '../../contracts/GatewayTransportPorts';
+import type { CloudConfigStore, CloudCredentialPort } from '../../contracts/CloudPorts';
 import type { ShadowSnapshot } from './CloudModels';
 import { CloudConfigValidator } from './CloudConfigValidator';
 import { CloudErrors } from './CloudErrors';

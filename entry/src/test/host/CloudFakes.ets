@@ -8,24 +8,15 @@
  */
 import { AppError, AppErrors } from '../../main/ets/common/types/AppError';
 import { HttpHeaders } from '../../main/ets/common/types/HttpHeaders';
-import type {
-  CancellationToken,
-  ClockPort,
-  RandomPort
-} from '../../main/ets/common/types/Ports';
+import type { ClockPort } from '../../main/ets/common/types/Ports';
+import type { RandomPort } from '../../main/ets/contracts/Ports';
+import type { CancellationToken } from '../../main/ets/common/types/CancellationToken';
 import { CloudConfig } from '../../main/ets/model/FamilyModels';
-import { HttpResponse } from '../../main/ets/service/gateway/GatewayTransportPorts';
-import type {
-  HttpRequest,
-  HttpTransport,
-  TlsPolicy
-} from '../../main/ets/service/gateway/GatewayTransportPorts';
-import type {
-  CloudActiveScopePort,
-  CloudConfigStore,
-  CloudCredentialPort,
-  TimerPort
-} from '../../main/ets/service/cloud/CloudPorts';
+import { HttpResponse } from '../../main/ets/model/GatewayTransportModels';
+import type { HttpTransport } from '../../main/ets/contracts/GatewayTransportPorts';
+import type { HttpRequest, TlsPolicy } from '../../main/ets/model/GatewayTransportModels';
+import type { CloudActiveScopePort, CloudConfigStore, CloudCredentialPort } from '../../main/ets/contracts/CloudPorts';
+import type { TimerPort } from '../../main/ets/contracts/TimerPort';
 
 export class FakeCloudClock implements ClockPort {
   value: number;

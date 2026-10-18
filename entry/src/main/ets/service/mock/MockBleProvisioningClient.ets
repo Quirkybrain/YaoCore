@@ -9,28 +9,17 @@
  */
 import { AppErrors } from '../../common/types/AppError';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
-import type { ClockPort, RandomPort, CancellationToken } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { RandomPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import {
   BleProvisioningIdentity,
   BleProvisioningResult,
   IdentityVersion,
   ProvisioningTlsMaterial
 } from '../../model/ProvisioningModels';
-import {
-  BleProvisioningRequest,
-  BleProvisioningStage,
-  BleScanDevice,
-  BleScanFilter,
-  BleWifiScanRequest,
-  ProvisioningProgress,
-  ProvisioningState,
-  WifiAp
-} from '../ble/BleProvisioningPorts';
-import type {
-  BleProvisioningProgressListener,
-  BleScanListener,
-  IBleProvisioningClient
-} from '../ble/BleProvisioningPorts';
+import { BleProvisioningRequest, BleProvisioningStage, BleScanDevice, BleScanFilter, BleWifiScanRequest, ProvisioningProgress, ProvisioningState, WifiAp } from '../../model/ProvisioningModels';
+import type { BleProvisioningProgressListener, BleScanListener, IBleProvisioningClient } from '../../contracts/BleProvisioningPorts';
 import { MockMode, MockScenario, MockTlsMode } from './MockScenario';
 
 const MOCK_GATEWAY_ID: string = 'Mock_Gateway_01';

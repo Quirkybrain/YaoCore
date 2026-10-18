@@ -16,7 +16,9 @@ import { NameValue } from '../../common/types/NameValue';
 import { StorageConstants } from '../../common/constants/StorageConstants';
 import { ProtocolConstants } from '../../common/constants/ProtocolConstants';
 import { BytesUtil } from '../../common/utils/BytesUtil';
-import type { ClockPort, LoggerPort, CancellationToken } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import { DeviceAction } from '../../common/constants/DeviceConstants';
 import { ControlOutcome, DeviceControlCommand, StateVerification } from '../../model/ControlModels';
 import {
@@ -25,15 +27,12 @@ import {
 } from '../../model/ProvisioningModels';
 import { GatewayAddress, TlsMaterial } from '../../model/GatewayRoute';
 import { TransportProfile } from '../../model/DeviceTypes';
-import type { GatewayCredentialPort } from '../../repository/GatewayPorts';
-import type { SecretDraftPort } from '../storage/SecretDraftPort';
+import type { GatewayCredentialPort } from '../../contracts/GatewayPorts';
+import type { SecretDraftPort } from '../../contracts/SecretDraftPort';
 import { SecureBytes } from '../../common/types/SecureBytes';
 import { ProbeBackoff } from '../gateway/ProbeBackoff';
-import {
-  GatewayTarget,
-  ProbeResult
-} from '../gateway/GatewayTransportPorts';
-import type { IGatewayClient } from '../gateway/GatewayTransportPorts';
+import { GatewayTarget, ProbeResult } from '../../model/GatewayTransportModels';
+import type { IGatewayClient } from '../../contracts/GatewayTransportPorts';
 import { defaultBleDelay, isCode, throwIfCancelled } from './BleSupport';
 import type { BleDelay } from './BleSupport';
 

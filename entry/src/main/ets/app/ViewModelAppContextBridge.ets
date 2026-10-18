@@ -8,7 +8,7 @@
  * adapter is the single fire-and-forget boundary; failures are logged and
  * never rethrown into a UI event handler.
  */
-import type { LoggerPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import type { AppContextPort } from '../viewmodel/core/ViewModelCore';
 import { AppContext } from './AppContext';
 

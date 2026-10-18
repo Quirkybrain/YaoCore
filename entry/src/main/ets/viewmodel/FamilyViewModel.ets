@@ -9,7 +9,8 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import type { Family, MemberRole } from '../model/FamilyModels';
 import { MemberRole as MemberRoleValue } from '../model/FamilyModels';
 import type {

@@ -10,7 +10,8 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { IpAddressUtil } from '../common/utils/IpAddressUtil';
 import { GatewayAddress } from '../model/GatewayRoute';
 import type { GatewayRoute } from '../model/GatewayRoute';
@@ -18,9 +19,9 @@ import type { CloudConfig } from '../model/FamilyModels';
 import { TransportProfile } from '../model/DeviceTypes';
 import type { CloudConfigValidation, CloudConfigView } from '../service/cloud/CloudModels';
 import type { SessionInfo } from '../service/auth/AuthModels';
-import type { PreferencesStore } from '../service/storage/PreferencesStore';
-import type { DiscoveryCandidate } from '../service/gateway/DiscoveryModels';
-import { LocaleChangedEvent, LocaleMode, SupportedLocale } from '../service/i18n/I18nModels';
+import type { PreferencesStore } from '../contracts/PreferencesStore';
+import type { DiscoveryCandidate } from '../model/DiscoveryModels';
+import { LocaleChangedEvent, LocaleMode, SupportedLocale } from '../model/I18nModels';
 import { ErrorI18nMapper } from '../service/i18n/ErrorI18nMapper';
 import {
   LoadPhase,
@@ -28,7 +29,7 @@ import {
   ViewModelSupport
 } from './core/ViewModelCore';
 import type { ViewModelBase } from './core/ViewModelCore';
-import type { ManualDiscoveryPort } from './ViewModelPorts';
+import type { ManualDiscoveryPort } from '../contracts/DiscoveryTransport';
 import { I18nService } from '../service/i18n/I18nService';
 import { CloudService } from '../service/cloud/CloudService';
 import { GatewayRepository } from '../repository/GatewayRepository';

@@ -12,7 +12,7 @@
 import { abilityAccessCtrl, bundleManager, common, Permissions, Want } from '@kit.AbilityKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { AppErrors } from '../common/types/AppError';
-import type { LoggerPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import {
   PermissionKind,
   PermissionPolicy,
@@ -20,12 +20,8 @@ import {
   PermissionState
 } from './PermissionPolicy';
 import type { PermissionPort } from './PermissionPolicy';
-import {
-  PermissionKind as ViewModelPermissionKind
-} from '../viewmodel/ViewModelPorts';
-import type {
-  PermissionPort as ViewModelPermissionPort
-} from '../viewmodel/ViewModelPorts';
+import { ProvisioningPermissionKind as ViewModelPermissionKind } from '../contracts/PermissionPort';
+import type { ProvisioningPermissionPort as ViewModelPermissionPort } from '../contracts/PermissionPort';
 
 export class PermissionGate implements PermissionPort {
   private readonly context: common.UIAbilityContext;
@@ -130,9 +126,9 @@ export class PermissionGate implements PermissionPort {
 }
 
 /**
- * Adapter for C-23 BleProvisioningViewModel, whose PermissionPort has a
- * narrower BLUETOOTH-only shape (T-16 seam). The same gate is used so the
- * manifest/request decision has one owner.
+ * Adapter for C-23 BleProvisioningViewModel, whose ProvisioningPermissionPort
+ * has a narrower BLUETOOTH-only shape (T-16 seam, renamed by T-23 F-03). The
+ * same gate is used so the manifest/request decision has one owner.
  */
 export class BleViewModelPermissionGate implements ViewModelPermissionPort {
   private readonly gate: PermissionGate;
@@ -152,7 +148,7 @@ export class BleViewModelPermissionGate implements ViewModelPermissionPort {
     }
   }
 
-  /** F-08: terminal denial recovery used by C-23's PermissionPort. */
+  /** F-08: terminal denial recovery used by C-23's ProvisioningPermissionPort. */
   openSettings(): Promise<void> {
     return this.gate.openSettings();
   }

@@ -15,11 +15,11 @@ import { DateTimeUtil } from '../common/utils/DateTimeUtil';
 import { UuidUtil } from '../common/utils/UuidUtil';
 import type { ClockPort, IdPort } from '../common/types/Ports';
 import { Room } from '../model/FamilyModels';
-import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
-import type { MigrationSink } from '../service/storage/MigrationPort';
+import type { RdbRow, RdbStore, RdbTransaction } from '../contracts/RdbStore';
+import type { MigrationSink } from '../contracts/MigrationPort';
 import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
-import type { RoomLookupPort } from './DomainPorts';
+import type { RoomLookupPort } from '../contracts/RoomPorts';
 import { SqlCells } from './SqlCells';
 
 const ROOM_COLUMNS: string = 'room_id, family_id, room_name, icon, order_index, ' +

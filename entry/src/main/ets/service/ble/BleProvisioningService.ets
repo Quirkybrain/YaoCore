@@ -23,34 +23,20 @@ import { BytesUtil } from '../../common/utils/BytesUtil';
 import { Utf8 } from '../../common/utils/Utf8';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import { ProtocolConstants } from '../../common/constants/ProtocolConstants';
-import type { ClockPort, LoggerPort, RandomPort, CancellationToken } from '../../common/types/Ports';
-import type { CryptoPort } from '../crypto/CryptoPort';
-import type { GatewayCredentialPort } from '../../repository/GatewayPorts';
-import type { SecretDraftPort } from '../storage/SecretDraftPort';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort, RandomPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
+import type { CryptoPort } from '../../contracts/CryptoPort';
+import type { GatewayCredentialPort } from '../../contracts/GatewayPorts';
+import type { SecretDraftPort } from '../../contracts/SecretDraftPort';
 import {
   BleProvisioningIdentity,
   BleProvisioningResult
 } from '../../model/ProvisioningModels';
-import type { IGatewayClient } from '../gateway/GatewayTransportPorts';
-import {
-  BleCharacteristicRef,
-  BleDescriptorRef,
-  BleProvisioningDevice,
-  BleProvisioningRequest,
-  BleProvisioningStage,
-  BleScanFilter,
-  BleWifiScanRequest,
-  ProvisioningProgress,
-  ProvisioningState
-} from './BleProvisioningPorts';
-import type {
-  BleConnection,
-  BleProvisioningProgressListener,
-  BleScanListener,
-  BleTransport,
-  IBleProvisioningClient,
-  WifiAp
-} from './BleProvisioningPorts';
+import type { IGatewayClient } from '../../contracts/GatewayTransportPorts';
+import { BleCharacteristicRef, BleDescriptorRef, BleProvisioningDevice, BleProvisioningRequest, BleProvisioningStage, BleScanFilter, BleWifiScanRequest, ProvisioningProgress, ProvisioningState } from '../../model/ProvisioningModels';
+import type { BleConnection, BleProvisioningProgressListener, BleScanListener, BleTransport, IBleProvisioningClient } from '../../contracts/BleProvisioningPorts';
+import type { WifiAp } from '../../model/ProvisioningModels';
 import {
   defaultBleDelay,
   isCode,
@@ -58,7 +44,7 @@ import {
   throwIfCancelled
 } from './BleSupport';
 import type { BleDelay } from './BleSupport';
-import { GattEndpointMap } from './GattEndpointMap';
+import { GattEndpointMap } from '../../model/GattEndpointMap';
 import { GattRequestQueue } from './GattRequestQueue';
 import { GattChannel } from './GattChannel';
 import { Security1Session } from './Security1Session';

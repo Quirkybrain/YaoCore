@@ -9,14 +9,14 @@
  * are re-read from C-08/C-12 after each transition.
  */
 import { AppError, AppErrors } from '../common/types/AppError';
-import type { LoggerPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import type { Family } from '../model/FamilyModels';
 import type { LocalProfile, SessionInfo } from '../service/auth/AuthModels';
-import type { IBleProvisioningClient } from '../service/ble/BleProvisioningPorts';
+import type { IBleProvisioningClient } from '../contracts/BleProvisioningPorts';
 import type { CloudService } from '../service/cloud/CloudService';
 import type { I18nService } from '../service/i18n/I18nService';
-import type { PreferencesStore } from '../service/storage/PreferencesStore';
-import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
+import type { PreferencesStore } from '../contracts/PreferencesStore';
+import type { SecretDraftPort } from '../contracts/SecretDraftPort';
 import type { PageVmFactoryPort } from './PageVmFactory';
 
 export enum SessionGateState {

@@ -11,11 +11,12 @@
  * coupled to real SQLite syntax.
  */
 import { AppError, AppErrors } from '../../main/ets/common/types/AppError';
-import type { RdbRow, RdbStore, RdbTransaction, RdbValue } from '../../main/ets/service/storage/RdbStore';
-import type { PreferencesStore } from '../../main/ets/service/storage/PreferencesStore';
-import { SecretAlias } from '../../main/ets/service/storage/SecretStore';
-import type { SecretStore } from '../../main/ets/service/storage/SecretStore';
-import type { ClockPort, IdPort, RandomPort } from '../../main/ets/common/types/Ports';
+import type { RdbRow, RdbStore, RdbTransaction, RdbValue } from '../../main/ets/contracts/RdbStore';
+import type { PreferencesStore } from '../../main/ets/contracts/PreferencesStore';
+import { SecretAlias } from '../../main/ets/common/types/SecretAlias';
+import type { SecretStore } from '../../main/ets/contracts/SecretStore';
+import type { ClockPort, IdPort } from '../../main/ets/common/types/Ports';
+import type { RandomPort } from '../../main/ets/contracts/Ports';
 import type { SecureBytes } from '../../main/ets/common/types/SecureBytes';
 import { BytesUtil } from '../../main/ets/common/utils/BytesUtil';
 

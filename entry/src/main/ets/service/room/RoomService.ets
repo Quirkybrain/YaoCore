@@ -14,8 +14,9 @@
  */
 import { AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../../common/types/Ports';
-import type { RdbStore, RdbTransaction } from '../storage/RdbStore';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { RdbStore, RdbTransaction } from '../../contracts/RdbStore';
 import { MemberStatus, Room } from '../../model/FamilyModels';
 import type { FamilyMember } from '../../model/FamilyModels';
 import { DeviceKey } from '../../model/DeviceKey';
@@ -23,11 +24,7 @@ import { DeviceState } from '../../model/DeviceState';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
 import { RoomRepository } from '../../repository/RoomRepository';
 import { FamilyRbac } from '../family/FamilyRbac';
-import type {
-  DeviceAssignmentPort,
-  MemberRoomGrantPort,
-  RoomDeviceNamePort
-} from '../../repository/DomainPorts';
+import type { DeviceAssignmentPort, MemberRoomGrantPort, RoomDeviceNamePort } from '../../contracts/RoomPorts';
 
 /**
  * F-03 / CQG-T18: narrow actor lookup used by RoomService to enforce ADMIN for

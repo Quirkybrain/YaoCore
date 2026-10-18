@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-093 fixture",
+  "policy": "D-03 positive fixture: common/model imports and type-only contracts edges with no cycle.",
+  "entries": [],
+  "port_location_exceptions": []
+}

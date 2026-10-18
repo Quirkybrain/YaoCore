@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { newDomainHarness } from '../domain/DomainHarness.ets';
-import { DiscoverApplyOptions } from '../../main/ets/repository/DomainModels.ets';
+import { DiscoverApplyOptions } from '../../main/ets/model/DeviceRecord.ets';
 import { SceneService, SceneInput } from '../../main/ets/service/scene/SceneService.ets';
 import { RoomService, RoomDeletionConfirmation } from '../../main/ets/service/room/RoomService.ets';
 import { PolicyDecision } from '../../main/ets/service/auth/AuthModels.ets';

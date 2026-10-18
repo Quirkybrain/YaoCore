@@ -18,18 +18,14 @@ import {
   AppSpacing,
   AppTypography
 } from '../common/theme/AppTheme';
-import {
-  BleProvisioningDevice,
-  ProvisioningState,
-  WifiAp
-} from '../service/ble/BleProvisioningPorts';
+import { BleProvisioningDevice, ProvisioningState, WifiAp } from '../model/ProvisioningModels';
 import {
   BleProvisioningViewState,
   BleProvisioningViewModel,
   ProvisioningPermissionState,
   WizardStep
 } from '../viewmodel/BleProvisioningViewModel';
-import type { ProvisioningProgress } from '../service/ble/BleProvisioningPorts';
+import type { ProvisioningProgress } from '../model/ProvisioningModels';
 import type { BleProvisioningResult } from '../model/ProvisioningModels';
 import {
   AppTextField,

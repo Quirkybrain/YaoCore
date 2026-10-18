@@ -12,16 +12,9 @@ import assert from 'node:assert/strict';
 import { AppError, AppErrors } from '../../main/ets/common/types/AppError.ets';
 import { GatewayAddress, GatewayRoute, GatewayRouteInit } from '../../main/ets/model/GatewayRoute.ets';
 import { TransportProfile } from '../../main/ets/model/DeviceTypes.ets';
-import {
-  ProbeResult,
-} from '../../main/ets/service/gateway/GatewayTransportPorts.ets';
+import { ProbeResult } from '../../main/ets/model/GatewayTransportModels.ets';
 import { GatewayDiscoveryService } from '../../main/ets/service/gateway/GatewayDiscoveryService.ets';
-import {
-  DiscoveryBeacon,
-  DiscoveryOptions,
-  DiscoverySource,
-  DiscoveryTransportKind,
-} from '../../main/ets/service/gateway/DiscoveryModels.ets';
+import { DiscoveryBeacon, DiscoveryOptions, DiscoverySource, DiscoveryTransportKind } from '../../main/ets/model/DiscoveryModels.ets';
 import { ManualAddressPolicy } from '../../main/ets/service/gateway/ManualAddressPolicy.ets';
 import { ProbeBackoff } from '../../main/ets/service/gateway/ProbeBackoff.ets';
 import {

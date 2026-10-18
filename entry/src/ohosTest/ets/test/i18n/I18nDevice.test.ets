@@ -17,9 +17,9 @@
 import { describe, expect, it } from '@ohos/hypium';
 import { abilityDelegatorRegistry } from '@kit.TestKit';
 import { NameValue } from '../../../../main/ets/common/types/NameValue';
-import type { LoggerPort } from '../../../../main/ets/common/types/Ports';
+import type { LoggerPort } from '../../../../main/ets/contracts/Ports';
 import { PreferencesStoreAdapter } from '../../../../main/ets/service/storage/PreferencesStoreAdapter';
-import { I18nParams, LocaleMode, SupportedLocale } from '../../../../main/ets/service/i18n/I18nModels';
+import { I18nParams, LocaleMode, SupportedLocale } from '../../../../main/ets/model/I18nModels';
 import { I18nService } from '../../../../main/ets/service/i18n/I18nService';
 import { I18nKeys } from '../../../../main/ets/service/i18n/I18nKeys';
 import { OhosLocaleApplier } from '../../../../main/ets/service/i18n/OhosLocaleApplier';

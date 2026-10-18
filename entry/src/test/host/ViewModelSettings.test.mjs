@@ -10,7 +10,7 @@ import { SettingsViewModel } from '../../main/ets/viewmodel/SettingsViewModel.et
 import { CloudConfig } from '../../main/ets/model/FamilyModels.ets';
 import { StorageConstants } from '../../main/ets/common/constants/StorageConstants.ets';
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
-import { LocaleMode, SupportedLocale } from '../../main/ets/service/i18n/I18nModels.ets';
+import { LocaleMode, SupportedLocale } from '../../main/ets/model/I18nModels.ets';
 import {
   FakeClock,
   FakeLogger,

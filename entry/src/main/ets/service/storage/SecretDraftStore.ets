@@ -13,11 +13,12 @@
  * otherwise the id is clock+counter based. The table itself is unreachable
  * outside this process and every entry expires after 10 minutes by default.
  */
-import type { ClockPort, RandomPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { RandomPort } from '../../contracts/Ports';
 import { SecureBytes } from '../../common/types/SecureBytes';
 import { BytesUtil } from '../../common/utils/BytesUtil';
 import { AppErrors } from '../../common/types/AppError';
-import type { SecretDraftPort } from './SecretDraftPort';
+import type { SecretDraftPort } from '../../contracts/SecretDraftPort';
 
 interface SyncRandomLike extends RandomPort {
   nextBytesSync(length: number): Uint8Array;

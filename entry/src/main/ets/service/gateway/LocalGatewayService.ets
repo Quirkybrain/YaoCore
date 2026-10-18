@@ -26,18 +26,14 @@ import { HttpHeaders } from '../../common/types/HttpHeaders';
 import { JsonKind } from '../../common/types/JsonNode';
 import { JsonParser } from '../../common/utils/JsonParser';
 import { Utf8 } from '../../common/utils/Utf8';
-import type { ClockPort, LoggerPort, MetricsPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../../contracts/Ports';
 import { TransportProfile } from '../../model/DeviceTypes';
 import { GatewayAddress, GatewayRoute } from '../../model/GatewayRoute';
 import { DeviceControlCommand, ControlOutcome } from '../../model/ControlModels';
 import { DiscoverySnapshot } from '../../model/DiscoveryModels';
-import type {
-  GatewayAddressPort,
-  GatewayCredentialPort,
-  GatewayRoutePort,
-  GatewaySequencePort
-} from '../../repository/GatewayPorts';
-import type { DeviceControlPort } from '../../repository/DomainPorts';
+import type { GatewayAddressPort, GatewayCredentialPort, GatewayRoutePort, GatewaySequencePort } from '../../contracts/GatewayPorts';
+import type { DeviceControlPort } from '../../contracts/DevicePorts';
 import { DiscoverMapper, DiscoverMapContext } from '../protocol/DiscoverMapper';
 import { ControlAckMapper, AckExpectation } from '../protocol/ControlAckMapper';
 import { ControlRequestSerializer } from '../protocol/ControlRequestSerializer';
@@ -47,15 +43,8 @@ import { ClockSkewTracker } from '../security/ClockSkewTracker';
 import { RequestSigner, DiscoverSigningInput, SigningInput } from '../security/RequestSigner';
 import { ExpectedResponse, ResponseVerifier } from '../security/ResponseVerifier';
 import { GatewayRequestPolicy, ControlPolicy } from './GatewayRequestPolicy';
-import {
-  GatewayTarget,
-  HttpRequest,
-  HttpResponse,
-  ProbeResult,
-  TlsPolicy,
-  TlsVerification
-} from './GatewayTransportPorts';
-import type { HttpTransport, IGatewayClient } from './GatewayTransportPorts';
+import { GatewayTarget, HttpRequest, HttpResponse, ProbeResult, TlsPolicy, TlsVerification } from '../../model/GatewayTransportModels';
+import type { HttpTransport, IGatewayClient } from '../../contracts/GatewayTransportPorts';
 
 const PENDING_TTL_MS: number = 300000;
 const HTTP_STATUS_CODE_PREFIX: string = 'HTTP' + '_';

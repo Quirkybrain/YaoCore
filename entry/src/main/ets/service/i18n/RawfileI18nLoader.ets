@@ -12,8 +12,8 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { Utf8 } from '../../common/utils/Utf8';
 import { I18nBundleCodec } from './I18nBundleCodec';
-import { I18nResourceBundle, SupportedLocale } from './I18nModels';
-import type { I18nResourceLoaderPort } from './I18nPorts';
+import { I18nResourceBundle, SupportedLocale } from '../../model/I18nModels';
+import type { I18nResourceLoaderPort } from '../../contracts/I18nPorts';
 
 export class RawfileI18nLoader implements I18nResourceLoaderPort {
   private readonly resourceManager: resourceManager.ResourceManager;
