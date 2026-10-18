@@ -416,3 +416,78 @@
 1. 本记录只证明上述 5 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §11.2 的六项检查；不构成 Stage Gate、IG-3/IG-4、设备验收或 release PASS。
 2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；`task/wp-090-ports` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-095-merge-report.md`；handoff 为 `state/handoffs/wp-095-merge-a1.json`。
+
+---
+
+## 12. i18n 合并记录（2026-10-18，wp-100）
+
+> 本节由 `repository-manager` 在合并任务 `wp-100-merge-i18n` 中追加，记录 `task/wp-096-i18n-triage` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§11 的历史结论仍针对各自标注的 revision，本节不回溯改写；凡旧章节仍写“596 条 `PENDING_REVIEW`”的表述，以本节与 `artifacts/50-implementation/t24-i18n-triage.md` 的新口径为准，旧文档待后续同步。
+
+### 12.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-096-i18n-triage` @ `875c12da56b7b390ad85e732a2de14eac68f1ea0`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `07895fd98b222264aec566cefd43a0ee9cb10f5e`（合并前 = handoff `base_commit`） |
+| 合并基 | `07895fd`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `0d7f1f89cdd7f44e86f09cd022916ff72bf3f9cb`（`chore(merge): 合并 i18n 证据化 triage 与修正`） |
+| 父提交 | `07895fd`（目标，第一父）+ `875c12d`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 0d7f1f8 875c12d` 退出 0 |
+| 合并范围 | 7 个路径（+2555 / −625），全部落在 handoff `writes` 内；未改 `input/`、构建配置、locale 值或 UI 代码 |
+
+合并路径：
+
+| 状态 | 路径 |
+|---|---|
+| A | `artifacts/50-implementation/t24-i18n-triage.md` |
+| A | `artifacts/70-review/t24-i18n-review.md` |
+| A | `artifacts/70-review/t24-i18n-rereview.md` |
+| A | `tools/i18n/triage_legacy.py` |
+| M | `entry/src/test/i18n/README.md` |
+| M | `entry/src/test/i18n/legacy-migration.csv` |
+| M | `entry/src/test/i18n/migration-boundary.md` |
+
+源提交（`07895fd..875c12d`，4 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `2d45628b3e0ac4fecb6660727103f1b61b8498d6` | chore(i18n): 证据化 triage 615 条历史文案 |
+| 2 | `818cb790bf6f94b44e9bee2839a5081ffc5a1dcb` | docs(review): i18n triage 独立复审 |
+| 3 | `9d22b5b2abe44bd03f6ee7de3714ec37a580ec9e` | fix(i18n): 修正 triage 证据链与检查器校验 |
+| 4 | `875c12da56b7b390ad85e732a2de14eac68f1ea0` | docs(review): i18n 修正聚焦复评 |
+
+门禁证据：`artifacts/70-review/t24-i18n-rereview.md`（Producer `agent:quality-reviewer`，Verdict **PASS**，仅覆盖复评 revision `9d22b5b` 与报告 §1 声明范围；来源提交内 sha256 `f455c80079f307e0b540c43d2d986d3016c559f7d9c20cc45dc7c2abb131d139` = handoff pin）。提交 `875c12d` 仅把该复评报告写入分支，不改变 `9d22b5b` 的被审内容。
+
+### 12.2 合并后验证矩阵（在 `0d7f1f8` 上实际执行）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | triage 一致性 | `python3 tools/i18n/triage_legacy.py --check` | `615 rows`；`OK: CSV matches computed triage; invariants pass` | 0 |
+| 2 | triage 汇总 | `python3 tools/i18n/triage_legacy.py --summary` | `A 606`（`ACCEPTED 10` / `MIGRATED 46` / `PENDING_REVIEW 6` / `OBSOLETE_LEGACY 544`）、`C 6`、`D 3`、`INLINE_LITERAL 0`；`csv_status: UP_TO_DATE` | 0 |
+| 3 | i18n strict-ui | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | CHK-01..09 PASS；`blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16`；CHK-05 57 条 unused key、CHK-07 16 条 hardcoded 均非 blocking | 0 |
+| 4 | Host 测试 | `entry/src/test/run-host-tests.sh` | `1..697`；`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3059.5 ms | 0 |
+| 5 | 分层检查 | `python3 tools/contract/check_layering.py` | `files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0`；PASS | 0 |
+| 6 | 分层夹具自测 | `python3 tools/contract/test_check_layering.py` | `Ran 22 tests in 2.119s`；`OK`（22/22） | 0 |
+| 7 | 构建 | `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL in 14 s 778 ms`；35 tasks（34 executed / 1 up-to-date）；unsigned HAP；仅既有 ArkTS 警告 | 0 |
+
+补充：以上命令均在合并提交的干净工作树上运行，Python 命令设置 `PYTHONDONTWRITEBYTECODE=1`；运行后清理 `__pycache__`，`git status --porcelain` 为空（ignored 构建产物除外）。
+
+### 12.3 残余与边界
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| 615 条 triage 状态 | **已登记，语义待确认** | A 类 606 = `ACCEPTED 10` + `MIGRATED 46` + `PENDING_REVIEW 6` + `OBSOLETE_LEGACY 544`；另有 C 6、D 3。`MIGRATED`/`OBSOLETE_LEGACY` 表示证据化分类，不等于 544/46 条业务语义已人工签署 |
+| 6 条 `PENDING_REVIEW` | **OPEN** | 关闭/刷新/添加网关/执行中/简体中文/语言；其中 5 条跨 rawfile 与 `string.json` 双存储，`执行中` 为同存储三义；需 T-17/T-18/solution-architect 裁定单一存储与目标键 |
+| 11 条 `B_REWRITE_REQUIRED` | **OPEN** | 全部落在 `OBSOLETE_LEGACY`，旧英文存在 machine/file(s) 术语问题；本次只补证据并保留原备注，未重译、未改状态 |
+| 6 条 C + 3 条 D | **保留待复核** | C：4 条 `RECHECK_REQUIRED` + 2 条 `SAFETY_RECHECK_REQUIRED`；D：3 条品牌数据 `NONE`；均未删除、未降级 |
+| 文档 596 旧口径 | **待同步（非阻塞）** | 根 `README.md` 第 78/202 行、`artifacts/80-maintenance/maintenance-plan.md` §3.4，以及本报告 §4/§6/§7/§8 仍写“596 条 `PENDING_REVIEW`”。按旧基线（596 = 46 + 6 + 544）总数仍可解释，但新口径应以本轮 triage 的 10/46/6/0/544 + C 6 + D 3 为准；本节为 append-only 增量，旧章节由对应 owner 在后续文档任务同步 |
+| 检查器告警 | **非阻塞** | `--strict-ui` 0 blocking / 0 missing；CHK-05 57 条未使用键（带 allowlist 39 条）与 CHK-07 16 条技术/品牌/Mock 字面量为 warning，非本次 triage 的 A 类旧字典行 |
+| locale/UI 变更 | **未涉及** | 本次合并未修改任何 locale 值或 UI 代码；`INLINE_LITERAL=0` 不等于源码零硬编码 |
+| 设备/真实环境 | **BLOCKED / NOT RUN** | 无设备、模拟器与签名；不得用 host/构建结果外推为设备验收或 Stage Gate PASS |
+
+### 12.4 边界声明
+
+1. 本记录只证明上述 4 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §12.2 的七项检查；不构成 Stage Gate、Component Quality、设备验收或 release PASS。
+2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-096-i18n-triage` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-100-merge-report.md`；handoff 为 `state/handoffs/wp-100-merge-i18n.json`。
