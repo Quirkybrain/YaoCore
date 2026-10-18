@@ -567,3 +567,59 @@
 1. 本记录只证明上述 2 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §13.2 的六项检查；不构成 Stage Gate、Component Quality、设备验收或 release PASS。
 2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-101-checker-rr` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-103-merge-report.md`；handoff 为 `state/handoffs/wp-103-merge-checker.json`。
+
+---
+
+## 14. DES F-03 状态同步合并记录（2026-10-18，wp-105）
+
+> 本节由 `repository-manager` 在合并任务 `wp-105-merge-des` 中追加，记录 `task/wp-104-des-sync` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§13 的历史结论仍针对各自标注的 revision，本节不回溯改写。本节只记录 DES-A/DES-B 的状态同步文本已进入集成分支；不新增裁定、不宣告 Stage Gate 或验收 PASS。
+
+### 14.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-104-des-sync` @ `b2d92d7ae372b407974cda5f3adf762e95b85f67`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `40044c092d56e2ad1ef91453b0029517adb19b98`（合并前 = handoff `base_commit`） |
+| 合并基 | `40044c0`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `4fe9ccf04028e68d967c4bef4ffe72ff603c0b75`（`chore(merge): 合并 DES F-03 状态同步`） |
+| 父提交 | `40044c0`（目标，第一父）+ `b2d92d7`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 4fe9ccf b2d92d7` 退出 0 |
+| 合并范围 | 2 个路径（+59 / −18）：`des-001a-foundation-transport.md`（+31 / −8）、`des-001b-domain-presentation.md`（+28 / −10）；全部落在 handoff `writes` 的 `artifacts/40-detailed-design/` 内；未改 `input/`、产品代码、构建配置或状态文件 |
+
+源提交（`40044c0..b2d92d7`，1 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `b2d92d7ae372b407974cda5f3adf762e95b85f67` | docs(design): 同步 T-23 F-03 落地状态 |
+
+门禁证据：`artifacts/40-detailed-design/des-001a-foundation-transport.md`（来源分支 blob sha256 `04a61be8b7db300cfbcaa6df6a7240846705d17da6178172f1e93a1f7b5c51f9` = handoff `gate_evidence_path_sha256`；Producer `agent:solution-architect`）。该文件是本次状态同步的载体与 handoff 固定证据，**不是独立审查报告**；本节不据此宣告新的 Gate PASS。
+
+### 14.2 合并后验证矩阵（在 `4fe9ccf` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **hard checks: ALL PASS**；14 条既有 frozen-input findings（非阻塞） | 0 |
+| 2 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+| 3 | Host 测试 | `entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3043.0 ms | 0 |
+
+补充：以上命令均在合并提交的干净工作树上运行；Python 命令设置 `PYTHONDONTWRITEBYTECODE=1`；运行后清理 `__pycache__`，证据提交前 `git status --porcelain` 仅显示两份 deliverable。
+
+### 14.3 状态同步要点
+
+| 项 | 同步后状态 | 依据 |
+|---|---|---|
+| T-23 F-03 C-23 符号 | **CLOSED @ `cc2233d`**：`ProvisioningPermissionPort`/`ProvisioningPermissionKind` 已落地；C-28 app seam（`PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult`）未变 | `wp-093-t23-fixes`；独立复审 `wp-094-t23-rereview` PASS |
+| §27.6.4 `PORT-LOC-17` | **CLOSED（位置 + 符号）** | DES-A §27.6.4；`cc2233d` + 复审 PASS |
+| §27.6.4 `PORT-LOC-01` | **仍 OPEN**：`ClockPort`/`IdPort` 仍在 `common/types/Ports.ets`，为唯一 live 端口位置例外 | DES-A §27.6.4；未因本次同步改变 |
+| RR-01/RR-02 checker 缺口 | 已由 `wp-101-checker-rr` @ `16b0f7c` 修复；再导出覆盖与诊断行号补齐 | `artifacts/70-review/t25-checker-review.md`（PASS） |
+| D-03 规则文本 | **未改变**（`contracts/**` 同层 type-only + 无环） | DES-A §2.2/§27.6.2；本次仅同步状态 |
+| 冻结签名 / G-004 语义 | **未改变**；未新增裁定 | DES-A/DES-B 文件头与附录 E.10/E.9 |
+| DES-B `EXT-DES-B-34` | **CLOSED @ `cc2233d`**；`EXT-DES-B-22` 仍为历史/SUPERSEDED | DES-B §23.7 |
+| 文档落点 | DES-A：文件头、§2.1 树注记、§27.6.2/§27.6.3 P4、§27.6.4、§29、附录 E §E.10；DES-B：文件头、§12.1.1、§23.7、附录 E §E.4/§E.7/§E.9 | 源提交 `b2d92d7` |
+
+### 14.4 边界声明
+
+1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §14.2 的三项检查；不构成 Stage Gate、Component Quality、独立评审、设备验收或 release PASS。
+2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-104-des-sync` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-105-merge-report.md`；handoff 为 `state/handoffs/wp-105-merge-des.json`。
