@@ -1,9 +1,9 @@
 # YaoCore Project State（最终：PAUSED_AT_STAGE）
 
 - **Project**: YaoCore (爻构) — HarmonyOS NEXT 原生智能家居应用 (ArkTS)
-- **Project Status**: **PAUSED_AT_STAGE**（Target Stage: documentation 已达到）
+- **Project Status**: ACTIVE（用户选择：release 准备，不发布）
 - **Current Stage**: implementation（Target Stage 已达成并通过 G-014 Stage Gate）
-- **Target Stage**: documentation（用户 2026-10-18 指令「继续完成开发」扩展；release/发布另需授权）
+- **Target Stage**: release（用户 2026-10-18 选择「Release 准备（不发布）」；push/PR/MR/发布仍需显式授权）
 - **Project Workflow Level**: STANDARD
 - **Execution Mode**: GATED_AUTO
 - **Final integration revision**: `feat/yaocore-app @ 1d4b202`（main 仍为 `a6f6558`；未 push）
@@ -75,3 +75,10 @@ D-030/GAP-T18-01 服务层 RBAC 缺口（v1 接受）｜R4-01 durable 取消边�
 - **Target Stage `documentation` 达到 → PAUSED_AT_STAGE**；release 未启动。
 - 最终 revision：`feat/yaocore-app @ 13de4d7`；工作树干净；无活动交接。
 - 待用户：GAP-AC-01..03、设备矩阵 BLK-01..08、release/远端授权、D-009..D-012 确认/覆盖。
+
+## Release 准备（2026-10-18，用户选择）
+
+- 目标：release **仅准备**（版本/CHANGELOG/release notes/签名与远端清单/发布检查单/未签名产物校验）。
+- **明确不授权**：push、PR/MR、`main` 合并、签名证书使用、应用市场/远端发布。
+- 现有基线：versionName `1.0.0` / versionCode `1000000`；`signingConfigs: []`；无 HAP 产物；无 CHANGELOG/LICENSE。
+- 待用户决定：许可证、签名证书与远端策略、GAP-AC-01..03、设备矩阵。
