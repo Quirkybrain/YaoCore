@@ -1,7 +1,7 @@
 # YaoCore Project State（最终：PAUSED_AT_STAGE）
 
 - **Project**: YaoCore (爻构) — HarmonyOS NEXT 原生智能家居应用 (ArkTS)
-- **Project Status**: ACTIVE（review Stage Gate PASS，进入 testing）
+- **Project Status**: ACTIVE（testing Stage Gate PASS，进入 acceptance）
 - **Current Stage**: implementation（Target Stage 已达成并通过 G-014 Stage Gate）
 - **Target Stage**: documentation（用户 2026-10-18 指令「继续完成开发」扩展；release/发布另需授权）
 - **Project Workflow Level**: STANDARD
@@ -54,3 +54,10 @@ D-030/GAP-T18-01 服务层 RBAC 缺口（v1 接受）｜R4-01 durable 取消边�
 - 本轮变更（端口迁移/裁定修复、i18n triage、检查器 RR、DES 同步）均有独立评审批次；阻断项全部闭环。
 - 转 documentation：RR-03（T-23 报告旧口径）；接受：V-01..V-06/O-01（Info）、PORT-LOC-01 OPEN、D-030 RA-01、设备 BLOCKED。
 - 下一阶段：G-016 testing（最终 revision 全量矩阵 + FR/NFR 映射）。
+
+## G-016 testing Stage Gate（2026-10-18）
+
+- **Verdict: PASS_WITH_ACCEPTED_RISKS** @ `1cccec5`（`state/gates/G-016-testing-gate.md`）。
+- TEST-002：11/11 矩阵 exit 0；host 697、crosscheck 66、simulator 20、layering 0、fixtures 27、i18n 0 blocking、build SUCCESS。
+- FR 26 → 24 covered / 2 partial / 0 gap；NFR 4.1/4.2/4.3 partial；ACK p95 MOCK_ONLY；设备 BLOCKED。
+- 下一阶段：G-017 acceptance（system-verifier 验收就绪与最终追溯）。
