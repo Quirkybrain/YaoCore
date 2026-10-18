@@ -1,7 +1,7 @@
 # YaoCore Project State（最终：PAUSED_AT_STAGE）
 
 - **Project**: YaoCore (爻构) — HarmonyOS NEXT 原生智能家居应用 (ArkTS)
-- **Project Status**: ACTIVE（用户选择：release 准备，不发布）
+- **Project Status**: **PAUSED_AT_STAGE**（release 准备完成；发布未授权）
 - **Current Stage**: implementation（Target Stage 已达成并通过 G-014 Stage Gate）
 - **Target Stage**: release（用户 2026-10-18 选择「Release 准备（不发布）」；push/PR/MR/发布仍需显式授权）
 - **Project Workflow Level**: STANDARD
@@ -82,3 +82,11 @@ D-030/GAP-T18-01 服务层 RBAC 缺口（v1 接受）｜R4-01 durable 取消边�
 - **明确不授权**：push、PR/MR、`main` 合并、签名证书使用、应用市场/远端发布。
 - 现有基线：versionName `1.0.0` / versionCode `1000000`；`signingConfigs: []`；无 HAP 产物；无 CHANGELOG/LICENSE。
 - 待用户决定：许可证、签名证书与远端策略、GAP-AC-01..03、设备矩阵。
+
+## G-019 release 准备 Stage Gate（2026-10-18）
+
+- **Verdict: NOT_READY（publish）** @ `e998cc6`（`state/gates/G-019-release-preparation-gate.md`）；**release 准备工作完成**。
+- 发布资产：RELEASE-001/检查单/CHANGELOG/Release Notes；独立复评 PASS（F-01..F-06 闭环）。
+- 产物：release 模式未签名 HAP 1,616,146 B / SHA-256 `1602110d…`（非字节可复现）。
+- 阻塞 B-01..B-09：许可证/身份、签名、设备验收、GAP-AC、远端授权、版本冻结、文档签核、风险签核、构建硬化。
+- **未执行**任何 push/PR/MR/tag/签名/市场发布。

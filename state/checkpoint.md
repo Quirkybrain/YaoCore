@@ -1,46 +1,45 @@
-# Checkpoint CP-012 — documentation 达到，PAUSED_AT_STAGE
+# Checkpoint CP-013 — release 准备完成，PAUSED_AT_STAGE
 
 ```text
-Checkpoint ID: CP-012
+Checkpoint ID: CP-013
 时间: 2026-10-18
-Repository revision / working-tree state: feat/yaocore-app @ 13de4d7（干净；无活动交接）
-Current Stage: documentation（完成）
-Target Stage: documentation（已达到）
+Repository revision / working-tree state: feat/yaocore-app @ e998cc6（干净；无活动交接）
+Current Stage: release（准备完成）
+Target Stage: release（准备范围；发布未授权）
 Workflow and Execution Modes: STANDARD / GATED_AUTO
 Active Task: 无
 ```
 
-## 本轮完成（自 CP-011）
+## 本轮完成（自 CP-012）
 
-| 任务 | 结果 | 证据 |
+| 工作 | 结果 | 证据 |
 |---|---|---|
-| A1 端口迁移 P1-P3 | 16/17 关闭；`contracts/**` 20 文件；125 文件 import 更新；fixtures 27 | `aa9bdd1`；`t23-ports-migration.md` |
-| T-23 评审/裁定/修复 | F-01..F-07 闭环；F-01 方案 B、F-02 方案 A；ohosTest 12 import 修复 | `f290f69`/`76c47f4`/`cc2233d`/`0eda993` |
-| i18n 615 triage | 10 ACCEPTED/46 MIGRATED/6 PENDING/0 INLINE/544 OBSOLETE；11 B/6 C/3 D；`--check` 幂等 | `2d45628`/`9d22b5b`/`875c12d` |
-| 检查器 RR-01/02/04 | `export *` 覆盖、行号诊断、provenance；fixtures 27/27 | `16b0f7c`/`eb73a2c` |
-| DES F-03 同步 | F-03 CLOSED @ `cc2233d`；PORT-LOC-17 关闭；PORT-LOC-01 OPEN | `b2d92d7` |
-| G-015 review | PASS_WITH_ACCEPTED_RISKS | `state/gates/G-015-review-gate.md` |
-| G-016 testing | PASS_WITH_ACCEPTED_RISKS；TEST-002 11/11 矩阵 | `7200543`；`G-016-testing-gate.md` |
-| G-017 acceptance | PASS_WITH_ACCEPTED_RISKS（readiness）；ACCEPT-001 | `d649ac7`；`G-017-acceptance-gate.md` |
-| G-018 documentation | PASS；D-AC-01..08 + RR-03 闭环 | `83beda0`；`G-018-documentation-gate.md` |
+| Release 目标扩展 | `config/project.md` Target Stage → release；登记发布未授权边界 | `6cd9a88` |
+| RELEASE-001 发布计划 + 检查单 | 版本/构建/签名/远端/回滚/Gate 判据；release 模式 HAP 1,616,146 B / `1602110d…` | `560d08a`/`972f177`/`3501f5e` |
+| 公开旧版本对照（F-01） | `origin/main` 1.0.0（`io.github.quirkybrain.yaocore`、Apache-2.0+NOTICE）A/B/C 选项，待用户决定 | `972f177` |
+| CHANGELOG + Release Notes | v1.0.0 草案（`DRAFT/NOT_READY`，B-01..B-09） | `63d2235`/`19df893` |
+| 独立评审 | 首次 CHANGES_REQUIRED（F-01 High）→ 修正 → **复评 PASS** | `f1fbe0d`/`1e955a8` |
+| G-019 release 准备 Gate | **NOT_READY（publish）**；准备工作完成 | `state/gates/G-019-release-preparation-gate.md` |
 
-集成提交：`54f2a0b`/`07895fd`（A1，finish 记 FAILED 留痕）、`0d7f1f8`/`b7e1e24`（i18n）、`6446a97`/`40044c0`（checker）、`4fe9ccf`/`09e1b46`（DES）、`6939574`/`1cccec5`（testing）、`06265fd`/`4faf3e3`（acceptance）、`6dc3808`/`13de4d7`（docs）。
+集成提交：`40fe2a8`/`b716207`（计划）、`21c601d`/`e998cc6`（文档与修正）。
 
-## 最终验证（当前 revision 可复现）
+## 最终验证（代码基线 `e74a181`，未变）
 
-- host **697/697**；crosscheck **66/66**；模拟器 **20/20**（HTTP+TLS）；layering **0 violation**（6 D-12 / 1 端口例外 used=0）；fixtures **27/27**；i18n **0 blocking/0 missing**；triage 615 行一致；build **SUCCESSFUL**；lint **0 error/25 warn**（build/lint 引用 TEST-002 @ `e74a181`，产品代码未变）。
-- FR 26：24 covered / 2 partial / 0 gap；NFR 4.1/4.2/4.3 partial；ACK p95 **MOCK_ONLY**。
+host **697/697**；crosscheck **66/66**；layering **0 violation**；fixtures **27/27**；i18n **0 blocking**；triage 615 行；发布文档 4 份存在、B-01..B-09 一致、53 链接 0 broken、无越界表述。
 
-## 开放项（需用户）
+## 发布阻塞（B-01..B-09）
 
-1. **GAP-AC-01..03**：LAN IP 展示、首页家庭切换形态、房间图标 → 接受为 v1 简化或 bounded fix。
-2. **设备矩阵 BLK-01..08**：签名/设备/BLE/LAN/TLS/云/视觉/A11y/fps。
-3. **release/远端策略**：push、PR/MR、`main` 合并与发布授权（`main_merge_mode: review_request_when_remote`）。
-4. **D-009..D-012**：产品决策推荐值仍可覆盖（Change Impact）。
-5. **残余风险**：D-030/RA-01、R4-01、PORT-LOC-01、i18n 6 PENDING/11 B/6 C/3 D、未签名 HAP、测试 lint/覆盖率、许可证 TODO。
+B-01 许可证/身份 A/B/C｜B-02 签名｜B-03 设备/用户验收｜B-04 GAP-AC-01..03｜B-05 远端/通道授权｜B-06 身份/版本冻结｜B-07 CHANGELOG/Notes 签核｜B-08 残余风险签核｜B-09 API 14 兼容/混淆裁剪决策。
+
+## 待用户决定
+
+1. 身份/版本/许可证：A 沿用旧身份 + versionCode >1000000 + Apache-2.0/NOTICE；B 保留 `com.example.yaocore` 独立应用；C 混合/迁移。
+2. B-09：API 14 运行时验证、混淆/裁剪/符号化。
+3. P1/P2 回滚阈值批准。
+4. 签名材料、设备矩阵、远端/发布授权。
+5. GAP-AC-01..03 接受或修复。
 
 ## Next ready action
 
-- **PAUSED_AT_STAGE**：不再自动启动任何阶段。
-- 用户决定后：bounded fix（GAP-AC）、设备验收、release 授权、或维护轮（RR-03 已关闭；V-01..V-06 等）。
-- 恢复：`python3 scripts/swe_guard.py status` → 核对 HEAD `13de4d7` → 读本 Checkpoint / `state/project-state.md`。
+- **PAUSED_AT_STAGE**：不启动签名/推送/PR/MR/tag/发布。
+- 恢复：`python3 scripts/swe_guard.py status` → 核对 HEAD `e998cc6` → 读 CP-013 / `state/project-state.md` / G-019。
