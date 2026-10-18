@@ -359,3 +359,60 @@
 ---
 
 *INTEGRATION-REPORT-001 结束。所有 PASS 均对应当前集成 revision `d2896fb` 与本报告 §1 环境实际执行；设备/真实环境、`COMPILED_ONLY`、`MOCK_ONLY` 均未写成 PASS。*
+
+---
+
+## 11. A1 合并记录（2026-10-18，wp-095）
+
+> 本节由 `repository-manager` 在合并任务 `wp-095-merge-a1` 中追加，记录 `task/wp-090-ports` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§10 的历史结论仍针对 `d2896fb`，本节不回溯改写。
+
+### 11.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-090-ports` @ `0eda9933a0b3d52a1a8a429b05b2587d19583105` |
+| 目标分支 | `feat/yaocore-app` @ `1d4b202a8ee68acb1679e9c7472c883e0e30ca9e`（合并前 = handoff `base_commit`） |
+| 合并基 | `1d4b202`（目标 tip 为来源 tip 的直接祖先） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `54f2a0b3a5e2b91dbc3cb66b08a85be0d8498782`（`merge: A1 端口迁移与 T-23 裁定修复`） |
+| 父提交 | `1d4b202`（目标，第一父）+ `0eda993`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 54f2a0b 0eda993` 退出 0 |
+| 合并范围 | 215 个路径（+3407 / −2470），全部落在 handoff `writes` 内；未改 `input/`、构建配置或状态文件 |
+
+源提交（`1d4b202..0eda993`，5 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `aa9bdd1b9a87c1d7ed51fa1fd7050615ce7daf51` | refactor(contracts): 迁移端口到 contracts 并收口例外 |
+| 2 | `f290f69a43a5377c3b9d916261cac987c6c826fc` | docs(review): A1 端口迁移独立评审 |
+| 3 | `76c47f4afd94e820b6186d183e7e2287380af7a6` | docs(design): T-23 裁定与端口契约同步 |
+| 4 | `cc2233dcf8f348fd619b508889de9e94edfad88c` | fix(contracts): 应用 T-23 裁定并修复 ohosTest imports |
+| 5 | `0eda9933a0b3d52a1a8a429b05b2587d19583105` | docs(review): T-23 修复聚焦复评 |
+
+### 11.2 合并后验证矩阵（在 `54f2a0b` 上实际执行）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `entry/src/test/run-host-tests.sh` | `1..697`；`# pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3080.5 ms | 0 |
+| 2 | 分层检查 | `python3 tools/contract/check_layering.py` | `files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0`；PASS | 0 |
+| 3 | 分层夹具自测 | `python3 tools/contract/test_check_layering.py` | `Ran 22 tests in 2.112s ... OK`（22/22） | 0 |
+| 4 | i18n strict-ui | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | `blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16`；CHK-08/CHK-09 PASS | 0 |
+| 5 | 协议资产交叉校验 | `python3 tools/contract/crosscheck_protocol_assets.py` | `hard checks: ALL PASS`；14 条既有 frozen-input findings（非阻塞） | 0 |
+| 6 | 构建 | `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL in 14 s 936 ms`；35 tasks（34 executed / 1 up-to-date）；unsigned HAP；仅既有 ArkTS 警告 | 0 |
+
+### 11.3 残余与边界
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| `PORT-LOC-01`（`ClockPort`/`IdPort` 留在 `common/types/Ports.ets`） | **OPEN（已登记）** | 需批准的 D-01 或冻结签名变更；live `port_location_exceptions` 仅此 1 条，`used=0`；不得写成“17 条全关闭” |
+| `RR-01` `export * from` 未触发 D-03/环检查 | Low（工具债，未修复） | 当前仓库无使用；建议紧随 checker 任务修复并补 fixture |
+| `RR-02` 行号/环违规诊断错位 | Low（既有，未修复） | 不影响门禁判定与退出码 |
+| `RR-03` 实现报告文首/§7.2 与 §10 状态不一致 | Low（文档，非阻塞） | 建议后续文档同步任务统一 |
+| `RR-04` checker/allowlist 元数据仍标 wp-090 | Info（provenance） | 可加 `updated_by: wp-093-t23-fixes` 或保持历史并在 Gate 注明 |
+| 设备/模拟器 ohosTest、真实 BLE/LAN/TLS/云/视觉/A11y/fps | **BLOCKED / NOT RUN** | 无 `hdc` target、无模拟器、无签名；不得用 host/mock 外推为验收 PASS |
+
+### 11.4 边界声明
+
+1. 本记录只证明上述 5 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §11.2 的六项检查；不构成 Stage Gate、IG-3/IG-4、设备验收或 release PASS。
+2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；`task/wp-090-ports` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-095-merge-report.md`；handoff 为 `state/handoffs/wp-095-merge-a1.json`。
