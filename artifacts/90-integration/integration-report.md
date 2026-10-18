@@ -682,3 +682,65 @@
 1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §15.2 的三项检查；不构成 Stage Gate、Component Quality、独立评审、产品验收、设备验收或 release PASS。
 2. 合并与验证均在本地完成：合并前执行 `git fetch origin`（仅更新远端跟踪引用），未 push、未 pull、未 rebase，未改写任何已评审提交；未切换分支；`task/wp-106-testing-stage` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-107-merge-report.md`；handoff 为 `state/handoffs/wp-107-merge-testing.json`。
+
+---
+
+## 16. ACCEPT-001 合并记录（2026-10-18，wp-109）
+
+> 本节由 `repository-manager` 在合并任务 `wp-109-merge-acceptance` 中追加，记录 `task/wp-108-acceptance` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§15 的历史结论仍针对各自标注的 revision，本节不回溯改写。本节只记录 ACCEPT-001 验收就绪报告已进入集成分支；**不新增裁定、不宣告 G-017、用户验收、产品验收或 release PASS**。
+
+### 16.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-108-acceptance` @ `d649ac78a13efbaf64c19cd6b5ce381787150c7e`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `b10d2f50c931b7c82cd8a2105fbe804582d24b32`（合并前 = handoff `base_commit`） |
+| 合并基 | `b10d2f5`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `06265fdfce27834e4bc202b08df5558c793b5d67`（`chore(merge): 合并 ACCEPT-001 验收就绪报告`） |
+| 父提交 | `b10d2f5`（目标，第一父）+ `d649ac7`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 06265fd d649ac7` 退出 0 |
+| 合并范围 | 1 个路径（+534 / −3）：`artifacts/65-acceptance/acceptance-report.md`（base 为 3 行占位，来源替换为 535 行报告）；落在 handoff `writes` 的 `artifacts/65-acceptance/` 内；未改 `input/`、产品代码、测试、工具、构建配置或状态文件 |
+
+源提交（`b10d2f5..d649ac7`，1 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `d649ac78a13efbaf64c19cd6b5ce381787150c7e` | docs(acceptance): 产出 ACCEPT-001 验收就绪报告 |
+
+门禁证据：`artifacts/65-acceptance/acceptance-report.md`（来源分支 blob sha256 `794fd588d7bbfbf9f7856dd3e5d9606e008c97faa973596abb01798a742a3e3c` = handoff `gate_evidence_path_sha256`；Producer `agent:system-verifier`）。该文件是 acceptance readiness 报告与 handoff 固定证据，**不是独立审查报告**；本节不据此宣告 Gate PASS。
+
+### 16.2 合并后验证矩阵（在 `06265fd` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `PYTHONDONTWRITEBYTECODE=1 entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3068.6 ms | 0 |
+| 2 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **hard checks: ALL PASS**：66 条 `[PASS]` / 0 条 `[FAIL]`；14 条既有 frozen-input `FINDING`（非阻塞） | 0 |
+| 3 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+
+补充：三项检查与 ACCEPT-001 §0.3 的对应复验一致（host 697/697、crosscheck 66/66、layering 0 violation），且与 TEST-002 的基线相同；完整日志暂存于 `/tmp/opencode/wp109-*`（未提交）。命令均在合并提交的干净工作树上运行；Python 命令设置 `PYTHONDONTWRITEBYTECODE=1`；运行后已清理 `__pycache__`。证据提交前 `git status --porcelain` 仅显示已跟踪的 `artifacts/90-integration/integration-report.md` 修改；新增的 `state/reports/wp-109-merge-report.md` 位于 `.gitignore` 的 `/state/` 忽略路径下，按 handoff 要求以 `git add -f` 纳入唯一证据提交。
+
+### 16.3 Verdict 与待决项去向
+
+| 项 | 内容 | 去向 | 是否由本次合并关闭 |
+|---|---|---|---|
+| ACCEPT-001 Verdict | **`READY_FOR_USER_ACCEPTANCE`（有条件）**：代码级证据完整，可开始用户验收；用户验收（U-01..U-12 / BLK-01..08）未执行，**不得**写成产品验收或 release PASS | G-017 acceptance 由 Orchestrator 判定；§6.2 六个条件 | **否** |
+| `GAP-AC-01` | FR-HOME-001 未显示局域网 IP（`GatewayStatus` 无 IP 字段） | 用户书面接受为 v1 简化，或派发 bounded fix（`implementation-engineer`，补 host 断言） | **否**（需用户决定） |
+| `GAP-AC-02` | FR-HOME-001 多家庭切换未实现首页弹窗，改为跳转家庭管理页 | 用户书面接受跳转式切换，或派发 `bindSheet` bounded fix（UI/implementation） | **否**（需用户决定） |
+| `GAP-AC-03` | FR-ROOM-001 房间图标未提供设置/展示（服务层支持 `icon?`，页面未接线/未展示） | 用户书面接受为 v1 简化，或派发图标选择/展示 bounded fix，补 UI/source 守卫 | **否**（需用户决定） |
+| `D-AC-01` | README 基线/分层数字过期（`13dc839`、209 files/13 D-12/17 port/10 used；结构未列 `contracts/**`） | documentation 阶段：`technical-writer` 按 TEST-002/G-016 数字统一 | **否**（文档任务） |
+| `D-AC-02` | README/维护计划/G-014 仍写“596 条 `PENDING_REVIEW`” | documentation：`technical-writer` + `test-engineer` 改为 6 PENDING / 544 OBSOLETE / 46 MIGRATED / 10 ACCEPTED 口径 | **否**（文档任务） |
+| `D-AC-03` | 维护计划仍称端口迁移未开始、13 D-12/17 端口例外 | documentation：`technical-writer` + `solution-architect` 同步 A1/T-23 结果（6 D-12 accepted、16/17 端口关闭、PORT-LOC-01 OPEN） | **否**（文档任务） |
+| `D-AC-04` | TEST-REPORT-001 历史计数与 `contracts/**` 表述过期（`T09_C11_*` 16 vs 15、`T16_Scene_*` 8 vs 7） | documentation/维护轮：`test-engineer` 加注“历史 @ `4f7c26b`，已被 TEST-002 取代”，不改写历史结论 | **否**（文档任务） |
+| `D-AC-05` | G-013/G-014 文本仍含旧端口/i18n 数字 | Orchestrator 在 G-017 记录“历史 Gate 数字以 G-015/G-016 为准”；不回改旧 Gate | **否**（Gate 记录任务） |
+| `D-AC-06` | `RR-03`：T-23 实现报告文首/§7.2 与 §10 状态不一致 | documentation：`technical-writer` + `solution-architect` | **否**（文档任务） |
+| `D-AC-07` | PRD/数据模型与 CB/ADR 差异（邀请码、stateSource、AC mode、GCM 等） | `solution-architect` 走 P-09/P-14/E-06/E-09/E-10/E-11 勘误提案；`input/` 冻结不改 | **否**（后续提案） |
+| `D-AC-08` | README ACK p95 仍写 0.598/0.589 ms | documentation：`technical-writer` 统一为 `MOCK_ONLY` 且数值随环境波动、不作验收 | **否**（文档任务） |
+
+补充：`OBS-AC-01`（`ContinuousGestureGuard` 未接线）、`OBS-AC-02`（设计系统未使用组件 / `MdnsDiscoveryTransport` 未接线）为维护观察项，仍按 ACCEPT-001 §4.3 保留；`PORT-LOC-01`、`D-030/GAP-T18-01`、`R4-01` 等既有风险状态不因本次合并改变。
+
+### 16.4 边界声明
+
+1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §16.2 的三项检查；不构成 G-017、Component Quality、用户验收、产品验收、设备验收或 release PASS。
+2. 合并与验证均在本地完成：未 fetch/pull、未 push、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-108-acceptance` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-109-merge-report.md`；handoff 为 `state/handoffs/wp-109-merge-acceptance.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 ACCEPT-001 合并证据`。
