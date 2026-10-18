@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-101-checker-rr fixture",
+  "policy": "D-03 negative fixture: export { value } from contracts/** is a value re-export and is illegal.",
+  "entries": [],
+  "port_location_exceptions": []
+}

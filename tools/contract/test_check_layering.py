@@ -1,11 +1,13 @@
 """Fixture self-test for tools/contract/check_layering.py (C-29 / T-20).
 
-Producer: agent:test-engineer | Updated: agent:implementation-engineer / Task: T-23 / wp-093-t23-fixes
+Producer: agent:test-engineer | Updated: agent:implementation-engineer /
+Tasks: T-23 / wp-093-t23-fixes, wp-101-checker-rr
 Contract: DES-B §18.1 (checker must have legal/illegal fixture self-tests and
           enforce exception status/symbols); DES-B §2.3 D-01..D-17;
           DES-A §27.6 port_location_exceptions; T-20 review F-01/F-02/F-06;
           DES-A 附录 E §E.3/E.5 (type-only acyclic contracts graph, strict
-          exception metadata, any pending-* port exception exits 1).
+          exception metadata, any pending-* port exception exits 1);
+          T-23 rereview RR-01/RR-02 (export re-export syntax + line numbers).
 """
 from __future__ import annotations
 
@@ -29,6 +31,10 @@ D03_TYPE_ONLY_OK = HERE / "fixtures/layering/contracts-type-only-ok"
 D03_VALUE_BAD = HERE / "fixtures/layering/value-import-bad"
 D03_SIDE_EFFECT_BAD = HERE / "fixtures/layering/side-effect-bad"
 D03_CYCLE_BAD = HERE / "fixtures/layering/cycle-bad"
+D03_EXPORT_STAR_BAD = HERE / "fixtures/layering/export-star-bad"
+D03_EXPORT_TYPE_STAR_OK = HERE / "fixtures/layering/export-type-star-ok"
+D03_EXPORT_NAMED_VALUE_BAD = HERE / "fixtures/layering/export-named-value-bad"
+D03_EXPORT_NAMED_TYPE_OK = HERE / "fixtures/layering/export-named-type-ok"
 
 
 def run(root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
@@ -165,6 +171,64 @@ class CheckLayeringFixtureTests(unittest.TestCase):
         self.assertIn("D-03", result.stdout)
         self.assertIn("contracts/** type-only import cycle", result.stdout)
         self.assertIn("A.ets -> B.ets -> A.ets", result.stdout)
+        # RR-02: the closing edge is written in B.ets, so the diagnostic must
+        # point at B.ets rather than at cycle[0] with B.ets's line/spec.
+        self.assertIn("contracts/B.ets:1 ./A", result.stdout)
+
+    def test_contracts_export_star_value_reexport_fails_d03(self) -> None:
+        result = run(D03_EXPORT_STAR_BAD, "--allowlist",
+                     str(D03_EXPORT_STAR_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("D-03", result.stdout)
+        self.assertIn("same-layer imports must be type-only", result.stdout)
+        # RR-02: header comments are masked; the diagnostic must still report
+        # the real export line (line 4), not line 1.
+        self.assertIn("contracts/Bad.ets:4 ./Base", result.stdout)
+
+    def test_contracts_export_type_star_reexport_passes(self) -> None:
+        result = run(D03_EXPORT_TYPE_STAR_OK, "--allowlist",
+                     str(D03_EXPORT_TYPE_STAR_OK / "allowlist.json"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("check_layering: PASS", result.stdout)
+        self.assertIn("violations=0", result.stdout)
+
+    def test_contracts_named_value_reexport_fails_d03(self) -> None:
+        result = run(D03_EXPORT_NAMED_VALUE_BAD, "--allowlist",
+                     str(D03_EXPORT_NAMED_VALUE_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("D-03", result.stdout)
+        self.assertIn("same-layer imports must be type-only", result.stdout)
+
+    def test_contracts_named_type_reexport_passes(self) -> None:
+        result = run(D03_EXPORT_NAMED_TYPE_OK, "--allowlist",
+                     str(D03_EXPORT_NAMED_TYPE_OK / "allowlist.json"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("check_layering: PASS", result.stdout)
+        self.assertIn("violations=0", result.stdout)
+
+    def test_contracts_type_only_reexport_cycle_fails_d03(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "tree"
+            contracts = root / "entry/src/main/ets/contracts"
+            contracts.mkdir(parents=True)
+            (contracts / "A.ets").write_text(
+                "// A re-exports B (type-only).\nexport type { B } from './B';\n",
+                encoding="utf-8")
+            (contracts / "B.ets").write_text(
+                "// B re-exports A (type-only).\nexport type { A } from './A';\n",
+                encoding="utf-8")
+            allowlist = Path(directory) / "allowlist.json"
+            allowlist.write_text(json.dumps({
+                "entries": [],
+                "port_location_exceptions": [],
+            }), encoding="utf-8")
+            result = run(root, "--allowlist", str(allowlist))
+            self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+            self.assertIn("contracts/** type-only import cycle", result.stdout)
+            self.assertIn("A.ets -> B.ets -> A.ets", result.stdout)
+            # Re-export edges participate in the cycle graph; the closing edge
+            # is B.ets's re-export at line 2.
+            self.assertIn("contracts/B.ets:2 ./A", result.stdout)
 
     def test_port_exception_missing_owner_is_exit_two(self) -> None:
         result = run_port("missing-owner")

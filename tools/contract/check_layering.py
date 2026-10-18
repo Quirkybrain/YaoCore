@@ -2,9 +2,10 @@
 """YaoCore C-29 layering checker (DES-A §2.2 D-01..D-06/D-08, DES-B §2.3 D-09..D-13/D-17).
 
 Producer: agent:test-engineer | Task: T-23 / wp-090-ports
+Updated: agent:implementation-engineer | Tasks: wp-093-t23-fixes, wp-101-checker-rr
 Contract: DES-A §2.2, §27.6; DES-B §2.3, §18.1; T-18 ruling 4b99e64 (§0.8/§0.9, §18.1);
-          T-20 final-system-review F-01/F-02/F-06.
-Status: T-23 implementation + wp-093 fixes. D-12 entries are file/symbol-level
+          T-20 final-system-review F-01/F-02/F-06; T-23 rereview RR-01/RR-02/RR-04.
+Status: T-23 implementation + wp-093 fixes + wp-101 checker debt. D-12 entries are file/symbol-level
 and ``status`` is enforced (a used entry that is not ``accepted`` fails the
 gate). Port location exceptions are read from ``port_location_exceptions``; the
 two former hardcoded port allowlists are gone. ``contracts/**`` is the canonical
@@ -72,13 +73,20 @@ RULE_ORDER = [
 ]
 
 IMPORT_RE = re.compile(
-    r"^\s*(?P<export>export\s+)?import\s+(?P<kind>type\s+)?"
+    r"^\s*(?P<export>export\s+)?(?P<import_kw>import)\s+(?P<kind>type\s+)?"
     r"(?:(?P<named>\{[^}]*\})|(?P<namespace>\*\s+as\s+\w+)|(?P<default>\w+))?"
     r"\s*(?:from\s*)?['\"](?P<spec>[^'\"]+)['\"]",
     re.MULTILINE | re.DOTALL,
 )
+# ``export * from`` is a value re-export, ``export type * from`` / ``export type
+# { ... } from`` are type-only re-exports (T-23 RR-01). ``export * as ns from``
+# also re-exports a runtime value. The line number is taken from the keyword
+# group, never from ``match.start()``: leading ``\s*`` may cross newlines and
+# would otherwise report a header comment as line 1 (T-23 RR-02).
 EXPORT_FROM_RE = re.compile(
-    r"^\s*export\s+(?P<kind>type\s+)?(?:\{[^}]*\}|\*\s+from)\s*from\s*['\"](?P<spec>[^'\"]+)['\"]",
+    r"^\s*(?P<export_kw>export)\s+(?P<kind>type\s+)?"
+    r"(?:(?P<named>\{[^}]*\})|(?P<star>\*\s*(?:as\s+\w+\s*)?))"
+    r"\s*from\s*['\"](?P<spec>[^'\"]+)['\"]",
     re.MULTILINE | re.DOTALL,
 )
 NEW_RE = re.compile(r"\bnew\s+(?P<name>[A-Z]\w*)\s*\(")
@@ -252,7 +260,7 @@ def parse_imports(root: Path, file: Path) -> list[ImportRecord]:
             symbols = []
         if not match.group("named") and not match.group("namespace") and not match.group("default"):
             kind = "side-effect"
-        line = masked[:match.start()].count("\n") + 1
+        line = masked[:match.start("import_kw")].count("\n") + 1
         records.append(ImportRecord(
             line=line,
             spec=spec,
@@ -265,13 +273,14 @@ def parse_imports(root: Path, file: Path) -> list[ImportRecord]:
         ))
     for match in EXPORT_FROM_RE.finditer(masked):
         spec = match.group("spec")
-        line = masked[:match.start()].count("\n") + 1
+        line = masked[:match.start("export_kw")].count("\n") + 1
+        symbols = _parse_named(match.group("named")) if match.group("named") else []
         target = resolve_target(root, file, spec)
         records.append(ImportRecord(
             line=line,
             spec=spec,
             kind="type" if match.group("kind") else "value",
-            symbols=[],
+            symbols=symbols,
             source_file=source_rel,
             source_layer=source_layer,
             target_rel=target,
@@ -762,7 +771,7 @@ def _contract_import_cycles(records: list[ImportRecord]) -> list[Violation]:
                 reported.add(key)
                 path = " -> ".join(Path(item).name for item in cycle)
                 violations.append(Violation(
-                    "D-03", cycle[0], record.line, record.spec,
+                    "D-03", record.source_file, record.line, record.spec,
                     f"contracts/** type-only import cycle: {path}"))
         stack.pop()
         state[node] = 2
@@ -874,6 +883,7 @@ def render_report(root: Path, violations: list[Violation], skipped: list[str],
     return {
         "tool": "check_layering.py",
         "producer": "agent:test-engineer",
+        "updated_by": ["wp-093-t23-fixes", "wp-101-checker-rr"],
         "task": "T-23 / wp-090-ports",
         "root": norm(root),
         "main_root": MAIN_PREFIX,

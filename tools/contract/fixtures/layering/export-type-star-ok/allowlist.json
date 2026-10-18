@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-101-checker-rr fixture",
+  "policy": "D-03 positive fixture: export type * from contracts/** is a type-only re-export.",
+  "entries": [],
+  "port_location_exceptions": []
+}
