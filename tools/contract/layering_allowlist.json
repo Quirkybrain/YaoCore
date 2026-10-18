@@ -3,7 +3,11 @@
   "artifact": "LAYERING-ALLOWLIST",
   "producer": "agent:implementation-engineer",
   "task": "T-23 / wp-090-ports",
-  "policy": "File/symbol-level exceptions only. Never widen a rule to a whole directory. D-12 entries are formalized by DES-B §2.3/§18.1; T-23 retired T20-D12-01..05/09/10 (unused; old paths no longer exist), leaving T20-D12-06/07/08/11/12/13. Port location exceptions are defined by DES-A §27.6: exact path + symbols subset + status accepted-location-exception; owner/close_condition/evidence must be non-empty. T-23 migrated the 17 registered entries; only PORT-LOC-01 remains for the frozen common/utils ClockPort/IdPort signatures. VmTimerPort is a VM-local seam in viewmodel/core/ViewModelCore.ets (DES-B §23.1 EXT-DES-B-33), not a contracts port and not a port_location_exception. The C-28 PermissionPort/PermissionResult/PermissionState/PermissionKind are app-layer seams (D-17), not contracts ports. Port exceptions never widen D-12.",
+  "updated_by": [
+    "wp-093-t23-fixes",
+    "wp-101-checker-rr"
+  ],
+  "policy": "File/symbol-level exceptions only. Never widen a rule to a whole directory. D-12 entries are formalized by DES-B §2.3/§18.1; T-23 retired T20-D12-01..05/09/10 (unused; old paths no longer exist), leaving T20-D12-06/07/08/11/12/13. Port location exceptions are defined by DES-A §27.6: exact path + symbols subset + status accepted-location-exception; owner/close_condition/evidence must be non-empty. T-23 migrated the 17 registered entries; only PORT-LOC-01 remains for the frozen common/utils ClockPort/IdPort signatures. VmTimerPort is a VM-local seam in viewmodel/core/ViewModelCore.ets (DES-B §23.1 EXT-DES-B-33), not a contracts port and not a port_location_exception. The C-28 PermissionPort/PermissionResult/PermissionState/PermissionKind are app-layer seams (D-17), not contracts ports. Port exceptions never widen D-12. Provenance: created for T-23 / wp-090-ports; updated by wp-093-t23-fixes (F-01..F-07) and wp-101-checker-rr (RR-01/RR-02/RR-04).",
   "entries": [
     {
       "id": "T20-D12-06",
