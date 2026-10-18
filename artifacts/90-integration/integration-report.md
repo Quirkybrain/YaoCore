@@ -623,3 +623,62 @@
 1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §14.2 的三项检查；不构成 Stage Gate、Component Quality、独立评审、设备验收或 release PASS。
 2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-104-des-sync` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-105-merge-report.md`；handoff 为 `state/handoffs/wp-105-merge-des.json`。
+
+---
+
+## 15. TEST-002 测试阶段报告合并记录（2026-10-18，wp-107）
+
+> 本节由 `repository-manager` 在合并任务 `wp-107-merge-testing` 中追加，记录 `task/wp-106-testing-stage` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§14 的历史结论仍针对各自标注的 revision，本节不回溯改写。本节只记录 TEST-002 测试阶段报告与 18 份证据日志已进入集成分支；不新增裁定、不宣告 Stage Gate、产品验收或 release PASS。
+
+### 15.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-106-testing-stage` @ `7200543010f4fe95cc6805ac7845f0312e46b181`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `e74a181cebec1968d9a197c38e350cd2dda6cc80`（合并前 = handoff `base_commit`） |
+| 合并基 | `e74a181`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `6939574be099ece91e3e698d4815fa932957298b`（`chore(merge): 合并 TEST-002 测试阶段报告`） |
+| 父提交 | `e74a181`（目标，第一父）+ `7200543`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 6939574 7200543` 退出 0 |
+| 合并范围 | 19 个路径（+6458 / −0）：`artifacts/60-testing/testing-stage-report.md`（+371）与 `artifacts/60-testing/evidence/` 下 18 份证据日志；全部落在 handoff `writes` 的 `artifacts/60-testing/` 内；未改 `input/`、产品代码、测试断言、工具、构建配置、README 或状态文件 |
+
+源提交（`e74a181..7200543`，1 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `7200543010f4fe95cc6805ac7845f0312e46b181` | test(stage): 执行 TEST-002 最终候选矩阵 |
+
+门禁证据：`artifacts/60-testing/testing-stage-report.md`（来源分支 blob sha256 `296ea215f73e04ad7266ec1f97aa403c846dd7fc345aed53a4970303f8de2a4c` = handoff `gate_evidence_path_sha256`；Producer `agent:test-engineer`）。该文件是 testing Stage 的测试报告与 handoff 固定证据，**不是独立审查报告**；本节不据此宣告新的 Gate PASS。
+
+### 15.2 合并后验证矩阵（在 `6939574` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3065.4 ms | 0 |
+| 2 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **hard checks: ALL PASS**：66 条 `[PASS]` / 0 条 `[FAIL]`；14 条既有 frozen-input `FINDING`（非阻塞） | 0 |
+| 3 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+
+补充：三项检查与 TEST-002 报告 §2 的对应结果一致（host 697/697、crosscheck 66/66、layering 0 violation）。命令均在合并提交的干净工作树上运行；Python 命令设置 `PYTHONDONTWRITEBYTECODE=1`；运行后清理 `__pycache__`，证据提交前 `git status --porcelain` 仅显示两份 deliverable（ignored 构建产物除外）。
+
+### 15.3 TEST-002 结论与残余
+
+| 项 | 结论 | 依据 |
+|---|---|---|
+| TEST-002 Verdict | **`PASS_WITH_ACCEPTED_RISKS`（代码级 testing Stage @ `e74a181`）**；11 项强制矩阵命令全部实际执行且 exit 0；0 `FAIL_PRODUCT` / 0 `FAIL_TEST` / 0 `FAIL_ENV` | `artifacts/60-testing/testing-stage-report.md` §2、§6 |
+| 强制矩阵 | host 697/697、crosscheck 66/66、仿真器契约 20/20（HTTP+TLS）、layering 0 violation、layering fixture 27/27、i18n `--strict-ui` 0 blocking / 0 missing、构建与 lint（0 error / 25 warning）通过；ACK p95 `0.609 ms` 仅 **`MOCK_ONLY`** | 同上 §2 |
+| FR / NFR | 26 FR：24 covered (host)、2 partial、0 gap；NFR 4.1/4.2/4.3 均 **partial**（设备/真实环境证据缺失，非代码级回归） | 同上 §3、§4 |
+| 建议 | G-016 testing Stage **`PASS_WITH_ACCEPTED_RISKS`**，允许进入 acceptance 分析；Gate 判定归 Orchestrator，本节不代行 | 同上 §7 |
+| `PORT-LOC-01` | **仍 OPEN**：`ClockPort`/`IdPort` 仍在 `common/types/Ports.ets`，为唯一 live 端口位置例外；0 violation 不代表端口位置完全合规 | 同上 §5.2 |
+| `D-030 / GAP-T18-01` | `FamilyRepository.addGatewayToFamily` 无 actor/RBAC；D-030 书面接受 v1 风险，**未关闭**；acceptance 必须记录 | 同上 §5.2、§7.2 |
+| `R4-01` | `addGatewayToFamily` 已发起后的取消不能 durable 回滚；v1 边界，无 durable 回滚测试 | 同上 §5.2 |
+| i18n / crosscheck 债务 | 73 warning / 16 hardcoded（均非用户可见 UI 字符串，0 blocking）；crosscheck 14 条既有 `FINDING`（冻结输入勘误线索，不阻断 hard checks） | 同上 §5.2 |
+| i18n legacy triage | 615 行：606 A（ACCEPTED 10 / MIGRATED 46 / PENDING_REVIEW 6 / OBSOLETE_LEGACY 544）、6 C、3 D；11 条 `B_REWRITE_REQUIRED`、6 条 `C_REVIEW`；不得把 544/46 写成业务语义已签署 | 同上 §5.2 |
+| 其他残余 | 测试源码 lint/覆盖率缺口；README 仍写 “596 条 `PENDING_REVIEW`” 旧口径（documentation 阶段同步）；unsigned HAP；构建 API warning | 同上 §5.2 |
+| 设备/真实环境 | `BLK-01..08` 仍 **BLOCKED / UNAVAILABLE**（无 `hdc` target、无模拟器、无签名、无真实 BLE/LAN/TLS/云）；不得用 host/build 结果外推为设备或产品验收 PASS | 同上 §5.3、§7.3 |
+
+### 15.4 边界声明
+
+1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §15.2 的三项检查；不构成 Stage Gate、Component Quality、独立评审、产品验收、设备验收或 release PASS。
+2. 合并与验证均在本地完成：合并前执行 `git fetch origin`（仅更新远端跟踪引用），未 push、未 pull、未 rebase，未改写任何已评审提交；未切换分支；`task/wp-106-testing-stage` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-107-merge-report.md`；handoff 为 `state/handoffs/wp-107-merge-testing.json`。
