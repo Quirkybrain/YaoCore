@@ -3,75 +3,8 @@
   "artifact": "LAYERING-ALLOWLIST",
   "producer": "agent:implementation-engineer",
   "task": "T-23 / wp-090-ports",
-  "policy": "File/symbol-level exceptions only. Never widen a rule to a whole directory. D-12 entries are formalized by DES-B §2.3/§18.1 T20-D12-01..13 and must keep status accepted; used entries with any other status fail the gate. Port location exceptions are defined by DES-A §27.6.2 / DES-B §18.1: exact path + symbols subset + status accepted-location-exception; an unregistered port path fails D-09/D-11. T-23 migrated all port declarations to contracts/** (and DTOs to model/**); only PORT-LOC-01 remains for the frozen common/utils ClockPort/IdPort signatures. Port exceptions never widen D-12.",
+  "policy": "File/symbol-level exceptions only. Never widen a rule to a whole directory. D-12 entries are formalized by DES-B §2.3/§18.1; T-23 retired T20-D12-01..05/09/10 (unused; old paths no longer exist), leaving T20-D12-06/07/08/11/12/13. Port location exceptions are defined by DES-A §27.6: exact path + symbols subset + status accepted-location-exception; owner/close_condition/evidence must be non-empty. T-23 migrated the 17 registered entries; only PORT-LOC-01 remains for the frozen common/utils ClockPort/IdPort signatures. VmTimerPort is a VM-local seam in viewmodel/core/ViewModelCore.ets (DES-B §23.1 EXT-DES-B-33), not a contracts port and not a port_location_exception. The C-28 PermissionPort/PermissionResult/PermissionState/PermissionKind are app-layer seams (D-17), not contracts ports. Port exceptions never widen D-12.",
   "entries": [
-    {
-      "id": "T20-D12-01",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/DeviceControlPage.ets",
-      "import": "entry/src/main/ets/repository/DomainModels.ets",
-      "symbols": [
-        "DeviceRecord"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-01.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-02",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/HomePage.ets",
-      "import": "entry/src/main/ets/repository/DomainModels.ets",
-      "symbols": [
-        "DeviceRecord"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-02.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-03",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/RoomsPage.ets",
-      "import": "entry/src/main/ets/repository/DomainModels.ets",
-      "symbols": [
-        "DeviceRecord"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-10 DTO type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-03.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-04",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/ScenePage.ets",
-      "import": "entry/src/main/ets/repository/DomainModels.ets",
-      "symbols": [
-        "SceneExecutionProgress",
-        "SceneExecutionResult",
-        "SceneStepResult"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-11 execution DTO type imports; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-04.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-05",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/ScenePage.ets",
-      "import": "entry/src/main/ets/repository/DomainModels.ets",
-      "symbols": [
-        "SceneRunState"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-11 enum type import; no service/repository construction or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-05.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
     {
       "id": "T20-D12-06",
       "rule": "D-12",
@@ -112,34 +45,6 @@
       "type_only": true,
       "status": "accepted",
       "reason": "T-20 F-02: pages read-only C-08 view type import; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-08.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-09",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
-      "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
-      "symbols": [
-        "BleProvisioningDevice",
-        "ProvisioningState",
-        "WifiAp"
-      ],
-      "type_only": false,
-      "status": "accepted",
-      "reason": "T-20 F-02 value import: same statement mixes runtime enum ProvisioningState with type-only BleProvisioningDevice/WifiAp; no service implementation construction/call, no I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-09.",
-      "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
-    },
-    {
-      "id": "T20-D12-10",
-      "rule": "D-12",
-      "from": "entry/src/main/ets/pages/ProvisioningPage.ets",
-      "import": "entry/src/main/ets/service/ble/BleProvisioningPorts.ets",
-      "symbols": [
-        "ProvisioningProgress"
-      ],
-      "type_only": true,
-      "status": "accepted",
-      "reason": "T-20 F-02: pages read-only C-19 progress type import; no service implementation construction/call or I/O. Formalized in DES-B §2.3 D-12 / §18.1 T20-D12-10.",
       "evidence": "artifacts/70-review/final-system-review.md F-02/§7.1; t18-review-c.md §R3-01; DES-B §2.3/§18.1; check_layering exceptions_used=13"
     },
     {

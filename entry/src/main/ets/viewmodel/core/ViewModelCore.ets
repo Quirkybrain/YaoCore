@@ -186,9 +186,11 @@ export class ControlUiState {
 }
 
 /**
- * Callback timer seam. Production wires setTimeout/clearTimeout in C-28; host
- * tests use a deterministic fake timer. It is intentionally separate from the
- * cloud TimerPort (sleep/cancel), which cannot schedule a callback.
+ * Callback timer seam (DES-B §23.1 EXT-DES-B-33). Production wires
+ * setTimeout/clearTimeout in C-28; host tests use a deterministic fake timer.
+ * It is a VM-local seam, not a contracts port, and intentionally separate from
+ * the C-15 cloud TimerPort (sleep/cancel) and the C-11 SceneTimerPort (delay),
+ * neither of which can schedule a reentrant callback.
  */
 export interface VmTimerPort {
   setTimer(delayMs: number, callback: () => void): number;

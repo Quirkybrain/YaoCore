@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-093 fixture",
+  "policy": "D-03 negative fixture: side-effect import is illegal.",
+  "entries": [],
+  "port_location_exceptions": []
+}

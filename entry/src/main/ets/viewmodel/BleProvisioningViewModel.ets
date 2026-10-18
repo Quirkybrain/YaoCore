@@ -29,8 +29,8 @@ import {
   ViewModelSupport
 } from './core/ViewModelCore';
 import type { ViewModelBase, VmTimerPort } from './core/ViewModelCore';
-import type { PermissionPort } from '../contracts/PermissionPort';
-import { PermissionKind } from '../contracts/PermissionPort';
+import type { ProvisioningPermissionPort } from '../contracts/PermissionPort';
+import { ProvisioningPermissionKind } from '../contracts/PermissionPort';
 import { I18nService } from '../service/i18n/I18nService';
 import { GatewayRepository } from '../repository/GatewayRepository';
 import { FamilyRepository } from '../repository/FamilyRepository';
@@ -110,7 +110,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   private readonly families: FamilyRepository;
   private readonly drafts: SecretDraftPort;
   private readonly crypto: CryptoPort;
-  private readonly permissions: PermissionPort;
+  private readonly permissions: ProvisioningPermissionPort;
   private readonly i18n: I18nService;
   private readonly clock: ClockPort;
   private readonly timer: VmTimerPort;
@@ -140,7 +140,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
   constructor(ble: IBleProvisioningClient, gateways: GatewayRepository,
     families: FamilyRepository, drafts: SecretDraftPort, crypto: CryptoPort,
-    permissions: PermissionPort, i18n: I18nService, clock: ClockPort, timer: VmTimerPort,
+    permissions: ProvisioningPermissionPort, i18n: I18nService, clock: ClockPort, timer: VmTimerPort,
     logger: LoggerPort) {
     this.ble = ble;
     this.gateways = gateways;
@@ -179,7 +179,7 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
   async requestPermission(): Promise<void> {
     const generation = this.cancelGeneration;
     try {
-      await this.permissions.ensure(PermissionKind.BLUETOOTH);
+      await this.permissions.ensure(ProvisioningPermissionKind.BLUETOOTH);
       if (this.isStale(generation)) {
         return;
       }

@@ -6,10 +6,10 @@
  *
  * Port-only surface consumed by C-05/C-13/C-19. No @ohos import here.
  *
- * Location exception (T-07 R-08 / T-06 R-13): DES-A §7 nominally places this
- * port under contracts/**. T-07/T-19 write scopes do not include contracts/,
- * so it stays in service/crypto/ with no duplicate implementation; migrate the
- * file once C-17 assembles the composition root.
+ * Moved to contracts/CryptoPort.ets by T-23 / wp-090-ports (2026-10-18) per
+ * DES-A §27.6.3 P1/P2; port-only surface, no @ohos import; the historical
+ * T-07/T-19 location exception is closed; do not reintroduce a copy under
+ * service/crypto/**.
  */
 import { AppErrors } from '../common/types/AppError';
 

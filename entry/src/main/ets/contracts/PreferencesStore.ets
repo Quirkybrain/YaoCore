@@ -8,10 +8,10 @@
  * optional last SSID). Large objects belong in RDB. Secrets/tokens/passwords/
  * private keys are forbidden here (SC-09).
  *
- * DES-A nominally places ports under contracts/**. T-08's write scope is
- * service/storage/** and repository/**, so this port remains next to its
- * implementation as a recorded location exception (same pattern as T-06 R-13
- * and T-07 R-08).
+ * Moved to contracts/PreferencesStore.ets by T-23 / wp-090-ports (2026-10-18)
+ * per DES-A §27.6.3 P1; port-only surface, no @ohos import; the historical T-08
+ * location exception is closed; do not reintroduce a copy under
+ * service/storage/**.
  */
 export interface PreferencesStore {
   getString(key: string): Promise<string | undefined>;

@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "artifact": "LAYERING-ALLOWLIST-FIXTURE",
+  "producer": "agent:implementation-engineer",
+  "task": "T-23 / wp-093 fixture",
+  "policy": "F-04 schema fixture: missing evidence must exit 2.",
+  "entries": [],
+  "port_location_exceptions": [
+    {
+      "id": "PORT-LOC-90",
+      "path": "entry/src/main/ets/service/ble/Ports.ets",
+      "symbols": [
+        "PortA"
+      ],
+      "kind": "port-only",
+      "status": "accepted-location-exception",
+      "owner": "fixture",
+      "reason": "fixture",
+      "close_condition": "fixture close"
+    }
+  ]
+}

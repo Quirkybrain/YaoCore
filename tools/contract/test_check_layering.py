@@ -1,9 +1,11 @@
 """Fixture self-test for tools/contract/check_layering.py (C-29 / T-20).
 
-Producer: agent:test-engineer | Updated: agent:implementation-engineer / Task: T-23 / wp-090-ports
+Producer: agent:test-engineer | Updated: agent:implementation-engineer / Task: T-23 / wp-093-t23-fixes
 Contract: DES-B §18.1 (checker must have legal/illegal fixture self-tests and
           enforce exception status/symbols); DES-B §2.3 D-01..D-17;
-          DES-A §27.6 port_location_exceptions; T-20 review F-01/F-02/F-06.
+          DES-A §27.6 port_location_exceptions; T-20 review F-01/F-02/F-06;
+          DES-A 附录 E §E.3/E.5 (type-only acyclic contracts graph, strict
+          exception metadata, any pending-* port exception exits 1).
 """
 from __future__ import annotations
 
@@ -23,6 +25,10 @@ PORTS = HERE / "fixtures/layering/port-exceptions"
 PENDING_D12 = HERE / "fixtures/layering/pending-d12"
 POST_MIGRATION = HERE / "fixtures/layering/post-migration"
 POST_MIGRATION_BAD = HERE / "fixtures/layering/post-migration-bad"
+D03_TYPE_ONLY_OK = HERE / "fixtures/layering/contracts-type-only-ok"
+D03_VALUE_BAD = HERE / "fixtures/layering/value-import-bad"
+D03_SIDE_EFFECT_BAD = HERE / "fixtures/layering/side-effect-bad"
+D03_CYCLE_BAD = HERE / "fixtures/layering/cycle-bad"
 
 
 def run(root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
@@ -130,6 +136,67 @@ class CheckLayeringFixtureTests(unittest.TestCase):
         for rule in ("D-09", "D-11", "D-12"):
             self.assertIn(rule, result.stdout)
         self.assertIn("not registered in port_location_exceptions", result.stdout)
+
+    def test_contracts_type_only_acyclic_graph_passes(self) -> None:
+        result = run(D03_TYPE_ONLY_OK, "--allowlist",
+                     str(D03_TYPE_ONLY_OK / "allowlist.json"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("check_layering: PASS", result.stdout)
+        self.assertIn("violations=0", result.stdout)
+
+    def test_contracts_same_layer_value_import_fails_d03(self) -> None:
+        result = run(D03_VALUE_BAD, "--allowlist",
+                     str(D03_VALUE_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("D-03", result.stdout)
+        self.assertIn("same-layer imports must be type-only", result.stdout)
+
+    def test_contracts_same_layer_side_effect_import_fails_d03(self) -> None:
+        result = run(D03_SIDE_EFFECT_BAD, "--allowlist",
+                     str(D03_SIDE_EFFECT_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("D-03", result.stdout)
+        self.assertIn("same-layer imports must be type-only", result.stdout)
+
+    def test_contracts_type_only_cycle_fails_d03(self) -> None:
+        result = run(D03_CYCLE_BAD, "--allowlist",
+                     str(D03_CYCLE_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("D-03", result.stdout)
+        self.assertIn("contracts/** type-only import cycle", result.stdout)
+        self.assertIn("A.ets -> B.ets -> A.ets", result.stdout)
+
+    def test_port_exception_missing_owner_is_exit_two(self) -> None:
+        result = run_port("missing-owner")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("owner must be non-empty", result.stderr)
+
+    def test_port_exception_missing_close_condition_is_exit_two(self) -> None:
+        result = run_port("missing-close-condition")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("close_condition must be non-empty", result.stderr)
+
+    def test_port_exception_missing_evidence_is_exit_two(self) -> None:
+        result = run_port("missing-evidence")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("evidence must be non-empty", result.stderr)
+
+    def test_port_exception_missing_id_is_exit_two(self) -> None:
+        result = run_port("missing-id")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("port exception id must be non-empty", result.stderr)
+
+    def test_port_exception_duplicate_id_is_exit_two(self) -> None:
+        result = run_port("duplicate-id")
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("duplicate port exception id", result.stderr)
+
+    def test_unused_pending_port_exception_fails_exit_one(self) -> None:
+        result = run_port("pending-unused")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("PORT PENDING PORT-LOC-97", result.stdout)
+        self.assertIn("port_pending=1", result.stdout)
+        self.assertIn("port_pending_used=0", result.stdout)
 
     def test_missing_main_root_is_exit_two(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

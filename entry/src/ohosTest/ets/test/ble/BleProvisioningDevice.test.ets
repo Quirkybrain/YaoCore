@@ -23,18 +23,16 @@ import { OhosCryptoProvider } from '../../../../main/ets/service/crypto/OhosCryp
 import { BytesUtil } from '../../../../main/ets/common/utils/BytesUtil';
 import { ProtobufReader, ProtobufWriter } from '../../../../main/ets/service/ble/Protobuf';
 import { ProtocommCodec } from '../../../../main/ets/service/ble/ProtocommCodec';
-import {
-  BleCharacteristicRef,
-  BlePermissionGate
-} from '../../../../main/ets/service/ble/BleProvisioningPorts';
-import { GattEndpointMap } from '../../../../main/ets/service/ble/GattEndpointMap';
+import { BlePermissionGate } from '../../../../main/ets/contracts/BleProvisioningPorts';
+import { BleCharacteristicRef } from '../../../../main/ets/model/ProvisioningModels';
+import { GattEndpointMap } from '../../../../main/ets/model/GattEndpointMap';
 import {
   Security1Session,
   Security1State
 } from '../../../../main/ets/service/ble/Security1Session';
 import { IdentityNegotiator } from '../../../../main/ets/service/ble/IdentityNegotiator';
 import { OhosBleTransport } from '../../../../main/ets/service/ble/adapters/OhosBleTransport';
-import type { RandomPort } from '../../../../main/ets/common/types/Ports';
+import type { RandomPort } from '../../../../main/ets/contracts/Ports';
 
 const provider: OhosCryptoProvider = new OhosCryptoProvider();
 const crypto: CryptoService = new CryptoService(provider);

@@ -4,27 +4,35 @@
 Producer: agent:test-engineer | Task: T-23 / wp-090-ports
 Contract: DES-A §2.2, §27.6; DES-B §2.3, §18.1; T-18 ruling 4b99e64 (§0.8/§0.9, §18.1);
           T-20 final-system-review F-01/F-02/F-06.
-Status: T-23 implementation. D-12 entries are file/symbol-level and ``status`` is
-enforced (a used entry that is not ``accepted`` fails the gate). Port location
-exceptions are read from ``port_location_exceptions``; the two former hardcoded
-port allowlists are gone. ``contracts/**`` is the canonical port location: repository,
-viewmodel, pages and components may import it directly under D-05/D-09/D-11/D-12.
-The registry only covers legacy locations; a port path that is not registered, a
-symbol outside the registered set, or a non-accepted location status fails
-D-09/D-11. A port exception never widens D-12: both allowlists are applied
-independently and the stricter one wins.
+Status: T-23 implementation + wp-093 fixes. D-12 entries are file/symbol-level
+and ``status`` is enforced (a used entry that is not ``accepted`` fails the
+gate). Port location exceptions are read from ``port_location_exceptions``; the
+two former hardcoded port allowlists are gone. ``contracts/**`` is the canonical
+port location: repository, viewmodel, pages and components may import it
+directly under D-05/D-09/D-11/D-12. The registry only covers legacy locations; a
+port path that is not registered, a symbol outside the registered set, or a
+non-accepted location status fails D-09/D-11. Exception metadata is strict:
+``id`` must be non-empty/unique and ``owner``/``reason``/``close_condition``/
+``evidence`` must be non-empty (malformed input exits 2); any ``pending-*`` port
+exception fails with exit 1 whether used or not. A port exception never widens
+D-12: both allowlists are applied independently and the stricter one wins.
+
+``contracts/**`` (D-03) may import ``common/**`` and ``model/**``; same-layer
+``contracts/**`` edges must be ``import type``/``export type`` and the
+contracts-only graph (including type-only edges) must be acyclic.
 
 Usage:
   python3 tools/contract/check_layering.py --root .
   python3 tools/contract/check_layering.py --root . --report reports/contract/layering.json
   python3 tools/contract/check_layering.py --root . --list-exceptions
 
-Exit codes: 0 = no violation, 1 = violation(s), 2 = input/CLI error.
+Exit codes: 0 = no violation, 1 = violation(s) or any pending-* port exception,
+            2 = malformed allowlist/registry or other input error.
 
 Scope (implemented here):
   D-01 common import floor
   D-02 model import floor
-  D-03 contracts import floor (when contracts/ exists)
+  D-03 contracts import floor + contracts/** type-only acyclic graph
   D-05/D-09 repository may not import service implementations or platform APIs
   D-06 adapters are only imported by the composition root / entryability
   D-08/D-11 UI and ViewModel platform/transport/storage/crypto direct imports
@@ -406,9 +414,13 @@ def load_port_location_exceptions(root: Path, explicit: Optional[Path]) -> list[
         raise ValueError("allowlist 'port_location_exceptions' must be a list")
     exceptions: list[PortLocationException] = []
     seen_paths: set[str] = set()
+    seen_ids: set[str] = set()
     for raw in raw_exceptions:
         if not isinstance(raw, dict):
             raise ValueError("port_location_exceptions entry must be an object")
+        entry_id = _non_empty_text(raw, "id", "port exception id")
+        if entry_id in seen_ids:
+            raise ValueError(f"duplicate port exception id {entry_id!r}")
         path = str(raw.get("path", ""))
         symbols = [str(item) for item in raw.get("symbols", [])]
         kind = str(raw.get("kind", ""))
@@ -424,19 +436,34 @@ def load_port_location_exceptions(root: Path, explicit: Optional[Path]) -> list[
         if status != PORT_ACCEPTED_STATUS and not status.startswith("pending-"):
             raise ValueError(
                 f"port exception {path!r} has invalid status {status!r}")
+        owner = _non_empty_text(raw, "owner", f"port exception {entry_id} owner")
+        reason = _non_empty_text(raw, "reason", f"port exception {entry_id} reason")
+        close_condition = _non_empty_text(
+            raw, "close_condition", f"port exception {entry_id} close_condition")
+        evidence = _non_empty_text(
+            raw, "evidence", f"port exception {entry_id} evidence")
         seen_paths.add(path)
+        seen_ids.add(entry_id)
         exceptions.append(PortLocationException(
-            id=str(raw.get("id", "")),
+            id=entry_id,
             path=path,
             symbols=symbols,
             kind=kind,
             status=status,
-            owner=str(raw.get("owner", "")),
-            reason=str(raw.get("reason", "")),
-            close_condition=str(raw.get("close_condition", "")),
-            evidence=str(raw.get("evidence", "")),
+            owner=owner,
+            reason=reason,
+            close_condition=close_condition,
+            evidence=evidence,
         ))
     return exceptions
+
+
+def _non_empty_text(raw: dict, key: str, label: str) -> str:
+    """Return the stripped metadata value or fail as a schema input error."""
+    value = raw.get(key, "")
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label} must be non-empty")
+    return value.strip()
 
 
 def _allowed(record: ImportRecord, allowlist: list[AllowEntry], rule: str) -> tuple[bool, Optional[AllowEntry]]:
@@ -525,10 +552,17 @@ def evaluate(root: Path, allowlist: list[AllowEntry],
                     f"model/** may only import common/** (+ model); got {spec!r}")
 
         # D-03 contracts import floor (only when contracts/ exists).
+        # T-23 F-02: same-layer edges are legal only when type-only; the
+        # contracts/** graph (including type-only edges) must also be acyclic.
         if source_layer == "contracts":
             if is_platform or target_layer not in (None, "common", "model", "contracts"):
                 add("D-03", record,
-                    f"contracts/** may only import common/** or model/**; got {spec!r}")
+                    "contracts/** may only import common/**, model/**, or "
+                    f"type-only contracts/**; got {spec!r}")
+            elif target_layer == "contracts" and record.kind != "type":
+                add("D-03", record,
+                    "contracts/** same-layer imports must be type-only "
+                    f"(import type/export type); got {spec!r}")
 
         # D-05 / D-09 repository floor. D-09 ports come only from the
         # versioned port_location_exceptions registry (no hardcoded paths).
@@ -666,6 +700,7 @@ def evaluate(root: Path, allowlist: list[AllowEntry],
                         f"{source_layer}/** must not construct service/repository/ViewModel "
                         f"({name} defined in {origin})"))
 
+    violations.extend(_contract_import_cycles(records))
     violations.extend(validate_port_location_files(root, port_exceptions))
 
     skipped.extend([
@@ -677,6 +712,65 @@ def evaluate(root: Path, allowlist: list[AllowEntry],
     ])
     violations.sort(key=lambda item: (item.path, item.line, item.rule))
     return violations, skipped
+
+
+def _canonical_cycle(cycle: list[str]) -> tuple[str, ...]:
+    """Normalize a cycle (closed path) so each directed cycle reports once."""
+    nodes = cycle[:-1]
+    if not nodes:
+        return ()
+    rotations = [tuple(nodes[index:] + nodes[:index]) for index in range(len(nodes))]
+    return min(rotations)
+
+
+def _contract_import_cycles(records: list[ImportRecord]) -> list[Violation]:
+    """Report each contracts/** import cycle once (T-23 F-02 / DES-A §2.2 D-03).
+
+    Every contracts -> contracts edge participates, including type-only edges;
+    all edges that reach this point are already type-only or separately reported
+    as D-03 value imports, so the graph is reported as a type-only cycle.
+    """
+    edges: dict[str, list[ImportRecord]] = {}
+    for record in records:
+        if (record.source_layer == "contracts" and
+                record.target_layer == "contracts" and record.target_rel):
+            edges.setdefault(record.source_file, []).append(record)
+    for outgoing in edges.values():
+        outgoing.sort(key=lambda item: (item.target_rel or "", item.line))
+
+    violations: list[Violation] = []
+    state: dict[str, int] = {}
+    stack: list[str] = []
+    reported: set[tuple[str, ...]] = set()
+
+    def visit(node: str) -> None:
+        state[node] = 1
+        stack.append(node)
+        for record in edges.get(node, []):
+            target = record.target_rel
+            if target is None:
+                continue
+            target_state = state.get(target, 0)
+            if target_state == 0:
+                visit(target)
+            elif target_state == 1:
+                start = stack.index(target)
+                cycle = stack[start:] + [target]
+                key = _canonical_cycle(cycle)
+                if key in reported:
+                    continue
+                reported.add(key)
+                path = " -> ".join(Path(item).name for item in cycle)
+                violations.append(Violation(
+                    "D-03", cycle[0], record.line, record.spec,
+                    f"contracts/** type-only import cycle: {path}"))
+        stack.pop()
+        state[node] = 2
+
+    for node in sorted(edges):
+        if state.get(node, 0) == 0:
+            visit(node)
+    return violations
 
 
 def _service_dir(target_rel: str) -> str:
@@ -923,6 +1017,10 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         print(f"  PORT PENDING {entry.id or entry.path} ({entry.status}, used={entry.used})")
     if violations:
         print(f"check_layering: FAIL ({len(violations)} violation(s))")
+        return 1
+    if port_pending:
+        # T-23 F-04: pending port exceptions are never a pass, even unused.
+        print(f"check_layering: FAIL ({len(port_pending)} pending port exception(s))")
         return 1
     print("check_layering: PASS")
     return 0

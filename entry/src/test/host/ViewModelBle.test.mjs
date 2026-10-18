@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { BleProvisioningViewModel } from '../../main/ets/viewmodel/BleProvisioningViewModel.ets';
-import { PermissionKind } from '../../main/ets/contracts/PermissionPort.ets';
+import { ProvisioningPermissionKind } from '../../main/ets/contracts/PermissionPort.ets';
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 import {
   FakeClock,

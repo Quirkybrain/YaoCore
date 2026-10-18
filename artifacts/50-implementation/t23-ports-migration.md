@@ -9,7 +9,7 @@
 - **Date**: 2026-10-18
 - **Workflow**: STANDARD / GATED_AUTO
 
-> **结论先行**：按 DES-A §27.6.3 P1-P3 建立 `entry/src/main/ets/contracts/**`，迁移 16 个端口/契约文件与 1 个纯映射 seam；17 条 `port_location_exceptions` 中 **16 条关闭**，仅保留 **PORT-LOC-01** 的 `ClockPort`/`IdPort`（原因见 §6.1）。混合文件按“端口→`contracts/**`、DTO/枚举→`model/**`”拆分，`check_layering` 删除全部硬编码端口路径放行，改为只读版本化登记；`violations=0`、`port_exceptions_used=0`。八项必跑命令全部退出 0：`assembleHap` BUILD SUCCESSFUL、codelinter 0 error、host **697/697**、layering 12/12、i18n blocking=0/missing=0、crosscheck hard checks ALL PASS。未改冻结端口签名、错误码、G-004 语义或 DES 文档。
+> **结论先行**：按 DES-A §27.6.3 P1-P3 建立 `entry/src/main/ets/contracts/**`，迁移 16 个端口/契约文件与 1 个纯映射 seam；17 条 `port_location_exceptions` 中 **16 条关闭**，仅保留 **PORT-LOC-01** 的 `ClockPort`/`IdPort`（原因见 §7.1）。混合文件按“端口→`contracts/**`、DTO/枚举→`model/**`”拆分，`check_layering` 删除全部硬编码端口路径放行，改为只读版本化登记；`violations=0`、`port_exceptions_used=0`。八项必跑命令全部退出 0：`assembleHap` BUILD SUCCESSFUL、codelinter 0 error、host **697/697**、layering 12/12、i18n blocking=0/missing=0、crosscheck hard checks ALL PASS。未改冻结端口签名、错误码、G-004 语义或 DES 文档。
 
 ---
 
@@ -45,7 +45,7 @@
 
 | ID | 原路径 | 新位置 | 结果 |
 |---|---|---|---|
-| PORT-LOC-01 | `common/types/Ports.ets` | `contracts/Ports.ets`（`RandomPort`/`LoggerPort`/`MetricsPort`/`HmacSignerPort`）+ `common/types/CancellationToken.ets`（`CancellationToken`）；**保留** `common/types/Ports.ets`（`ClockPort`/`IdPort`） | **部分关闭**；保留 1 条，理由 §6.1 |
+| PORT-LOC-01 | `common/types/Ports.ets` | `contracts/Ports.ets`（`RandomPort`/`LoggerPort`/`MetricsPort`/`HmacSignerPort`）+ `common/types/CancellationToken.ets`（`CancellationToken`）；**保留** `common/types/Ports.ets`（`ClockPort`/`IdPort`） | **部分关闭**；保留 1 条，理由 §7.1 |
 | PORT-LOC-02 | `service/crypto/CryptoPort.ets` | `contracts/CryptoPort.ets`（`CryptoPort` + X25519/AES/GCM 值类型） | 关闭 |
 | PORT-LOC-03 | `service/storage/RdbStore.ets` | `contracts/RdbStore.ets` | 关闭 |
 | PORT-LOC-04 | `service/storage/PreferencesStore.ets` | `contracts/PreferencesStore.ets` | 关闭 |
@@ -67,7 +67,7 @@
 
 ### 2.1 为满足 D-03 同步落位的 DTO（不属于 17 条端口例外）
 
-`contracts/**` 只允许 import `common/**`、`model/**`；以下 DTO/值类型必须随端口迁移离开 `repository/**`/`service/**`/`viewmodel/**`，否则新 `contracts/**` 会立即触发 D-03：
+`contracts/**` 只允许 import `common/**`、`model/**`，以及 **type-only 且无环**的同层 `contracts/**`（T-23 F-02 裁定，见 DES-A §2.2/附录 E §E.3）；以下 DTO/值类型必须随端口迁移离开 `repository/**`/`service/**`/`viewmodel/**`，否则新 `contracts/**` 会立即触发 D-03：
 
 | 原路径 | 新位置 | 内容 | 影响 |
 |---|---|---|---|
@@ -195,7 +195,7 @@
 
 | 风险 | 影响 | 处置 |
 |---|---|---|
-| `entry/src/ohosTest/**` 未在本次写范围，仍有 7 个文件/12 条旧路径 import（I18nModels、GatewayTransportPorts、BleProvisioningPorts、GattEndpointMap、RdbStore、SecretStore、DomainModels、common/types/Ports 的 RandomPort） | `assembleHap`/host 测试不编译 ohosTest，本次验证不受影响；设备测试编译会失败 | 建议紧随的 bounded 任务仅更新 ohosTest import（不改断言），或由 repository-manager 在设备测试任务前处理 |
+| `entry/src/ohosTest/**` 未在本次写范围，仍有 7 个文件/12 条旧路径 import（I18nModels、GatewayTransportPorts、BleProvisioningPorts、GattEndpointMap、RdbStore、SecretStore、DomainModels、common/types/Ports 的 RandomPort 与 LoggerPort×2；9 条失效模块 + `RandomPort` + `LoggerPort`×2） | `assembleHap`/host 测试不编译 ohosTest，本次验证不受影响；设备测试编译会失败 | 建议紧随的 bounded 任务仅更新 ohosTest import（不改断言），或由 repository-manager 在设备测试任务前处理；见 §10 wp-093 执行记录 |
 | 7 条 D-12 entries 变为 unused（T20-D12-01..05/09/10） | 白名单保留历史条目，与 DES-B §18.1 当前文本一致 | 后续 DES-B 同步任务退休；本次不修改 DES-B（写范围外） |
 | `service/**` 仍 import `repository/**` 用例实现（`FamilyService`/`SceneService` 等） | 这是用例→仓储的正常依赖，不是端口反向可见性；D-09 仅禁止 repository→service | 记录为架构既有形态，不在本任务扩大范围 |
 | codelinter 25 条 warn / i18n 73 条 warning / crosscheck 14 条 frozen-input findings | 均为迁移前既有；本次未新增 error/blocking | 保持基线，交由各自 Stage 处置 |
@@ -234,3 +234,65 @@ python3 tools/contract/test_check_layering.py
 python3 entry/src/test/i18n/check_i18n.py --strict-ui
 python3 tools/contract/crosscheck_protocol_assets.py
 ```
+
+---
+
+## 10. T-23 裁定修复执行记录（2026-10-18，wp-093）
+
+> **性质**：按 `artifacts/40-detailed-design/des-001a-foundation-transport.md` / `des-001b-domain-presentation.md` **附录 E**（commit `76c47f4`）逐条落地 F-01..F-07 与 ohosTest import 修复。**边界**：只改 `entry/src/main/ets/**`、`entry/src/test/**`、`entry/src/ohosTest/**`、`tools/contract/**`、`artifacts/50-implementation/**`；不改 DES 文本、冻结签名、错误码或 G-004 语义。**Harness**：`task/wp-090-ports`，base `76c47f4`。
+
+### 10.1 逐条实现
+
+| Finding | 实现位置 | 结果 |
+|---|---|---|
+| **F-01** `TimerPort` 归属 | `contracts/TimerPort.ets` 文件头删除 `EXT-DES-B-01` 错误引用，写明 C-15 云轮询 `sleep/cancel`；`VmTimerPort` 指向 DES-B §23.1 `EXT-DES-B-33`；`SceneTimerPort.ets` 与 `viewmodel/core/ViewModelCore.ets` 的 `VmTimerPort` 声明注释同步“三分保留” | 仅注释；`TimerPort.sleep/cancel` 签名未变；`grep -R "scheduleOnce\|scheduleRepeating\|TimerHandle" entry/src/main/ets entry/src/test` 无命中 |
+| **F-02** D-03 type-only/无环 | `tools/contract/check_layering.py`：`contracts/**` 同层仅接受 `import type`/`export type`；值/副作用/namespace 值导入报 D-03；新增 contracts 同层有向图 DFS 环检测（含 type-only 边，每环报一次） | 现有 4 条 type-only 边保留未写；repo `violations=0`；新增 `contracts-type-only-ok`、`value-import-bad`、`side-effect-bad`、`cycle-bad` fixture |
+| **F-03** C-23 符号重命名 | `contracts/PermissionPort.ets` → `ProvisioningPermissionPort`/`ProvisioningPermissionKind`，不导出 `PermissionResult`；`viewmodel/BleProvisioningViewModel.ets`、`app/PermissionGate.ets`、`entry/src/test/host/ViewModelBle.test.mjs` 同步；`app/PermissionPolicy.ets` 的 C-28 `PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult` 未改 | `grep -R "export interface PermissionPort\|export enum PermissionKind" entry/src/main/ets/contracts` 无命中；`BleViewModelPermissionGate` 仍是唯一适配器；host ViewModelBle 通过 |
+| **F-04** 例外元数据/pending | `load_port_location_exceptions()`：`id` 非空唯一，`owner`/`reason`/`close_condition`/`evidence` 去空白非空；畸形 → `ValueError` → exit 2；`main()` 对任何 `pending-*`（used 或 unused）exit 1，保留 `used && status != accepted` 路径 | 新增 `missing-owner`/`missing-close-condition`/`missing-evidence`/`missing-id`/`duplicate-id`（exit 2）与 `pending-unused`（exit 1）fixture；`port_pending=0` |
+| **F-05** 陈旧文件头 | `contracts/CryptoPort.ets`、`contracts/PreferencesStore.ets` 删除“仍留在 service/**”段落，改为“T-23 已迁移、历史例外关闭、不得在旧目录重建副本” | 仅注释；无接口/字段变更 |
+| **F-06** 报告勘误 | 本报告 §1/§2 的“§6.1” → “§7.1”；§2.1 改为“common/model + contracts type-only 无环”；§7.2 ohosTest 清单补 `LoggerPort`×2（7 文件/12 条 = 9 模块失效 + `RandomPort` + `LoggerPort`×2）；本 §10 记录执行结果 | 交叉引用与清单一致；不改变原结论 |
+| **F-07** allowlist policy | `tools/contract/layering_allowlist.json` 删除 7 条 retired D-12（`T20-D12-01..05/09/10`），保留 6 条 active；`policy` 按附录 E §E.6 文本更新（PORT-LOC-01 保留；`VmTimerPort` 为 VM 本地 seam；C-28 app seam 说明） | `entries=6`、`exceptions_used=6`、`unused_exceptions=[]`；`port_location_exceptions=1`（仅 PORT-LOC-01） |
+
+### 10.2 ohosTest import 修复（7 文件 / 12 条原失效 import）
+
+| 文件 | 原 import | 新 import |
+|---|---|---|
+| `viewmodel/ViewModelsDevice.test.ets` | `service/i18n/I18nModels`（`SupportedLocale`） | `model/I18nModels` |
+| `gateway/GatewayTransportDevice.test.ets` | `service/gateway/GatewayTransportPorts`（`HttpRequest`/`TlsPolicy`） | `model/GatewayTransportModels` |
+| `storage/StorageDevice.test.ets` | `service/storage/SecretStore`（`SecretAlias`） | `common/types/SecretAlias` |
+| `storage/StorageDevice.test.ets` | `service/storage/RdbStore`（`RdbTransaction`） | `contracts/RdbStore` |
+| `ble/BleProvisioningDevice.test.ets` | `service/ble/BleProvisioningPorts`（`BlePermissionGate`） | `contracts/BleProvisioningPorts` |
+| `ble/BleProvisioningDevice.test.ets` | 同上语句的 `BleCharacteristicRef` | `model/ProvisioningModels`（混合语句按符号拆分） |
+| `ble/BleProvisioningDevice.test.ets` | `service/ble/GattEndpointMap` | `model/GattEndpointMap` |
+| `ble/BleProvisioningDevice.test.ets` | `common/types/Ports`（`RandomPort`） | `contracts/Ports` |
+| `cloud/CloudDevice.test.ets` | `service/gateway/GatewayTransportPorts`（`HttpRequest`/`TlsPolicy`） | `model/GatewayTransportModels` |
+| `domain/DomainDevice.test.ets` | `repository/DomainModels`（`DiscoverApplyOptions`） | `model/DeviceRecord` |
+| `domain/DomainDevice.test.ets` | `common/types/Ports`（`LoggerPort`） | `contracts/Ports` |
+| `i18n/I18nDevice.test.ets` | `common/types/Ports`（`LoggerPort`） | `contracts/Ports` |
+| `i18n/I18nDevice.test.ets` | `service/i18n/I18nModels` | `model/I18nModels` |
+
+- `ClockPort`/`IdPort` 仍从 `common/types/Ports` import（PORT-LOC-01，3 个文件），不属于失效路径。
+- 静态检索：`grep -REn "from ['\"][^'\"]*(service/i18n/I18nModels|service/gateway/GatewayTransportPorts|service/ble/BleProvisioningPorts|service/ble/GattEndpointMap|service/storage/RdbStore|service/storage/SecretStore|repository/DomainModels)(\.ets)?['\"]" entry/src/ohosTest` → **0**；ohosTest 全部相对 import 解析缺失 **0/122**。
+- 未改任何断言/测试语义；`BleCharacteristicRef` 的拆分由 ohosTest 编译错误发现并修正（该 DTO 属 `model/**`，端口文件只 import type）。
+
+### 10.3 验证矩阵（wp-093 实际执行）
+
+| # | 命令 | 退出码 | 关键结果 |
+|---|---|---|---|
+| 1 | `ohpm install` | 0 | install completed |
+| 2 | `hvigorw clean assembleHap --no-daemon` | 0 | **BUILD SUCCESSFUL**（14 s 976 ms） |
+| 3 | `codelinter -c code-linter.json5 -p default .` | 0 | **Errors: 0**；Warns 25（迁移前既有） |
+| 4 | `entry/src/test/run-host-tests.sh` | 0 | **tests 697 / pass 697 / fail 0** |
+| 5 | `python3 tools/contract/check_layering.py` | 0 | files=221 **violations=0** exceptions_used=6 pending=0 **port_exceptions_used=0** port_pending=0 |
+| 6 | `python3 tools/contract/test_check_layering.py` | 0 | **Ran 22 tests / OK**（含 4 条 D-03、6 条 F-04 fixture 用例） |
+| 7 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | 0 | blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16（既有基线） |
+| 8 | `python3 tools/contract/crosscheck_protocol_assets.py` | 0 | **hard checks: ALL PASS**；14 条 frozen-input findings（既有） |
+| 9 | `hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon` | 0 | **BUILD SUCCESSFUL**（13 s 233 ms）；ohosTest 编译通过 |
+
+### 10.4 残余与风险
+
+- **PORT-LOC-01 仍为 OPEN**：`ClockPort`/`IdPort` 留在 `common/types/Ports.ets`，关闭条件不变（需批准的 D-01 或冻结签名变更）；不得写成“17 条全关闭”。
+- **D-12 历史保留**：7 条 retired 条目只在 live allowlist 删除；DES-B §18.1 历史表与旧 JSON 证据保留，Stage Gate 记录“6 active / 7 retired”。
+- **设备运行未执行**：ohosTest 仅完成编译；设备/模拟器、真实 BLE/网关仍 **BLOCKED/NOT RUN**。
+- **基线告警**：codelinter 25 warn、i18n 73 warning/16 hardcoded、crosscheck 14 findings 均与迁移前一致，本任务未新增 error/blocking。
+- **F-01 三分**：未合并 `TimerPort`/`VmTimerPort`/`SceneTimerPort`；`VmTimerPort` 未进入 `contracts/**` 或端口位置例外。
