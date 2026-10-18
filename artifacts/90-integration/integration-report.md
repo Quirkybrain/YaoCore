@@ -879,3 +879,71 @@
 1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §18.2 的五项检查；不构成 G-018、Component Quality、独立评审、用户验收、产品验收、设备验收或 release PASS。
 2. 合并与验证均在本地完成：按任务“仅本地”要求未 fetch、未 pull、未 push、未 rebase，未改写任何已评审提交；未切换分支；`task/wp-110-documentation` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-111-merge-report.md`；handoff 为 `state/handoffs/wp-111-merge-docs.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 documentation 合并证据`。
+
+---
+
+## 19. release 准备计划合并记录（2026-10-18，wp-113）
+
+> 本节由 `repository-manager` 在合并任务 `wp-113-merge-release-plan` 中追加，记录 `task/wp-112-release-plan` → `feat/yaocore-app` 的本地合并与合并后复验。目的是把 RELEASE-001 发布准备计划与发布检查单纳入集成分支，并留下可追溯的合并证据。**本节不构成发布授权、部署授权、签名授权、用户验收或 release Gate PASS。**
+
+### 19.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-112-release-plan` @ `560d08a9e76ac949c0a00b51500fcedee137958b`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `6cd9a88d0fdc1b08cc6ffca233c12c41df737519`（合并前 = handoff `base_commit`；`chore(release): 目标扩展至 release 准备（不发布）`） |
+| 合并基 | `6cd9a88`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `40fe2a8895aa80fb4ef2191fdd973e3da3d5e1f1`（`chore(merge): 合并 release 准备计划与检查单`） |
+| 父提交 | `6cd9a88`（目标，第一父）+ `560d08a`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 40fe2a8 560d08a` 退出 0 |
+| 合并范围 | 2 个路径（+780 / −3）：`artifacts/85-release/release-plan.md`（+476/−3）、`docs/release-checklist.md`（新建，307 行）；全部落在 handoff `writes` 内；未改 `input/`、产品代码、测试断言、工具、契约或构建配置 |
+
+源提交（`6cd9a88..560d08a`，1 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `560d08a9e76ac949c0a00b51500fcedee137958b` | docs(release): 发布就绪评估与检查单 |
+
+门禁证据：`artifacts/85-release/release-plan.md`（合并后 blob sha256 `3e2cd6158216f58d2a84cad9bc1bb2e87a9c84c29aee3252c58399bc02756411` = handoff `gate_evidence_path_sha256`）。该文件是 RELEASE-001 的发布准备评估，**不是发布批准或独立审查报告**；本节不据此宣告 release Gate PASS。
+
+### 19.2 合并后验证矩阵（在 `40fe2a8` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `PYTHONDONTWRITEBYTECODE=1 entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；`duration_ms 3604.514874` | 0 |
+| 2 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **`hard checks: ALL PASS`**：66 条 `[PASS]` / 0 条 `[FAIL]`；14 条既有 frozen-input `FINDING`（非阻塞） | 0 |
+| 3 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+
+补充：三项检查均在 `40fe2a8` 的干净工作树上运行，与 documentation 合并（§18.2）及 TEST-002 的基线一致（host 697/697、crosscheck 66/66、layering `files=221 / 0 violation`）。命令统一设置 `PYTHONDONTWRITEBYTECODE=1`；运行后已清理 `__pycache__`；完整日志暂存于 `/tmp/opencode/wp113/`（未提交）。构建 / lint 未在本次合并中重跑，仍引用 TEST-002 @ `e74a181` 的 `BUILD SUCCESSFUL` 与 `codelinter 0 error / 25 warning`。
+
+### 19.3 交付物与内容检查
+
+| 文件 | 合并后状态 | 说明 |
+|---|---|---|
+| `artifacts/85-release/release-plan.md` | 474 行；完整章节与评估 | RELEASE-001；Producer `agent:release-engineer`；sha256 与 handoff 门禁证据一致 |
+| `docs/release-checklist.md` | 307 行；新建 | 发布检查单，含检查项、命令与责任角色；非占位内容 |
+
+`docs/` 受 `.gitignore` 忽略，但来源分支已以 `-f` 提交该检查单，合并后仍为已跟踪文件（`git ls-files docs/release-checklist.md` 可验证）。两份交付物中出现的 `TODO` 均为对既有 README 许可证占位的事实描述（B-01），不是本次交付物的未完成占位。
+
+### 19.4 RELEASE-001 裁定与阻塞项（摘要，权威文本在 release-plan.md）
+
+RELEASE-001 的 Release Verdict 为 **`NOT_READY`**（不满足发布授权条件）。以下 8 项阻塞在合并时点全部 **未关闭**；任一项未关闭即不得进入发布授权或市场/远端发布：
+
+| # | 阻塞项 | 摘要 |
+|---|---|---|
+| B-01 | 项目级许可证未定 | 无 `LICENSE`；README 仍为 TODO；不得假定可再分发 |
+| B-02 | 无签名配置，HAP 不可安装 | `signingConfigs: []`；构建跳过签名；产物未签名 |
+| B-03 | 设备/用户验收未执行 | ACCEPT-001 U-01..U-12 均 NOT RUN/BLOCKED；无 `hdc` target |
+| B-04 | GAP-AC-01..03 未决 | LAN IP 显示、多家庭切换交互、房间图标接线未决 |
+| B-05 | 远端/发布通道未授权 | 未 push；无 tag；远端策略与保护分支/CI 未就绪 |
+| B-06 | 发布标识/版本/构建模式未冻结 | bundleName/vendor/version 待确认；未签名产物为 `buildMode=debug` |
+| B-07 | CHANGELOG/Release Notes 缺失 | 无 `CHANGELOG.md` 与正式 release notes |
+| B-08 | 残余风险未逐项书面确认 | PORT-LOC-01、i18n 残余、设备 BLOCKED、ACK p95 `MOCK_ONLY`、NFR partial、lint/覆盖率缺口等 |
+
+### 19.5 未授权边界与工作树声明
+
+1. 本任务**仅本地合并**：未 fetch、未 pull、未 push、未创建 PR/MR、未创建 tag、未签名、未执行任何市场或远端发布写操作；`task/wp-112-release-plan` 分支保留，未切换分支。
+2. 合并未改写任何已评审提交；合并提交新增的只有两份 release 准备交付物。
+3. 本节只证明 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §19.2 的三项检查；不构成独立评审、release Gate PASS、发布授权、部署授权、签名授权或用户验收。发布相关裁定仍归 Orchestrator / 用户。
+4. 合并后证据更新与报告提交见 `state/reports/wp-113-merge-report.md`；handoff 为 `state/handoffs/wp-113-merge-release-plan.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 release 准备合并证据`。
