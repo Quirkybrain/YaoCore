@@ -11,7 +11,7 @@
 - **Final release revision/tag**: **未冻结**（待 B-06/B-09 与用户决策后确定；当前无 tag；`e74a181` 是代码证据基线，不是最终发布 commit）
 - **Workflow**: STANDARD / GATED_AUTO
 - **Target Stage**: `release`（用户 2026-10-18 选择「Release 准备（不发布）」）
-- **Upstream**: `state/project-state.md`（Release 准备段）；`artifacts/65-acceptance/acceptance-report.md`（ACCEPT-001）；`artifacts/60-testing/testing-stage-report.md`（TEST-002 @ `e74a181`）；`artifacts/80-maintenance/maintenance-plan.md`（MAINTENANCE-PLAN-001 v1.1）；`README.md`（README-001 v1.2）；`config/project.md`；`AppScope/app.json5`；`build-profile.json5`；`config/git-policy.json`；`docs/git-collaboration.md`；G-014..G-018；`artifacts/70-review/t26-release-review.md`（T26-RELEASE-REVIEW）
+- **Upstream**: `state/project-state.md`（Release 准备段）；`artifacts/65-acceptance/acceptance-report.md`（ACCEPT-001）；`artifacts/60-testing/testing-stage-report.md`（TEST-002 @ `e74a181`）；`artifacts/80-maintenance/maintenance-plan.md`（MAINTENANCE-PLAN-001 v1.1）；`README.md`（README-001 v1.3）；`config/project.md`；`AppScope/app.json5`；`build-profile.json5`；`config/git-policy.json`；`docs/git-collaboration.md`；G-014..G-018；`artifacts/70-review/t26-release-review.md`（T26-RELEASE-REVIEW）
 - **Write scope**: `artifacts/85-release/`、`docs/`；本任务唯一交付为 `artifacts/85-release/release-plan.md` 与 `docs/release-checklist.md`。未修改代码、版本号、签名配置、测试断言、契约、Gate 记录、release notes/CHANGELOG/README 或 `input/`。
 - **Input pins**: 原始任务 `wp-112` 的 10 项输入 10/10 一致（§11.1）；修订任务 `wp-116` 的 4 项输入与只读复核见 §11.5。
 
@@ -73,14 +73,14 @@
 | **B-08** | 残余风险未逐项书面确认 | D-030/RA-01、R4-01/RA-02、PORT-LOC-01、i18n 残余、设备 BLOCKED、ACK p95 MOCK_ONLY、NFR partial、测试 lint/覆盖率缺口、未签名产物 | 用户在发布 Gate 记录中逐项接受，或派发修复；不得静默忽略 | 用户 / Orchestrator / 各 owner |
 | **B-09** | 构建硬化/兼容性决策未完成 | API 18 `ColumnType/TEXT/BLOB` 与 compatible **API 14** 的运行时兼容性未验证；混淆/裁剪未启用且未决定；符号化/崩溃定位与回归方案未记录 | 完成 API 14 运行时验证，或用户书面接受“未验证”的范围与残余风险；记录混淆/裁剪启用与否的决策、理由、符号化/崩溃定位方案与回归结果；不得仅以“构建成功”关闭 | 用户 / `implementation-engineer` / `release-engineer` |
 
-> B-01..B-09 未全部关闭时，发布 Gate 结论保持 `NOT_READY`；不得用“代码级 PASS”替代发布授权。`release-notes-v1.0.0.md` §9 的 B 列表当前仍为 B-01..B-08，B-09 与 F-01 相关表述由 `technical-writer` 后续同步；本任务只改本计划与检查单。
+> B-01..B-09 未全部关闭时，发布 Gate 结论保持 `NOT_READY`；不得用“代码级 PASS”替代发布授权。`release-notes-v1.0.0.md` §9 与 `docs/release-checklist.md` §7 使用同一 B-01..B-09 编号（wp-117 已同步）；本任务只改本计划与检查单，不改变任何阻塞项状态。
 
 ### 2.3 已就绪的部分（可复用证据）
 
 - 代码级 Gate 链：G-015 review、G-016 testing、G-017 acceptance readiness、G-018 documentation 均为 `PASS`/`PASS_WITH_ACCEPTED_RISKS`；release 为独立阶段，不自动继承为发布 PASS。
 - TEST-002：11/11 强制矩阵 exit 0；host 697/697、crosscheck 66/66、仿真器 20/20、layering 0 violation、fixture 27/27、i18n 0 blocking、triage 615 行一致、构建/lint 通过。
 - 本任务在 `6cd9a88` 上重新构建并复跑关键检查（见 §11），未发现产品行为失败或测试断言失败。
-- README v1.2（README-001）、ACCEPT-001、TEST-002、维护计划 v1.1 与 G-014..G-018 可作为发布说明/风险登记的上游。
+- README v1.3（README-001）、ACCEPT-001、TEST-002、维护计划 v1.1 与 G-014..G-018 可作为发布说明/风险登记的上游。
 
 ---
 
@@ -97,7 +97,7 @@
 | **构建产物** | 默认 `clean assembleHap`：`entry/build/default/outputs/default/entry-default-unsigned.hap`，4,597,005 B，SHA-256 `1983ea22…839c7`，14 条目，`buildMode=debug`；补充 `buildMode=release` 干净构建：1,616,146 B，SHA-256 `1602110d…35bd03`，13 条目，`buildMode=release`、`debug=false`，均未签名 | `DONE（unsigned build）` / `NOT_INSTALLABLE` | 发布候选须以 release 模式在冻结 revision 上重建；签名后重新记录大小/SHA-256；构建目录被 gitignore，产物不提交 |
 | **CHANGELOG / Release Notes** | **草案已产出 @ `63d2235`**：`CHANGELOG.md`（`Status: DRAFT`）与 `docs/release-notes-v1.0.0.md`（`DRAFT / NOT_READY`） | `PARTIAL` | 内容待发布评审与用户/发布负责人签核（B-07）；按 B-09 与 §4.4 决定同步 B 列表、身份/版本与许可证表述 |
 | **LICENSE** | 当前树无项目级 `LICENSE`；README §许可与致谢为 **TODO**；`entry/oh-package.json5` 的 `license` 为空；模板/第三方文件保留各自版权声明。公开旧版本为 **Apache-2.0 + `LICENSE` + `NOTICE`** | `BLOCKED` | **待 §4.4 A/B/C 决定**：A 继承旧 Apache-2.0/NOTICE；B 为新应用确定许可证（如有衍生关系仍须评估 Apache-2.0 义务）；C 单独裁定。许可证未定前不得公开再分发 |
-| **文档** | README-001 v1.2、ACCEPT-001、TEST-002、MAINTENANCE-PLAN-001 v1.1、G-014..G-018；本任务维护发布计划与检查单；CHANGELOG/release notes 草案 @ `63d2235` | `PARTIAL` | release notes/CHANGELOG 待评审/签核；商店文案/隐私说明（如适用）仍缺；文档数字须与本计划/证据一致 |
+| **文档** | README-001 v1.3、ACCEPT-001、TEST-002、MAINTENANCE-PLAN-001 v1.1、G-014..G-018；本任务维护发布计划与检查单；CHANGELOG/release notes 草案 @ `63d2235` | `PARTIAL` | release notes/CHANGELOG 待评审/签核；商店文案/隐私说明（如适用）仍缺；文档数字须与本计划/证据一致 |
 | **测试证据** | TEST-002 @ `e74a181`：11/11 矩阵 exit 0；`6cd9a88` 复跑：ohpm install、build、host 697/697、crosscheck 66/66、simulator 20/20、layering 0 violation、fixture 27/27、i18n 0 blocking、triage 615、codelinter 0 error/25 warning；产品代码自 `e74a181` 至本修订未变 | `DONE（code-level；代码证据基线 e74a181/TEST-002）` | 设备/真实网络/性能仍见下；最终 release revision/tag 未冻结；任何代码/配置变更使证据失效，需 Change Impact 与重跑 |
 | **验收** | ACCEPT-001：`READY_FOR_USER_ACCEPTANCE`（有条件）；U-01..U-12 未执行；G-017 仅为 acceptance readiness | `PENDING` | 用户验收/设备矩阵完成前，不得宣称产品验收或发布就绪 |
 | **已接受风险** | D-030/GAP-T18-01（RA-01）、R4-01（RA-02）、PORT-LOC-01、i18n 6 PENDING + 11 B + 6 C + 3 D、设备 BLOCKED（RA-05）、ACK p95 MOCK_ONLY（RA-06）、NFR 4.1/4.2/4.3 partial（RA-07）、测试 lint/覆盖率缺口（RA-08）、未签名（RA-10）；构建硬化/API 14 兼容性（B-09） | `PENDING_RELEASE_SIGNOFF` | 发布 Gate 前逐项书面接受或修复；不得把 partial 写成达标 |
@@ -549,7 +549,7 @@ git merge-base main origin/main   # 空：历史不相关
 | 验收就绪 | `artifacts/65-acceptance/acceptance-report.md`（ACCEPT-001） |
 | 测试证据 | `artifacts/60-testing/testing-stage-report.md`（TEST-002 @ `e74a181`，代码证据基线）；§11.2（`6cd9a88` 构建探针）；§11.5（本修订验证） |
 | 维护/设备矩阵 | `artifacts/80-maintenance/maintenance-plan.md` §4、§5 |
-| 文档/限制 | `README.md`（README-001 v1.2）；`CHANGELOG.md` 与 `docs/release-notes-v1.0.0.md` 草案 @ `63d2235`；MAINTENANCE-PLAN-001 v1.1 |
+| 文档/限制 | `README.md`（README-001 v1.3）；`CHANGELOG.md` 与 `docs/release-notes-v1.0.0.md` 草案 @ `63d2235`；MAINTENANCE-PLAN-001 v1.1 |
 | 公开旧版本 | `origin/main` @ `7d6f4c9`（`io.github.quirkybrain.yaocore`、1.0.0/1000000、Apache-2.0 + NOTICE）；§4.4 |
 | 复审输入 | `artifacts/70-review/t26-release-review.md`（T26-RELEASE-REVIEW；F-01..F-06） |
 | Gate | G-014（implementation）、G-015（review）、G-016（testing）、G-017（acceptance readiness）、G-018（documentation） |

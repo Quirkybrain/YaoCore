@@ -87,7 +87,7 @@
 |---|---|---|---|---|
 | 1.4.1 | zh-CN/en-US 资源完整；无 blocking 硬编码；key parity 通过 | `implementation-engineer` / `test-engineer` | `check_i18n.py --strict-ui`、资源清单、HAP 内 `resources/rawfile/i18n/*` | `DONE` |
 | 1.4.2 | i18n 历史文案残余已 triage（6 PENDING / 11 B / 6 C / 3 D）；544 OBSOLETE 不作为删除清单 | `technical-writer` / `implementation-engineer` | `legacy-migration.csv`、triage 日志、残余签核 | `PENDING（人工收口/接受）` |
-| 1.4.3 | README 与实际 revision/命令/数字/已知限制一致 | `technical-writer` | README v1.2、差异检查 | `DONE（v1.2）` |
+| 1.4.3 | README 与实际 revision/命令/数字/已知限制一致 | `technical-writer` | README v1.3、差异检查 | `DONE（v1.3）` |
 | 1.4.4 | `CHANGELOG.md` 草案已覆盖本版本；待评审/签核 | `technical-writer` | `CHANGELOG.md`（`Status: DRAFT`）、变更分类、评审记录 | `PARTIAL（草案已产出 @63d2235；待评审/签核）` |
 | 1.4.5 | Release notes 草案已覆盖范围、验证边界、已知限制、安装/升级、许可证；待评审/定稿 | `technical-writer` + 用户 | `docs/release-notes-v1.0.0.md`（`DRAFT / NOT_READY`）、评审记录 | `PARTIAL（草案已产出 @63d2235；待评审/签核）` |
 | 1.4.6 | 文档链接、命令、产物路径与实际仓库一致 | `technical-writer` / `release-engineer` | 链接检查、命令清单、路径核对 | `PENDING（发布前复核）` |
@@ -305,7 +305,7 @@ Rollback: <plan/owner/previous artifact>
 
 **发布 Gate 结论：`NOT_READY`。** 本检查单在 B-01..B-09 关闭并完成 §2 授权记录前，不得用于发布执行。
 
-> 回滚阈值（RELEASE-001 §8.1.1）仍为提案，须用户批准；批准前不构成回滚授权。`release-notes-v1.0.0.md` §9 的 B 列表当前仍为 B-01..B-08，B-09 与 F-01 相关表述由 `technical-writer` 后续同步；本任务只改发布计划与检查单。
+> 回滚阈值（RELEASE-001 §8.1.1）仍为提案，须用户批准；批准前不构成回滚授权。`release-notes-v1.0.0.md` §9 与 RELEASE-001 §2、本检查单 §7 的阻塞项编号一致（B-01..B-09，wp-117 已同步）；本修订不改变任何阻塞项状态。
 
 ---
 
