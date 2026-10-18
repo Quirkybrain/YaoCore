@@ -4,8 +4,8 @@
 
 YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域网通道。App 负责 BLE 配网、局域网设备控制、真实状态同步、场景联动，以及家庭 / 房间 / 设备管理。ESP32-S3 网关是外部物理设备，其固件不在本仓库内。
 
-> **Producer**: agent:technical-writer · **Status**: ACTIVE · **文档版本**: README-001 v1.1 · **生效日期**: 2026-10-18 · **适用代码基线**: `e74a181`（TEST-002；产品代码内容至 G-017 `4faf3e3` 未变） · **阶段 Gate 基线**: `4faf3e3`（G-017）
-> **变更记录**: v1.1（G-018 documentation，wp-110）同步 A1/T-23 端口迁移、i18n triage、D-12 6 active / 7 retired、TEST-002 与 G-015..G-017 证据及阶段状态；移除 A 类非 ACCEPTED 总数被误写为 `PENDING_REVIEW` 的旧口径，以及端口 / D-12 / 分层 / 性能的过期数字。
+> **Producer**: agent:technical-writer · **Status**: ACTIVE · **文档版本**: README-001 v1.2 · **生效日期**: 2026-10-18 · **适用代码基线**: `e74a181`（TEST-002；产品代码内容至 G-017 `4faf3e3` 未变） · **阶段 Gate 基线**: `4faf3e3`（G-017）
+> **变更记录**: v1.2（wp-114 release notes）新增“发布状态与发布文档”小节，链接 `CHANGELOG.md`、v1.0.0 发布说明、RELEASE-001 与发布检查单；发布状态保持 `NOT_READY`，未改变既有验证数字与证据口径。v1.1（G-018 documentation，wp-110）同步 A1/T-23 端口迁移、i18n triage、D-12 6 active / 7 retired、TEST-002 与 G-015..G-017 证据及阶段状态；移除 A 类非 ACCEPTED 总数被误写为 `PENDING_REVIEW` 的旧口径，以及端口 / D-12 / 分层 / 性能的过期数字。
 > 维护节奏、待办与风险接受登记见 [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md)。
 
 ## 核心设计原则
@@ -56,6 +56,21 @@ YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域�
 | ACK p95 | **MOCK_ONLY** | localhost 约 0.6 ms 量级，数值随环境波动；不是 NFR 4.3 验收数据 |
 
 > `PASS` 仅表示对应 revision、对应环境实际执行且断言通过。构建 / lint 证据来自 TEST-002 @ `e74a181`，产品代码内容自该提交至 `4faf3e3` 未变；其余检查在 documentation 阶段复跑。`COMPILED_ONLY`、`BLOCKED`、`NOT_RUN`、`UNAVAILABLE`、`MOCK_ONLY` 均不写成 PASS。详细证据与分类见 [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md)（TEST-002）与 [`artifacts/65-acceptance/acceptance-report.md`](artifacts/65-acceptance/acceptance-report.md)（ACCEPT-001）。
+
+## 发布状态与发布文档
+
+> **发布状态：`NOT_READY`（发布准备评估已完成；版本未发布，发布未授权）。**
+>
+> 当前 `signingConfigs` 为空，构建产物未签名、不可安装；设备 / 用户验收未执行；许可证仍为 **TODO**。push、PR/MR、tag、签名、应用市场与任何远端发布操作均未授权，需项目所有者显式授权。B-01..B-08 的当前状态见 RELEASE-001 §2 与发布检查单 §7。
+
+| 文档 | 路径 | 用途 |
+|---|---|---|
+| 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) | v1.0.0 发布准备基线的 Added / Security / Known Issues / Verification |
+| 用户发布说明（草案） | [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) | 版本与平台、支持设备、安装前提、首次使用、已知限制与证据边界 |
+| 发布准备计划（RELEASE-001） | [`artifacts/85-release/release-plan.md`](artifacts/85-release/release-plan.md) | 就绪评估、阻塞项 B-01..B-08、签名 / 远端 / 回滚预案 |
+| 发布检查单（RELEASE-CHECKLIST-001） | [`docs/release-checklist.md`](docs/release-checklist.md) | 发布前 / 中 / 后检查项与证据要求 |
+
+> `CHANGELOG.md` 与 `docs/release-notes-v1.0.0.md` 当前为**发布准备草案**：B-07 的文档缺口已补齐草案，但仍需发布评审 / 用户签核；这不改变 `NOT_READY` 结论。
 
 ## v1 范围与安全边界
 
@@ -355,6 +370,9 @@ YaoCore/
 | 独立系统评审 | [`artifacts/70-review/final-system-review.md`](artifacts/70-review/final-system-review.md) |
 | 集成验证报告 | [`artifacts/90-integration/integration-report.md`](artifacts/90-integration/integration-report.md)（INTEGRATION-REPORT-001） |
 | 维护计划与风险登记 | [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md) |
+| 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) |
+| v1.0.0 发布说明（草案） | [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) |
+| 发布准备计划 / 检查单 | [`artifacts/85-release/release-plan.md`](artifacts/85-release/release-plan.md)、[`docs/release-checklist.md`](docs/release-checklist.md) |
 
 `input/` 为冻结的设计语料，只读；如与契约基线或 ADR 冲突，按变更提案流程处理，不直接修改 `input/`。文档版本与修订机制见维护计划 §2。
 
