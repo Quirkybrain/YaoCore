@@ -3,9 +3,9 @@
 - **Artifact ID**: DES-001B
 - **Producer**: agent:solution-architect
 - **Type**: Detailed Design / Interface Contract（可实现粒度，不含产品实现代码）
-- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）；**T-18 裁定同步（2026-10-18）见 §0.9/§23.7**（R2-03 C-09/C-11/C-19/C-23/C-28 增量登记、F-06 D-12 白名单扩展、`GAP-T18-01`/`TRUST-T18-01`；不改变冻结签名与 G-004 语义）；**T-20 收口（2026-10-18）见 §0.10/§2.3/§18.1/§23.7**（F-02 13 条 D-12 例外正式化；不改变冻结签名与 G-004 语义）
-- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-09/C-11/C-19/C-23/C-28 公共签名/端口增量（`EXT-DES-B-28..32`），裁定 D-12 采用文件/符号级白名单扩展（不迁移 UI 类型），并登记 `GAP-T18-01`/`TRUST-T18-01`；见 §0.9/§2.3/§12.1.1/§18.1/§23.7。不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/F-02 把 13 条 pages 既有 service/repository DTO/UI 枚举 import（10 条 `import type` + 3 条含运行时值的 import）正式纳入 §2.3 D-12 与 §18.1 文件/符号级 allowlist，`status` 定稿为 `accepted`；同步登记端口物理位置例外与 checker 读取契约（§18.1；DES-A §27.6）。不改变任何冻结签名、页面/服务契约与 G-004 语义。
-- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-20 收口，§0.10/§2.3/§18.1/§23.7）
+- **Status**: Accepted（G-007 PASS @ `0b5e636`）；2026-10-17 `G-007 扩展 / T-09 复审同步`（D-022/D-023、`SCENE_RUN_IN_PROGRESS`、C-13 回执账本；不改变已冻结签名与 G-004 语义）；T-13 裁定同步（2026-10-17）见 §0.4；T-13 复审收尾（2026-10-17）见 §0.5（`EXT-DES-B-26` 登记；不宣告 `STABLE`）；**T-14 裁定同步（2026-10-17）见 §0.6**（F-03/F-04/F-05/F-06；不改变冻结签名与 G-004 语义）；**T-15 裁定同步（2026-10-17）见 §0.7**（F-06/F-07；成员加入 `COMPLETED` 唯一定义、C-08 `MEMBER_BOUND`/`markProfileBound`、C-22 档案完成时序与 `needsUnlock`；不改变冻结签名与 G-004 语义）；**T-17 裁定同步（2026-10-18）见 §0.8**（U-01 D-12/D-17、UI 显式 props DI、F-01 启动键名、F-09 构造顺序；不改变冻结签名与 G-004 语义）；**T-18 裁定同步（2026-10-18）见 §0.9/§23.7**（R2-03 C-09/C-11/C-19/C-23/C-28 增量登记、F-06 D-12 白名单扩展、`GAP-T18-01`/`TRUST-T18-01`；不改变冻结签名与 G-004 语义）；**T-20 收口（2026-10-18）见 §0.10/§2.3/§18.1/§23.7**（F-02 13 条 D-12 例外正式化；不改变冻结签名与 G-004 语义）；**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）见 §18.1/§23.1/§23.7/附录 E**（F-01 `EXT-DES-B-01` 退休、`EXT-DES-B-33` `VmTimerPort` 登记；F-02 D-03 type-only 规则；F-03 C-23 契约符号 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`；7 条 D-12 退休；未改变已实现冻结签名/G-004 语义）
+- **Revision（`G-007 扩展 / T-09 复审同步`，2026-10-17）**: 同步 **D-022**（邀请 `maxUses`/`ACCEPTED` 非终态/过期回执）与 **D-023**（`DomainOperationGate` 有界等待）；登记 R2-04 的 `SCENE_RUN_IN_PROGRESS`（§6.2/§23.4）与 R3-01 的 C-13 回执去重账本（§23.6）。上游裁决见 `state/project-state.md` Decisions；复审证据见 `artifacts/70-review/t09-review-b.md` §R2-04、`artifacts/70-review/t09-review-c.md` §4。**T-13 裁定同步（2026-10-17，`wp-051-t13-contracts`）**：F-02 家庭行导入（`EXT-DES-B-25`）、F-04 账本并发措辞、F-08 GUEST 场景裁定，并同步 F-07 的 `InviteServicePort` 回执输入语义；依据 `artifacts/70-review/t13-review.md`。不改变冻结签名与 G-004 语义。**T-13 复审收尾（2026-10-17，`wp-054-t13-sync2`）**：按 `artifacts/70-review/t13-review-b.md` R2-01 登记 `InviteServicePort.releaseReceipt`（`EXT-DES-B-26`；仅 C-08 提交失败补偿、非通用 API；失败处理与补偿失败残留跟踪见 §23.6），并按 R2-02 同步 ADR-003 §5.4 的 canonical `YCP1` 回执形态；不改变冻结签名与 G-004 语义。**T-14 裁定同步（2026-10-17，`wp-057-t14-rulings`）**：按 `artifacts/70-review/t14-review.md` F-03/F-04/F-05/F-06 裁定 `testConnection` 两层状态语义、固定名/inventory 完成判定路由、v1 单 active 云作用域与 `brand.*` 资源键归属；只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-15 裁定同步（2026-10-17，`wp-062-t15-rulings`）**：按 `artifacts/70-review/t15-16-review.md` F-06/F-07 裁定成员加入 `COMPLETED` 的唯一定义（成员绑定 + 家庭行 + 本地档案 + active family）、C-08 新增 `MEMBER_BOUND` 阶段与 `FamilyJoinSession.markProfileBound()`（`EXT-DES-B-27`）、C-22 `completeJoinWithProfile` 固定时序与 `needsUnlock`/`AUTH_PROFILE_EXISTS` 重试边界；`submitInvitation` 成功终态由 `COMPLETED` 改为 `MEMBER_BOUND`（语义修订，不是签名变更）；不改变 DES-A 冻结签名、邀请/回执线格式与 G-004 语义。**T-17 裁定同步（2026-10-18，`wp-071-t17-ruling`）**：按 `artifacts/70-review/t17-review.md` U-01（关联 F-01/F-09）裁定 D-12/D-17 的分层分工、`AppCompositionRoot` 构造注入为唯一生产装配、UI 显式 `@Require` props 为唯一依赖传递方式（不使用 `@Provide/@Consume`）；同步 `ShellBootstrap` 启动键与 `CompositionPlan` 已登记的 F-09/SceneService 顺序偏差。只同步设计语义，不改变 DES-A/DES-B 冻结签名与 G-004 语义。**T-18 裁定同步（2026-10-18，`wp-078-t18-contracts`）**：按 `artifacts/70-review/t18-review-b.md` R2-03/F-06 登记 C-09/C-11/C-19/C-23/C-28 公共签名/端口增量（`EXT-DES-B-28..32`），裁定 D-12 采用文件/符号级白名单扩展（不迁移 UI 类型），并登记 `GAP-T18-01`/`TRUST-T18-01`；见 §0.9/§2.3/§12.1.1/§18.1/§23.7。不改变冻结签名与 G-004 语义。**T-20 收口（2026-10-18，`wp-084-contract-cleanup`）**：按 `artifacts/70-review/final-system-review.md` F-01/F-02 把 13 条 pages 既有 service/repository DTO/UI 枚举 import（10 条 `import type` + 3 条含运行时值的 import）正式纳入 §2.3 D-12 与 §18.1 文件/符号级 allowlist，`status` 定稿为 `accepted`；同步登记端口物理位置例外与 checker 读取契约（§18.1；DES-A §27.6）。不改变任何冻结签名、页面/服务契约与 G-004 语义。**T-23 裁定同步（2026-10-18，`wp-092-t23-contracts`）**：依据 `artifacts/70-review/t23-review.md`（commit `f290f69`）与 `artifacts/50-implementation/t23-ports-migration.md`，① F-01 采用方案 B——`contracts/TimerPort.ets` 保持 C-15 云 `TimerPort.sleep/cancel`，正式退休从未实现的 `EXT-DES-B-01`（`scheduleOnce/scheduleRepeating/cancel`+`TimerHandle`），新增 `EXT-DES-B-33` 登记实际 VM seam `VmTimerPort`（`viewmodel/core/ViewModelCore.ets`，`setTimer/clearTimer`）；`VmTimerPort`/`TimerPort`/`SceneTimerPort` 保留三分；② F-02 D-03 允许 `contracts/**` 同层 type-only 且无环（DES-A §2.2/附录 E）；③ F-03 C-23 VM-facing 符号改为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`，`PermissionResult` 保留 app 层 C-28；④ §18.1 `T20-D12-01..05/09/10` 正式退休（unused，保留历史）；⑤ F-04/F-05/F-06/F-07 勘误交后续 bounded task。**变更依据**：`EXT-DES-B-01` 从未实现，实际冻结代码为 `VmTimerPort`；本次仅修正设计文本，不改变任何已实现签名/错误语义/G-004 语义。详见附录 E。
+- **Date**: 2026-10-17（初版）；**Last Updated**: 2026-10-18（T-23 裁定同步，§18.1/§23.1/§23.7/附录 E）
 - **Task**: `wp-009-des-b`（T-04；task 分支 `task/wp-009-des-b`，父分支 `feat/yaocore-app`，base commit `a57723d`）
 - **Workflow**: STANDARD / GATED_AUTO（`config/project.md` L17-19）
 - **Target Stage**: `implementation`
@@ -136,7 +136,7 @@
 
 | 裁定 | 结论 | 落点 |
 |---|---|---|
-| **U-01 D-12/D-17 分工** | D-12 与 D-17 不是同一维度：**D-12 管 `pages/**`/`components/**` 的 import 白名单，D-17 管 `app/**` 的依赖方向与可见性**。修订后 D-17 取代旧句“只能被 `entryability/**`/`pages/Index.ets` 引用”：`app/**` 可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；`app/**` 可依赖 `viewmodel/**`，但**仅限 VM 工厂与 VM 端口适配**（`AppCompositionRoot.create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `PermissionPort` 适配），不得在 app 内实现业务规则；`viewmodel/**` 不得反向 import `app/**`。D-12 增补 `app/{ShellBootstrap,ShellTheme,ShellGateRouting,ContinuousGestureGuard,PermissionPolicy}.ets` UI seam；`ShellTheme` 是 T-17/T-18 过渡，C-24 全量迁移到 `common/theme/**` 后从 app 白名单移除。 | §2.3 D-12/D-17；§13.1.3；§17.1.2/§17.1.5；§18.1 |
+| **U-01 D-12/D-17 分工** | D-12 与 D-17 不是同一维度：**D-12 管 `pages/**`/`components/**` 的 import 白名单，D-17 管 `app/**` 的依赖方向与可见性**。修订后 D-17 取代旧句“只能被 `entryability/**`/`pages/Index.ets` 引用”：`app/**` 可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；`app/**` 可依赖 `viewmodel/**`，但**仅限 VM 工厂与 VM 端口适配**（`AppCompositionRoot.create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `ProvisioningPermissionPort` 适配），不得在 app 内实现业务规则；`viewmodel/**` 不得反向 import `app/**`。D-12 增补 `app/{ShellBootstrap,ShellTheme,ShellGateRouting,ContinuousGestureGuard,PermissionPolicy}.ets` UI seam；`ShellTheme` 是 T-17/T-18 过渡，C-24 全量迁移到 `common/theme/**` 后从 app 白名单移除。 | §2.3 D-12/D-17；§13.1.3；§17.1.2/§17.1.5；§18.1 |
 | **U-01 UI 依赖注入** | 生产装配唯一方式 = `AppCompositionRoot` **构造注入**（服务/仓储/适配器/VM）；禁止全局单例、服务定位器、页面自行 `new` 服务/仓储/VM。UI 依赖传递唯一方式 = **显式类型化 props**：必需依赖 `@Require`，单向状态 `@Prop`，双向/可观察状态 `@Link`/`@ObjectLink`，事件用回调。**`@Provide`/`@Consume` 不作为生产依赖注入机制**；T-17 的显式 `@Require` props 被确认。`@LocalStorageProp('bootstrap')` 只用于 EntryAbility→Index 启动交接，`AppStorage`/`@StorageLink` 不得用于服务/VM 实例传递，二者均不得作为通用服务定位器；`Index` 只持有实例并向直接子组件显式传参。 | §0.2-9；§1.1-8；§12.4；§13.1.3；§17.1.2/§17.1.4/§17.1.5；§17.4 |
 | **F-01 启动键名同步** | `EntryAbility` 向 ability `LocalStorage` 写入单个 `ShellBootstrap` 包装对象（键 `bootstrap`，含 `appContext`/`startupError`）；`Index` 必须用 `@Entry({ useSharedStorage: true })` + `@LocalStorageProp('bootstrap')` 读取。§17.1.4/§17.1.5 旧“写入 `appContext` 键”的文字被取代；这是对已实现修复的契约同步，不改变 `AppContext`/`AppCompositionRoot` 签名。若 T-18 需要拆分键，必须走 Change Impact。 | §17.1.4/§17.1.5 |
 | **F-09 CryptoService 顺序（最小裁定）** | 接受 `CryptoService`/`CryptoRandomSource` 在 `PLATFORM`（第 1 步）构造：它只依赖 `OhosCryptoProvider`/`CryptoRandomSource`，无存储边；§2.4 第 5 步仍是安全栈的逻辑分组，`CompositionPlan.ASSEMBLY_CONSTRUCTION_ORDER` 是可执行构造顺序。该偏差与已登记的 `SceneService` 偏差一并视为 T-17 接受项；除此之外不得新增顺序偏差，变更需 Change Impact。 | §2.4；§17.1.2；§18.1 |
@@ -154,7 +154,7 @@
 |---|---|---|
 | **R2-03 C-09 服务层 RBAC** | `RoomService` 8 个变更方法增加**可选** `actorMemberId?: string`；构造器增加可选 `RoomActorLookupPort`。提供 actor 时必须在 C-08 中为 `ACTIVE` 且 `FamilyRbac.requireAdmin` 通过，否则 `AUTH_RBAC_DENIED`；缺省 actor 是 **v1 local-admin trust**（与 `FamilyService.requireAdmin` 同约定），生产 `RoomViewModel` 始终传入 active memberId。UI 隐藏不是授权。 | §4.1.3；§23.7 `EXT-DES-B-28`；DES-A §27.5 |
 | **R2-03 C-19 additive seam** | `IBleProvisioningClient.scanWifiAccessPoints(BleWifiScanRequest, listener, cancellation?)` 为**新增**方法：真实执行 permission→scan→connect→MTU/discovery→capability→Security1→identity→AP 扫描，随后断链并清零 PoP；不应用 Wi-Fi 凭据。`provision()` 仍是权威聚合流程。代价是 Step2/3 预览与 Step4 `submit` 各建一次 BLE 会话（两次 Security1）；若后续改为复用会话，走 Change Impact。 | §12.1.1；§16.1.2；§23.7 `EXT-DES-B-29`；DES-A §16.1.1/§27.5 |
-| **R2-03 C-23 expectedGatewayId / RECONFIGURE** | `BleProvisioningViewModel.submit(..., expectedGatewayId?)` 把目标 id 写入 `BleProvisioningRequest.expectedGatewayId`；`ROTATE_SECRET`/`RECONFIGURE` 在 `ProvisioningPage.aboutToAppear` 必须携带该 id，缺失直接 `blocked`；`IdentityNegotiator.checkExpected` 在绑定前做最终校验。强校验语义不等于新错误码，沿用既有 `PROTOCOL_INVALID_IDENTIFIER`/`PROVISIONING_BINDING_IDENTITY_MISMATCH` 等。`prepareWifi(pop, expectedGatewayId?)` 与 `PermissionPort.openSettings?` 为同批增量；`openSettings` 是可选能力，缺失时调用方以 `CONFIGURATION_ERROR` fail-closed。 | §12.1.1；§16.1.2；§23.7 `EXT-DES-B-30` |
+| **R2-03 C-23 expectedGatewayId / RECONFIGURE** | `BleProvisioningViewModel.submit(..., expectedGatewayId?)` 把目标 id 写入 `BleProvisioningRequest.expectedGatewayId`；`ROTATE_SECRET`/`RECONFIGURE` 在 `ProvisioningPage.aboutToAppear` 必须携带该 id，缺失直接 `blocked`；`IdentityNegotiator.checkExpected` 在绑定前做最终校验。强校验语义不等于新错误码，沿用既有 `PROTOCOL_INVALID_IDENTIFIER`/`PROVISIONING_BINDING_IDENTITY_MISMATCH` 等。`prepareWifi(pop, expectedGatewayId?)` 与 `PermissionPort.openSettings?` 为同批增量；`openSettings` 是可选能力，缺失时调用方以 `CONFIGURATION_ERROR` fail-closed。**T-23 后 C-23 符号为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`（§23.7/附录 E）；本行为 T-18 历史记录。** | §12.1.1；§16.1.2；§23.7 `EXT-DES-B-30` |
 | **R2-03 C-28 UI seams** | `PageVmFactoryPort`（9 个 `create*ViewModel`）由 `AppCompositionRoot` 实现，经 `AppContext.pageVms` 与 `Index`/`MainShell` 显式 props 传给页面；`AppContext.subscribeActiveFamily` 提供活动家庭变化订阅；`NavigationService.openRoomsWithHighlight/consumeRoomsHighlight` 提供一次性房间高亮；`OnboardingPort`/`OnboardingService` 提供 NO_PROFILE 创建/加入/取消。均为文档此前未登记的 seam（本次登记；不改变既有 `AppContext`/`AppCompositionRoot` 方法签名）。 | §17.1.1/§17.1.2/§17.1.3；§23.7 `EXT-DES-B-31` |
 | **R2-03 C-11 场景授权** | `SceneExecutionAuthorizationPort` 新增为 `SceneService`/`SceneViewModel` 的可选构造依赖；`SceneService.run()` 在任何命令前 fail-closed，`SceneViewModel.canExecuteScene()` 与 `run()` 使用同一端口。属服务/VM 增量，不改变 DES-A 冻结签名。 | §6.1.4；§11.1.3；§23.7 `EXT-DES-B-32` |
 | **F-06 D-12 唯一裁定** | **采用“白名单扩展”，不做 UI 类型迁移**：① `pages/**` 可 `import type { PageVmFactoryPort }` from `app/PageVmFactory`；② `components/**` 可 import `viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯枚举/只读 UI 状态类型，并可为预览**构造** `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值，但不得 import `*ViewModel`/端口/构造或调用 VM；③ `components/support/UiMapping.ets` 可值 import `service/ac/AcModels` 的 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`，并可构造 `AcViewState`（C-16 预览）与 `DoorUiState`（C-21 门锁预览）两个纯值；`DeviceCards.ets` 仅 `import type AcViewState`；④ components 对 C-10/C-11/C-15 只读结果 DTO 允许 `import type`（当前实际为 `DeviceRecord`、`SceneExecutionResult`）。类型迁移到 `model/**` 作为后续可选重构，不在 T-18 执行；若执行，走 Change Impact，不得与本次白名单并行。**理由**：迁移会改动 C-16/C-21 的类型归属与多个已稳定组件，超出 T-18 写范围；文件/符号级白名单可由 T-20 精确约束，风险更低。 | §2.3 D-12；§18.1；§23.7 `EXT-DES-B-31`（UI seam 部分） |
@@ -170,7 +170,7 @@
 
 | 项 | 结论 | 落点 |
 |---|---|---|
-| **F-02 13 条 D-12 例外** | 按 T-18 既有裁定方向（文件/符号级白名单，不迁移 UI 类型）正式纳入 `pages/**` 白名单；10 条 `import type` + 3 条含运行时值的 import 全部 `status: accepted`。 | §2.3 D-12 注记；§18.1 `T20-D12-01..13` |
+| **F-02 13 条 D-12 例外** | 按 T-18 既有裁定方向（文件/符号级白名单，不迁移 UI 类型）正式纳入 `pages/**` 白名单；10 条 `import type` + 3 条含运行时值的 import 全部 `status: accepted`。**T-23 更新：6 条 active（`T20-D12-06/07/08/11/12/13`；2 条值 import），7 条退休（`T20-D12-01..05/09/10`；旧路径已不存在，unused）。** | §2.3 D-12 注记；§18.1 `T20-D12-01..13`（状态列） |
 | **3 条值 import 说明** | `FamilyManagePage` 的 `CreateInvitationInput`/`FamilyJoinPhase` 用于构造表单输入与比较 join 阶段；`ProvisioningPage` 的 `BleProvisioningDevice`/`ProvisioningState`/`WifiAp` 中仅 `ProvisioningState` 是运行时枚举值，`BleProvisioningDevice`/`WifiAp` 仅作类型注解（同一 value import 语句）；`SettingsPage` 的 `CloudTransportState` 用于云状态分支。以上均**不构造/调用 service 实现、无 I/O、无仓储写**。 | §18.1 |
 | **端口位置例外（F-01）** | 端口物理位置不在 `contracts/**` 的现状由 DES-A §27.6 逐文件/符号登记（17 条：16 个端口/契约文件 + 1 个纯映射 seam）；本文件 §18.1 定义 checker 读取 `port_location_exceptions` 的契约与失败语义。 | §18.1；DES-A §27.6 |
 | **迁移建议** | `model/**` 迁移仍为可选独立重构（P2/P3），不是 G-013/G-014 前置；任何迁移需独立 Change Impact，且不得与 allowlist 定稿并行。 | §18.1；§23.7 |
@@ -484,18 +484,20 @@ entry/src/main/resources/
 | D-09 | `repository/**` 不得 import `service/**` 实现；跨仓储协调通过 `contracts/**` 端口 + C-28 组合根 | `check_layering.py` |
 | D-10 | `service/{family,room,scene,cloud,i18n}/**` 不得 import `@ohos.*`；平台适配器只在 `adapters/**` | `check_host_safe_imports.py` |
 | D-11 | `viewmodel/**` 只通过构造注入引用 C-07..C-15 用例类/接口（含 `GatewayRepository`/`DeviceRepository`）与 `contracts/**`；可 import `common/**`/`model/**`/C-14 `I18nService`；不得 import `@ohos.*`、`service/{gateway,ble,crypto}/**`、`*/adapters/**`，不得自行 `new` 服务 | `check_layering.py` + `check_host_safe_imports.py` |
-| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`，以及 **`app/PageVmFactory` 的 `PageVmFactoryPort`（仅 `import type`）**，以及 **§18.1 表 `T20-D12-01..13` 的 pages 既有只读 DTO/UI 枚举（文件/符号级；含 3 条值 import；不得调用 service 实现/无 I/O）**；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件、**`viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯 UI 词汇（枚举/只读状态类型，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import `*ViewModel`/端口或构造/调用 VM）**、C-10/C-11/C-15 只读结果 DTO（必须 `import type`），以及 **`components/support/UiMapping.ets` 对 `service/ac/AcModels` 的纯值 import（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`；仅预览构造，无 I/O；`DeviceCards.ets` 仅 `import type AcViewState`）**；**不得 import `app/**`、`repository/**` 实现、传输/存储/crypto、`service/**` 实现类（`service/ac/AcModels` 为已登记纯值例外），也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29）；T-18/T-20 例外为文件/符号级 allowlist |
+| D-12 | **UI 层 import 白名单**：① `pages/**` 可 import `common/**`（含 `common/theme/**`）、`model/**`、`viewmodel/**`、C-14 `I18nService`/`I18nModels` 公共类型、`contracts/**` 端口、C-24 `components/**`，以及 `app/**` 的 UI seam：`AppContext`、`NavigationService`、`ShellBootstrap`、`ShellTheme`（T-17/T-18 过渡；C-24 全量迁移到 `common/theme/**` 后移除）、`ShellGateRouting`、`ContinuousGestureGuard`、`PermissionPolicy`，以及 **`app/PageVmFactory` 的 `PageVmFactoryPort`（仅 `import type`）**，以及 **§18.1 表 `T20-D12-06/07/08/11/12/13` 的 pages 既有只读 DTO/UI 枚举（文件/符号级；含 2 条值 import；不得调用 service 实现/无 I/O；`T20-D12-01..05/09/10` 已由 T-23 退休，保留历史）**；② `components/**` 只可 import `common/**`、`model/**`、`contracts/**`、C-14 公共类型、其他 C-24 组件、**`viewmodel/core/{ViewModelCore,DoorConfirmationTracker}` 的纯 UI 词汇（枚举/只读状态类型，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import `*ViewModel`/端口或构造/调用 VM）**、C-10/C-11/C-15 只读结果 DTO（必须 `import type`），以及 **`components/support/UiMapping.ets` 对 `service/ac/AcModels` 的纯值 import（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`；仅预览构造，无 I/O；`DeviceCards.ets` 仅 `import type AcViewState`）**；**不得 import `app/**`、`repository/**` 实现、传输/存储/crypto、`service/**` 实现类（`service/ac/AcModels` 为已登记纯值例外），也不得调用/构造 VM**；③ 两者均不得 import `app/AppCompositionRoot`、`app/CompositionPlan` | 评审 + 静态扫描 + `check_layering.py`（C-29）；T-18/T-20 例外为文件/符号级 allowlist |
 | D-13 | `adapter/ac/**` 只 import `common/**`、`model/**`；不得 import 仓储/传输/网络 | 评审 + 静态扫描 |
 | D-14 | 生产 `entry/src/main/ets/**` 不得 import `entry/src/ohosTest/**`/`Mock*`；组合根不得出现 `DEV-ONLY` 分支 | `check_production_mock_exclusion.py` |
 | D-15 | `service/cloud/**` 只能通过 `HttpTransport`/`CloudCredentialPort`/`CloudConfigStore` 访问外部；不得直接 `@ohos.net.http` | 评审 + 静态扫描 |
 | D-16 | 所有 UI 用户可见文本必须经 `$r('app.string.*')` 或 `I18nService.t()`；不得在 `pages/`/`components/` 出现 CJK 字面量或英文句子 | CHK-07 |
-| D-17 | **app 层依赖方向**：`app/**`（C-28）可依赖 `service/**`、`repository/**`、`contracts/**`、`common/**`、`model/**`，以及 `viewmodel/**`（仅 VM 工厂与 VM 端口适配：`AppCompositionRoot` 的 `create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `PermissionPort` 适配；不得在 app 内实现业务规则）；可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；不得被 `viewmodel/**`/`repository/**`/`service/**`/`model/**`/`common/**`/`components/**` 反向依赖 | `check_layering.py` + 评审 |
+| D-17 | **app 层依赖方向**：`app/**`（C-28）可依赖 `service/**`、`repository/**`、`contracts/**`、`common/**`、`model/**`，以及 `viewmodel/**`（仅 VM 工厂与 VM 端口适配：`AppCompositionRoot` 的 `create*ViewModel`、`ViewModelAppContextBridge`、`AppContextAdapters`、`PermissionGate` 的 C-23 `ProvisioningPermissionPort` 适配；不得在 app 内实现业务规则）；可被 `entryability/**` 与 D-12 白名单内的 `pages/**` 引用；不得被 `viewmodel/**`/`repository/**`/`service/**`/`model/**`/`common/**`/`components/**` 反向依赖 | `check_layering.py` + 评审 |
 
 > **T-17 裁定同步（2026-10-18；`artifacts/70-review/t17-review.md` U-01）**：D-12 与 D-17 按维度分工——D-12 管 UI import 白名单，D-17 管 `app/**` 依赖方向与可见性。旧 D-17“只能被 `entryability/**`/`pages/Index.ets` 引用”与旧 D-12 未列 `ShellTheme`/`ShellBootstrap` 的文字均被本表取代。若两条规则在具体 import 上交叉，按“更严格者优先”执行；任何放宽必须走 Change Impact，不得在实现/评审中静默修改。`app→viewmodel` 是单向边，`viewmodel/**` 不得为工厂/适配反向 import `app/**`。
 
 > **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03/F-06）**：D-12 对 T-18 的实际 UI 依赖采用“白名单扩展”，不做 `model/**` 类型迁移。新增允许项仅限：`pages/**` → `app/PageVmFactory`（`import type PageVmFactoryPort`）；`components/**` → `viewmodel/core/{ViewModelCore,DoorConfirmationTracker}`（纯枚举/只读 UI 状态，并可为预览构造 `DoorUiState`/`DeviceFilter`/`ControlUiState` 等纯值；不得 import VM/端口/构造或调用 VM）；`components/support/UiMapping.ets` → `service/ac/AcModels`（纯值 `AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`，仅预览构造；`DeviceCards.ets` 仅 `import type AcViewState`）；components → C-10/C-11/C-15 只读结果 DTO（`import type`）。`check_layering.py` 必须把上述例外编码为**文件/符号级 allowlist**，不得放宽为“components 可 import 整个 viewmodel/service”；未来新增例外必须走 Change Impact 并更新 §0.9/§18.1。若 `viewmodel/core/ViewModelCore.ets`/`DoorConfirmationTracker.ets` 新增 `@ohos`、repository 实现或 transport 依赖，必须先把纯 UI 词汇拆到 `model/**` 或独立无依赖模块，否则检查器按 D-12 失败。
 
 > **T-20 收口（2026-10-18；`final-system-review.md` F-02/§7.1）**：pages 既有的 13 条 service/repository DTO/枚举 import（10 条 `import type` + 3 条含运行时值的 import）已按“公共只读 DTO/UI 枚举”正式纳入 D-12，**文件/符号级**条目见 §18.1 `T20-D12-01..13`。`tools/contract/layering_allowlist.json` 的 `status` 由 `pending-T-20` 改为 `accepted`；**不得**把本裁定解释为 pages 可 import `service/**`/`repository/**` 整目录或任意实现类。迁移到 `model/**` 仍是独立可选重构（P2/P3），不是 G-013/G-014 前置。端口物理位置例外见 DES-A §27.6，与本条是不同维度。
+
+> **T-23 裁定同步（2026-10-18；`t23-review.md` F-03/§4.1）**：`T20-D12-01..05/09/10` 在迁移后不再匹配任何 import（`repository/DomainModels.ets` 已拆为 `model/DeviceRecord.ets`/`model/SceneExecutionModels.ets`；`service/ble/BleProvisioningPorts.ets` 已拆为 `contracts/BleProvisioningPorts.ets` + `model/ProvisioningModels.ets`），**正式退休**并保留历史说明；active D-12 仅 `T20-D12-06/07/08/11/12/13`（其中 2 条值 import：07、12）。`tools/contract/layering_allowlist.json` 的 13 条应在紧随的工具任务中 prune 为 6 条，`exceptions_used=6`、`unused_exceptions=[]`；不得把退休条目改回 `pending-*` 或复用 ID。D-12 仍不得解释为 pages 可 import `service/**`/`repository/**` 整目录。
 
 **依赖图（DES-B 新增边）**：
 
@@ -749,7 +751,7 @@ CREATE TABLE IF NOT EXISTS cloud_config (
 | 同网关命令 | C-17 每网关串行；C-10/C-11 不并行发同网关命令（场景串行；VM 单次控制；节流器保证 1 在途） |
 | 跨网关 | 可并行；场景仍按动作数组顺序串行（`SceneAction.delayMs` 生效） |
 | 取消 | C-11 场景执行、C-15 影子轮询、C-23 配网接受 `CancellationToken`；每步/每轮检查 |
-| 定时器 | `TimerPort` 注入；host 用 `FakeTimer.advance(ms)`；禁止 VM 直接 `setInterval` |
+| 定时器 | VM/场景定时器分别注入 `VmTimerPort`/`SceneTimerPort`；C-15 云轮询注入 `TimerPort`（`sleep/cancel`）；host 用 `FakeTimer.advance(ms)`；禁止 VM 直接 `setInterval` |
 | 时间 | 领域仲裁用 `DateTimeUtil.parseUtcCompact`；UI 计时用 `ClockPort.nowMs()`；超时差值不用 wall clock 直接相减跨重启 |
 | 应用后台 | C-28 调用 `AuthService.lockAll()`、`SecretDraftStore.clearAll()`、`BleProvisioningService.cancel()`、`CloudService.stopPolling()`、`PreferencesStore.flush()`；取消所有 VM 定时器 |
 | 重启 | `PendingCommand` 不持久化；重启后控制显示未确认，不自动重放；`seq` 持久化继续递增（DES-A §14.3） |
@@ -1965,7 +1967,7 @@ export class SceneService {
               control: DeviceControlPort,
               routes: GatewayRoutePort,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: SceneTimerPort,
               ids: IdPort,
               logger: LoggerPort,
               metrics: MetricsPort);
@@ -2007,7 +2009,7 @@ export class SceneExecutor {
               devices: DeviceRepository,
               routes: GatewayRoutePort,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: SceneTimerPort,
               logger: LoggerPort);
 
   execute(scene: Scene,
@@ -2021,7 +2023,7 @@ export class SceneExecutor {
 > **T-18 裁定同步（2026-10-18；`t18-review-b.md` R2-03、`t18-fix-report.md` F-02）**：`SceneService` 构造器新增可选 `authorization?: SceneExecutionAuthorizationPort`（`canExecuteScene(): PolicyDecision`）；既有可选 `rdb`/`gate` 一并登记为当前签名。`run()` 在预检/首条命令前调用；端口缺失或 `allowed=false` → `AUTH_RBAC_DENIED`（fail-closed）。既有 `run`/`cancel`/CRUD 签名不变；C-12 仍是策略所有者，组合根用 `AuthService.getActiveSession()+canExecuteScene(session)` 适配。
 
 **方法语义**：
-- `SceneService` 在构造时创建 `SceneExecutor`（同一 `DeviceControlPort`/`DeviceRepository`/`GatewayRoutePort`/`Clock`/`Timer`/`Logger`；纯逻辑，无平台 API）；测试可直接替换 executor。
+- `SceneService` 在构造时创建 `SceneExecutor`（同一 `DeviceControlPort`/`DeviceRepository`/`GatewayRoutePort`/`Clock`/`SceneTimerPort`/`Logger`；纯逻辑，无平台 API）；测试可直接替换 executor。
 - `createScene/updateScene`：`sceneName` trim 1..31；`actions` 每项校验 `gatewayId`/`targetDeviceId` 非空、`action` 是 `DeviceAction`、值合法；`SceneAction.targetDeviceId` 只存裸 `deviceId`；`gatewayId` 必须属于同家庭（校验 C-07 route）。`sceneId` UUID。
 - `deleteScene`：只删场景；不影响设备。
 - `run`：
@@ -2032,7 +2034,7 @@ export class SceneExecutor {
   5. `cancellation` 在每步前/延迟期间检查 → `CANCELLED`，剩余 `SKIPPED`；已执行步骤保留；
   6. 返回 `SceneExecutionResult`；全程通过 `listener` 推送 `SceneExecutionProgress`。
 - `runId` = `ids.newId()`；返回/进度均带 `runId`。`cancel(runId)`：设置取消标志；不强制中断在途 C-17 请求（等其返回/超时），后续步骤不再下发。
-- `SceneExecutor` 用 `TimerPort` 对每步施加 `stepTimeoutMs`；超时 → 该步 `FAILED`（`SCENE_STEP_FAILED` + `GATEWAY_TIMEOUT` 语义），后续 `SKIPPED`；迟到的 `ControlOutcome` 不得改写已结束的步骤结果（operation token 丢弃）。
+- `SceneExecutor` 用 `SceneTimerPort` 对每步施加 `stepTimeoutMs`；超时 → 该步 `FAILED`（`SCENE_STEP_FAILED` + `GATEWAY_TIMEOUT` 语义），后续 `SKIPPED`；迟到的 `ControlOutcome` 不得改写已结束的步骤结果（operation token 丢弃）。
 - 场景执行不自动重试；C-17 `BACKGROUND` 客户端负责传输级精确重传。
 - 并发：同一场景同一时间只允许一个 run；第二次 `run` 在首条命令前以 `SCENE_RUN_IN_PROGRESS` 拒绝（不排队、不产生部分执行）；不同场景可并行但共享网关时由 C-17 串行；建议 UI 全局串行执行场景。
 
@@ -2113,7 +2115,7 @@ stateDiagram-v2
 
 ### 6.4 依赖注入与测试 seam（`DES-B-C11-SEAM`）
 
-- 依赖：`SceneRepository`、`DeviceRepository`、`DeviceControlPort`、`GatewayRoutePort`、`ClockPort`、`TimerPort`、`LoggerPort`、`MetricsPort`；不 import C-17 实现/平台 API。
+- 依赖：`SceneRepository`、`DeviceRepository`、`DeviceControlPort`、`GatewayRoutePort`、`ClockPort`、`SceneTimerPort`、`LoggerPort`、`MetricsPort`；不 import C-17 实现/平台 API。
 - host 测试：
   - 预检失败 0 命令（fake port 记录 0 调用）；
   - 串行顺序（fake port 记录调用顺序/时间）；
@@ -3329,7 +3331,7 @@ export class HomeViewModel implements ViewModelBase<HomeViewState> {
               appContext: AppContext,
               i18n: I18nService,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               logger: LoggerPort);
 
   getState(): HomeViewState;
@@ -3379,7 +3381,7 @@ export class DeviceViewModel implements ViewModelBase<DeviceViewState> {
               control: DeviceControlCoordinatorPort,
               i18n: I18nService,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               logger: LoggerPort);
 
   getState(): DeviceViewState;
@@ -3434,7 +3436,7 @@ export enum ThrottlePhase {
 }
 
 export class ThrottleGate {
-  constructor(timer: TimerPort,
+  constructor(timer: VmTimerPort,
               clock: ClockPort,
               throttleMs: number,          // 55
               dispatch: (value: number) => Promise<void>);
@@ -3533,7 +3535,7 @@ export class ClimateViewModel implements ViewModelBase<ClimateViewState> {
               control: DeviceControlCoordinatorPort,
               i18n: I18nService,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               logger: LoggerPort);
 
   getState(): ClimateViewState;
@@ -3613,7 +3615,7 @@ export class DoorViewState {
 
 export class DoorConfirmationTracker {
   constructor(clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               policy: DoorConfirmationPolicy);
 
   startLock(link: DoorLinkConfig): void;
@@ -3637,7 +3639,7 @@ export class DoorViewModel implements ViewModelBase<DoorViewState> {
               control: DeviceControlCoordinatorPort,
               i18n: I18nService,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               logger: LoggerPort);
 
   getState(): DoorViewState;
@@ -3756,7 +3758,7 @@ sequenceDiagram
 
 ### 10.4 依赖注入与测试 seam（`DES-B-C21-SEAM`）
 
-- 依赖：`FamilyService`/`RoomService`/`DeviceRepository`/`DeviceCommandRunner`/`IGatewayClient`/`GatewayDiscoveryService`/`CloudService`/`AcAdapterFactory`/`I18nService`/`ClockPort`/`TimerPort`/`LoggerPort`；不 import 平台 API/仓储实现（注：VM 通过构造注入用例接口）。
+- 依赖：`FamilyService`/`RoomService`/`DeviceRepository`/`DeviceCommandRunner`/`IGatewayClient`/`GatewayDiscoveryService`/`CloudService`/`AcAdapterFactory`/`I18nService`/`ClockPort`/`VmTimerPort`/`LoggerPort`；不 import 平台 API/仓储实现（注：VM 通过构造注入用例接口）。
 - host 测试（`entry/src/test/viewmodel/`）：
   - `ThrottleGate`：55ms 合并、1 在途、latest 不丢、TouchUp 最终值、cancel、dispatch 失败；
   - 三态：PENDING→COMMITTED/REVERT、MISMATCH→REVERT、UNVERIFIED→COMMITTED、超时/错误→REVERT；
@@ -4142,10 +4144,10 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
               families: FamilyService,
               drafts: SecretDraftPort,
               crypto: CryptoPort,
-              permissions: PermissionPort,
+              permissions: ProvisioningPermissionPort,
               i18n: I18nService,
               clock: ClockPort,
-              timer: TimerPort,
+              timer: VmTimerPort,
               logger: LoggerPort);
 
   getState(): BleProvisioningViewState;
@@ -4167,12 +4169,16 @@ export class BleProvisioningViewModel implements ViewModelBase<BleProvisioningVi
 
 **T-18 增量签名（2026-10-18；F-07/F-08/F-09；R2-03）**：
 
-> **同名端口冲突记录（不裁定）**：C-23 VM 使用的 `PermissionPort` 在 `viewmodel/ViewModelPorts.ets`，形状为 `ensure(kind): Promise<void>` + 可选 `openSettings?()`；C-28 §17.1.6 的 `PermissionPort` 在 `app/PermissionPolicy.ets`，形状为 `ensure(kind): Promise<PermissionResult>` + `check` + `openSettings()` + `requiredForProvisioning()`。两者同名但不同接口；`BleViewModelPermissionGate` 做适配。T-18 只扩展 **VM-facing** 端口；C-28 端口保持 §17.1.6 契约。**该命名冲突是已记录技术债，不在 T-18 重命名/迁移**；若后续收敛，走 Change Impact，并保持 `BleViewModelPermissionGate` 的 manifest/request 单一所有者语义。
+> **同名端口冲突记录（T-18 历史；T-23 已裁定）**：C-23 VM 使用的 `PermissionPort` 原在 `viewmodel/ViewModelPorts.ets`，形状为 `ensure(kind): Promise<void>` + 可选 `openSettings?()`；C-28 §17.1.6 的 `PermissionPort` 在 `app/PermissionPolicy.ets`，形状为 `ensure(kind): Promise<PermissionResult>` + `check` + `openSettings()` + `requiredForProvisioning()`。两者同名但不同接口；`BleViewModelPermissionGate` 做适配。**T-23 F-03 裁定（2026-10-18，`wp-092-t23-contracts`）**：C-23 VM-facing 契约移至 `contracts/PermissionPort.ets` 并重命名为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`（不导出 `PermissionResult`）；C-28 app seam 保留 `PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult`。`BleViewModelPermissionGate` 仍是 manifest/request 与结果转换的单一所有者。**状态：RULED；代码重命名待 bounded implementation task。** 完整清单见 DES-A 附录 E §E.4。
 
 ```ts
-// PermissionPort（viewmodel/ViewModelPorts.ets；C-23 VM-facing；可选能力）
-export interface PermissionPort {
-  ensure(kind: PermissionKind): Promise<void>;
+// ProvisioningPermissionPort（contracts/PermissionPort.ets；C-23 VM-facing；T-23 重命名）
+export enum ProvisioningPermissionKind {
+  BLUETOOTH = 'BLUETOOTH'
+}
+
+export interface ProvisioningPermissionPort {
+  ensure(kind: ProvisioningPermissionKind): Promise<void>;
   /** F-08：打开本应用设置页；缺失时调用方以 CONFIGURATION_ERROR fail-closed。 */
   openSettings?(): Promise<void>;
 }
@@ -4189,7 +4195,7 @@ export class BleProvisioningViewModel {
 
 - `prepareWifi`：真实执行权限→扫描→连接→MTU/发现→能力门禁→Security1→身份协商→AP 扫描，成功后进入 `STEP_3_WIFI_SELECT` 并发布真实 `accessPoints`；**不**下发 Wi-Fi 凭据。结束后断开 BLE 并清零 PoP。Step4 `submit` 仍执行权威聚合流程，因此预览与提交各握手一次（两次 Security1）；这是为避免改动冻结聚合状态机接受的代价，后续若支持会话复用走 Change Impact。
 - `submit`：第 5 参数 `expectedGatewayId?` 写入 `BleProvisioningRequest.expectedGatewayId`；`ROTATE_SECRET`/`RECONFIGURE` 必须由页面携带目标 id，缺失时页面在进入向导前 `blocked`；C-19 `IdentityNegotiator.checkExpected` 在绑定前做最终校验，失败为 `PROVISIONING_BINDING_IDENTITY_MISMATCH`。**C-19 强校验**：`provision` 在 `credentialDraftId` 为空时必须提供 `expectedGatewayId`（否则 `CONFIGURATION_ERROR`），对应“用已绑定密钥重配”路径；新绑定必须提供 draft；`expectedGatewayId` 的格式在 `BleProvisioningRequest`/`BleWifiScanRequest` 构造时按既有 `PROTOCOL_INVALID_IDENTIFIER` 校验。不得用 UI 校验替代 C-19 校验。
-- `openSettings`：调用可选 `PermissionPort.openSettings`；端口缺失时抛 `CONFIGURATION_ERROR`，不得静默成功；只打开本应用设置页，不新增系统权限。
+- `openSettings`：调用可选 `ProvisioningPermissionPort.openSettings`；端口缺失时抛 `CONFIGURATION_ERROR`，不得静默成功；只打开本应用设置页，不新增系统权限。
 - `accessPoints`：来自 `prepareWifi` 的真实结果；Step3 只渲染该列表或既有手工 SSID 回退，不得伪造 AP 或把预览结果当绑定成功。
 - 取消：`cancel()` 与 `prepareWifi`/`submit` 的竞态由 `cancelled`/扫描代际保护；页面在 `busy` 时仍必须提供取消入口（R2-02）；晚到结果不得覆盖取消界面。
 
@@ -4365,7 +4371,7 @@ stateDiagram-v2
 
 ### 12.4 依赖注入与测试 seam（`DES-B-C23-SEAM`）
 
-- 依赖：`IBleProvisioningClient`、`GatewayRepository`、`FamilyService`、`SecretDraftPort`、`CryptoPort`、`PermissionPort`、`I18nService`、`CloudService`、`GatewayDiscoveryService`、`AuthService`、`PreferencesStore`、`ClockPort`、`TimerPort`、`LoggerPort`；不 import 平台 API。
+- 依赖：`IBleProvisioningClient`、`GatewayRepository`、`FamilyService`、`SecretDraftPort`、`CryptoPort`、`ProvisioningPermissionPort`、`I18nService`、`CloudService`、`GatewayDiscoveryService`、`AuthService`、`PreferencesStore`、`ClockPort`、`VmTimerPort`、`LoggerPort`；不 import 平台 API。
 - **T-18 裁定同步（2026-10-18；R2-03）**：host 测试必须覆盖 `prepareWifi` 真实 AP 预览（不应用凭据）、`submit` 的 `expectedGatewayId` 传递、`ROTATE_SECRET`/`RECONFIGURE` 缺目标拒绝、`openSettings` 可选端口缺失 fail-closed、`busy` 时取消（R2-02）与中途权限失败的设置 CTA（R2-05）。证据见 `T18_provisioningSeamsAndRecoveryAreWired`、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`、`T18_R2_provisioningCancelStaysAvailableWhileBusy`、`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`。
 - host 测试：
   - 6 步映射：每个 `ProvisioningState` → WizardStep；FAILED/CANCELLED；
@@ -5435,6 +5441,8 @@ export class PermissionGate implements PermissionPort {
 }
 ```
 
+> **T-23 F-03 归属（2026-10-18）**：上列 `PermissionKind`/`PermissionState`/`PermissionResult`/`PermissionPort` 是 **C-28 app seam**（`app/PermissionPolicy.ets`），D-17 允许；不是 `contracts/**` 契约。C-23 VM-facing 契约在 `contracts/PermissionPort.ets`，T-23 后符号为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`（不导出 `PermissionResult`）。`BleViewModelPermissionGate` 是两者唯一适配器；详见 §12.1.1/§23.7 与 DES-A 附录 E §E.4。
+
 **权限声明（`module.json5`，T-17 按当前 SDK 验证）**：
 
 | 权限 | 类型 | 用途 | 备注 |
@@ -5557,7 +5565,7 @@ tools/
 | 工具 | 命令 | 退出码 | 输出 |
 |---|---|---|---|
 | 构建基线 | `tools/build/verify-baseline.sh` | 0/非0 | 命令/日志路径；未运行项标 BLOCKED |
-| 分层 | `python3 tools/contract/check_layering.py --root .` | 0/1 | 违规文件/规则 ID |
+| 分层 | `python3 tools/contract/check_layering.py --root .` | 0/1/2 | 0=通过；1=违规或任何 `pending-*` 端口例外；2=畸形 allowlist/registry；违规文件/规则 ID |
 | Host 安全 import | `python3 tools/contract/check_host_safe_imports.py --root .` | 0/1 | 文件/import |
 | Mock 排除 | `python3 tools/contract/check_production_mock_exclusion.py --root .` | 0/1 | 文件/符号 |
 | i18n | `python3 tools/i18n/check_i18n.py --root . --report ...` | 0/1/2 | JSON 报告（C-14 §7.4.4） |
@@ -5575,32 +5583,35 @@ tools/
   - 检查器必须有 fixture 自测：合法树通过；上述每一类违规 import/构造/装饰器都必须失败。allowlist 纳入版本控制，新增例外需评审与 Change Impact（§18.3-4）。检查器落地前，评审执行等价静态扫描并记录命令/结果（T-17 同款要求）；不得以“评审人工通过”替代 T-20 工具证据。
 
 - **T-20 收口（2026-10-18；`final-system-review.md` F-01/F-02/§7.1/§7.2）— pages D-12 定稿与端口位置读取契约**：
-  1. **D-12 定稿**：`pages/**` 既有 13 条 service/repository DTO/UI 枚举 import 采用**文件/符号级** `accepted` 例外（`T20-D12-01..13`）；10 条 `import type`，3 条为含运行时值的 import。**不得**放宽为 `pages/**` 可 import `service/**`/`repository/**` 整目录，也不得把 `status: accepted` 解释为 service 实现可构造/调用。
+  1. **D-12 定稿**：`pages/**` 既有 13 条 service/repository DTO/UI 枚举 import 采用**文件/符号级**例外（`T20-D12-01..13`）；T-23 后 **6 条 active**（`T20-D12-06/07/08/11/12/13`；其中 2 条值 import：07、12），**7 条退休**（`T20-D12-01..05/09/10`；旧路径已拆分/删除，unused）。**不得**放宽为 `pages/**` 可 import `service/**`/`repository/**` 整目录，也不得把 `status: accepted` 解释为 service 实现可构造/调用。
   2. **status 强制**：T-20 后 `used && status !== "accepted"` 必须视为门禁违规（`check_layering.py` 退出码 1 或在 Gate 包装中失败）；`pending-T-20` 不得原样进入 G-013/G-014。报告必须保留 `exceptions_used` 明细与 `unused_exceptions`。
   3. **端口位置例外（F-01）**：`layering_allowlist.json` 新增顶层数组 `port_location_exceptions`，逐条与 DES-A §27.6.2 的表格及机器可读 JSON 一致（17 条：16 个端口/契约文件 + 1 个 `pure-seam`）。checker 必须用它替换 `_is_storage_port_path`（`check_layering.py:550-561`）与 `_is_viewmodel_service_port`（`:564-578`）的硬编码路径集合；未登记端口路径必须按 D-09/D-11 失败。
   4. **符号级匹配**：端口例外必须校验 `record.symbols ⊆ entry.symbols`；新增符号、值 import 实现类、或文件新增 `@ohos.*`/repository/transport 依赖时，例外失效并失败。禁止路径通配/目录放宽。`port_location_exceptions` 只替代 D-09/D-11 的端口路径判断；pages/components 的 D-12 仍按 `entries` 匹配，两者同时适用时取更严格者。
   5. **fixture**：至少覆盖“合法登记通过”“未登记端口路径失败”“超出 symbols 失败”“`pending-*` 状态失败”“`GattEndpointMap` pure-seam 通过”；与 F-06 的 D-03（`contracts/**` 违规 import）和 D-05（`repository/**` 平台 import）负例一并补齐。
   6. **Gate 语义**：`check_layering` 0 violation **不等于** D-12 已完全收口，也**不等于**端口位置合规；G-014 必须逐项记录“例外已登记、迁移未完成”，不得写成 PASS。
+  7. **T-23 裁定（2026-10-18，`wp-092-t23-contracts`）**：① **D-03**：checker 允许 `contracts/**` 同层 **type-only** 依赖（`import type`/`export type`），拒绝值/副作用导入，并要求 contracts 同层图无环；现有 4 条 type-only 边合法（见 DES-A §2.2/附录 E §E.3）。② **F-04**：`load_port_location_exceptions()` 必须校验 `id` 唯一且 `owner`/`close_condition`/`evidence`/`reason` 非空（缺失 → exit 2）；**任何 `pending-*`（used 或 unused）→ exit 1**；现有 `used && status != accepted` 失败路径保留。③ **D-12 退休**：`T20-D12-01..05/09/10` 正式退休，live allowlist 由 13 条 prune 为 6 条；`exceptions_used=6`、`unused_exceptions=[]`。④ **F-07 policy**：不得再写“all port declarations migrated”；应写“17 条登记已迁移，仅 PORT-LOC-01 保留；`VmTimerPort` 是 VM 本地 seam，不进入端口例外”。⑤ fixture：新增 D-03 type-only/值导入/环、F-04 schema/pending-unused 用例；退出码与 CLI 表一致。
 
-**T20-D12 条目表（13 条，与下方 JSON 逐条一致）**：
+**T20-D12 条目表（13 条，与下方 JSON 逐条一致；T-23 状态列为准）**：
 
-| ID | 页面 | import 目标 | 符号 | 类型 | 理由 | 迁移/关闭 |
-|---|---|---|---|---|---|---|
-| `T20-D12-01` | `pages/DeviceControlPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | C-10 只读记录类型；页面只读字段/渲染 | P2 迁到 `model/DeviceRecord.ets` |
-| `T20-D12-02` | `pages/HomePage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 |
-| `T20-D12-03` | `pages/RoomsPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 |
-| `T20-D12-04` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneExecutionProgress`、`SceneExecutionResult`、`SceneStepResult` | `import type` | C-11 只读执行结果；页面只读展示 | P2 迁到 `model/SceneExecutionModels.ets` |
-| `T20-D12-05` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneRunState` | `import type` | C-11 枚举仅作类型/状态读取 | P2 |
-| `T20-D12-06` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView`、`InvitationView`、`InviteCreation` | `import type` | C-08 只读视图/结果值；页面不构造 service | P2 迁到 `model/FamilyViewModels.ets` |
-| `T20-D12-07` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `CreateInvitationInput`、`FamilyJoinPhase` | **value** | 页面本地表单输入构造 + join 阶段比较；经 VM 调用，无 service 实现 import/构造、无 I/O | P2；可拆为 `model/**` 输入类型 + UI 枚举 |
-| `T20-D12-08` | `pages/ProfilePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView` | `import type` | C-08 只读视图类型 | P2 |
-| `T20-D12-09` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `BleProvisioningDevice`、`ProvisioningState`、`WifiAp` | **value** | 同一 value import 语句：`ProvisioningState` 运行时枚举；`BleProvisioningDevice`/`WifiAp` 仅类型注解；无 service 实现构造/调用、无 I/O | P2/P3；DTO/枚举拆到 `model/ProvisioningModels.ets` |
-| `T20-D12-10` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `ProvisioningProgress` | `import type` | C-19 只读进度类型 | P2/P3 |
-| `T20-D12-11` | `pages/RoomManagePage.ets` | `service/room/RoomService.ets` | `RoomDeletionPreview` | `import type` | C-09 只读删除预览；**符号声明在实现文件内**，因此必须符号级放行 | P3 迁到 `model/RoomModels.ets` |
-| `T20-D12-12` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudTransportState` | **value** | 云状态 UI 分支的运行时枚举；无 service 实现构造/调用、无 I/O | P2 迁到 `model/CloudModels.ets` |
-| `T20-D12-13` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudConfigView` | `import type` | C-15 只读配置视图类型 | P2 |
+| ID | 页面 | import 目标 | 符号 | 类型 | 理由 | 迁移/关闭 | T-23 状态 |
+|---|---|---|---|---|---|---|---|
+| `T20-D12-01` | `pages/DeviceControlPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | C-10 只读记录类型；页面只读字段/渲染 | P2 迁到 `model/DeviceRecord.ets` | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-02` | `pages/HomePage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-03` | `pages/RoomsPage.ets` | `repository/DomainModels.ets` | `DeviceRecord` | `import type` | 同上 | P2 | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-04` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneExecutionProgress`、`SceneExecutionResult`、`SceneStepResult` | `import type` | C-11 只读执行结果；页面只读展示 | P2 迁到 `model/SceneExecutionModels.ets` | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-05` | `pages/ScenePage.ets` | `repository/DomainModels.ets` | `SceneRunState` | `import type` | C-11 枚举仅作类型/状态读取 | P2 | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-06` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView`、`InvitationView`、`InviteCreation` | `import type` | C-08 只读视图/结果值；页面不构造 service | P2 迁到 `model/FamilyViewModels.ets` | **ACTIVE（used）** |
+| `T20-D12-07` | `pages/FamilyManagePage.ets` | `service/family/FamilyModels.ets` | `CreateInvitationInput`、`FamilyJoinPhase` | **value** | 页面本地表单输入构造 + join 阶段比较；经 VM 调用，无 service 实现 import/构造、无 I/O | P2；可拆为 `model/**` 输入类型 + UI 枚举 | **ACTIVE（used）** |
+| `T20-D12-08` | `pages/ProfilePage.ets` | `service/family/FamilyModels.ets` | `FamilyMemberView` | `import type` | C-08 只读视图类型 | P2 | **ACTIVE（used）** |
+| `T20-D12-09` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `BleProvisioningDevice`、`ProvisioningState`、`WifiAp` | **value** | 同一 value import 语句：`ProvisioningState` 运行时枚举；`BleProvisioningDevice`/`WifiAp` 仅类型注解；无 service 实现构造/调用、无 I/O | P2/P3；DTO/枚举拆到 `model/ProvisioningModels.ets` | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-10` | `pages/ProvisioningPage.ets` | `service/ble/BleProvisioningPorts.ets` | `ProvisioningProgress` | `import type` | C-19 只读进度类型 | P2/P3 | **RETIRED（T-23；旧路径已不存在，unused）** |
+| `T20-D12-11` | `pages/RoomManagePage.ets` | `service/room/RoomService.ets` | `RoomDeletionPreview` | `import type` | C-09 只读删除预览；**符号声明在实现文件内**，因此必须符号级放行 | P3 迁到 `model/RoomModels.ets` | **ACTIVE（used）** |
+| `T20-D12-12` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudTransportState` | **value** | 云状态 UI 分支的运行时枚举；无 service 实现构造/调用、无 I/O | P2 迁到 `model/CloudModels.ets` | **ACTIVE（used）** |
+| `T20-D12-13` | `pages/SettingsPage.ets` | `service/cloud/CloudModels.ets` | `CloudConfigView` | `import type` | C-15 只读配置视图类型 | P2 | **ACTIVE（used）** |
 
-**`layering_allowlist.json` — `entries` 定稿（13 条，可直接替换现有 `pending-T-20` 条目）**：
+**`layering_allowlist.json` — T-20 `entries` 历史快照（13 条；T-23 退休 01..05/09/10，live 应 prune 为 6 条）**：
+
+> 下方 JSON 是 T-20 的正式化快照，保留作为历史/证据；**不是 T-23 后的 live allowlist**。T-23 后 active 条目仅 `T20-D12-06/07/08/11/12/13`；`T20-D12-01..05/09/10` 因旧路径已拆分/删除而不再匹配任何 import（unused），正式退休。紧随的工具任务必须从 live `entries` 删除这 7 条，保持 6 条 `status: accepted`，并让 `exceptions_used=6`、`unused_exceptions=[]`；不得复用 ID 或把退休条目改回 `pending-*`。JSON 的 `status` 字段保持 `accepted` 是 T-20 历史状态，不代表 T-23 后仍 active。
 
 ```json
 [
@@ -5750,7 +5761,7 @@ tools/
 ]
 ```
 
-> **字段说明**：现有 `load_allowlist()` 只读取 `rule`/`from`/`import`/`symbols`/`type_only`/`status`/`reason`/`evidence`；上面的 `id` 是审计用稳定 ID，当前 checker 会忽略，不影响匹配。落地时可保留 `id`，也可在保持 13 条一一对应的前提下删除；不得删除或合并 `symbols`/`type_only` 不同的条目。
+> **字段说明（T-23 更新）**：`load_allowlist()` 只读取 `rule`/`from`/`import`/`symbols`/`type_only`/`status`/`reason`/`evidence`；上面的 `id` 是审计用稳定 ID，当前 checker 会忽略，不影响匹配。**T-23 后 live entries 只保留 6 条 active（`T20-D12-06/07/08/11/12/13`）；01..05/09/10 退休，必须在紧随的工具任务中从 live allowlist 删除。** 本 JSON 是 T-20 历史快照，不得直接复制回 live。不得删除或合并 `symbols`/`type_only` 不同的 active 条目。
 
 **端口位置例外 schema（`port_location_exceptions`，与 DES-A §27.6 逐条一致）**：
 
@@ -6060,7 +6071,7 @@ sequenceDiagram
 
 | Fake | 端口/用途 | 行为 |
 |---|---|---|
-| `FakeTimer` | `TimerPort` | 手动 `advance(ms)`；记录 schedule/cancel；host 驱动 55ms/10s/30s |
+| `FakeTimer` | `VmTimerPort` | 手动 `advance(ms)`；记录 schedule/cancel；host 驱动 55ms/10s/30s |
 | `FakeI18nResourceLoader` | `I18nResourceLoaderPort` | 返回 fixture bundle；可注入缺失/重复/空值 |
 | `FakeLocaleApplier` | `LocaleApplierPort` | 记录 apply；可注入失败；system locale 可设 |
 | `InMemoryCloudConfigStore` | `CloudConfigStore` | 内存配置；可注入读写失败 |
@@ -6151,7 +6162,7 @@ CQG-Txx
 | `RISK-IMPORTED-FAMILY-OWNER` | 导入家庭 owner 占位/权威成员收敛 | `RISK`（Low） | 本机加入设备的 owner 指针与 `transferAdmin` | `importFamily` 使用占位 owner；RBAC 仍按 `targetRole`；`transferAdmin` 在权威同步前不可用；不新增在线协议 | 接触式同步/后续 Change Impact |
 | `RISK-JOIN-RESUME` | 成员接受后、档案创建前进程终止/离开页面 | `RISK`（Low） | 用户已有成员/家庭行但无可用档案；join session 不持久 | `COMPLETED` 的持久事实是“成员 ACTIVE + `LocalProfile` + active family”，以持久状态判断已加入；重启后由 SessionGate 解锁；T-17/T-18 提供“完成本机档案”恢复入口；不得回退成员/家庭 | T-17/T-18 页面联调；若需持久 join 会话另走 Change Impact |
 | `RISK-FR-HOME-001-RTT` | RTT 口径未定义 | `RISK`（测量） | 性能声明 | TEST-001 定义样本/环境；UI 单次值 | T-05/T-19 |
-| `RISK-D12-ALLOWLIST` | pages DTO/UI 枚举 import 以文件/符号级 allowlist 放行（F-02/R3-01） | `RISK`（Low） | 维护者把 `accepted` 误读为目录放宽；新增例外绕过 Change Impact；`status` 不被工具强制 | §2.3/§18.1 `T20-D12-01..13` 定稿；禁止目录级；新增需 Change Impact；checker 将 used+pending 视为失败；`RoomDeletionPreview` 等实现文件内符号只按符号放行 | 迁移到 `model/**` 或 checker 符号级强制 + 复审 |
+| `RISK-D12-ALLOWLIST` | pages DTO/UI 枚举 import 以文件/符号级 allowlist 放行（F-02/R3-01） | `RISK`（Low） | 维护者把 `accepted` 误读为目录放宽；新增例外绕过 Change Impact；`status` 不被工具强制 | §2.3/§18.1 `T20-D12-01..13`（T-23：6 active / 7 retired）；禁止目录级；新增需 Change Impact；checker 将 used+pending 视为失败；`RoomDeletionPreview` 等实现文件内符号只按符号放行 | 迁移到 `model/**` 或 checker 符号级强制 + 复审 |
 | `RISK-C29-TOOLS` | 检查器自身缺陷/误报 | `RISK` | 门禁误判 | 工具自测 fixture；allowlist；评审 | T-05/T-19 |
 
 > `TRUST-T18-01`（`RoomService` 缺省 actor 的 v1 local-admin trust）是已声明的组合边界，不是缺口；见 §23.7。`GAP-T18-01` 是未关闭的上游 RBAC 缺口，不得用 `TRUST-T18-01` 解释为已授权。
@@ -6188,7 +6199,7 @@ CQG-Txx
 
 | ID | 文件 | 类型 | 用途 | 兼容性 |
 |---|---|---|---|---|
-| `EXT-DES-B-01` | `contracts/TimerPort.ets` | `TimerPort`/`TimerHandle` | VM 55ms/10s/30s 超时；host `FakeTimer` | 新增，无破坏 |
+| `EXT-DES-B-01` | `contracts/TimerPort.ets`（历史） | `TimerPort`/`TimerHandle`（**RETIRED**） | **T-23 裁定：从未实现，正式退休。** 原描述“VM 55ms/10s/30s 超时”与实际代码不符；实际 VM seam 为 `EXT-DES-B-33` `VmTimerPort`。`contracts/TimerPort.ets` 保留为 C-15 云轮询 `sleep/cancel` 端口（§8.1.7），不实现本行 | **RETIRED**；无代码影响；历史签名保留在下方代码块 |
 | `EXT-DES-B-02` | `contracts/I18nPorts.ets` | `I18nResourceLoaderPort`/`LocaleApplierPort` | C-14 平台隔离 | 新增 |
 | `EXT-DES-B-03` | `contracts/CloudPorts.ets` | `CloudConfigStore`/`CloudCredentialPort` | C-15 配置/Token 隔离 | DES-A §4.4 提到但未定义；补齐 |
 | `EXT-DES-B-04` | `contracts/RoomPorts.ets` | `RoomLookupPort`/`DeviceAssignmentPort` | C-09↔C-10 解耦/事务 | 新增 |
@@ -6197,18 +6208,31 @@ CQG-Txx
 | `EXT-DES-B-07` | `contracts/DevicePorts.ets` | `DeviceControlPort` | C-11/C-21 → C-17 端口 | 补齐 DES-A §3.7 未给的签名 |
 | `EXT-DES-B-08` | `contracts/DevicePorts.ets` | `DeviceStatePort` | C-10 实现；DES-A §3.7 已列名 | 补齐签名 |
 | `EXT-DES-B-09` | `service/i18n/I18nKeys.ets` | `I18nKeys`（纯函数） | 键构造；C-14/C-21..C-23 | 新增 |
-| `EXT-DES-B-22` | `contracts/PermissionPort.ets` | `PermissionPort`/`PermissionKind`/`PermissionResult` | C-23 VM 与 C-28 `PermissionGate` 解耦；host fake | 新增 |
+| `EXT-DES-B-22` | `contracts/PermissionPort.ets` | `PermissionPort`/`PermissionKind`/`PermissionResult`（**历史描述；T-23 更正**） | 原描述把 C-23 VM 端口与 C-28 `PermissionResult` 混在同一文件；实际 `PermissionResult` 属 app seam。T-23 由 `EXT-DES-B-34` 取代 | **SUPERSEDED by EXT-DES-B-34**；历史保留 |
 | `EXT-DES-B-23` | `contracts/ControlPorts.ets` | `DeviceControlCoordinatorPort` | C-21 VM → LAN/云回退编排；VM 不 import service 实现 | 新增 |
 
 **端口签名补充**：
 
 ```ts
-export interface TimerPort {
+// RETIRED（T-23，2026-10-18）：以下形状从未实现，保留仅作历史证据。
+// 不得据此新增 contracts/TimerPort.ets 的 scheduleOnce/scheduleRepeating/TimerHandle；
+// contracts/TimerPort.ets 的实际形状是 C-15 云 sleep/cancel（DES-B §8.1.7）。
+export interface TimerPort {                    // HISTORICAL / RETIRED
   scheduleOnce(delayMs: number, callback: () => void): TimerHandle;
   scheduleRepeating(periodMs: number, callback: () => void): TimerHandle;
   cancel(handle: TimerHandle): void;
 }
-export class TimerHandle { readonly id: number; }
+export class TimerHandle { readonly id: number; } // HISTORICAL / RETIRED
+
+// T-23 canonical VM timer seam（EXT-DES-B-33；实现位于 viewmodel/core/ViewModelCore.ets）。
+export interface VmTimerPort {
+  setTimer(delayMs: number, callback: () => void): number;
+  clearTimer(timerId: number): void;
+}
+
+// T-23 保留三分：C-15 云延迟（contracts/TimerPort.ets，sleep/cancel）、
+// VM 回调（VmTimerPort）、C-11 场景延迟（contracts/SceneTimerPort.ets，delay）。
+// 三者语义不同；任何合并/收敛必须走 Change Impact，不得在实现中复制第二套。
 
 export interface DeviceAssignmentPort {
   onRoomDeleted(tx: RdbTransaction, familyId: string, roomId: string): Promise<number>;
@@ -6383,11 +6407,15 @@ export interface DeviceStatePort {
 |---|---|---|---|---|---|
 | `EXT-DES-B-28` | C-09 | 增量方法 + 服务级端口 | `RoomActorLookupPort`；`RoomService` 构造器新增可选 `actors`（既有 `gate`/`deviceNames` 一并登记为当前签名）；8 个变更方法可选 `actorMemberId` | 提供 actor 时必须 ACTIVE+ADMIN，否则 `AUTH_RBAC_DENIED`；缺省 actor 为 v1 local-admin trust；旧调用源码兼容；生产 `RoomViewModel` 始终传 active memberId | `T18_C09_roomMutationsRequireAdminActorMatrix`、`T18_RoomViewModel_passesActiveMemberIdToServiceActorChecks`；C-22/C-25/C-26 |
 | `EXT-DES-B-29` | C-19 | 增量方法 + 新请求类型 | `IBleProvisioningClient.scanWifiAccessPoints(request, listener, cancellation?)`；`BleWifiScanRequest` | 新方法；`provision()` 不变；C-19/C-20 已实现；预览与提交各一次 BLE 会话；不应用 Wi-Fi 凭据；PoP 用后清零 | `T18_C19_scanWifiAccessPointsHandshakesWithoutApplyingCredentials`；C-23/C-27；DES-A §27.5 |
-| `EXT-DES-B-30` | C-23 | 增量方法/可选能力 | `prepareWifi(pop, expectedGatewayId?)`；`submit(..., expectedGatewayId?)`；`openSettings()`；`PermissionPort.openSettings?`；`SettingsViewModel.probeManualAddress` ADMIN-only 语义补充（无签名变化） | 可选参数/方法；`expectedGatewayId` 在页面与 C-19 双重校验；`ROTATE_SECRET`/`RECONFIGURE` 缺目标即 blocked；`openSettings` 缺失时 `CONFIGURATION_ERROR`；非 ADMIN `probeManualAddress` → `AUTH_RBAC_DENIED` | `T18_provisioningSeamsAndRecoveryAreWired`、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`、`T18_R2_provisioningCancelStaysAvailableWhileBusy`、`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`、`T16_Settings_manualAddressProbeAcceptsBoundAndRejectsLoopback`（ADMIN 正路径；非 ADMIN 负例待补/T-19）；C-27 |
+| `EXT-DES-B-30` | C-23 | 增量方法/可选能力 | `prepareWifi(pop, expectedGatewayId?)`；`submit(..., expectedGatewayId?)`；`openSettings()`；`ProvisioningPermissionPort.openSettings?`（T-23 后名称；T-18 原文为 C-23 `PermissionPort`）；`SettingsViewModel.probeManualAddress` ADMIN-only 语义补充（无签名变化） | 可选参数/方法；`expectedGatewayId` 在页面与 C-19 双重校验；`ROTATE_SECRET`/`RECONFIGURE` 缺目标即 blocked；`openSettings` 缺失时 `CONFIGURATION_ERROR`；非 ADMIN `probeManualAddress` → `AUTH_RBAC_DENIED` | `T18_provisioningSeamsAndRecoveryAreWired`、`T18_R2_cancelDuringPrepareWifiCancelsBleAndClearsTimer`、`T18_R2_provisioningCancelStaysAvailableWhileBusy`、`T18_R2_midFlowPermissionFailureKeepsStepAndOffersSettings`、`T16_Settings_manualAddressProbeAcceptsBoundAndRejectsLoopback`（ADMIN 正路径；非 ADMIN 负例待补/T-19）；C-27 |
 | `EXT-DES-B-31` | C-28 | UI seam | `PageVmFactoryPort`；`AppContext.pageVms`；`AppContext.subscribeActiveFamily`；`NavigationService.openRoomsWithHighlight/consumeRoomsHighlight`；`OnboardingPort`/`OnboardingService` | 均为文档此前未登记的接口/getter/方法（本次登记）；页面经显式 props；无全局单例/服务定位器；不改变既有 `AppContext`/`AppCompositionRoot` 方法 | `T18_pagesAndComponentsRespectLayeringGuards`、`T18_nonAdminRoomPoolAndGatewayEntriesAreHidden`、`T18_R2_settingsReprovisionRequiresAdmin`、`T18_R2_doorExplicitLinkButtonReopensGuide`；C-25/C-26/C-27 |
 | `EXT-DES-B-32` | C-11 | 增量端口/构造依赖 | `SceneExecutionAuthorizationPort`；`SceneService`/`SceneViewModel` 可选 `authorization`；`SceneViewModel.canExecuteScene()` | 新端口；缺失或 deny → `AUTH_RBAC_DENIED`（fail-closed）；`run`/CRUD 既有签名不变 | `T18_C11_sceneRunRbacMatrixAdminMemberGuestAndMissingPolicy`、`T18_SceneViewModel_capabilityAndRunRbacMatrix`、`T18_scenePageAndServiceUseTheSameRbacGate`；C-12/C-22 |
+| `EXT-DES-B-33` | C-21..C-23 / C-28 | VM 本地 seam（T-23 登记） | `viewmodel/core/ViewModelCore.ets` 的 `VmTimerPort`：`setTimer(delayMs: number, callback: () => void): number`；`clearTimer(timerId: number): void` | **实际已实现并冻结的 VM 回调定时器**；生产 `app/AppPlatformPorts.ets` `SystemVmTimer`，host `FakeTimer`；数值 id 是不透明句柄，不新增 `TimerHandle` 类。与 C-15 云 `TimerPort`（`contracts/TimerPort.ets`，`sleep/cancel`）和 C-11 `SceneTimerPort` 三分；不得合并/复制 | `T16_*` VM 超时/节流 host 测试；`ThrottleGate`/`DoorConfirmationTracker`/五个 VM；DES-A 附录 E §E.2 |
+| `EXT-DES-B-34` | C-23 | 契约符号重命名（T-23 裁定） | `contracts/PermissionPort.ets` 的 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`；不含 `PermissionResult` | 取代 `EXT-DES-B-22` 的 C-23 符号描述；`ensure(kind): Promise<void>` + 可选 `openSettings?()` 行为不变；C-28 `PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult` 保留在 `app/PermissionPolicy.ets`；`BleViewModelPermissionGate` 仍为唯一适配器 | 待 bounded implementation task；DES-A 附录 E §E.4 |
 
-> **同名 `PermissionPort` 冲突记录（T-18，不裁定）**：`EXT-DES-B-30` 只涉及 `viewmodel/ViewModelPorts.ets` 的 C-23 VM-facing `PermissionPort`（`ensure(): Promise<void>` + 可选 `openSettings?`）。C-28 §17.1.6 的 `PermissionPort`（`app/PermissionPolicy.ets`，`ensure(): Promise<PermissionResult>` + `check` + `openSettings` + `requiredForProvisioning`）保持原契约；`BleViewModelPermissionGate` 负责适配。两者同名不同接口，属已记录技术债，T-18 不做重命名/迁移；后续收敛走 Change Impact。
+> **同名 `PermissionPort` 冲突记录（T-18 记录；T-23 已裁定）**：`EXT-DES-B-30` 原先只涉及 `viewmodel/ViewModelPorts.ets` 的 C-23 VM-facing `PermissionPort`（`ensure(): Promise<void>` + 可选 `openSettings?`）。C-28 §17.1.6 的 `PermissionPort`（`app/PermissionPolicy.ets`，`ensure(): Promise<PermissionResult>` + `check` + `openSettings` + `requiredForProvisioning`）保持原契约；`BleViewModelPermissionGate` 负责适配。**T-23 F-03 裁定（2026-10-18，`wp-092-t23-contracts`）**：C-23 VM-facing 契约符号改为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`（文件仍为 `contracts/PermissionPort.ets`），不导出 `PermissionResult`；C-28 app seam 保留 `PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult`。**状态：RULED（契约已裁定）；代码重命名待 bounded implementation task；在代码落地前不得宣称“无同名冲突”，也不得把 `EXT-DES-B-22` 写成已完整实现。** 精确文件/import 清单见 DES-A 附录 E §E.4。
+
+> **T-23 定时器 seam 裁定（2026-10-18）**：`EXT-DES-B-01` 退休（从未实现）；`EXT-DES-B-33` 登记 `VmTimerPort`。C-15 `TimerPort`（`contracts/TimerPort.ets`，`sleep/cancel`）、VM `VmTimerPort`（`viewmodel/core/ViewModelCore.ets`，`setTimer/clearTimer`）、C-11 `SceneTimerPort`（`contracts/SceneTimerPort.ets`，`delay`）**保留三分**；理由与影响面见 DES-A 附录 E §E.2。所有 VM 构造器/`ThrottleGate`/`DoorConfirmationTracker` 的 timer 参数均为 `VmTimerPort`；`SceneService`/`SceneExecutor` 为 `SceneTimerPort`；云 `CloudService` 为 `TimerPort`。不得把云 `TimerPort` 注入 VM，也不得把 `VmTimerPort` 放进 `contracts/**` 作为端口位置例外。
 
 **`TRUST-T18-01`（v1 边界，已声明）**：`RoomService.requireAdmin` 在 `actorMemberId === undefined` 时直接放行，沿用 C-08 `FamilyService.requireAdmin` 的 v1 local-admin trust；这是组合根/迁移/受控 host 调用约定，不是 UI 可触达的授权旁路。生产 `RoomViewModel` 通过 `RoomSessionPort` 始终传入 active memberId；任何新调用方必须传 actor，否则视为受控组合根并接受该边界。该边界不改变 `AUTH_RBAC_DENIED` 语义，也不改变 `FamilyRbac`。
 
@@ -6397,7 +6425,7 @@ export interface DeviceStatePort {
 >
 > **后续可选重构建议（不执行）**：若未来要把 UI 类型迁到 `model/**`，建议最小集合为 `model/AcUiModels.ets`（`AcViewState`/`AcBrand`/`AcModeViewKind`/`AcVocabulary`）、`model/DoorUiModels.ets`（`DoorUiState`/`DoorStage`/`DoorLockState`）、`model/ControlUiModels.ets`（`ControlPhase`/`ControlUiState`/`DeviceFilter`/`DeviceFilterKind`），并同步 C-21/C-24 imports、收缩 §18.1 allowlist；该重构需独立 Change Impact，不在 T-18 执行。
 >
-> **T-20 收口（2026-10-18；`final-system-review.md` F-02/§7.1）**：T-18 留待 T-20 处理的 pages 既有 `import type` C-08/C-09/C-11/C-15 DTO/枚举已正式纳入 §2.3 D-12 与 §18.1 `T20-D12-01..13`；`tools/contract/layering_allowlist.json` 的 13 条 `status` 由 `pending-T-20` 改为 `accepted`。其中 3 条含运行时值的 import 已在 §18.1 逐条说明（无 service 实现构造/调用、无 I/O）。该收口**不**把 pages 放宽为可 import 任意 service/repository，也**不**改变 T-18 的任何冻结签名；迁移到 `model/**` 仍为独立可选重构（P2/P3），不是 G-013/G-014 前置。
+> **T-20 收口（2026-10-18；`final-system-review.md` F-02/§7.1）**：T-18 留待 T-20 处理的 pages 既有 `import type` C-08/C-09/C-11/C-15 DTO/枚举已正式纳入 §2.3 D-12 与 §18.1 `T20-D12-01..13`；`tools/contract/layering_allowlist.json` 的 13 条 `status` 由 `pending-T-20` 改为 `accepted`。其中 3 条含运行时值的 import 已在 §18.1 逐条说明（无 service 实现构造/调用、无 I/O）。该收口**不**把 pages 放宽为可 import 任意 service/repository，也**不**改变 T-18 的任何冻结签名；迁移到 `model/**` 仍为独立可选重构（P2/P3），不是 G-013/G-014 前置。**T-23 更新：6 条 active / 7 条 retired（`T20-D12-01..05/09/10`）；live allowlist 待 prune 为 6 条；§18.1 状态列为准。**
 
 **Change Impact（2026-10-18）**：
 
@@ -6475,13 +6503,13 @@ export interface DeviceStatePort {
 | F-09 CryptoService/SceneService 顺序 | 实现/CQG-T17 | `ACCEPTED（记录）` | `CompositionPlan` 顺序断言覆盖两项偏差；评审确认无新增偏差 |
 | T-17 证据 | Orchestrator/CQG-T17 | `UNVERIFIED` | 按 t17-review.md §6 重跑 host/codelinter/assemble/ohosTest/i18n + 独立复审；不得以本裁定代替 F-02/F-03 等修复 |
 
-**T-20 收口后续待办（2026-10-18，§0.10/§18.1）**：
+**T-20 收口后续待办（2026-10-18，§0.10/§18.1；T-23 更新）**：
 
 | 项 | 归属 | 状态 | 关闭条件 |
 |---|---|---|---|
-| F-02 pages D-12 13 条 | solution-architect（契约）→ test-engineer（allowlist 落地） | `DONE（契约登记）`；allowlist `status` 待下一工具任务改为 `accepted` | 13 条 `entries` 与 §18.1 逐条一致；used+pending 消失；G-014 记录 |
-| F-01 端口物理位置 17 条 | solution-architect（登记）→ test-engineer/C-29（checker） | `ACCEPTED（v1，登记完成）`；迁移 `OPEN` | checker 读取 `port_location_exceptions`；未登记端口失败；独立迁移任务删除全部条目 |
-| checker status/符号强制与 fixture | test-engineer/C-29 | `OPEN` | used+pending 失败；未登记端口失败；symbols 超集失败；F-06 D-03/D-05 负例补齐 |
+| F-02 pages D-12 13 条 | solution-architect（契约）→ test-engineer（allowlist 落地） | `DONE（契约登记 T-20）`；**T-23：6 active / 7 retired；live prune 待工具任务** | 6 条 active `entries` 与 §18.1 逐条一致；7 条 retired 删除；`exceptions_used=6`、`unused=[]`；G-014 记录 |
+| F-01 端口物理位置 17 条 | solution-architect（登记）→ test-engineer/C-29（checker） | `DONE（T-23 迁移；16 CLOSED / 1 OPEN）` | live `port_location_exceptions`=1（PORT-LOC-01）；未登记端口失败；D-03/F-04 硬化与 fixture 完成 |
+| checker status/符号强制与 fixture | test-engineer/C-29 | `PARTIAL（T-23 基础；F-02/F-04 硬化 OPEN）` | used+pending 失败；任何 pending 失败；未登记端口失败；symbols 超集失败；D-03 type-only/无环 + F-04 schema/pending fixture 补齐 |
 | `model/**` 类型迁移 | implementation-engineer（独立 Change Impact） | `DEFERRED`（P2/P3） | 页面/VM imports 改到 `model/**`；allowlist shrink；全量回归 + 复审 |
 
 ### 24.3 契约条目索引（80 条）
@@ -6515,6 +6543,7 @@ export interface DeviceStatePort {
 - [x] T-14 裁定同步（§0.6）：F-03 两层状态、F-04 固定名/inventory 路由、F-06 单 active 云作用域、F-05 `brand.*` 资源归属均已登记，未改冻结签名/G-004 语义。
 - [x] T-17 裁定同步（§0.8）：U-01 D-12/D-17 分工、UI 显式 props DI（无 `@Provide/@Consume`）、F-01 `bootstrap` 启动键、F-09 CryptoService/SceneService 顺序偏差均已登记；未改冻结签名/G-004 语义。
 - [x] T-20 收口（§0.10/§18.1）：F-02 13 条 pages D-12 例外定稿为 `accepted`；F-01 端口物理位置 17 条逐文件/符号登记；明确 0 violation ≠ D-12 收口/位置合规；未改冻结签名/G-004 语义。
+- [x] T-23 裁定同步（§18.1/§23.1/§23.7/附录 E）：F-01 `EXT-DES-B-01` 退休、`EXT-DES-B-33` `VmTimerPort` 登记、三分保留；F-02 D-03 type-only/无环；F-03 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`；F-04/F-05/F-06/F-07 勘误；7 条 D-12 退休；未改已实现冻结签名/G-004 语义。
 - [x] i18n：API/资源布局/fallback/键规则/迁移/CHK（§7）。
 - [x] VM：state/event/selector/异步/错误映射/节流/防乐观（§10-§12）。
 - [x] UI：页面/导航/组件 props/events/主题/动效/空态/加载/错误/可访问性（§13-§16）。
@@ -6598,6 +6627,108 @@ export interface DeviceStatePort {
 - 任务提示 “C-24..C-29” 中 C-29 为构建/仿真/README 工具；本文只补 DES-B 检查器契约，构建基线引用 BB/DES-A。
 - 任务提示 “C-09 RoomRepository” 与 CG 一致；本文新增 `RoomService` 用例层，不改变组件边界。
 - 任务提示 “C-10 DeviceRepository” 与 CG 一致；本文新增 `DeviceCommandRunner`（C-10 用例）与 `DeviceRecord` 视图，不改变 SSOT 职责。
+
+## 附录 E：T-23 裁定与实现指令（2026-10-18，wp-092）
+
+> **性质**：`artifacts/70-review/t23-review.md`（commit `f290f69`）F-01..F-07 在 DES-B 侧的正式裁定记录。完整逐条裁定、checker 规则与跨文件实现清单见 **DES-A 附录 E**；本附录只列 DES-B 的契约状态、文本变更与下游实现指令，避免两处漂移。**输入**：评审报告、`t23-ports-migration.md`、DES-A §27.6、DES-B §18.1/§23.1/§23.7、checker、allowlist。**边界**：`wp-092` 只写 `artifacts/40-detailed-design/**`；不改代码/checker/allowlist/测试/分支。**冻结签名声明**：不改变任何**已实现**的端口/VM 方法名、参数顺序、返回类型或错误语义，不改变 G-004；唯一设计文本修正是退休**从未实现**的 `EXT-DES-B-01`，并以 `EXT-DES-B-33` 登记实际代码 seam。该变更在本附录、Revision 与 DES-A 附录 E 中显式记录，不是静默变更。**编号说明**：本文件此前无附录 D；为与 DES-A 的跨文件裁定编号一致，本节使用“附录 E”。
+
+### E.1 DES-B 侧裁定总表
+
+| Finding | DES-B 裁定 | 影响的 DES-B 契约/章节 | 代码状态 |
+|---|---|---|---|
+| F-01 `TimerPort` 路径冲突 | 采用**方案 B**：`contracts/TimerPort.ets` 保持 C-15 云 `sleep/cancel`；`EXT-DES-B-01` **RETIRED**（从未实现）；新增 `EXT-DES-B-33` 登记 `VmTimerPort`（`viewmodel/core/ViewModelCore.ets`，`setTimer/clearTimer`）；`VmTimerPort`/`TimerPort`/`SceneTimerPort` 保留三分 | §23.1、§23.7、§2.4 定时器行、§6.1.4/§10.1.x/§12.1.1/§21.2 的 timer 类型名 | 仅文件头/文档；C-15/C-29 无变更 |
+| F-02 D-03 同层 type-only | 允许 `contracts/** → contracts/**` 的 **type-only** 边；禁止值/副作用导入；同层图无环；checker 精确执行（DES-A §2.2/附录 E §E.3） | §18.1（checker 契约/CLI/fixture） | checker 变更属后续工具任务；现有 4 条 import 保留 |
+| F-03 `PermissionPort` 分裂 | `contracts/PermissionPort.ets` 的 C-23 VM-facing 符号改为 `ProvisioningPermissionPort`/`ProvisioningPermissionKind`；不导出 `PermissionResult`；`app/PermissionPolicy.ets` 的 C-28 `PermissionPort`/`PermissionKind`/`PermissionState`/`PermissionResult` 保留为 app seam；`BleViewModelPermissionGate` 仍为唯一适配器 | §23.1 `EXT-DES-B-22`（历史）/`EXT-DES-B-34`（T-23）、§23.7 债务状态、§12.1.1/§16.1.2 的 `PermissionPort` 引用 | 3 个生产/测试文件重命名；行为不变 |
+| F-04 checker 元数据/pending | `owner`/`close_condition`/`evidence`/`reason`/`id` 非空且 id 唯一（缺失 → exit 2）；任何 `pending-*`（used 或 unused）→ exit 1 | §18.1 CLI/端口 schema/Gate 语义 | checker + fixtures 后续任务 |
+| F-05/F-06/F-07 | 文件头、报告交叉引用/ohosTest 清单、allowlist policy 按 DES-A 附录 E §E.6 勘误 | §18.1 端口/allowlist 说明 | 后续 bounded docs/tooling 任务 |
+| D-12 退休 | `T20-D12-01..05/09/10` 正式 **RETIRED**（unused；旧路径已拆分/删除）；active 仅 `T20-D12-06/07/08/11/12/13`；live allowlist 13→6 | §2.3 D-12、§18.1 表/JSON/Gate 语义 | allowlist prune 属后续工具任务；本任务不改 |
+
+### E.2 F-01：`EXT-DES-B-01` 退休与 `EXT-DES-B-33` 登记
+
+**裁定**：DES-B §23.1 的 `EXT-DES-B-01`（`contracts/TimerPort.ets` / `TimerPort` / `TimerHandle`；`scheduleOnce/scheduleRepeating/cancel`）**从未实现**，且与 C-15 云轮询 `TimerPort.sleep/cancel` 的冻结路径冲突。采用**方案 B**，不采用方案 A（把云端口改名并让 `contracts/TimerPort.ets` 实现一个未落地的 VM 定时器形状）：方案 A 会引入新的 `TimerHandle`/scheduler 契约、迁移全部 VM/`ThrottleGate`/`DoorConfirmationTracker`/host fake，属于比修正文档更大的语义变更，且没有实现收益。
+
+**canonical 映射（三分保留）**：
+
+| seam | path / symbol | 形状 | 消费者 | 生产/host 实现 |
+|---|---|---|---|---|
+| C-15 云延迟 | `contracts/TimerPort.ets` / `TimerPort` | `sleep(ms, cancellation?): Promise<void>`；`cancel(): void` | `CloudService`、`SystemTimerPort` | `SystemTimerPort` / `ImmediateCloudTimer` |
+| VM 回调 | `viewmodel/core/ViewModelCore.ets` / `VmTimerPort` | `setTimer(delayMs, callback): number`；`clearTimer(timerId): void` | Home/Device/Climate/Door/BleProvisioning VM、`ThrottleGate`、`DoorConfirmationTracker` | `SystemVmTimer` / `FakeTimer` |
+| C-11 场景延迟 | `contracts/SceneTimerPort.ets` / `SceneTimerPort` | `delay(ms): Promise<void>` | `SceneService`、`SceneExecutor` | `SystemSceneTimer` / `ManualSceneTimer` |
+
+**不合并理由**：三者分别承载“可取消的 Promise 等待”“回调 + 多 timer 数值 id + 可重入调度”“无取消的场景 delay”，合并会改变 VM 状态机/host fake 或把 `CancellationToken`/错误语义带入 C-11；`VmTimerPort` 的数值 id 是不透明句柄，不新增 `TimerHandle` 类。任何未来合并/收敛必须走 Change Impact。
+
+**实现指令**：
+1. `contracts/TimerPort.ets` 仅改头注释：去掉 `EXT-DES-B-01` 引用，指向 `DES-B §8.1.7` 与 `§23.1 EXT-DES-B-33`；保留 `TimerPort.sleep/cancel` 原签名。
+2. DES-B §23.1 已在本任务完成：`EXT-DES-B-01` 标记 `RETIRED` 并保留历史签名块；新增 `EXT-DES-B-33`；旧 `TimerPort` 签名块标注 `HISTORICAL / RETIRED`，加入 `VmTimerPort`。
+3. §6.1.4/§10.1.2/§10.1.3/§10.1.4/§10.1.6/§10.1.7/§12.1.1/§21.2 的 VM/Scene timer 类型名已改为 `VmTimerPort`/`SceneTimerPort`；不得再把 VM 构造器写成云 `TimerPort`。
+4. C-15/C-29 无调用方变更：`CloudService.ets:19`、`SystemTimerPort.ets:11`、`CloudFakes.ets:19` 保持 `contracts/TimerPort` 的 `TimerPort`。
+5. 验收：`grep -R "scheduleOnce\|scheduleRepeating\|TimerHandle" entry/src/main/ets entry/src/test` 无产品/测试命中；`VmTimerPort` 只在 VM/app 适配/host helper；host 697/697、clean build、layering 0 violation。
+
+### E.3 F-02：DES-B §18.1 checker 契约补充
+
+- **D-03 精确规则**（与 DES-A §2.2 一致）：`contracts/**` 只允许 `common/**`、`model/**`、**type-only** `contracts/**`；值/副作用导入失败；同层图无环；平台/实现层 import 失败。
+- **现有 4 条 type-only 边**：`GatewayTransportPorts.ets:22`、`MigrationPort.ets:10`、`RoomPorts.ets:9`、`ScenePorts.ets:9`；全部保留，不改写。
+- **checker 退出码**：0=通过；1=分层违规或任何 `pending-*` 端口例外；2=畸形 allowlist/registry（含 D-03 fixture 的输入错误不适用；D-03 违规为 1）。
+- **fixture**：`contracts-type-only-ok`、`contracts-value-import-bad`、`contracts-side-effect-bad`、`contracts-cycle-bad`；`test_check_layering.py` 断言规则 ID/消息/退出码。
+- **DES-B 文本**：§18.1 T-23 点 7 已写明；实现报告 §2.1 的“只允许 common/model”需由 F-06 勘误任务改为“common/model + contracts type-only 无环”。
+
+### E.4 F-03：`PermissionPort` canonical 归属与重命名
+
+**canonical**：
+- **`contracts/PermissionPort.ets`**：C-23 VM-facing `ProvisioningPermissionPort` / `ProvisioningPermissionKind`（`EXT-DES-B-34`，取代 `EXT-DES-B-22` 的符号描述）；`ensure(kind): Promise<void>` + 可选 `openSettings?(): Promise<void>`；**不导出 `PermissionResult`**。
+- **`app/PermissionPolicy.ets`**：C-28 app seam `PermissionPort` / `PermissionKind` / `PermissionState` / `PermissionResult`；D-17 允许，不由 contracts 复制。
+- **`app/PermissionGate.ets`**：`BleViewModelPermissionGate` 实现 `ProvisioningPermissionPort`，是 manifest/request 与 `PermissionResult` 转换的单一所有者。
+
+**精确实现清单**：
+1. `entry/src/main/ets/contracts/PermissionPort.ets`：重命名导出；不新增 `PermissionResult`。
+2. `entry/src/main/ets/viewmodel/BleProvisioningViewModel.ets`：import/字段/构造参数/`ensure(ProvisioningPermissionKind.BLUETOOTH)`。
+3. `entry/src/main/ets/app/PermissionGate.ets`：`implements ProvisioningPermissionPort`；import 与 `ensure` 参数类型同步。
+4. `entry/src/test/host/ViewModelBle.test.mjs`：import `ProvisioningPermissionKind`。
+5. 全仓搜索 `contracts/PermissionPort` 的旧符号；不得保留 `export interface PermissionPort`/`export enum PermissionKind` 于 contracts。
+6. **DES-B §23.7 状态**：已由“同名技术债，不裁定”更新为“RULED（wp-092）；代码重命名待 bounded implementation task；落地前不得宣称无同名冲突”。`EXT-DES-B-22` 不再声称 contracts 含 `PermissionResult`。
+
+### E.5 F-04/F-05/F-06/F-07（DES-B 相关部分）
+
+- **F-04**：`check_layering.py` 的 `load_port_location_exceptions()` 强制 `id` 唯一、`owner`/`close_condition`/`evidence`/`reason` 非空（exit 2）；任何 `pending-*`（used 或 unused）exit 1；保留 `used && status != accepted` 失败路径。fixture/CLI 见表 E.1；完整清单见 DES-A 附录 E §E.5。
+- **F-05**：`contracts/CryptoPort.ets`/`PreferencesStore.ets` 头注释改为“已迁移、例外关闭”；只改注释。DES-B 不涉及文件内容。
+- **F-06**：`t23-ports-migration.md` §1/§2 的“§6.1” → “§7.1”；§7.2 ohosTest 清单补 `LoggerPort`×2，保持 7 文件/12 条。DES-B 的 §23.4 错误表不受影响。
+- **F-07**：allowlist `policy` 改为“17 条登记已迁移，仅 PORT-LOC-01 保留；`VmTimerPort` 是 VM 本地 seam，不进入端口例外；C-28 `PermissionPort`/`PermissionResult`/`PermissionState`/`PermissionKind` 是 app seam（D-17），不是 contracts 端口”；不得写“all port declarations migrated”。DES-B §23.1 `EXT-DES-B-33` 已登记 `VmTimerPort` 归属。
+
+### E.6 D-12 退休与 §18.1 状态
+
+- `T20-D12-01..05/09/10`：**RETIRED**（unused；`repository/DomainModels.ets` 与 `service/ble/BleProvisioningPorts.ets` 已拆分/删除）；保留表行、历史 JSON 与证据，不删。
+- `T20-D12-06/07/08/11/12/13`：**ACTIVE**（used=6；其中 07/12 为值 import）。
+- live allowlist：13 → 6（工具任务执行）；`exceptions_used=6`、`unused_exceptions=[]`、`pending=0`。
+- Gate：`check_layering` 0 violation 不等于 D-12 完全收口；Stage Gate 记录“6 active / 7 retired；端口 16 CLOSED / 1 OPEN”；不得引用 T-20 的 13 条/17 条现状。
+
+### E.7 实现任务清单（DES-B 侧）
+
+| # | 文件/位置 | 变更 | 验收 |
+|---|---|---|---|
+| 1 | `contracts/TimerPort.ets` | 头注释指向 §8.1.7/`EXT-DES-B-33`；签名不变 | grep 无 `scheduleOnce`/`TimerHandle`；C-15 编译/测试 |
+| 2 | `contracts/PermissionPort.ets` | 重命名 `ProvisioningPermissionPort`/`ProvisioningPermissionKind` | 无旧导出；host/build |
+| 3 | `viewmodel/BleProvisioningViewModel.ets` | 同步 F-03 import/类型 | host `ViewModelBle` |
+| 4 | `app/PermissionGate.ets` | 适配器实现新符号 | build + 权限测试 |
+| 5 | `entry/src/test/host/ViewModelBle.test.mjs` | 同步 F-03 import | host 697/697 |
+| 6 | `tools/contract/check_layering.py` | D-03 type-only/无环；F-04 schema/pending | fixture/repo 0 violation |
+| 7 | `tools/contract/layering_allowlist.json` | 删除 7 条 retired D-12；F-07 policy | used=6、unused=[]、ports=1 |
+| 8 | `tools/contract/test_check_layering.py` + fixtures | 新增 D-03/pending/schema 用例 | 全测试通过 |
+| 9 | `artifacts/50-implementation/t23-ports-migration.md` | F-06 勘误 | 引用/清单正确 |
+| 10 | `entry/src/ohosTest/**` | 12 条旧 import（bounded follow-up；`RandomPort`/`LoggerPort`×2 等） | ohosTest 编译；不改断言 |
+
+### E.8 验证要求
+
+**本任务（文档）**：
+```bash
+python3 tools/contract/crosscheck_protocol_assets.py   # hard checks ALL PASS
+python3 tools/contract/check_layering.py               # files=221 violations=0
+python3 tools/contract/test_check_layering.py          # 现有 12 项通过（本任务不改 fixture）
+```
+`entry/src/test/host/I18n.test.mjs` 的 DES-A §3.2.3 / DES-B §23.4 解析区间未被本任务修改；host 全量应保持 697/697。
+
+**后续实现任务**：重跑评审 §2 的 7 项命令 + `grep`/fixture 检查；期望 `exceptions_used=6`、`port_exceptions_used=0`、`port_pending=0`、`violations=0`；host 697/697；clean build SUCCESSFUL；codelinter 0 error；i18n blocking=0/missing=0。
+
+**不得**：把 `EXT-DES-B-01` 退休写成“已实现签名变更”；把 `Pending`/`0 violation` 写成 Gate PASS；把 `PermissionResult` 写进 contracts；把 `VmTimerPort` 放进 `contracts/**` 或端口位置例外。
 
 ---
 
