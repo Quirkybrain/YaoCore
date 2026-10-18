@@ -4,8 +4,8 @@
 
 YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域网通道。App 负责 BLE 配网、局域网设备控制、真实状态同步、场景联动，以及家庭 / 房间 / 设备管理。ESP32-S3 网关是外部物理设备，其固件不在本仓库内。
 
-> **Producer**: agent:technical-writer · **Status**: ACTIVE · **文档版本**: README-001 v1.0 · **生效日期**: 2026-10-18 · **适用代码基线**: `13dc839`
-> **变更记录**: T-21 将 README 从脚手架状态更新为已实现 App 状态，补充 v1 范围、验证命令、已知限制、仓库结构与文档入口。
+> **Producer**: agent:technical-writer · **Status**: ACTIVE · **文档版本**: README-001 v1.1 · **生效日期**: 2026-10-18 · **适用代码基线**: `e74a181`（TEST-002；产品代码内容至 G-017 `4faf3e3` 未变） · **阶段 Gate 基线**: `4faf3e3`（G-017）
+> **变更记录**: v1.1（G-018 documentation，wp-110）同步 A1/T-23 端口迁移、i18n triage、D-12 6 active / 7 retired、TEST-002 与 G-015..G-017 证据及阶段状态；移除 A 类非 ACCEPTED 总数被误写为 `PENDING_REVIEW` 的旧口径，以及端口 / D-12 / 分层 / 性能的过期数字。
 > 维护节奏、待办与风险接受登记见 [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md)。
 
 ## 核心设计原则
@@ -14,35 +14,48 @@ YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域�
 |---|---|
 | 真实状态 + 执行确认 | 只有收到网关真实 ACK，并完成响应验签、`request_id:seq` correlation 匹配、`result_code == 0` 与 `reported_state` 校验后，才允许显示控制成功；禁止虚构成功状态。 |
 | 局域网优先 / 离线可用 | 日常控制优先走本地网络，不依赖云端；云端不可用时，已绑定的局域网设备仍应可用。 |
-| 端到端机密性与完整性（按通道如实标注） | BLE 配网使用 Protocomm Security1；局域网控制使用 HMAC-SHA256 双向认证与防重放；网关支持时启用 HTTPS + 证书指纹固定（SPKI pinning）。仅有 P-HMAC 时只保证完整性与防重放，机密性须如实标注为未启用。 |
+| 机密性与完整性按通道如实标注 | BLE 配网使用 Protocomm Security1；局域网控制使用 HMAC-SHA256 双向认证与防重放；网关支持时启用 HTTPS + 证书指纹固定（SPKI pinning）。仅有 P-HMAC 时只保证完整性与防重放，机密性须如实标注为未启用。 |
 | 家庭 - 房间 - 设备松耦合 | 房间与设备使用不变 ID 关联；改名、换房是本地操作；删除房间时设备进入未分配池并保护性禁用，而不是级联删除。 |
 
 ## 当前交付状态
 
-> **状态：implementation 阶段代码已完成（T-06..T-20），Stage Gate 尚未判定。可用于代码审阅与本地构建验证，不可用于生产。**
+> **状态：代码级 implementation、review、testing 与 acceptance readiness 已完成（G-015 / G-016 / G-017 均为 `PASS_WITH_ACCEPTED_RISKS`）；documentation 文档同步已完成（wp-110，G-018 Stage Gate 由 Orchestrator 判定）。设备 / 真实环境仍未验证，用户验收未完成，release 未授权。**
 
-- 29 个组件（C-01..C-29）的 v1 代码、资源、测试与文档收尾已落地；实现报告、组件质量门禁与评审证据位于 [`artifacts/`](artifacts/)。
-- 代码级证据限当前 revision 与当前主机环境：构建、静态检查、Host 纯逻辑测试、协议资产交叉校验、仿真器契约测试、i18n 与分层检查。
+- 29 个组件（C-01..C-29）的 v1 代码、资源、测试与文档已落地；C-29 扫描口径下 `entry/src/main/ets/**` 为 **221 个 ArkTS 文件**，其中 `contracts/**` 20 个端口 / 契约文件、`model/**` 17 个 DTO / 枚举文件。实现报告、组件质量门禁与评审证据位于 [`artifacts/`](artifacts/)。
+- 代码级证据限当前 revision 与当前主机环境：构建、静态检查、Host 纯逻辑测试、协议资产交叉校验、仿真器契约测试、i18n、分层检查与 i18n triage。
 - **设备 / 真实硬件 / 真实网络测试由用户自行执行**：BLE、真实 LAN、真实 TLS pin、华为云 IoTDA、视觉 / 动效 / 无障碍与 60/120fps 尚未验证（见 [已知限制](#已知限制)）。
 - **Mock / 仿真仅 DEV-ONLY**：仿真器响应固定携带 `X-YaoCore-Simulator: DEV-ONLY`；生产客户端必须拒收，Mock/仿真器不进入生产路径，也不构成物理网关可用的证据。
 - 构建产物为**未签名** HAP / `.app`，不能安装到设备，也不是 release 交付物。
 
-| 证据项 | 本次结果 | 说明 |
+### 阶段 Gate 状态（代码级）
+
+| Stage | Gate | Verdict | 范围 / 边界 |
+|---|---|---|---|
+| review | G-015 @ `09e1b46` | **PASS_WITH_ACCEPTED_RISKS** | 最终集成候选的变更覆盖、独立评审与残余登记；RR-03 转 documentation |
+| testing | G-016 @ `1cccec5` | **PASS_WITH_ACCEPTED_RISKS** | TEST-002 @ `e74a181`；11 项矩阵 exit 0；FR 24 covered / 2 partial / 0 gap |
+| acceptance | G-017 @ `4faf3e3` | **PASS_WITH_ACCEPTED_RISKS（acceptance readiness）** | 代码级验收就绪；用户验收（BLK-01..08）未执行 |
+| documentation | G-018 | 文档同步完成；Gate 由 Orchestrator 判定 | 本 README、维护计划、TEST-REPORT-001 注记、RR-03 勘误、集成报告 §17 |
+
+### 证据摘要
+
+| 证据项 | 当前结果 | 来源 / 说明 |
 |---|---|---|
-| `ohpm install` | **PASS** | 依赖安装完成 |
-| 干净 HAP 构建 | **PASS** | `BUILD SUCCESSFUL`；未签名 HAP |
-| 静态检查（codelinter） | **PASS（0 error / 25 warning）** | warning 为性能建议，非阻断 |
-| Host 纯逻辑测试 | **PASS 697/697** | Node 24 测试运行器；非 Hypium 设备测试 |
-| 协议资产交叉校验 | **PASS 66/66 hard checks** | 14 项冻结输入 `FINDING` 为已知勘误线索，不阻断 |
-| 仿真器契约测试（HTTP + TLS） | **PASS 20/20** | localhost；DEV-ONLY 测试夹具 |
-| i18n 检查（`--strict-ui`） | **PASS：0 blocking / 0 missing** | 73 条 advisory warning（其中 hardcoded 16 条，均为非 UI 技术字符串） |
-| 分层检查（C-29） | **PASS：0 violation** | 13 条 D-12 例外已登记；10/17 条端口位置例外当前被使用，迁移未完成 |
+| `ohpm install` | **PASS** | TEST-002 @ `e74a181` |
+| 干净 HAP 构建 | **PASS**（`BUILD SUCCESSFUL`；未签名） | TEST-002 @ `e74a181` |
+| 静态检查（codelinter） | **PASS（0 error / 25 warning）** | TEST-002 @ `e74a181`；warning 为性能建议，非阻断 |
+| Host 纯逻辑测试 | **PASS 697/697** | documentation 复跑 @ `422c687`；Node 24 运行器，非 Hypium 设备测试 |
+| 协议资产交叉校验 | **PASS 66/66 hard checks** | documentation 复跑；14 项冻结输入 `FINDING` 为已知勘误线索，不阻断 |
+| 仿真器契约测试（HTTP + TLS） | **PASS 20/20** | documentation 复跑；localhost，需 `no_proxy`；DEV-ONLY 测试夹具 |
+| i18n 检查（`--strict-ui`） | **PASS：0 blocking / 0 missing** | documentation 复跑；73 条 advisory warning（其中 hardcoded 16 条，均为非 UI 技术字符串） |
+| i18n legacy triage | **PASS：615 行一致** | `triage_legacy.py --check`；10 ACCEPTED / 46 MIGRATED / 6 PENDING / 0 INLINE / 544 OBSOLETE_LEGACY；11 B_REWRITE / 6 C / 3 D |
+| 分层检查（C-29） | **PASS：221 files / 0 violation** | `exceptions_used=6`（D-12 active）、`port_exceptions_used=0`；live 端口例外 1 条（PORT-LOC-01 OPEN） |
+| 分层检查器 fixture | **PASS 27/27** | `test_check_layering.py` |
 | ohosTest HAP 编译 | **COMPILED_ONLY** | 仅证明测试代码可编译，不证明设备断言通过 |
 | 设备 / 模拟器测试 | **BLOCKED** | 无 `hdc` target、无模拟器实例、无签名 |
-| 真实 BLE / LAN / TLS / 云 / 视觉 / fps | **BLOCKED / UNAVAILABLE** | 由用户按设备矩阵执行 |
-| ACK p95 | **MOCK_ONLY** | T-19/T-20 证据 p95 0.598 ms；T-21 复跑 0.589 ms；不是 NFR 4.3 验收数据 |
+| 真实 BLE / LAN / TLS / 云 / 视觉 / fps | **BLOCKED / UNAVAILABLE** | 由用户按设备矩阵执行（维护计划 §4） |
+| ACK p95 | **MOCK_ONLY** | localhost 约 0.6 ms 量级，数值随环境波动；不是 NFR 4.3 验收数据 |
 
-> `PASS` 仅表示对应 revision、对应环境实际执行且断言通过。本表命令于 T-21 在 `13dc839` 复跑；ACK p95 采用 T-19/T-20 已对齐的证据，仍为 `MOCK_ONLY`。`COMPILED_ONLY`、`BLOCKED`、`NOT_RUN`、`UNAVAILABLE` 均不写成 PASS；测试 HAP 编译通过不等于测试通过。详细证据与分类见 [`artifacts/60-testing/test-report.md`](artifacts/60-testing/test-report.md) 和 [`artifacts/70-review/final-system-review.md`](artifacts/70-review/final-system-review.md)。
+> `PASS` 仅表示对应 revision、对应环境实际执行且断言通过。构建 / lint 证据来自 TEST-002 @ `e74a181`，产品代码内容自该提交至 `4faf3e3` 未变；其余检查在 documentation 阶段复跑。`COMPILED_ONLY`、`BLOCKED`、`NOT_RUN`、`UNAVAILABLE`、`MOCK_ONLY` 均不写成 PASS。详细证据与分类见 [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md)（TEST-002）与 [`artifacts/65-acceptance/acceptance-report.md`](artifacts/65-acceptance/acceptance-report.md)（ACCEPT-001）。
 
 ## v1 范围与安全边界
 
@@ -66,17 +79,19 @@ YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域�
 
 | 限制 | 说明 |
 |---|---|
-| 设备 / 真实环境未验证 | 无真机、模拟器实例与签名；真实 BLE 配网、LAN 控制、TLS pin、云 IoTDA、视觉 / 动效 / 无障碍与 fps 均未执行。设备矩阵与执行前置见维护计划 §4。 |
+| 设备 / 真实环境未验证 | 无真机、模拟器实例与签名；真实 BLE 配网、LAN 控制、TLS pin、云 IoTDA、视觉 / 动效 / 无障碍与 fps 均未执行。设备矩阵与执行前置见维护计划 §4。**用户验收未完成。** |
 | Mock / 仿真仅 DEV-ONLY | `tools/simulator/` 是 localhost 契约夹具；测试证书与私钥均为 `PUBLIC TEST DATA ONLY`，不得用于真实设备或生产环境。 |
 | P-HMAC 无机密性 | LAN 默认通道只保证完整性与防重放；TLS / pinning 依赖网关固件 v2.1，未就绪时不得宣称“端到端加密”或“TLS 已验证”。 |
 | 云 Token 手工管理 | 无自动刷新 / 后端换取；Token 过期需用户更新。外部模块 `DeviceInventoryJson` 云完成判定受 `PB-02` 未决结构限制，未知结构一律 `UNSUPPORTED`，不声明成功。 |
 | 家庭同步为接触式收敛 | 无服务器；家庭 / 成员 / 密钥变更通过邀请凭据与接触式导入收敛，不提供实时同步或成员在线状态（v1 声明性限制）。 |
 | 部分交互 DEFERRED | 扫码 / 相机二维码、设备删除 / 改名、场景编辑、通知系统权限状态等未在 v1 UI 开放或仅保留诚实提示；不伪造未实现能力。 |
-| 网关管理服务层 RBAC 缺口 | `FamilyRepository.addGatewayToFamily` 缺少 actor/RBAC（`GAP-T18-01`）；D-030 已书面接受 v1 风险，补偿控制为 UI ADMIN 门 + BLE PoP 前置 + 内部 API 边界。**该缺口未关闭**，不得宣称网关管理服务层 RBAC 已闭合。 |
+| UI 子句偏离待用户决定 | `GAP-AC-01`：`FR-HOME-001` 未显示局域网 IP；`GAP-AC-02`：多家庭切换为跳转家庭管理页，未实现首页弹窗；`GAP-AC-03`：`FR-ROOM-001` 房间图标未接线 / 未展示。均为 Low，需用户书面接受为 v1 简化或派发 bounded fix。 |
+| 网关管理服务层 RBAC 缺口 | `FamilyRepository.addGatewayToFamily` 缺少 actor/RBAC（`GAP-T18-01`）；D-030 已书面接受 v1 风险（RA-01），补偿控制为 UI ADMIN 门 + BLE PoP 前置 + 内部 API 边界。**该缺口未关闭**，不得宣称网关管理服务层 RBAC 已闭合。 |
 | 配网取消的 durable 边界 | `addGatewayToFamily` 已发起后的取消只能抑制 `BOUND` 发布，不能回滚已发起的 durable 写（R4-01，Info）。 |
-| 端口位置例外 / 迁移未完成 | DES-A 名义端口位置为 `contracts/**`，当前实际位于 `service/**`、`repository/**`、`viewmodel/**` 等；T-20 已将 17 条例外登记进 allowlist，但 P1-P3 迁移未执行。`check_layering` 的 0 violation **不代表端口位置已合规**。 |
-| i18n 旧文案仍待迁移 | `legacy-migration.csv` 仍有 **596 条 `PENDING_REVIEW`**（A 类 606 条中）；当前 UI 无 blocking 硬编码，但历史文案未逐条人工签署。 |
-| 性能证据不足 | ACK p95 仅 `MOCK_ONLY`（T-19/T-20 0.598 ms；T-21 复跑 0.589 ms，随环境波动）；真实 LAN p95 ≤500ms、60/120fps 未测量。55ms 节流仅有 Host 逻辑证据。 |
+| 端口位置例外仅剩 PORT-LOC-01 | T-23 已建立 `entry/src/main/ets/contracts/**`，17 条登记中 **16 条关闭（16/17 CLOSED）**；仅 `ClockPort`/`IdPort` 因冻结签名与 D-01 留在 `common/types/Ports.ets`（**PORT-LOC-01 OPEN**）。live `port_location_exceptions` 1 条、`port_exceptions_used=0`；`check_layering` 的 0 violation **仍不等于 100% 端口位置合规**。 |
+| D-12 例外已收口为 6 active | T-20 登记的 13 条 D-12 中，T-23 后 **7 条退休、6 条 active accepted**（`T20-D12-06/07/08/11/12/13`；2 条值 import）。live allowlist 保留 6 条；`exceptions_used=6`。**0 violation 不等于这 6 条已迁移到 `model/**`**。 |
+| i18n 历史文案 triage 残余 | `legacy-migration.csv` 615 行：10 ACCEPTED / 46 MIGRATED / 6 PENDING_REVIEW / 0 INLINE_LITERAL / 544 OBSOLETE_LEGACY；另有 11 条 B_REWRITE_REQUIRED、C 类 6（4 RECHECK + 2 SAFETY_RECHECK）、D 类 3。`MIGRATED` 是机器证据，**不等于人工签收**；`OBSOLETE_LEGACY` **不是删除清单**，需业务复核。旧口径中的“596 条”是非 ACCEPTED 总数（46 + 6 + 544），不是 `PENDING_REVIEW` 数。当前 UI 无 blocking 硬编码。 |
+| 性能证据不足 | ACK p95 仅 `MOCK_ONLY`（localhost 约 0.6 ms 量级，随环境波动）；真实 LAN p95 ≤500ms、60/120fps 未测量。55ms 节流仅有 Host 逻辑证据。 |
 | 测试源码未 lint / 无覆盖率 | `code-linter.json5` 忽略 `src/test/**`、`src/ohosTest/**`；无行 / 分支覆盖率；25 条 lint warning 为非阻断性能建议。 |
 | 未签名构建不可安装 | `signingConfigs: []`，可产出未签名 HAP / `.app`，但不能安装或发布。 |
 | 视觉 / 无障碍未验收 | 布局、暗黑模式、长英文、文本膨胀、对比度、读屏、动效与触感均需设备 / 截图评审。 |
@@ -96,7 +111,7 @@ v1 范围、错误语义与安全通道的权威定义见 [`artifacts/20-archite
 | 包管理器 | `ohpm` 26.0.0.630 或更高（基线验证值：26.0.0.630） |
 | 构建工具 | `hvigorw` 6.26.8（基线验证值） |
 | 静态检查 | `codelinter` 6.0.240（基线验证值） |
-| Python | 3.10+（仅标准库；用于契约 / 仿真器检查） |
+| Python | 3.10+（仅标准库；用于契约 / 仿真器 / i18n 检查） |
 | 网络 | 首次 `ohpm install` 需可访问 ohpm registry；仿真器仅使用 localhost |
 | PATH | `ohpm`、`hvigorw`、`codelinter`、`node`、`java`、`python3` 可用 |
 | 签名 | 构建未签名包不需要签名；安装到设备、运行设备测试需要单独配置签名 |
@@ -105,19 +120,25 @@ v1 范围、错误语义与安全通道的权威定义见 [`artifacts/20-archite
 
 ## 已验证命令
 
-以下命令于 **2026-10-18** 在仓库根、Linux x86_64、`task/wp-086-docs` @ `13dc839` 实际复跑；详细日志见 [`artifacts/60-testing/test-report.md`](artifacts/60-testing/test-report.md) 与 [`entry/src/test/evidence/`](entry/src/test/evidence/)。
+以下命令于 **2026-10-18** 在仓库根、Linux x86_64、`task/wp-110-documentation` @ `422c687` 实际复跑；构建 / 静态检查证据来自 **TEST-002 @ `e74a181`**（产品代码内容自该提交至 `4faf3e3` 未变）。详细日志见 [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md) 与 [`artifacts/60-testing/evidence/`](artifacts/60-testing/evidence/)。
 
 | 命令 | 本次结果 |
+|---|---|
+| `entry/src/test/run-host-tests.sh` | PASS（697/697） |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | PASS（66/66 hard checks；14 项 `FINDING`） |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | PASS（221 files / 0 violation / 6 D-12 / 1 port exception，`used=0`） |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py` | PASS（27/27） |
+| `PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui` | PASS（0 blocking / 0 missing；73 warning / 16 hardcoded） |
+| `PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check` | PASS（615 行；CSV 与计算 triage 一致） |
+| `no_proxy=127.0.0.1,localhost NO_PROXY=127.0.0.1,localhost PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tools.simulator.test_gateway_contract -v` | PASS（20/20；HTTP + TLS） |
+
+构建 / 静态检查（TEST-002 @ `e74a181`）：
+
+| 命令 | 结果 |
 |---|---|
 | `ohpm install` | PASS |
 | `hvigorw clean assembleHap --no-daemon` | PASS（`BUILD SUCCESSFUL`，未签名 HAP） |
 | `codelinter -c code-linter.json5 -p default .` | PASS（0 error / 25 warning） |
-| `entry/src/test/run-host-tests.sh` | PASS（697/697） |
-| `python3 tools/contract/check_layering.py` | PASS（209 files / 0 violation） |
-| `python3 tools/contract/test_check_layering.py` | PASS（10/10） |
-| `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | PASS（0 blocking / 0 missing） |
-| `python3 tools/contract/crosscheck_protocol_assets.py` | PASS（66/66 hard checks） |
-| `python3 -m unittest tools.simulator.test_gateway_contract -v` | PASS（20/20；localhost 需 `no_proxy`） |
 
 ### 1. 环境准备
 
@@ -158,7 +179,7 @@ entry/build/default/outputs/default/entry-default-unsigned.hap
 codelinter -c code-linter.json5 -p default .
 ```
 
-本次结果：`Defects: 25; Errors: 0; Warns: 25; Suggestions: 0`。warning 为自定义组件性能建议，非阻断。当前 `code-linter.json5` 不检查测试源码（`ohosTest` / `test` / `mock` 被显式忽略）。
+TEST-002 结果：`Defects: 25; Errors: 0; Warns: 25; Suggestions: 0`。warning 为自定义组件性能建议，非阻断。当前 `code-linter.json5` 不检查测试源码（`ohosTest` / `test` / `mock` 被显式忽略）。
 
 ### 5. Host 纯逻辑测试
 
@@ -168,45 +189,64 @@ entry/src/test/run-host-tests.sh
 
 本次结果：`tests 697 / pass 697 / fail 0 / skipped 0`。该运行器使用 Node 24 的 `node:test` 执行纯逻辑测试，不依赖设备、模拟器或 Hypium Previewer；它不能替代设备断言。
 
-### 6. 契约与分层检查
+### 6. 契约、分层与 i18n triage
 
 ```bash
 # 协议 schema / 向量 / 实现交叉校验
-python3 tools/contract/crosscheck_protocol_assets.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py
 
 # 契约基线分层规则（D-01..D-17）
-python3 tools/contract/check_layering.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py
 
 # 检查器 fixture 自测
-python3 tools/contract/test_check_layering.py
+PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py
+
+# i18n 历史登记表 triage 一致性
+PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check
 ```
 
-本次结果：crosscheck `66/66 hard checks`（14 项冻结输入 `FINDING` 为已知勘误线索）；分层检查 `209 files / violations=0 / exceptions_used=13 / port_exceptions_used=10`。
+本次结果：crosscheck `66/66 hard checks`（14 项冻结输入 `FINDING` 为已知勘误线索）；分层检查 `files=221 / violations=0 / exceptions_used=6 / pending=0 / port_exceptions_used=0`；fixture `27/27`；triage `615 rows / OK`。
 
-> 分层检查的 0 violation 包含已登记例外：13 条 D-12 文件 / 符号级例外（`accepted`）与 17 条端口位置例外中的 10 条。端口迁移未完成前，**不得**把该结果解释为“端口位置已合规”。
+> 分层检查的 0 violation 包含已登记例外：6 条 **active** D-12 文件 / 符号级例外（`T20-D12-06/07/08/11/12/13`；7 条历史条目已于 T-23 退休），以及 **1 条** live 端口位置例外 `PORT-LOC-01`（`ClockPort`/`IdPort`；当前 `used=0`）。除 `PORT-LOC-01` 外，17 条端口登记中 16 条已迁移到 `contracts/**`。**`check_layering` 的 0 violation 仍不得解释为 100% 端口位置合规。**
 
-性能 harness（`MOCK_ONLY`，**不是** NFR 4.3 验收）：
+性能 harness（`MOCK_ONLY`，**不是** NFR 4.3 验收；本次未重跑，引用 TEST-002 @ `e74a181`）：
 
 ```bash
-python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5
+PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5
 ```
 
-本次复跑结果：p50 0.521 ms / p95 0.589 ms / max 0.647 ms，0 failures；输出标注 `MOCK_ONLY`，不包含 ArkTS 客户端验签、状态应用、真实 LAN、TLS pin、BLE 或 UI 帧。
+TEST-002 复核值：p95 **0.609 ms**（N=100，warmup=5）；localhost 数值随环境波动，不包含 ArkTS 客户端验签、状态应用、真实 LAN、TLS pin、BLE 或 UI 帧。**不得**作为 NFR 4.3 达标证据。
 
 ### 7. i18n 检查
 
 ```bash
-python3 entry/src/test/i18n/check_i18n.py --strict-ui
+PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui
 ```
 
-本次结果：`blockingFailures=0 / missingKeys=0`；warnings 73（其中 hardcoded 16 条，均为技术状态 / 品牌 / Mock 字符串）；`--strict-ui` 会把短英文 UI 文案提升为 blocking。历史 596 条迁移状态见维护计划。
+本次结果：`blockingFailures=0 / missingKeys=0`；warnings 73（其中 hardcoded 16 条，均为技术状态 / 品牌 / Mock 字符串）；`--strict-ui` 会把短英文 UI 文案提升为 blocking。
+
+历史文案 triage 的当前口径（`triage_legacy.py --summary`）：
+
+| 维度 | 数量 |
+|---|---|
+| 总行数 | 615（A 迁移 606、C 废弃 6、D 排除 3） |
+| `ACCEPTED` | 10（T-10 人工审查） |
+| `MIGRATED` | 46（机器证据；**不等于人工签收**） |
+| `PENDING_REVIEW` | 6（多键歧义，待人工选键） |
+| `INLINE_LITERAL` | 0 |
+| `OBSOLETE_LEGACY` | 544（**不是删除清单**，需业务复核） |
+| `B_REWRITE_REQUIRED` | 11（均在 `OBSOLETE_LEGACY` 中） |
+| C 类复核 | 6（4 `RECHECK_REQUIRED` + 2 `SAFETY_RECHECK_REQUIRED`） |
+| D 类排除 | 3（品牌数据） |
+
+> 旧口径中的“596 条”是当时 A 类非 `ACCEPTED` 总数（46 `MIGRATED` + 6 `PENDING_REVIEW` + 544 `OBSOLETE_LEGACY`），**不是 596 条都处于待审状态**。当前 UI 无 blocking 硬编码，不代表 615 行历史文案已全部人工签署。
 
 ### 8. 仿真器契约测试（DEV-ONLY）
 
 ```bash
 # 若本机设置了 HTTP(S)_PROXY，需要绕过 localhost 代理
 no_proxy='127.0.0.1,localhost' NO_PROXY='127.0.0.1,localhost' \
-  python3 -m unittest tools.simulator.test_gateway_contract -v
+  PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tools.simulator.test_gateway_contract -v
 ```
 
 本次结果：`Ran 20 tests ... OK`（HTTP + TLS）。
@@ -260,7 +300,8 @@ YaoCore/
 │   │   ├── app/               # 组合根、应用上下文、导航、权限与启动装配
 │   │   ├── common/            # 常量、主题、通用类型与工具
 │   │   ├── components/        # 复用 UI 组件与设计系统
-│   │   ├── model/             # 领域 / 协议 / 云 / 配网模型
+│   │   ├── contracts/         # 端口 / 契约（T-23 迁移后 20 个文件；PORT-LOC-01 除外）
+│   │   ├── model/             # 领域 / 协议 / 云 / 配网 DTO 与枚举（17 个文件）
 │   │   ├── pages/             # 页面与导航壳
 │   │   ├── repository/        # 本地持久化仓储与领域端口
 │   │   ├── service/           # 协议、安全、存储、网关、BLE、云、AC、i18n 等服务
@@ -272,10 +313,11 @@ YaoCore/
 │   └── src/ohosTest/          # Hypium 设备测试骨架（COMPILED_ONLY / BLOCKED）
 ├── tools/
 │   ├── build/                 # 构建 / 测试基线脚本
-│   ├── contract/              # 协议 crosscheck、分层检查、ACK 延迟 harness
+│   ├── contract/              # 协议 crosscheck、分层检查、ACK 延迟 harness、fixtures
+│   ├── i18n/                  # legacy 文案 triage（615 行登记表一致性检查）
 │   ├── simulator/             # DEV-ONLY 网关仿真器、localhost 测试证书
 │   └── test-fixtures/         # 测试夹具（如 IoTDA product-profile）
-├── artifacts/                 # 工作流工件：验证、架构 / ADR、规划、设计、实现、测试、评审、维护
+├── artifacts/                 # 工作流工件：验证、架构 / ADR、规划、设计、实现、测试、验收、评审、维护、集成
 ├── input/                     # 原始设计资产（需求 / 架构 / 数据 / API / UIUX，只读；未纳入 Git）
 ├── build-profile.json5        # 应用级构建配置
 ├── code-linter.json5          # 静态检查配置
@@ -287,8 +329,9 @@ YaoCore/
 说明：
 
 - `entry/src/main/ets/` 采用 MVVM 与单向依赖：页面 / 组件不直接构造 service、repository 或 ViewModel；生产组合根为 `app/AppCompositionRoot.ets`。
+- `contracts/**` 是端口 / 契约的规范位置；`model/**` 承载跨层 DTO 与枚举。`ClockPort`/`IdPort` 因冻结签名与 D-01 仍留在 `common/types/Ports.ets`（PORT-LOC-01，OPEN）。
 - `input/` 是本地只读设计资产池，**修改 `input/` 不在本仓库工作流内**；任何契约变更走勘误 / 补丁提案与 Change Impact。
-- `artifacts/` 保存可追溯的设计、验证、规划、实现与评审证据；详细命令日志位于 `entry/src/test/evidence/`。
+- `artifacts/` 保存可追溯的设计、验证、规划、实现、测试、验收与评审证据；详细命令日志位于 `entry/src/test/evidence/` 与 `artifacts/60-testing/evidence/`。
 
 ## 文档入口
 
@@ -305,9 +348,12 @@ YaoCore/
 | 架构决策记录（ADR） | [`artifacts/20-architecture/`](artifacts/20-architecture/)（ADR-001..004） |
 | 详细设计 DES-A / DES-B | [`artifacts/40-detailed-design/des-001a-foundation-transport.md`](artifacts/40-detailed-design/des-001a-foundation-transport.md)、[`artifacts/40-detailed-design/des-001b-domain-presentation.md`](artifacts/40-detailed-design/des-001b-domain-presentation.md) |
 | 交付计划 / 组件图 | [`artifacts/30-plan/delivery-plan.md`](artifacts/30-plan/delivery-plan.md)、[`artifacts/30-plan/component-graph.md`](artifacts/30-plan/component-graph.md) |
-| 构建与测试基线（T-01 历史基线） | [`artifacts/50-implementation/build-baseline.md`](artifacts/50-implementation/build-baseline.md)；当前命令与结果以本 README / 测试报告为准 |
-| 测试计划 / 测试报告 | [`artifacts/60-testing/test-plan.md`](artifacts/60-testing/test-plan.md)、[`artifacts/60-testing/test-report.md`](artifacts/60-testing/test-report.md) |
+| 构建与测试基线（T-01 历史基线） | [`artifacts/50-implementation/build-baseline.md`](artifacts/50-implementation/build-baseline.md)；当前命令与结果以本 README / TEST-002 为准 |
+| 测试计划 / 历史测试报告 | [`artifacts/60-testing/test-plan.md`](artifacts/60-testing/test-plan.md)、[`artifacts/60-testing/test-report.md`](artifacts/60-testing/test-report.md)（TEST-REPORT-001，历史 @ `4f7c26b`） |
+| 最终测试 Stage 报告（首选） | [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md)（TEST-002 @ `e74a181`） |
+| 验收就绪报告 | [`artifacts/65-acceptance/acceptance-report.md`](artifacts/65-acceptance/acceptance-report.md)（ACCEPT-001） |
 | 独立系统评审 | [`artifacts/70-review/final-system-review.md`](artifacts/70-review/final-system-review.md) |
+| 集成验证报告 | [`artifacts/90-integration/integration-report.md`](artifacts/90-integration/integration-report.md)（INTEGRATION-REPORT-001） |
 | 维护计划与风险登记 | [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md) |
 
 `input/` 为冻结的设计语料，只读；如与契约基线或 ADR 冲突，按变更提案流程处理，不直接修改 `input/`。文档版本与修订机制见维护计划 §2。

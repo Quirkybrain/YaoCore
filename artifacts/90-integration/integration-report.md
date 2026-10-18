@@ -744,3 +744,68 @@
 1. 本记录只证明上述 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §16.2 的三项检查；不构成 G-017、Component Quality、用户验收、产品验收、设备验收或 release PASS。
 2. 合并与验证均在本地完成：未 fetch/pull、未 push、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-108-acceptance` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-109-merge-report.md`；handoff 为 `state/handoffs/wp-109-merge-acceptance.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 ACCEPT-001 合并证据`。
+
+---
+
+## 17. documentation 收尾（2026-10-18，wp-110）
+
+> 本节由 `technical-writer` 在 `wp-110-documentation` 中追加，记录 G-018 documentation 阶段的最终 revision、Gate 结论、文档同步与残余。§1–§16 的历史结论仍针对各自标注的 revision，本节不回溯改写；**本节不宣告 G-018 PASS、用户验收、产品验收或 release PASS**，G-018 由 Orchestrator 判定。
+
+### 17.1 Revision 与阶段结论
+
+| 项 | 值 |
+|---|---|
+| 文档任务 | `wp-110-documentation`（task 分支 `task/wp-110-documentation`，父分支 `feat/yaocore-app`） |
+| 文档基线 | `422c687`（G-017 acceptance Stage Gate PASS） |
+| 最终集成候选 | `feat/yaocore-app @ 4faf3e3`（G-017 输入；ACCEPT-001 合并后） |
+| 产品代码基线 | `e74a181`（TEST-002）；`git diff e74a181..4faf3e3 -- entry/src/main tools entry/src/test entry/src/ohosTest` 为空 |
+| G-015 review | **PASS_WITH_ACCEPTED_RISKS** @ `09e1b46` |
+| G-016 testing | **PASS_WITH_ACCEPTED_RISKS** @ `1cccec5`；TEST-002 @ `e74a181` |
+| G-017 acceptance | **PASS_WITH_ACCEPTED_RISKS（acceptance readiness）** @ `4faf3e3`；用户验收未完成 |
+| G-018 documentation | 文档同步完成；**待 Orchestrator 判定** |
+
+### 17.2 本轮文档同步
+
+| 文件 | 变更 | 对应输入 |
+|---|---|---|
+| `README.md` | v1.1：阶段状态（review/testing/acceptance readiness PASS；documentation 完成）、221 files / 0 violation / 6 D-12 / 1 port exception / fixture 27、i18n triage 新口径、PORT-LOC-01 OPEN、`MOCK_ONLY` 性能口径、`no_proxy` 仿真器命令、`contracts/**` 仓库结构 | D-AC-01/02/03/08；TEST-002；G-015..G-017 |
+| `artifacts/80-maintenance/maintenance-plan.md` | v1.1：§3.2 P1-P3 完成 / PORT-LOC-01 OPEN；§3.3 D-12 6 active / 7 retired；§3.4 triage 完成与残余；§5.1 RA-03/RA-04 当前状态；追加 §8 收尾记录 | D-AC-02/03；T-23；TEST-002 |
+| `artifacts/60-testing/test-report.md` | 追加历史注记；`T09_C11_*` / `T16_Scene_*` 由 16/8 勘误为 15/7；D-03 / D-12 历史快照注记；末尾指向 TEST-002 | D-AC-04 |
+| `artifacts/50-implementation/t23-ports-migration.md` | 文首/文末“文档勘误（agent:technical-writer，wp-110）”：标题、§1、§5.2、§5.3、§6、§7.2 与 §10 状态对齐；保留原 Producer 与 §10 | D-AC-06 / RR-03 |
+| `artifacts/90-integration/integration-report.md` | 追加本节；不改写 §1–§16 | G-018 收尾 |
+
+### 17.3 本轮实际复跑（cwd = 仓库根）
+
+| # | 命令 | 实测结果 | Exit |
+|---|---|---|---|
+| 1 | `PYTHONDONTWRITEBYTECODE=1 entry/src/test/run-host-tests.sh` | `1..697`；tests 697 / pass 697 / fail 0 / skipped 0；≈3326.4 ms | 0 |
+| 2 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | 66 `[PASS]` / 0 `[FAIL]`；14 条既有 `FINDING`；`hard checks: ALL PASS` | 0 |
+| 3 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | `files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0`；`PASS` | 0 |
+| 4 | `PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui` | CHK-01..09 全 PASS；`blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16` | 0 |
+| 5 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check` | `615 rows`；`OK: CSV matches computed triage; invariants pass` | 0 |
+| 6 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py` | `Ran 27 tests ... OK` | 0 |
+| 7 | `no_proxy=127.0.0.1,localhost NO_PROXY=127.0.0.1,localhost PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tools.simulator.test_gateway_contract -v` | `Ran 20 tests ... OK`（HTTP + TLS） | 0 |
+
+> 构建 / lint 未在 documentation 阶段重跑；引用 TEST-002 @ `e74a181` 的 `BUILD SUCCESSFUL` 与 `codelinter 0 error / 25 warning`。产品代码自 `e74a181` 至 `4faf3e3` 未变，该证据适用。
+
+### 17.4 最终状态与残余
+
+| 项 | 状态 | 证据 / 去向 |
+|---|---|---|
+| 端口位置 | **16/17 CLOSED；PORT-LOC-01 OPEN**（`ClockPort`/`IdPort` 在 `common/types/Ports.ets`） | DES-A §27.6.4；维护计划 §3.2 |
+| D-12 | **6 active / 7 retired**；`exceptions_used=6`、`unused_exceptions=[]` | DES-B §18.1；T-23 F-07 |
+| i18n | **615 行一致**：10 ACCEPTED / 46 MIGRATED / 6 PENDING / 0 INLINE / 544 OBSOLETE_LEGACY；11 B / 6 C / 3 D 残余 | TEST-002；维护计划 §3.4 |
+| 测试 / 构建 | Host 697/697；crosscheck 66/66；layering 0 violation；fixture 27/27；i18n 0 blocking；simulator 20/20；build/lint 引用 TEST-002 | 本节 §17.3；TEST-002 |
+| FR / NFR | 26 FR：24 COVERED / 2 PARTIAL / 0 GAP；NFR 4.1/4.2/4.3 均 PARTIAL | ACCEPT-001 §2 |
+| UI 偏离 | GAP-AC-01..03 待用户接受或 bounded fix | ACCEPT-001 §4.3 |
+| 设备 / 真实环境 | BLOCKED / UNAVAILABLE；用户验收未执行 | BLK-01..08；维护计划 §4 |
+| 风险接受 | D-030/RA-01、R4-01、P-HMAC、PB-01/02、PORT-LOC-01、i18n 残余均登记 | G-014/G-015/G-016/G-017；维护计划 §5 |
+| 构建产物 | 未签名；不可安装 / 发布 | `signingConfigs: []` |
+| release | **未授权** | 需用户签名 / 推送 / PR/MR / main 合并决策 |
+
+### 17.5 边界声明
+
+1. 本节只证明 documentation 文档同步与本轮复跑结果；不构成 G-018、用户验收、产品验收、设备验收或 release PASS。
+2. 未修改产品代码、测试断言、工具、构建配置、契约或 `input/`；未改写 §1–§16 的历史 Gate/数字。
+3. 未执行设备 / 真实 BLE / LAN / TLS / 云 / 视觉 / A11y / fps；相关项继续 `BLOCKED` / `UNAVAILABLE`。
+4. 历史 Gate（G-013/G-014）与历史报告（TEST-REPORT-001、T-23 原始段落）保留原文；当前数字以 G-015/G-016/G-017、TEST-002 与本节为准。

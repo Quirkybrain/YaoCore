@@ -11,6 +11,8 @@
 - **Upstream**: TEST-001 @ G-008（`fa21c67`）；CQG-T06..T18；DES-A §2.2；DES-B §2.3/§18.1；T-18 裁定 `4b99e64`；T-17/T-18 评审 R3-01/R3-02/R4-01
 - **写范围**: `artifacts/60-testing/`、`entry/src/test/`、`tools/contract/`；未修改产品代码、构建配置或 `input/`。
 
+> **文档注记（agent:technical-writer，wp-110，2026-10-18）**：本报告是 T-19 在 base `4f7c26b` 的历史执行记录，**不是最终候选报告**。其后 T-20 将 Host 用例由 696 增至 697；T-23 / wp-090（修复 wp-093）建立 `contracts/**` 并把 D-12 收口为 6 active / 7 retired；最终候选测试以 **TEST-002 @ `e74a181`**（`artifacts/60-testing/testing-stage-report.md`）为准。以下原文与原始证据保留；仅对明确计数错误加 `【勘误】` 标记，不回溯改写历史结论。
+
 > **结论先行**：在 base `4f7c26b` 的集成候选上，host 纯逻辑 **696/696 PASS**（新增 2 条 R3-01 并发/失败隔离用例），契约 crosscheck **66/66 PASS**，仿真器套件 **20/20 PASS**（需 `no_proxy=127.0.0.1` 绕过本机代理；默认环境首跑为 `FAIL_ENV`，已保留证据），i18n **CHK-01..09 全 PASS / 0 blocking / 0 missing**，分层检查器 **0 violation（13 条 R3-01 pending-T-20 例外可见）**，构建 **BUILD SUCCESSFUL**，`codelinter` **0 error / 25 warning**。设备/模拟器/真实 BLE/LAN/TLS/云/视觉/fps 仍 **BLOCKED/UNAVAILABLE**；ACK p95 仅有 **MOCK_ONLY** 值，不能作为 NFR 4.3 验收证据。
 >
 > **T-20 修订（2026-10-18）**：ACK p95 三项数字已按证据文件 `t19-ack-p95-mock.json` 更正为 p50 **0.536 ms** / p95 **0.598 ms** / max **0.684 ms**（原 0.526/0.601/0.647 为笔误，见 F-03）；i18n `--strict-ui` 在 T-20 真正生效，CHK-07 不再把 `LOADING`/`RECONFIGURE` 等状态常量计为短 UI 文案，重跑为 **0 blocking / 55 warnings / hardcoded 16**（T-19 的 121/82 是旧 checker 计数）。分层检查器已读取 `port_location_exceptions` 并把 13 条 D-12 例外定为 `accepted`；T-20 证据见 `tooling-cleanup-report.md`。
@@ -93,15 +95,17 @@
 - `tools/contract/layering_allowlist.json`：**文件/符号级**例外，禁止目录级放宽；每条含 `status`、`reason`、`evidence`。
 - `tools/contract/fixtures/layering/{good,bad}/`：合法树 + 每类违规树。
 - `tools/contract/test_check_layering.py`：4 条自测（含“仓库树 0 违规、R3-01 必须在报告中以 pending 可见”）。
-- **D-03 当前无输入**：仓库尚无 `contracts/**` 目录（端口位置例外，见 §3.2）；规则已就绪，待迁移后生效。
+- **D-03 当前无输入（历史 @ `4f7c26b`）**：本报告执行时仓库尚无 `contracts/**` 目录（端口位置例外，见 §3.2）；规则已就绪，待迁移后生效。**【勘误】T-23 / wp-093 已建立 `contracts/**`（20 个文件），D-03 现已有真实输入并执行 type-only / 无环规则；最终状态见 DES-A §27.6.4 与 TEST-002。**
 - **D-13 实际路径**：设计名义 `adapter/ac/**`，实现位于 `service/ac/**`；检查器按实际路径执行。
 
-### 3.2 当前例外（全部可见）
+### 3.2 当前例外（历史快照 @ `4f7c26b`）
 
-| 类别 | 条目 | 状态 | 说明 |
+> **历史说明**：下表是 T-19 执行时的例外状态。T-20 已将 13 条 D-12 定为 `accepted`；T-23 / wp-093 后 live D-12 为 **6 active / 7 retired**，端口位置例外为 **1 条（PORT-LOC-01，`used=0`）**，17 条中 16 条已迁移。此处保留原快照，不回溯改写；当前状态见 DES-A §27.6.4 / DES-B §18.1 与 TEST-002。
+
+| 类别 | 条目 | 状态（历史） | 说明 |
 |---|---|---|---|
 | D-12 pages 既有只读 DTO/枚举（R3-01） | 13 条：`DeviceRecord`/`Scene*`、`FamilyMemberView`/`InvitationView`/`InviteCreation`、`CreateInvitationInput`/`FamilyJoinPhase`、`BleProvisioning*`、`RoomDeletionPreview`、`CloudTransportState`/`CloudConfigView` | **pending-T-20** | 与 `t18-review-c.md` §R3-01 一致；检查器不放宽整个 `service/**`/`repository/**` |
-| 端口位置例外（T-06 R-13、T-07 R-08、T-08、T-09、T-11 D-1、T-14） | `repository/**` → `service/storage/{RdbStore,PreferencesStore,SecretStore,SecretDraftPort,MigrationPort}`；`viewmodel/**` → `service/{ble/BleProvisioningPorts,ble/GattEndpointMap,crypto/CryptoPort,gateway/GatewayTransportPorts,gateway/DiscoveryModels,storage/*}` | **accepted（实现内置）** | DES-A/B 名义位置为 `contracts/**`；迁移仍待 C-17/T-20 统一处理；报告不把“通过”解释为端口位置已合规 |
+| 端口位置例外（T-06 R-13、T-07 R-08、T-08、T-09、T-11 D-1、T-14） | `repository/**` → `service/storage/{RdbStore,PreferencesStore,SecretStore,SecretDraftPort,MigrationPort}`；`viewmodel/**` → `service/{ble/BleProvisioningPorts,ble/GattEndpointMap,crypto/CryptoPort,gateway/GatewayTransportPorts,gateway/DiscoveryModels,storage/*}` | **accepted（实现内置）** | DES-A/B 名义位置为 `contracts/**`；T-23 后 16/17 已迁移，仅 PORT-LOC-01 OPEN |
 | 适配器内部 helper | `service/gateway/adapters/OhosHttpTransport` / `SocketTlsPinVerifier` → `./TlsPinCheck` | **accepted（实现内置）** | 仅允许同一 `adapters/` 目录内 helper；任何纯逻辑层 import adapter 仍失败 |
 
 > **工具边界**：D-04/D-10（host-safe）、D-07/D-14（Mock 生产排除）、D-15（云 HTTP 隔离）、D-16（i18n）由其他检查器/评审负责；当前 Mock 生产排除证据使用 host `TransportBoundary`/`AppShell` 源码守卫。检查器 PASS **不等于** T-20 已正式收口 R3-01。
@@ -167,7 +171,7 @@
 | FR-DEV-003 门锁/门磁 | C-21 + C-10 | `T15_Door_*` 9 条、`T15_DoorView_*` 9 条 | **covered (host)** | 物理传感器 BLOCKED |
 | FR-DEV-004 空调/品牌 | C-16/C-21 | `C16_*` 8 条、`T15_Climate_*` 5 条 | **covered (host)** | 真实 AC BLOCKED |
 | FR-DEV-005 状态来源标记 | C-03/C-14/C-25 | `C03_DiscoverMapper_unknownTypeRoomModeColorAndStateSourceAreTolerated`、`T10_C14_errorMapper`（`stateSourceKey`）、`T18_lowRiskUiGuards_sourceLevel`、`ViewModelHome` 环境来源 | **covered (host/source)** | 视觉 BLOCKED |
-| FR-SCN-001 场景编排/局部失败 | C-11/C-22 | `T09_C11_*` 16 条、`T16_Scene_*` 8 条 | **covered (host)** | BLOCKED |
+| FR-SCN-001 场景编排/局部失败 | C-11/C-22 | `T09_C11_*` **15 条**、`T16_Scene_*` **7 条**（【勘误】原文 16/8；实际 T-19 TAP 与当前 TAP 均为 15/7，见文首注记） | **covered (host)** | BLOCKED |
 | FR-SET-001 家庭管理面板 | C-22/C-26 | `T16_Family_*`、`T18_familyJoinAndInviteGuards`、`T18_nonAdminRoomPool...` | **covered (host/source)** | 视觉 BLOCKED |
 | FR-SET-002 E2E 加密/密钥配置 | C-04/C-05/C-07 + C-23 | `Security` 16、`Crypto` 18、`GatewayRepository` 29；P-TLS-PIN mock 全链 | **partial**：P-HMAC 按 ADR-002 无机密性；真实 TLS pin 设备 BLOCKED；LAN GCM `EXT-GCM-001` 归档 | 设备 BLOCKED |
 | FR-SET-003 云/国际化 | C-15/C-14 | `CloudService` 18、`I18n` 28、`T16_Settings_*` 11；CHK-01..09 PASS | **covered (host)** | 真实 IoTDA UNAVAILABLE |
@@ -251,5 +255,7 @@ python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5 \
 - 下游：T-20 独立评审（安全/分层/测试真实性）、T-21 README/维护计划、T-22 IG-4/G-014 Stage Gate。
 
 ---
+
+> **最终候选指向（wp-110）**：本报告的历史结论（696 host、13 pending D-12、无 `contracts/**`）不适用于最终候选。最终候选的构建 / lint / Host 697 / crosscheck / simulator / layering / fixture / i18n / triage 证据见 **TEST-002 @ `e74a181`**（[`testing-stage-report.md`](testing-stage-report.md)）；验收结论见 ACCEPT-001。本报告仅作为 T-19 历史证据保留。
 
 *TEST-REPORT-001 结束。所有 PASS 均对应当前 base `4f7c26b` + 本任务工作树实际执行；设备/真实环境证据明确标为 BLOCKED/UNAVAILABLE。*

@@ -16,6 +16,8 @@
 > **未发现产品行为失败、测试断言失败或环境失败（0 FAIL_PRODUCT / 0 FAIL_TEST / 0 FAIL_ENV）。** 设备/模拟器/真实 BLE/LAN/TLS/云/视觉/fps 仍为 **BLOCKED/UNAVAILABLE**，ACK p95 只能标 **MOCK_ONLY**，不能作为 NFR 4.3 验收。
 >
 > **Verdict: `PASS_WITH_ACCEPTED_RISKS`（代码级 testing Stage）**。建议允许进入 **acceptance 分析**，但不得把本报告解释为产品验收、设备验收或 release 完成；条件见 §7。
+>
+> **文档注记（agent:technical-writer，wp-110，2026-10-18）**：本报告的测试证据仍针对 `e74a181`，不因文档同步改变。§5.2 所列“README 旧口径（596 条 `PENDING_REVIEW`）”已在 documentation 阶段关闭：README v1.1 已改为 10 ACCEPTED / 46 MIGRATED / 6 PENDING / 0 INLINE / 544 OBSOLETE_LEGACY（另 11 B / 6 C / 3 D）；当前状态见 README 与维护计划 v1.1。
 
 ---
 

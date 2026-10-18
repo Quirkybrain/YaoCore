@@ -1,4 +1,4 @@
-# T-23 端口位置迁移报告（P1-P3 / 关闭 17 条端口位置例外）
+# T-23 端口位置迁移报告（P1-P3 / 16/17 关闭，PORT-LOC-01 OPEN）
 
 - **Artifact ID**: T23-PORTS-MIGRATION
 - **Producer**: agent:implementation-engineer
@@ -9,11 +9,22 @@
 - **Date**: 2026-10-18
 - **Workflow**: STANDARD / GATED_AUTO
 
-> **结论先行**：按 DES-A §27.6.3 P1-P3 建立 `entry/src/main/ets/contracts/**`，迁移 16 个端口/契约文件与 1 个纯映射 seam；17 条 `port_location_exceptions` 中 **16 条关闭**，仅保留 **PORT-LOC-01** 的 `ClockPort`/`IdPort`（原因见 §7.1）。混合文件按“端口→`contracts/**`、DTO/枚举→`model/**`”拆分，`check_layering` 删除全部硬编码端口路径放行，改为只读版本化登记；`violations=0`、`port_exceptions_used=0`。八项必跑命令全部退出 0：`assembleHap` BUILD SUCCESSFUL、codelinter 0 error、host **697/697**、layering 12/12、i18n blocking=0/missing=0、crosscheck hard checks ALL PASS。未改冻结端口签名、错误码、G-004 语义或 DES 文档。
+> **文档勘误（agent:technical-writer，wp-110，2026-10-18）**：本报告是 T-23 原始实现报告，**Producer 保留 `agent:implementation-engineer`**；§10 的 `wp-093` 执行记录同样保留。以下勘误只修正“文首 / §1 / §5 / §6 / §7.2 的旧口径”，不改变 T-23 首次交付与 wp-093 修复的历史事实，也不改写 §10：
+>
+> 1. **标题**：原“关闭 17 条端口位置例外”与正文“16 条关闭、1 条保留”不一致；以 **16/17 关闭、PORT-LOC-01 OPEN** 为准。
+> 2. **layering 12/12**：原文把 `test_check_layering.py` 的 12 条 fixture 写成“layering 12/12”。`check_layering` 本体结果是 `files=221 / violations=0 / exceptions_used=6 / port_exceptions_used=0`；fixture 在 T-23 时 12 条，wp-093 后 22 条，**TEST-002 / G-016 最终为 27/27**。
+> 3. **八项命令**：见 §6 与 §10.3；原文列举不完整。当前最终证据以 **TEST-002 @ `e74a181`** 为准。
+> 4. **ohosTest**：§7.2 原写“未修复”；wp-093 §10.2 已修复 7 文件 / 12 条 import 并使 ohosTest HAP 编译通过。**设备运行仍 BLOCKED**，不写成设备 PASS。
+> 5. **D-12 历史条目**：§5.2 原写“13 条保持不变、7 条 unused 留待退休”；wp-093 §10.1 F-07 已把 live allowlist prune 为 **6 active + 7 retired**，`exceptions_used=6`、`unused_exceptions=[]`。
+> 6. **PORT-LOC-01**：`ClockPort`/`IdPort` 仍留在 `common/types/Ports.ets`，**OPEN**；不得写成“全部关闭”。
+
+> **结论先行（保留原文；以 §10 与上方勘误为最终状态）**：按 DES-A §27.6.3 P1-P3 建立 `entry/src/main/ets/contracts/**`，迁移 16 个端口/契约文件与 1 个纯映射 seam；17 条 `port_location_exceptions` 中 **16 条关闭**，仅保留 **PORT-LOC-01** 的 `ClockPort`/`IdPort`（原因见 §7.1）。混合文件按“端口→`contracts/**`、DTO/枚举→`model/**`”拆分，`check_layering` 删除全部硬编码端口路径放行，改为只读版本化登记；`violations=0`、`port_exceptions_used=0`。八项必跑命令（见 §6）全部退出 0：`ohpm install`、`assembleHap` BUILD SUCCESSFUL、codelinter 0 error、host **697/697**、`check_layering` files=221/violations=0、`test_check_layering` 12/12（当时）、i18n blocking=0/missing=0、crosscheck hard checks ALL PASS。未改冻结端口签名、错误码、G-004 语义或 DES 文档。
 
 ---
 
 ## 1. 盘点结果（迁移前）
+
+> **现状提示（wp-110 勘误）**：本节记录的是 T-23 **迁移前**的 17 条盘点，不是当前状态。迁移结果：**16/17 关闭，PORT-LOC-01 OPEN**；最终以 §10 与 DES-A §27.6.4 为准。
 
 17 条登记与 DES-A §27.6.2 逐条一致；盘点确认 `contracts/**` 在迁移前不存在，端口实际分布在 `common/types/**`、`service/**`、`repository/**`、`viewmodel/**`。迁移同时清除了端口间接造成的 `service/** → repository/**` 反向可见性（`GatewayTransportPorts -> GatewayPorts`、`DomainPorts -> RdbStore`）。
 
@@ -147,13 +158,13 @@
 
 - `producer`/`task`/`policy` 更新为 T-23；`policy` 记录迁移完成状态与唯一保留条目。
 - `port_location_exceptions` 删除 16 条已完成迁移条目，保留 **PORT-LOC-01**（`ClockPort`、`IdPort`；`kind: port-only`；`status: accepted-location-exception`；close condition 改为需上游 D-01/冻结签名变更）。
-- 13 条 D-12 `entries` 保持不变（DES-B §18.1 正式化）。迁移后使用数 **13 → 6**（仅 `T20-D12-06/07/08/11/12/13` 仍被使用；`01..05/09/10` 变为 unused，留待 DES-B 同步任务退休）。
+- 13 条 D-12 `entries` 在 T-23 首次迁移提交中保持 `accepted`；迁移后使用数 **13 → 6**（仅 `T20-D12-06/07/08/11/12/13` 仍被使用；`01..05/09/10` 变为 unused）。**【勘误】wp-093 §10.1 F-07 已从 live allowlist 删除 7 条 retired，最终 `entries=6`、`exceptions_used=6`、`unused_exceptions=[]`；历史 13 条仅保留在 DES-B §18.1 与 Git 历史。**
 
 ### 5.3 Fixture / 自测
 
 - 新增 `tools/contract/fixtures/layering/post-migration/`：合法树，`repository`/`viewmodel`/`pages` 直接 import `contracts/**` 与 `model/**`，空端口登记通过、`port_exceptions_used=0`。
 - 新增 `tools/contract/fixtures/layering/post-migration-bad/`：空端口登记下，`repository -> service/storage`（D-09）、`viewmodel -> service/storage`（D-11）、`pages -> service/room`（D-12）全部失败，并报告 “not registered in port_location_exceptions”。
-- 既有 legal / bad / pending / symbol-overflow / wildcard 负例保留；`test_check_layering.py` 更新仓库期望为 `exceptions_used=6`、`port_exceptions_used=0`、登记数 1，并新增 2 条 post-migration 测试（共 **12** 条，全部通过）。
+- 既有 legal / bad / pending / symbol-overflow / wildcard 负例保留；`test_check_layering.py` 更新仓库期望为 `exceptions_used=6`、`port_exceptions_used=0`、登记数 1，并新增 2 条 post-migration 测试（T-23 时共 **12** 条，全部通过；wp-093 后 22 条；TEST-002 最终 27/27）。
 
 ---
 
@@ -166,7 +177,7 @@
 | 3 | `codelinter -c code-linter.json5 -p default .` | 0 | **Errors: 0**；Warns 25（迁移前既有的性能/自定义组件告警） |
 | 4 | `entry/src/test/run-host-tests.sh` | 0 | **tests 697 / pass 697 / fail 0**（与迁移前 697 持平） |
 | 5 | `python3 tools/contract/check_layering.py` | 0 | files=221 **violations=0** exceptions_used=6 pending=0 **port_exceptions_used=0** |
-| 6 | `python3 tools/contract/test_check_layering.py` | 0 | **Ran 12 tests / OK** |
+| 6 | `python3 tools/contract/test_check_layering.py` | 0 | **Ran 12 tests / OK**（T-23 当时；wp-093 后 22；TEST-002 最终 27/27） |
 | 7 | `python3 entry/src/test/i18n/check_i18n.py --strict-ui` | 0 | blockingFailures=0 missingKeys=0 hardcoded=16（迁移前既有 warning，73 条） |
 | 8 | `python3 tools/contract/crosscheck_protocol_assets.py` | 0 | **hard checks: ALL PASS**；14 条 frozen-input findings（既有，不因迁移变化） |
 
@@ -193,10 +204,12 @@
 
 ### 7.2 残余风险
 
+> **状态说明（wp-110 勘误）**：下表前两行是 T-23 首次交付时的残余；**ohosTest import 已由 wp-093 §10.2 修复**，**7 条 D-12 已由 wp-093 §10.1 F-07 退休并从 live allowlist 删除**。保留原文以记录历史，最终状态以 §10 为准。
+
 | 风险 | 影响 | 处置 |
 |---|---|---|
-| `entry/src/ohosTest/**` 未在本次写范围，仍有 7 个文件/12 条旧路径 import（I18nModels、GatewayTransportPorts、BleProvisioningPorts、GattEndpointMap、RdbStore、SecretStore、DomainModels、common/types/Ports 的 RandomPort 与 LoggerPort×2；9 条失效模块 + `RandomPort` + `LoggerPort`×2） | `assembleHap`/host 测试不编译 ohosTest，本次验证不受影响；设备测试编译会失败 | 建议紧随的 bounded 任务仅更新 ohosTest import（不改断言），或由 repository-manager 在设备测试任务前处理；见 §10 wp-093 执行记录 |
-| 7 条 D-12 entries 变为 unused（T20-D12-01..05/09/10） | 白名单保留历史条目，与 DES-B §18.1 当前文本一致 | 后续 DES-B 同步任务退休；本次不修改 DES-B（写范围外） |
+| `entry/src/ohosTest/**` 未在本次写范围，仍有 7 个文件/12 条旧路径 import（I18nModels、GatewayTransportPorts、BleProvisioningPorts、GattEndpointMap、RdbStore、SecretStore、DomainModels、common/types/Ports 的 RandomPort 与 LoggerPort×2；9 条失效模块 + `RandomPort` + `LoggerPort`×2） | `assembleHap`/host 测试不编译 ohosTest，本次验证不受影响；设备测试编译会失败 | **已由 wp-093 §10.2 关闭**：12 条 import 已修正，ohosTest HAP 编译通过；设备运行仍 **BLOCKED**，不写成设备 PASS |
+| 7 条 D-12 entries 变为 unused（T20-D12-01..05/09/10） | 白名单保留历史条目，与 DES-B §18.1 当前文本一致 | **已由 wp-093 §10.1 F-07 处理**：live allowlist 删除 7 条 retired，保留 6 条 active；`exceptions_used=6`、`unused_exceptions=[]`；历史仅保留在 DES-B/Git |
 | `service/**` 仍 import `repository/**` 用例实现（`FamilyService`/`SceneService` 等） | 这是用例→仓储的正常依赖，不是端口反向可见性；D-09 仅禁止 repository→service | 记录为架构既有形态，不在本任务扩大范围 |
 | codelinter 25 条 warn / i18n 73 条 warning / crosscheck 14 条 frozen-input findings | 均为迁移前既有；本次未新增 error/blocking | 保持基线，交由各自 Stage 处置 |
 
@@ -296,3 +309,7 @@ python3 tools/contract/crosscheck_protocol_assets.py
 - **设备运行未执行**：ohosTest 仅完成编译；设备/模拟器、真实 BLE/网关仍 **BLOCKED/NOT RUN**。
 - **基线告警**：codelinter 25 warn、i18n 73 warning/16 hardcoded、crosscheck 14 findings 均与迁移前一致，本任务未新增 error/blocking。
 - **F-01 三分**：未合并 `TimerPort`/`VmTimerPort`/`SceneTimerPort`；`VmTimerPort` 未进入 `contracts/**` 或端口位置例外。
+
+---
+
+> **文档勘误结束（agent:technical-writer，wp-110，2026-10-18）**：以上 §10 执行记录保留原文；本报告标题、§1、§5.2、§5.3、§6 第 6 项、§7.2 已按 wp-093 之后的最终状态勘误。**不改变 T-23 首次交付的代码/证据，也不改变 wp-093 执行记录**。当前权威状态：16/17 端口关闭、PORT-LOC-01 OPEN、D-12 6 active / 7 retired、fixture 27/27；最终测试候选以 TEST-002 @ `e74a181` 为准。
