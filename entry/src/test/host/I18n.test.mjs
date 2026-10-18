@@ -23,12 +23,7 @@ import { DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets'
 import { InvitationStatus, InviteMode, MemberRole, MemberStatus } from '../../main/ets/model/FamilyModels.ets';
 import { TransportProfile } from '../../main/ets/model/DeviceTypes.ets';
 import { I18nBundleCodec } from '../../main/ets/service/i18n/I18nBundleCodec.ets';
-import {
-  I18nKey,
-  I18nParams,
-  LocaleMode,
-  SupportedLocale,
-} from '../../main/ets/service/i18n/I18nModels.ets';
+import { I18nKey, I18nParams, LocaleMode, SupportedLocale } from '../../main/ets/model/I18nModels.ets';
 import { I18nService } from '../../main/ets/service/i18n/I18nService.ets';
 import { I18nKeys } from '../../main/ets/service/i18n/I18nKeys.ets';
 import { ErrorI18nMapper } from '../../main/ets/service/i18n/ErrorI18nMapper.ets';

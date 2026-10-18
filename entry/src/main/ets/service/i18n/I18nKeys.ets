@@ -14,7 +14,7 @@ import { NameValue } from '../../common/types/NameValue';
 import { DeviceType } from '../../common/constants/DeviceConstants';
 import { InvitationStatus, InviteMode, MemberRole, MemberStatus } from '../../model/FamilyModels';
 import { TransportProfile } from '../../model/DeviceTypes';
-import { I18nKey } from './I18nModels';
+import { I18nKey } from '../../model/I18nModels';
 
 export class I18nKeys {
   /** `errors.app.<code>` except `SCENE_RUN_IN_PROGRESS` -> `errors.scene.run_in_progress`. */

@@ -15,7 +15,7 @@ import { relationalStore } from '@kit.ArkData';
 import { common } from '@kit.AbilityKit';
 import { AppErrors } from '../../common/types/AppError';
 import { StorageConstants } from '../../common/constants/StorageConstants';
-import type { RdbRow, RdbStore, RdbTransaction, RdbValue } from './RdbStore';
+import type { RdbRow, RdbStore, RdbTransaction, RdbValue } from '../../contracts/RdbStore';
 import type { RdbTransactionDriver } from './RdbTransactionRunner';
 import { RdbTransactionRunner, mapRdbError } from './RdbTransactionRunner';
 

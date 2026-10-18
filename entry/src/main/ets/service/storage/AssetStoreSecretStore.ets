@@ -17,8 +17,8 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import type { SecureBytes } from '../../common/types/SecureBytes';
 import { BytesUtil } from '../../common/utils/BytesUtil';
-import { SecretAlias } from './SecretStore';
-import type { SecretStore } from './SecretStore';
+import { SecretAlias } from '../../common/types/SecretAlias';
+import type { SecretStore } from '../../contracts/SecretStore';
 
 interface PlatformErrorLike {
   code?: number;

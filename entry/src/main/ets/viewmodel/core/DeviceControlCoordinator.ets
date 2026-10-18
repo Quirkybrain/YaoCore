@@ -11,17 +11,20 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
 import { DeviceControlCommand, StateVerification } from '../../model/ControlModels';
-import type { DeviceCommandExecution, ControlApplyResult } from '../../repository/DomainModels';
-import { ControlApplyContext, DeviceCommandOptions } from '../../repository/DomainModels';
+import type { DeviceCommandExecution, ControlApplyResult } from '../../model/DeviceRecord';
+import { ControlApplyContext, DeviceCommandOptions } from '../../model/DeviceRecord';
 import { DeviceRepository } from '../../repository/DeviceRepository';
-import type { CloudConfigView, CloudControlOutcome } from '../../service/cloud/CloudModels';
+import type { CloudConfigView } from '../../service/cloud/CloudModels';
+import type { CloudControlOutcome } from '../../model/CloudControlModels';
 import { CloudTransportState } from '../../service/cloud/CloudModels';
 import { CloudService } from '../../service/cloud/CloudService';
 import { DeviceCommandRunner } from '../../service/device/DeviceCommandRunner';
-import { ControlExecution, ControlTransport } from './ViewModelCore';
-import type { DeviceControlCoordinatorPort } from '../ViewModelPorts';
+
+import { ControlExecution, ControlTransport } from '../../model/ControlExecution';
+import type { DeviceControlCoordinatorPort } from '../../contracts/ControlPorts';
 
 const FALLBACK_CODES: ReadonlyArray<string> = [
   'GATEWAY_UNREACHABLE',

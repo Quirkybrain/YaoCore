@@ -13,10 +13,10 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { StorageConstants } from '../../common/constants/StorageConstants';
-import type { MigrationSink, MigrationRegistryPort } from './MigrationPort';
-import type { PreferencesStore } from './PreferencesStore';
-import type { RdbStore } from './RdbStore';
-import type { SecretStore } from './SecretStore';
+import type { MigrationSink, MigrationRegistryPort } from '../../contracts/MigrationPort';
+import type { PreferencesStore } from '../../contracts/PreferencesStore';
+import type { RdbStore } from '../../contracts/RdbStore';
+import type { SecretStore } from '../../contracts/SecretStore';
 
 export class StorageService {
   readonly preferences: PreferencesStore;

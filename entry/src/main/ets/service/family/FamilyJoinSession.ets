@@ -10,7 +10,8 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
-import type { ClockPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
 import { FamilyMember, MemberRole, MemberStatus } from '../../model/FamilyModels';
 import { FamilyRepository } from '../../repository/FamilyRepository';
 import {

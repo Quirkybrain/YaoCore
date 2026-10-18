@@ -7,7 +7,7 @@
  * @ohos.security.cryptoFramework (DES-A §7.4). Host tests inject an
  * independent pure-TS provider through this seam.
  */
-import type { GcmCiphertext, X25519KeyHandle, X25519KeyPair } from './CryptoPort';
+import type { GcmCiphertext, X25519KeyHandle, X25519KeyPair } from '../../contracts/CryptoPort';
 
 export enum CryptoErrorKind {
   UNAVAILABLE = 'UNAVAILABLE',

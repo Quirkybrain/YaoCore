@@ -13,8 +13,8 @@
 import { AppError } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { BytesUtil } from '../../common/utils/BytesUtil';
-import type { LoggerPort } from '../../common/types/Ports';
-import type { CryptoPort } from '../crypto/CryptoPort';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { CryptoPort } from '../../contracts/CryptoPort';
 import { InventoryDeviceState } from '../../model/CloudModels';
 import {
   ShadowMapContext,

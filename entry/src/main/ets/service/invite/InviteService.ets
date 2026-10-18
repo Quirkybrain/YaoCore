@@ -35,7 +35,8 @@ import { BytesUtil } from '../../common/utils/BytesUtil';
 import { Base64Url } from '../../common/utils/Base64Url';
 import { UuidUtil } from '../../common/utils/UuidUtil';
 import { SecureBytes } from '../../common/types/SecureBytes';
-import type { ClockPort, IdPort, RandomPort } from '../../common/types/Ports';
+import type { ClockPort, IdPort } from '../../common/types/Ports';
+import type { RandomPort } from '../../contracts/Ports';
 import { ProtocolConstants } from '../../common/constants/ProtocolConstants';
 import {
   FamilyMember,
@@ -49,14 +50,11 @@ import { TlsMaterial } from '../../model/GatewayRoute';
 import { ProvisioningTlsMaterial } from '../../model/ProvisioningModels';
 import { FamilyRepository, InvitationPatch } from '../../repository/FamilyRepository';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
-import type {
-  GatewayCredentialPort,
-  GatewayRoutePort,
-  InvitationApplicationPort
-} from '../../repository/GatewayPorts';
-import { InvitedGateway } from '../../repository/GatewayPorts';
-import type { SecretStore } from '../storage/SecretStore';
-import type { CryptoPort, X25519KeyHandle } from '../crypto/CryptoPort';
+import type { GatewayCredentialPort, GatewayRoutePort, InvitationApplicationPort } from '../../contracts/GatewayPorts';
+
+import { InvitedGateway } from '../../model/InvitedGateway';
+import type { SecretStore } from '../../contracts/SecretStore';
+import type { CryptoPort, X25519KeyHandle } from '../../contracts/CryptoPort';
 import {
   AcceptInvitationOptions,
   AcceptedInvitation,

@@ -15,7 +15,8 @@
  */
 import { bundleManager, common } from '@kit.AbilityKit';
 import { AppError, AppErrors } from '../common/types/AppError';
-import type { ClockPort, IdPort, LoggerPort, MetricsPort, RandomPort } from '../common/types/Ports';
+import type { ClockPort, IdPort } from '../common/types/Ports';
+import type { LoggerPort, MetricsPort, RandomPort } from '../contracts/Ports';
 import { AuthPolicy } from '../service/auth/AuthModels';
 import { AuthService } from '../service/auth/AuthService';
 import { BleProvisioningService } from '../service/ble/BleProvisioningService';
@@ -54,11 +55,11 @@ import { PreferencesStoreAdapter } from '../service/storage/PreferencesStoreAdap
 import { RdbStoreAdapter } from '../service/storage/RdbStoreAdapter';
 import { SecretDraftStore } from '../service/storage/SecretDraftStore';
 import { StorageService } from '../service/storage/StorageService';
-import type { PreferencesStore } from '../service/storage/PreferencesStore';
-import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
-import type { IBleProvisioningClient } from '../service/ble/BleProvisioningPorts';
-import type { IGatewayClient } from '../service/gateway/GatewayTransportPorts';
-import type { SceneTimerPort } from '../service/scene/SceneTimerPort';
+import type { PreferencesStore } from '../contracts/PreferencesStore';
+import type { SecretDraftPort } from '../contracts/SecretDraftPort';
+import type { IBleProvisioningClient } from '../contracts/BleProvisioningPorts';
+import type { IGatewayClient } from '../contracts/GatewayTransportPorts';
+import type { SceneTimerPort } from '../contracts/SceneTimerPort';
 import { DeviceRepository } from '../repository/DeviceRepository';
 import { DomainMigrations } from '../repository/DomainMigrations';
 import { DomainOperationGate } from '../repository/DomainOperationGate';

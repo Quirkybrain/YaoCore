@@ -1,6 +1,6 @@
 """Fixture self-test for tools/contract/check_layering.py (C-29 / T-20).
 
-Producer: agent:test-engineer | Task: T-20 / wp-085-tooling
+Producer: agent:test-engineer | Updated: agent:implementation-engineer / Task: T-23 / wp-090-ports
 Contract: DES-B §18.1 (checker must have legal/illegal fixture self-tests and
           enforce exception status/symbols); DES-B §2.3 D-01..D-17;
           DES-A §27.6 port_location_exceptions; T-20 review F-01/F-02/F-06.
@@ -21,6 +21,8 @@ GOOD = HERE / "fixtures/layering/good"
 BAD = HERE / "fixtures/layering/bad"
 PORTS = HERE / "fixtures/layering/port-exceptions"
 PENDING_D12 = HERE / "fixtures/layering/pending-d12"
+POST_MIGRATION = HERE / "fixtures/layering/post-migration"
+POST_MIGRATION_BAD = HERE / "fixtures/layering/post-migration-bad"
 
 
 def run(root: Path, *extra: str) -> subprocess.CompletedProcess[str]:
@@ -59,19 +61,24 @@ class CheckLayeringFixtureTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(report.read_text(encoding="utf-8"))
             self.assertEqual(payload["violation_count"], 0)
-            self.assertEqual(payload["exceptions_used_count"], 13)
+            self.assertEqual(payload["exceptions_used_count"], 6)
             self.assertTrue(all(item["status"] == "accepted"
                                 for item in payload["exceptions"]),
                             "T-20 D-12 entries must all be accepted")
             self.assertEqual(payload["pending_exceptions"], [])
             self.assertEqual(payload["port_pending_exceptions"], [])
             self.assertIn("pending=0", result.stdout)
-            self.assertIn("port_exceptions_used=10", result.stdout)
-            self.assertEqual(len(payload["port_location_exceptions"]), 17)
-            used_ids = {item["id"] for item in payload["port_exceptions_used"]}
-            self.assertIn("PORT-LOC-03", used_ids)
-            self.assertIn("PORT-LOC-09", used_ids)
-            self.assertIn("PORT-LOC-10", used_ids)
+            self.assertIn("port_exceptions_used=0", result.stdout)
+            self.assertEqual(len(payload["port_location_exceptions"]), 1)
+            self.assertEqual(payload["port_location_exceptions"][0]["id"], "PORT-LOC-01")
+            self.assertEqual(payload["port_location_exceptions"][0]["symbols"],
+                             ["ClockPort", "IdPort"])
+            self.assertEqual(payload["port_exceptions_used"], [])
+            used_d12 = {item["id"] for item in payload["exceptions"]}
+            self.assertTrue(used_d12.issubset({
+                "T20-D12-06", "T20-D12-07", "T20-D12-08",
+                "T20-D12-11", "T20-D12-12", "T20-D12-13"}),
+                f"unexpected D-12 usage after T-23 migration: {sorted(used_d12)}")
 
     def test_port_exception_legal_tree_passes_including_pure_seam(self) -> None:
         result = run_port("legal")
@@ -109,6 +116,20 @@ class CheckLayeringFixtureTests(unittest.TestCase):
         self.assertIn("status 'pending-T-20'", result.stdout)
         self.assertIn("pending=1", result.stdout)
         self.assertIn("pending_used=1", result.stdout)
+
+    def test_post_migration_contracts_ports_are_legal(self) -> None:
+        result = run(POST_MIGRATION, "--allowlist", str(POST_MIGRATION / "allowlist.json"))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("violations=0", result.stdout)
+        self.assertIn("port_exceptions_used=0", result.stdout)
+
+    def test_post_migration_unregistered_service_ports_fail(self) -> None:
+        result = run(POST_MIGRATION_BAD,
+                     "--allowlist", str(POST_MIGRATION_BAD / "allowlist.json"))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        for rule in ("D-09", "D-11", "D-12"):
+            self.assertIn(rule, result.stdout)
+        self.assertIn("not registered in port_location_exceptions", result.stdout)
 
     def test_missing_main_root_is_exit_two(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

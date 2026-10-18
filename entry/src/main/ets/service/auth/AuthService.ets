@@ -18,24 +18,21 @@ import { StorageConstants } from '../../common/constants/StorageConstants';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import { BytesUtil } from '../../common/utils/BytesUtil';
 import { SecureBytes } from '../../common/types/SecureBytes';
-import type {
-  ClockPort,
-  IdPort,
-  RandomPort
-} from '../../common/types/Ports';
+import type { ClockPort, IdPort } from '../../common/types/Ports';
+import type { RandomPort } from '../../contracts/Ports';
 import {
   MemberRole,
   MemberStatus
 } from '../../model/FamilyModels';
 import { DeviceState, RoomRef } from '../../model/DeviceState';
-import type { MigrationSink } from '../storage/MigrationPort';
-import type { RdbRow, RdbTransaction } from '../storage/RdbStore';
+import type { MigrationSink } from '../../contracts/MigrationPort';
+import type { RdbRow, RdbTransaction } from '../../contracts/RdbStore';
 import { StorageService } from '../storage/StorageService';
 import { SqlCells } from '../../repository/SqlCells';
 import { FamilyRepository } from '../../repository/FamilyRepository';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
 import type { FamilyAuthPort } from '../family/FamilyModels';
-import type { CryptoPort } from '../crypto/CryptoPort';
+import type { CryptoPort } from '../../contracts/CryptoPort';
 import {
   AuthPolicy,
   CreateProfileInput,

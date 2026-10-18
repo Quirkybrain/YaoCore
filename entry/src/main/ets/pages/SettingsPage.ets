@@ -23,7 +23,7 @@ import { CloudConfig } from '../model/FamilyModels';
 import { MemberRole } from '../model/FamilyModels';
 import { CloudTransportState } from '../service/cloud/CloudModels';
 import type { CloudConfigView } from '../service/cloud/CloudModels';
-import { LocaleMode, I18nParams, SupportedLocale } from '../service/i18n/I18nModels';
+import { LocaleMode, I18nParams, SupportedLocale } from '../model/I18nModels';
 import { NameValue } from '../common/types/NameValue';
 import { TransportProfile } from '../model/DeviceTypes';
 import {

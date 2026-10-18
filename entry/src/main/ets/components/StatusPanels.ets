@@ -12,7 +12,7 @@ import {
   GatewayStatus
 } from '../viewmodel/core/ViewModelCore';
 import { I18nKeys } from '../service/i18n/I18nKeys';
-import { I18nParams, I18nKey } from '../service/i18n/I18nModels';
+import { I18nParams, I18nKey } from '../model/I18nModels';
 import {
   AppColors,
   AppRadius,

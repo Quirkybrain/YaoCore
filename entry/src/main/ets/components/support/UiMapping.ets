@@ -10,8 +10,8 @@
 import { DeviceType } from '../../common/constants/DeviceConstants';
 import { DeviceKey } from '../../model/DeviceKey';
 import type { Room } from '../../model/FamilyModels';
-import type { DeviceRecord } from '../../repository/DomainModels';
-import type { SceneExecutionProgress, SceneExecutionResult } from '../../repository/DomainModels';
+import type { DeviceRecord } from '../../model/DeviceRecord';
+import type { SceneExecutionProgress, SceneExecutionResult } from '../../model/SceneExecutionModels';
 import {
   ControlPhase,
   ControlUiState,

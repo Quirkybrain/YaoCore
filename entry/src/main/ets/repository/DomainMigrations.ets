@@ -7,7 +7,7 @@
  * Versions stay contiguous: v1 C-06, v2 C-08 (FamilyRepository), v3 C-12,
  * v4 this file. T-09 does not register a v3 placeholder; C-12 owns it.
  */
-import type { MigrationSink } from '../service/storage/MigrationPort';
+import type { MigrationSink } from '../contracts/MigrationPort';
 
 const V4_STATEMENTS: ReadonlyArray<string> = [
   'CREATE TABLE IF NOT EXISTS room (' +

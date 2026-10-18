@@ -17,13 +17,8 @@ import type { CommandValue } from '../../common/utils/JsonAtom';
 import { DeviceStatePatch, DeviceStatePatchInit } from '../../model/DeviceState';
 import { StateVerification } from '../../model/ControlModels';
 import type { InventoryDeviceState, ShadowDeviceState } from '../../model/CloudModels';
-import {
-  CloudCommandExpectation,
-  CloudCompletion,
-  CloudCompletionPolicy,
-  CloudCompletionVerdict,
-  ShadowSnapshot
-} from './CloudModels';
+import { CloudCommandExpectation, CloudCompletionPolicy, ShadowSnapshot } from './CloudModels';
+import { CloudCompletion, CloudCompletionVerdict } from '../../model/CloudControlModels';
 import { CloudErrors } from './CloudErrors';
 
 const FIXED_PREFIXES: ReadonlyArray<string> = ['Door_01', 'Light_01', 'AC_01'];

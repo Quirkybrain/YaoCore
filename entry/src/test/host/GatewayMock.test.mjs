@@ -15,9 +15,7 @@ import { TransportProfile } from '../../main/ets/model/DeviceTypes.ets';
 import { DeviceControlCommand, StateVerification } from '../../main/ets/model/ControlModels.ets';
 import { IdentityVersion } from '../../main/ets/model/ProvisioningModels.ets';
 import { CryptoService } from '../../main/ets/service/crypto/CryptoService.ets';
-import {
-  GatewayTarget,
-} from '../../main/ets/service/gateway/GatewayTransportPorts.ets';
+import { GatewayTarget } from '../../main/ets/model/GatewayTransportModels.ets';
 import { MockGatewayService } from '../../main/ets/service/mock/MockGatewayService.ets';
 import { MockBleProvisioningClient } from '../../main/ets/service/mock/MockBleProvisioningClient.ets';
 import {
@@ -25,12 +23,8 @@ import {
   MockScenario,
   MockTlsMode,
 } from '../../main/ets/service/mock/MockScenario.ets';
-import {
-  BleProvisioningRequest,
-  BleProvisioningStage,
-  BleScanFilter,
-} from '../../main/ets/service/ble/BleProvisioningPorts.ets';
-import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
+import { BleProvisioningRequest, BleProvisioningStage, BleScanFilter } from '../../main/ets/model/ProvisioningModels.ets';
+import { GattEndpointMap } from '../../main/ets/model/GattEndpointMap.ets';
 import { FakeTransportClock, SequenceRandom } from './TransportFakes.ets';
 import { TestCryptoProvider } from './TestCryptoProvider.ets';
 

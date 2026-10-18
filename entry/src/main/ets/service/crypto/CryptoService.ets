@@ -9,8 +9,8 @@
  * payloads (ADR-002 §5, EXT-GCM-001).
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
-import { AesCtrState, GcmCiphertext, X25519KeyPair } from './CryptoPort';
-import type { AesCtrStream, CryptoPort, X25519KeyHandle } from './CryptoPort';
+import { AesCtrState, GcmCiphertext, X25519KeyPair } from '../../contracts/CryptoPort';
+import type { AesCtrStream, CryptoPort, X25519KeyHandle } from '../../contracts/CryptoPort';
 import {
   CryptoErrorKind,
   CryptoProviderError

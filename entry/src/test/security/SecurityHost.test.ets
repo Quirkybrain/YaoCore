@@ -21,7 +21,8 @@ import { DeviceAction } from '../../main/ets/common/constants/DeviceConstants';
 import { BytesUtil } from '../../main/ets/common/utils/BytesUtil';
 import { TestCryptoProvider } from '../host/TestCryptoProvider';
 import securityDeviceTest from '../../ohosTest/ets/test/security/SecurityDevice.test';
-import type { ClockPort, RandomPort } from '../../main/ets/common/types/Ports';
+import type { ClockPort } from '../../main/ets/common/types/Ports';
+import type { RandomPort } from '../../main/ets/contracts/Ports';
 
 const FIXED_MS: number = Date.UTC(2026, 6, 14, 8, 0, 0);
 

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """YaoCore C-29 layering checker (DES-A §2.2 D-01..D-06/D-08, DES-B §2.3 D-09..D-13/D-17).
 
-Producer: agent:test-engineer | Task: T-20 / wp-085-tooling
+Producer: agent:test-engineer | Task: T-23 / wp-090-ports
 Contract: DES-A §2.2, §27.6; DES-B §2.3, §18.1; T-18 ruling 4b99e64 (§0.8/§0.9, §18.1);
           T-20 final-system-review F-01/F-02/F-06.
-Status: T-20 implementation. D-12 entries are file/symbol-level and ``status`` is
+Status: T-23 implementation. D-12 entries are file/symbol-level and ``status`` is
 enforced (a used entry that is not ``accepted`` fails the gate). Port location
 exceptions are read from ``port_location_exceptions``; the two former hardcoded
-port allowlists are gone. A port path that is not registered, a symbol outside the
-registered set, or a non-accepted location status fails D-09/D-11. A port exception
-never widens D-12: both allowlists are applied independently and the stricter one wins.
+port allowlists are gone. ``contracts/**`` is the canonical port location: repository,
+viewmodel, pages and components may import it directly under D-05/D-09/D-11/D-12.
+The registry only covers legacy locations; a port path that is not registered, a
+symbol outside the registered set, or a non-accepted location status fails
+D-09/D-11. A port exception never widens D-12: both allowlists are applied
+independently and the stricter one wins.
 
 Usage:
   python3 tools/contract/check_layering.py --root .
@@ -89,8 +92,8 @@ PAGES_APP_SEAMS = {
     "ContinuousGestureGuard.ets",
     "PermissionPolicy.ets",
 }
-PAGES_I18N_FILES = {"I18nService.ets", "I18nModels.ets", "I18nKeys.ets"}
-COMPONENT_I18N_FILES = {"I18nService.ets", "I18nModels.ets", "I18nKeys.ets"}
+PAGES_I18N_FILES = {"I18nService.ets", "I18nKeys.ets"}
+COMPONENT_I18N_FILES = {"I18nService.ets", "I18nKeys.ets"}
 COMPONENT_VIEWMODEL_CORE = {"ViewModelCore.ets", "DoorConfirmationTracker.ets"}
 APP_VM_FACTORY_FILES = {
     "AppCompositionRoot.ets",
@@ -584,9 +587,8 @@ def evaluate(root: Path, allowlist: list[AllowEntry],
                     add("D-12", record,
                         f"pages/** may only import C-14 i18n public types from service/**; got {spec!r}")
             elif target_layer == "repository":
-                if not _is_pages_repository_dto(target_rel):
-                    add("D-12", record,
-                        f"pages/** must not import repository implementation; got {spec!r}")
+                add("D-12", record,
+                    f"pages/** must not import repository implementation; got {spec!r}")
             elif target_layer == "app":
                 if not _is_pages_app_seam(target_rel, record):
                     add("D-12", record,
@@ -603,9 +605,8 @@ def evaluate(root: Path, allowlist: list[AllowEntry],
             elif target_layer == "app":
                 add("D-12", record, f"components/** must not import app/**; got {spec!r}")
             elif target_layer == "repository":
-                if not _is_components_repository_dto(record):
-                    add("D-12", record,
-                        f"components/** may only import read-only DTO types from repository/**; got {spec!r}")
+                add("D-12", record,
+                    f"components/** must not import repository implementation; got {spec!r}")
             elif target_layer == "service":
                 if not _is_components_service_target(record):
                     add("D-12", record,
@@ -725,11 +726,6 @@ def _is_pages_i18n(target_rel: str) -> bool:
     return target_rel.startswith(prefix) and target_rel.rsplit("/", 1)[-1] in PAGES_I18N_FILES
 
 
-def _is_pages_repository_dto(target_rel: str) -> bool:
-    # T-18 R3-01: existing pages read-only DTO/enum imports are tracked in the
-    # allowlist, not silently permitted by this function.
-    return False
-
 
 def _is_pages_app_seam(target_rel: str, record: ImportRecord) -> bool:
     prefix = MAIN_PREFIX + "/app/"
@@ -742,15 +738,6 @@ def _is_pages_app_seam(target_rel: str, record: ImportRecord) -> bool:
         return record.kind == "type" and set(record.symbols or []).issubset({"PageVmFactoryPort"})
     return False
 
-
-def _is_components_repository_dto(record: ImportRecord) -> bool:
-    target_rel = record.target_rel or ""
-    if target_rel != MAIN_PREFIX + "/repository/DomainModels.ets":
-        return False
-    if record.kind != "type":
-        return False
-    return set(record.symbols or []).issubset(
-        {"DeviceRecord", "SceneExecutionResult", "SceneExecutionProgress"})
 
 
 def _is_components_service_target(record: ImportRecord) -> bool:
@@ -793,7 +780,7 @@ def render_report(root: Path, violations: list[Violation], skipped: list[str],
     return {
         "tool": "check_layering.py",
         "producer": "agent:test-engineer",
-        "task": "T-20 / wp-085-tooling",
+        "task": "T-23 / wp-090-ports",
         "root": norm(root),
         "main_root": MAIN_PREFIX,
         "rules_checked": RULE_ORDER,

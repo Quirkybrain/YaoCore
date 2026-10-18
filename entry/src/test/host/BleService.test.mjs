@@ -10,12 +10,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { AppError } from '../../main/ets/common/types/AppError.ets';
-import {
-  BleScanFilter,
-  BleWifiScanRequest,
-  ProvisioningState
-} from '../../main/ets/service/ble/BleProvisioningPorts.ets';
-import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
+import { BleScanFilter, BleWifiScanRequest, ProvisioningState } from '../../main/ets/model/ProvisioningModels.ets';
+import { GattEndpointMap } from '../../main/ets/model/GattEndpointMap.ets';
 import { IdentityVersion } from '../../main/ets/model/ProvisioningModels.ets';
 import {
   FakeClock,

@@ -28,12 +28,12 @@ import {
   MemberStatus,
   InviteMode
 } from '../model/FamilyModels';
-import type { PreferencesStore } from '../service/storage/PreferencesStore';
-import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
-import type { MigrationSink } from '../service/storage/MigrationPort';
+import type { PreferencesStore } from '../contracts/PreferencesStore';
+import type { RdbRow, RdbStore, RdbTransaction } from '../contracts/RdbStore';
+import type { MigrationSink } from '../contracts/MigrationPort';
 import { DomainOperationGate } from './DomainOperationGate';
 import { SqlCells, SqlJson } from './SqlCells';
-import type { MemberRoomGrantPort } from './DomainPorts';
+import type { MemberRoomGrantPort } from '../contracts/RoomPorts';
 
 export class InvitationPatch {
   readonly acceptedAt?: string;

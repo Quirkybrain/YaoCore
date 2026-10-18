@@ -12,10 +12,8 @@ import { AppErrors } from '../../common/types/AppError';
 import type { ClockPort } from '../../common/types/Ports';
 import type { DeviceKey } from '../../model/DeviceKey';
 import { StateVerification } from '../../model/ControlModels';
-import {
-  ControlExecution,
-  ViewModelError
-} from './ViewModelCore';
+import { ViewModelError } from './ViewModelCore';
+import { ControlExecution } from '../../model/ControlExecution';
 import type { VmTimerPort } from './ViewModelCore';
 
 export enum DoorLinkMode {

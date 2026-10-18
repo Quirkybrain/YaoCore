@@ -9,7 +9,8 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { DeviceAction, DeviceConstants } from '../common/constants/DeviceConstants';
 import type { CommandValue } from '../common/utils/JsonAtom';
 import { AcMode } from '../model/DeviceTypes';
@@ -17,18 +18,12 @@ import { DeviceControlCommand, StateVerification } from '../model/ControlModels'
 import { DeviceStatePatch, DeviceStatePatchInit } from '../model/DeviceState';
 import type { DeviceSnapshot } from '../model/DeviceState';
 import { DeviceKey } from '../model/DeviceKey';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import { AcAdapterFactory } from '../service/ac/AcAdapterFactory';
 import type { AcAdapter } from '../service/ac/AcAdapter';
 import type { AcViewState } from '../service/ac/AcModels';
-import {
-  ControlExecution,
-  ControlPhase,
-  ControlUiState,
-  LoadPhase,
-  ViewModelError,
-  ViewModelSupport
-} from './core/ViewModelCore';
+import { ControlPhase, ControlUiState, LoadPhase, ViewModelError, ViewModelSupport } from './core/ViewModelCore';
+import { ControlExecution } from '../model/ControlExecution';
 import type {
   ViewModelBase,
   VmTimerPort
@@ -37,7 +32,7 @@ import { I18nService } from '../service/i18n/I18nService';
 import { DeviceRepository } from '../repository/DeviceRepository';
 import { DeviceControlCoordinator } from './core/DeviceControlCoordinator';
 import { ThrottleGate } from './core/ThrottleGate';
-import type { DeviceControlCoordinatorPort } from './ViewModelPorts';
+import type { DeviceControlCoordinatorPort } from '../contracts/ControlPorts';
 
 const TAG: string = 'ClimateViewModel';
 const THROTTLE_MS: number = 55;

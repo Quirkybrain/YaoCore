@@ -11,12 +11,13 @@ import { ProtocolConstants, ProtocolHeaders } from '../../common/constants/Proto
 import { DeviceAction } from '../../common/constants/DeviceConstants';
 import { HttpHeaders } from '../../common/types/HttpHeaders';
 import { NameValue } from '../../common/types/NameValue';
-import type { ClockPort, RandomPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { RandomPort } from '../../contracts/Ports';
 import { BytesUtil } from '../../common/utils/BytesUtil';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import { JsonAtom } from '../../common/utils/JsonAtom';
 import type { CommandValue } from '../../common/utils/JsonAtom';
-import type { CryptoPort } from '../crypto/CryptoPort';
+import type { CryptoPort } from '../../contracts/CryptoPort';
 import {
   CanonicalBuilder,
   ControlCanonicalFields,

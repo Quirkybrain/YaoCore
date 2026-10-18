@@ -5,7 +5,7 @@
  */
 import type { I18nService } from '../service/i18n/I18nService';
 import { DeviceType } from '../common/constants/DeviceConstants';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import type { Room } from '../model/FamilyModels';
 import type { DeviceKey } from '../model/DeviceKey';
 import type { ControlUiState } from '../viewmodel/core/ViewModelCore';

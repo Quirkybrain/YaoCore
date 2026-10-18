@@ -15,18 +15,10 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { StorageConstants } from '../../common/constants/StorageConstants';
-import type { LoggerPort } from '../../common/types/Ports';
-import type { PreferencesStore } from '../storage/PreferencesStore';
-import {
-  I18nLoadResult,
-  I18nParams,
-  I18nKey,
-  I18nResourceBundle,
-  LocaleChangedEvent,
-  LocaleMode,
-  SupportedLocale
-} from './I18nModels';
-import type { I18nResourceLoaderPort, LocaleApplierPort } from './I18nPorts';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { PreferencesStore } from '../../contracts/PreferencesStore';
+import { I18nLoadResult, I18nParams, I18nKey, I18nResourceBundle, LocaleChangedEvent, LocaleMode, SupportedLocale } from '../../model/I18nModels';
+import type { I18nResourceLoaderPort, LocaleApplierPort } from '../../contracts/I18nPorts';
 
 const TAG = 'I18nService';
 const ZH_CN = SupportedLocale.ZH_CN;

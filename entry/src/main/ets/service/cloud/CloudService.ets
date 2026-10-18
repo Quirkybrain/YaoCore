@@ -9,29 +9,16 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
-import type {
-  CancellationToken,
-  ClockPort,
-  LoggerPort,
-  MetricsPort
-} from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort, MetricsPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import type { DeviceControlCommand } from '../../model/ControlModels';
 import { StateVerification } from '../../model/ControlModels';
 import type { CloudConfig } from '../../model/FamilyModels';
-import type { CloudConfigStore, CloudCredentialPort, TimerPort } from './CloudPorts';
-import {
-  CloudCommandExpectation,
-  CloudCommandReceipt,
-  CloudCompletion,
-  CloudCompletionPolicy,
-  CloudCompletionVerdict,
-  CloudConfigValidation,
-  CloudConfigView,
-  CloudControlOutcome,
-  CloudStateChangedEvent,
-  CloudTokenStatus,
-  CloudTransportState
-} from './CloudModels';
+import type { CloudConfigStore, CloudCredentialPort } from '../../contracts/CloudPorts';
+import type { TimerPort } from '../../contracts/TimerPort';
+import { CloudCommandExpectation, CloudCompletionPolicy, CloudConfigValidation, CloudConfigView, CloudStateChangedEvent, CloudTokenStatus, CloudTransportState } from './CloudModels';
+import { CloudCommandReceipt, CloudCompletion, CloudCompletionVerdict, CloudControlOutcome } from '../../model/CloudControlModels';
 import { CloudCommandClient } from './CloudCommandClient';
 import { CloudCompletionEvaluator } from './CloudCompletionEvaluator';
 import { CloudConfigValidator } from './CloudConfigValidator';

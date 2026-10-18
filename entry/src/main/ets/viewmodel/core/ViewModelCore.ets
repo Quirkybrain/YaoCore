@@ -12,16 +12,19 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { DeviceAction } from '../../common/constants/DeviceConstants';
 import type { CommandValue } from '../../common/utils/JsonAtom';
-import type { ClockPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
 import { DeviceKey } from '../../model/DeviceKey';
 import { TransportProfile } from '../../model/DeviceTypes';
 import type { ControlOutcome, DeviceControlCommand } from '../../model/ControlModels';
 import { StateVerification } from '../../model/ControlModels';
-import type { DeviceCommandExecution } from '../../repository/DomainModels';
-import type { ControlApplyResult } from '../../repository/DomainModels';
-import type { CloudControlOutcome } from '../../service/cloud/CloudModels';
+import type { DeviceCommandExecution } from '../../model/DeviceRecord';
+import type { ControlApplyResult } from '../../model/DeviceRecord';
+import type { ControlExecution } from '../../model/ControlExecution';
+
+import type { CloudControlOutcome } from '../../model/CloudControlModels';
 import { ErrorI18nMapper } from '../../service/i18n/ErrorI18nMapper';
-import { LocaleChangedEvent, LocaleMode, SupportedLocale } from '../../service/i18n/I18nModels';
+import { LocaleChangedEvent, LocaleMode, SupportedLocale } from '../../model/I18nModels';
 
 export enum LoadPhase {
   IDLE = 'IDLE',
@@ -146,38 +149,6 @@ export enum ControlPhase {
   PENDING = 'PENDING',
   COMMITTED = 'COMMITTED',
   REVERT = 'REVERT'
-}
-
-export enum ControlTransport {
-  LAN = 'LAN',
-  CLOUD = 'CLOUD'
-}
-
-/** Unified LAN/cloud control result consumed by the ViewModels. */
-export class ControlExecution {
-  readonly command: DeviceControlCommand;
-  readonly transport: ControlTransport;
-  readonly lan?: DeviceCommandExecution;
-  readonly cloud?: CloudControlOutcome;
-  readonly apply?: ControlApplyResult;
-  readonly error?: AppError;
-  readonly elapsedMs: number;
-  readonly ackAccepted: boolean;
-  readonly stateVerification: StateVerification;
-
-  constructor(command: DeviceControlCommand, transport: ControlTransport, elapsedMs: number,
-    ackAccepted: boolean, stateVerification: StateVerification, lan?: DeviceCommandExecution,
-    cloud?: CloudControlOutcome, apply?: ControlApplyResult, error?: AppError) {
-    this.command = command;
-    this.transport = transport;
-    this.elapsedMs = elapsedMs;
-    this.ackAccepted = ackAccepted;
-    this.stateVerification = stateVerification;
-    this.lan = lan;
-    this.cloud = cloud;
-    this.apply = apply;
-    this.error = error;
-  }
 }
 
 export class ControlUiState {

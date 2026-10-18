@@ -9,19 +9,14 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { DeviceAction } from '../common/constants/DeviceConstants';
 import { DeviceKey } from '../model/DeviceKey';
 import { DeviceControlCommand, StateVerification } from '../model/ControlModels';
-import type { DeviceRecord, DeviceChangeEvent } from '../repository/DomainModels';
-import {
-  ControlExecution,
-  ControlPhase,
-  ControlUiState,
-  LoadPhase,
-  ViewModelError,
-  ViewModelSupport
-} from './core/ViewModelCore';
+import type { DeviceRecord, DeviceChangeEvent } from '../model/DeviceRecord';
+import { ControlPhase, ControlUiState, LoadPhase, ViewModelError, ViewModelSupport } from './core/ViewModelCore';
+import { ControlExecution } from '../model/ControlExecution';
 import type {
   ViewModelBase,
   VmTimerPort
@@ -36,7 +31,7 @@ import {
   DoorStage,
   DoorUiState
 } from './core/DoorConfirmationTracker';
-import type { DeviceControlCoordinatorPort } from './ViewModelPorts';
+import type { DeviceControlCoordinatorPort } from '../contracts/ControlPorts';
 
 const TAG: string = 'DoorViewModel';
 const TIMEOUT_MS: number = 3000;

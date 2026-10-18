@@ -10,11 +10,7 @@
 import { describe, expect, it } from '@ohos/hypium';
 import { NameValue } from '../../main/ets/common/types/NameValue';
 import { I18nBundleCodec } from '../../main/ets/service/i18n/I18nBundleCodec';
-import {
-  I18nParams,
-  LocaleMode,
-  SupportedLocale
-} from '../../main/ets/service/i18n/I18nModels';
+import { I18nParams, LocaleMode, SupportedLocale } from '../../main/ets/model/I18nModels';
 import { I18nService } from '../../main/ets/service/i18n/I18nService';
 import { I18nKeys } from '../../main/ets/service/i18n/I18nKeys';
 import {

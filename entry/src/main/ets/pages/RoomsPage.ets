@@ -19,7 +19,7 @@ import {
 import { MemberRole } from '../model/FamilyModels';
 import type { Room } from '../model/FamilyModels';
 import { DeviceKey } from '../model/DeviceKey';
-import type { DeviceRecord } from '../repository/DomainModels';
+import type { DeviceRecord } from '../model/DeviceRecord';
 import { DeviceFilter, CloudLinkState } from '../viewmodel/core/ViewModelCore';
 import { DeviceViewState, DeviceViewModel } from '../viewmodel/DeviceViewModel';
 import { RoomViewState, RoomViewModel } from '../viewmodel/RoomViewModel';

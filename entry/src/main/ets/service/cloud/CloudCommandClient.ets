@@ -17,30 +17,20 @@ import { JsonAtom } from '../../common/utils/JsonAtom';
 import { Utf8 } from '../../common/utils/Utf8';
 import { BytesUtil } from '../../common/utils/BytesUtil';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
-import type { ClockPort, LoggerPort, RandomPort, CancellationToken } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort, RandomPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import type { DeviceControlCommand } from '../../model/ControlModels';
-import type { CryptoPort } from '../crypto/CryptoPort';
-import type {
-  GatewayCredentialPort,
-  GatewaySequencePort
-} from '../../repository/GatewayPorts';
-import {
-  HttpRequest,
-  HttpResponse
-} from '../gateway/GatewayTransportPorts';
-import type { HttpTransport } from '../gateway/GatewayTransportPorts';
+import type { CryptoPort } from '../../contracts/CryptoPort';
+import type { GatewayCredentialPort, GatewaySequencePort } from '../../contracts/GatewayPorts';
+import { HttpRequest, HttpResponse } from '../../model/GatewayTransportModels';
+import type { HttpTransport } from '../../contracts/GatewayTransportPorts';
 import { CanonicalBuilder, CloudCanonicalFields } from '../security/CanonicalBuilder';
 import { CloudCommandSerializer } from '../protocol/CloudCommandSerializer';
 import type { CloudCommandDto } from '../protocol/dto/CloudDto';
-import type {
-  CloudActiveScopePort,
-  CloudConfigStore,
-  CloudCredentialPort
-} from './CloudPorts';
-import {
-  CloudCommandReceipt,
-  CloudCommandResponseDto
-} from './CloudModels';
+import type { CloudActiveScopePort, CloudConfigStore, CloudCredentialPort } from '../../contracts/CloudPorts';
+import { CloudCommandResponseDto } from './CloudModels';
+import { CloudCommandReceipt } from '../../model/CloudControlModels';
 import { CloudConfigValidator } from './CloudConfigValidator';
 import { CloudErrors } from './CloudErrors';
 

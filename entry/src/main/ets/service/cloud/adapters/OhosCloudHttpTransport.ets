@@ -16,12 +16,8 @@ import { JsonKind } from '../../../common/types/JsonNode';
 import { JsonParser } from '../../../common/utils/JsonParser';
 import { Utf8 } from '../../../common/utils/Utf8';
 import type { ClockPort } from '../../../common/types/Ports';
-import {
-  HttpRequest,
-  HttpResponse,
-  TlsPolicy
-} from '../../gateway/GatewayTransportPorts';
-import type { HttpTransport } from '../../gateway/GatewayTransportPorts';
+import { HttpRequest, HttpResponse, TlsPolicy } from '../../../model/GatewayTransportModels';
+import type { HttpTransport } from '../../../contracts/GatewayTransportPorts';
 
 interface PlatformErrorLike {
   code?: number;

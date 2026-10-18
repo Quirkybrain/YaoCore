@@ -13,8 +13,8 @@ import { AppErrors } from '../../common/types/AppError';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import type { ClockPort } from '../../common/types/Ports';
 import { CloudConfig } from '../../model/FamilyModels';
-import type { RdbRow, RdbStore } from '../storage/RdbStore';
-import type { CloudConfigStore } from './CloudPorts';
+import type { RdbRow, RdbStore } from '../../contracts/RdbStore';
+import type { CloudConfigStore } from '../../contracts/CloudPorts';
 
 const TABLE: string = 'cloud_config';
 const SINGLETON_ID: number = 1;

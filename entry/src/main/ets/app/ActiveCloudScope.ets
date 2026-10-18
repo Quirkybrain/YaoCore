@@ -11,8 +11,8 @@
  * - `isGatewayBound` delegates to the route repository's persisted binding and
  *   never reads the command secret.
  */
-import type { CloudActiveScopePort } from '../service/cloud/CloudPorts';
-import type { GatewayRoutePort } from '../repository/GatewayPorts';
+import type { CloudActiveScopePort } from '../contracts/CloudPorts';
+import type { GatewayRoutePort } from '../contracts/GatewayPorts';
 
 export type ActiveFamilyIdProvider = () => string | undefined;
 

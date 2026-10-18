@@ -12,7 +12,7 @@
 import { abilityAccessCtrl, bundleManager, common, Permissions, Want } from '@kit.AbilityKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { AppErrors } from '../common/types/AppError';
-import type { LoggerPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import {
   PermissionKind,
   PermissionPolicy,
@@ -20,12 +20,8 @@ import {
   PermissionState
 } from './PermissionPolicy';
 import type { PermissionPort } from './PermissionPolicy';
-import {
-  PermissionKind as ViewModelPermissionKind
-} from '../viewmodel/ViewModelPorts';
-import type {
-  PermissionPort as ViewModelPermissionPort
-} from '../viewmodel/ViewModelPorts';
+import { PermissionKind as ViewModelPermissionKind } from '../contracts/PermissionPort';
+import type { PermissionPort as ViewModelPermissionPort } from '../contracts/PermissionPort';
 
 export class PermissionGate implements PermissionPort {
   private readonly context: common.UIAbilityContext;

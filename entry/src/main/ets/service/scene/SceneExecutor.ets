@@ -10,22 +10,17 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { CancellationToken, ClockPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
+import type { CancellationToken } from '../../common/types/CancellationToken';
 import { DeviceControlCommand, ControlOutcome, StateVerification } from '../../model/ControlModels';
 import { Scene, SceneAction } from '../../model/FamilyModels';
 import { DeviceRepository } from '../../repository/DeviceRepository';
-import type { DeviceControlPort } from '../../repository/DomainPorts';
-import type { GatewayRoutePort } from '../../repository/GatewayPorts';
-import {
-  ControlApplyContext,
-  SceneExecutionPolicy,
-  SceneExecutionProgress,
-  SceneExecutionResult,
-  SceneRunState,
-  SceneStepResult,
-  SceneStepState
-} from '../../repository/DomainModels';
-import type { SceneTimerPort } from './SceneTimerPort';
+import type { DeviceControlPort } from '../../contracts/DevicePorts';
+import type { GatewayRoutePort } from '../../contracts/GatewayPorts';
+import { ControlApplyContext } from '../../model/DeviceRecord';
+import { SceneExecutionPolicy, SceneExecutionProgress, SceneExecutionResult, SceneRunState, SceneStepResult, SceneStepState } from '../../model/SceneExecutionModels';
+import type { SceneTimerPort } from '../../contracts/SceneTimerPort';
 import { SceneValidation } from './SceneValidation';
 
 export class RunCancellation implements CancellationToken {

@@ -12,37 +12,25 @@
 import { AppErrors } from '../common/types/AppError';
 import type { AppError } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { BytesUtil } from '../common/utils/BytesUtil';
 import { Utf8 } from '../common/utils/Utf8';
 import { SecureBytes } from '../common/types/SecureBytes';
-import {
-  BleProvisioningDevice,
-  BleProvisioningRequest,
-  BleProvisioningStage,
-  BleScanFilter,
-  BleWifiScanRequest,
-  ProvisioningProgress,
-  ProvisioningState,
-  WifiAp
-} from '../service/ble/BleProvisioningPorts';
-import type {
-  BleProvisioningProgressListener,
-  BleScanListener,
-  IBleProvisioningClient
-} from '../service/ble/BleProvisioningPorts';
-import { GattEndpointMap } from '../service/ble/GattEndpointMap';
+import { BleProvisioningDevice, BleProvisioningRequest, BleProvisioningStage, BleScanFilter, BleWifiScanRequest, ProvisioningProgress, ProvisioningState, WifiAp } from '../model/ProvisioningModels';
+import type { BleProvisioningProgressListener, BleScanListener, IBleProvisioningClient } from '../contracts/BleProvisioningPorts';
+import { GattEndpointMap } from '../model/GattEndpointMap';
 import type { BleProvisioningResult } from '../model/ProvisioningModels';
-import type { CryptoPort } from '../service/crypto/CryptoPort';
-import type { SecretDraftPort } from '../service/storage/SecretDraftPort';
+import type { CryptoPort } from '../contracts/CryptoPort';
+import type { SecretDraftPort } from '../contracts/SecretDraftPort';
 import {
   LoadPhase,
   ViewModelError,
   ViewModelSupport
 } from './core/ViewModelCore';
 import type { ViewModelBase, VmTimerPort } from './core/ViewModelCore';
-import type { PermissionPort } from './ViewModelPorts';
-import { PermissionKind } from './ViewModelPorts';
+import type { PermissionPort } from '../contracts/PermissionPort';
+import { PermissionKind } from '../contracts/PermissionPort';
 import { I18nService } from '../service/i18n/I18nService';
 import { GatewayRepository } from '../repository/GatewayRepository';
 import { FamilyRepository } from '../repository/FamilyRepository';

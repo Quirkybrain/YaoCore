@@ -20,40 +20,23 @@ import { NameValue } from '../common/types/NameValue';
 import { ProtocolConstants } from '../common/constants/ProtocolConstants';
 import { DateTimeUtil } from '../common/utils/DateTimeUtil';
 import { UuidUtil } from '../common/utils/UuidUtil';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { DeviceKey } from '../model/DeviceKey';
 import { DeviceState, DeviceSnapshot, DeviceSnapshotInit, DeviceStatePatch } from '../model/DeviceState';
 import { ControlOutcome, StateVerification } from '../model/ControlModels';
 import type { DiscoverySnapshot } from '../model/DiscoveryModels';
-import type { GatewayRoutePort } from './GatewayPorts';
-import type { RdbRow, RdbStore, RdbTransaction } from '../service/storage/RdbStore';
-import type { MigrationSink } from '../service/storage/MigrationPort';
+import type { GatewayRoutePort } from '../contracts/GatewayPorts';
+import type { RdbRow, RdbStore, RdbTransaction } from '../contracts/RdbStore';
+import type { MigrationSink } from '../contracts/MigrationPort';
 import { DomainMigrations } from './DomainMigrations';
 import { DomainOperationGate } from './DomainOperationGate';
 import { DeviceSnapshotCodec } from './DeviceSnapshotCodec';
 import { SqlCells } from './SqlCells';
-import {
-  ControlApplyContext,
-  ControlApplyReason,
-  ControlApplyResult,
-  DeviceChangeEvent,
-  DeviceChangeEventType,
-  DeviceMergeResult,
-  DeviceMergeState,
-  DeviceRecord,
-  DeviceRemovalOptions,
-  DeviceRemovalResult,
-  DiscoverApplyOptions,
-  DiscoverApplyResult,
-  SceneCleanupSummary
-} from './DomainModels';
-import type {
-  DeviceAssignmentPort,
-  DeviceStatePort,
-  RoomDeviceNamePort,
-  RoomLookupPort,
-  SceneReferencePort
-} from './DomainPorts';
+import { ControlApplyContext, ControlApplyReason, ControlApplyResult, DeviceChangeEvent, DeviceChangeEventType, DeviceMergeResult, DeviceMergeState, DeviceRecord, DeviceRemovalOptions, DeviceRemovalResult, DiscoverApplyOptions, DiscoverApplyResult, SceneCleanupSummary } from '../model/DeviceRecord';
+import type { DeviceAssignmentPort, RoomDeviceNamePort, RoomLookupPort } from '../contracts/RoomPorts';
+import type { SceneReferencePort } from '../contracts/ScenePorts';
+import type { DeviceStatePort } from '../contracts/DevicePorts';
 
 const DEVICE_COLUMNS: string = 'gateway_id, device_id, family_id, device_name, room_id, ' +
   'is_enabled, is_unassigned, snapshot_json, state_epoch_ms, last_merge_at, ' +

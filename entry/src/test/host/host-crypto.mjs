@@ -22,7 +22,7 @@ import {
 } from 'node:crypto';
 
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
-import { GcmCiphertext, X25519KeyPair } from '../../main/ets/service/crypto/CryptoPort.ets';
+import { GcmCiphertext, X25519KeyPair } from '../../main/ets/contracts/CryptoPort.ets';
 import { X25519KeyCodec } from '../../main/ets/service/crypto/X25519KeyCodec.ets';
 
 class HostX25519Handle {

@@ -20,13 +20,10 @@ import {
 import { AppErrors } from '../../main/ets/common/types/AppError.ets';
 import { NameValue } from '../../main/ets/common/types/NameValue.ets';
 import { SecureBytes } from '../../main/ets/common/types/SecureBytes.ets';
-import {
-  BleProvisioningDevice,
-  BleProvisioningRequest,
-} from '../../main/ets/service/ble/BleProvisioningPorts.ets';
-import { GattEndpointMap } from '../../main/ets/service/ble/GattEndpointMap.ets';
+import { BleProvisioningDevice, BleProvisioningRequest } from '../../main/ets/model/ProvisioningModels.ets';
+import { GattEndpointMap } from '../../main/ets/model/GattEndpointMap.ets';
 import { ProtobufReader, ProtobufWriter } from '../../main/ets/service/ble/Protobuf.ets';
-import { X25519KeyPair } from '../../main/ets/service/crypto/CryptoPort.ets';
+import { X25519KeyPair } from '../../main/ets/contracts/CryptoPort.ets';
 import {
   DiscoverySnapshot,
   DiscoverySnapshotInit,
@@ -37,7 +34,7 @@ import {
   StateVerification,
 } from '../../main/ets/model/ControlModels.ets';
 import { GatewayResultClassifier } from '../../main/ets/common/types/GatewayResult.ets';
-import { ProbeResult } from '../../main/ets/service/gateway/GatewayTransportPorts.ets';
+import { ProbeResult } from '../../main/ets/model/GatewayTransportModels.ets';
 import { SecretDraftStore } from '../../main/ets/service/storage/SecretDraftStore.ets';
 import { BleProvisioningService } from '../../main/ets/service/ble/BleProvisioningService.ets';
 

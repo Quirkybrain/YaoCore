@@ -18,12 +18,9 @@ import { AppErrors } from '../../../common/types/AppError';
 import { Utf8 } from '../../../common/utils/Utf8';
 import { IpAddressUtil } from '../../../common/utils/IpAddressUtil';
 import { GatewayAddress } from '../../../model/GatewayRoute';
-import type { CancellationToken } from '../../../common/types/Ports';
-import {
-  DiscoveryBeacon,
-  DiscoveryTransportKind
-} from '../DiscoveryModels';
-import type { DiscoveryTransport } from '../DiscoveryModels';
+import type { CancellationToken } from '../../../common/types/CancellationToken';
+import { DiscoveryBeacon, DiscoveryTransportKind } from '../../../model/DiscoveryModels';
+import type { DiscoveryTransport } from '../../../contracts/DiscoveryTransport';
 
 export class MdnsDiscoveryTransport implements DiscoveryTransport {
   readonly kind: DiscoveryTransportKind = DiscoveryTransportKind.MDNS;

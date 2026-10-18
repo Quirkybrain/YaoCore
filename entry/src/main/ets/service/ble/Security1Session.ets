@@ -12,9 +12,9 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { BytesUtil } from '../../common/utils/BytesUtil';
-import type { RandomPort } from '../../common/types/Ports';
-import type { AesCtrStream, CryptoPort, X25519KeyHandle, X25519KeyPair } from '../crypto/CryptoPort';
-import { AesCtrState } from '../crypto/CryptoPort';
+import type { RandomPort } from '../../contracts/Ports';
+import type { AesCtrStream, CryptoPort, X25519KeyHandle, X25519KeyPair } from '../../contracts/CryptoPort';
+import { AesCtrState } from '../../contracts/CryptoPort';
 import { ProtocommCodec, SessionDataMessage } from './ProtocommCodec';
 
 const X25519_BYTES: number = 32;

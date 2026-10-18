@@ -7,8 +7,8 @@
  * TimerPort seam; host tests inject a deterministic fake.
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
-import type { CancellationToken } from '../../common/types/Ports';
-import type { TimerPort } from './CloudPorts';
+import type { CancellationToken } from '../../common/types/CancellationToken';
+import type { TimerPort } from '../../contracts/TimerPort';
 
 export class SystemTimerPort implements TimerPort {
   private timer: number | undefined = undefined;

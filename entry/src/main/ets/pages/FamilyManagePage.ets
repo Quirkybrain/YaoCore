@@ -21,7 +21,7 @@ import {
 } from '../common/theme/AppTheme';
 import { DateTimeUtil } from '../common/utils/DateTimeUtil';
 import { NameValue } from '../common/types/NameValue';
-import { I18nParams } from '../service/i18n/I18nModels';
+import { I18nParams } from '../model/I18nModels';
 import {
   InviteMode,
   MemberRole

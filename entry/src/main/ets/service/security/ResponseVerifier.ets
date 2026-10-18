@@ -10,7 +10,7 @@
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { ProtocolConstants, ProtocolHeaders } from '../../common/constants/ProtocolConstants';
 import { HttpHeaders } from '../../common/types/HttpHeaders';
-import type { CryptoPort } from '../crypto/CryptoPort';
+import type { CryptoPort } from '../../contracts/CryptoPort';
 import { BytesUtil } from '../../common/utils/BytesUtil';
 import { CanonicalBuilder, ResponseKind } from './CanonicalBuilder';
 

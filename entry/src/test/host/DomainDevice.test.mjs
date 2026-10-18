@@ -10,12 +10,7 @@ import assert from 'node:assert/strict';
 
 import { newDomainHarness } from '../domain/DomainHarness.ets';
 import { DomainOperationGate } from '../../main/ets/repository/DomainOperationGate.ets';
-import {
-  ControlApplyContext,
-  ControlApplyReason,
-  DeviceMergeResult,
-  DiscoverApplyOptions
-} from '../../main/ets/repository/DomainModels.ets';
+import { ControlApplyContext, ControlApplyReason, DeviceMergeResult, DiscoverApplyOptions } from '../../main/ets/model/DeviceRecord.ets';
 import { DeviceRepository } from '../../main/ets/repository/DeviceRepository.ets';
 import { DeviceKey } from '../../main/ets/model/DeviceKey.ets';
 import { DeviceAction, DeviceType } from '../../main/ets/common/constants/DeviceConstants.ets';

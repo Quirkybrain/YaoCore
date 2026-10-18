@@ -23,7 +23,7 @@ import {
   ShadowShape,
 } from '../../main/ets/model/CloudModels.ets';
 import { HostCrypto } from './host-crypto.mjs';
-import { HttpResponse } from '../../main/ets/service/gateway/GatewayTransportPorts.ets';
+import { HttpResponse } from '../../main/ets/model/GatewayTransportModels.ets';
 import {
   InMemoryCredentials,
   InMemorySequences,
@@ -45,13 +45,8 @@ import {
   CloudCommandClient,
   CloudSendRetryPolicy,
 } from '../../main/ets/service/cloud/CloudCommandClient.ets';
-import {
-  CloudCommandExpectation,
-  CloudCompletion,
-  CloudCompletionPolicy,
-  ShadowSnapshot,
-  CloudTransportState,
-} from '../../main/ets/service/cloud/CloudModels.ets';
+import { CloudCommandExpectation, CloudCompletionPolicy, ShadowSnapshot, CloudTransportState } from '../../main/ets/service/cloud/CloudModels.ets';
+import { CloudCompletion } from '../../main/ets/model/CloudControlModels.ets';
 import { CloudCompletionEvaluator } from '../../main/ets/service/cloud/CloudCompletionEvaluator.ets';
 import { CloudConfigValidator } from '../../main/ets/service/cloud/CloudConfigValidator.ets';
 import { RdbCloudConfigStore } from '../../main/ets/service/cloud/CloudConfigStore.ets';

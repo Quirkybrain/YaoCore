@@ -17,7 +17,7 @@
  */
 import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
-import type { RdbTransaction } from './RdbStore';
+import type { RdbTransaction } from '../../contracts/RdbStore';
 
 interface PlatformErrorLike {
   code?: number;

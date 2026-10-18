@@ -11,24 +11,17 @@
  */
 import { AppErrors } from '../common/types/AppError';
 import { NameValue } from '../common/types/NameValue';
-import type { ClockPort, LoggerPort } from '../common/types/Ports';
+import type { ClockPort } from '../common/types/Ports';
+import type { LoggerPort } from '../contracts/Ports';
 import { DeviceAction } from '../common/constants/DeviceConstants';
 import type { CommandValue } from '../common/utils/JsonAtom';
 import { DeviceKey } from '../model/DeviceKey';
 import { DeviceControlCommand, StateVerification } from '../model/ControlModels';
 import type { DeviceSnapshot, DeviceStatePatch } from '../model/DeviceState';
 import type { Room } from '../model/FamilyModels';
-import type { DeviceRecord } from '../repository/DomainModels';
-import {
-  ControlExecution,
-  ControlPhase,
-  ControlUiState,
-  DeviceFilter,
-  DeviceFilterKind,
-  LoadPhase,
-  ViewModelError,
-  ViewModelSupport
-} from './core/ViewModelCore';
+import type { DeviceRecord } from '../model/DeviceRecord';
+import { ControlPhase, ControlUiState, DeviceFilter, DeviceFilterKind, LoadPhase, ViewModelError, ViewModelSupport } from './core/ViewModelCore';
+import { ControlExecution } from '../model/ControlExecution';
 import type {
   ViewModelBase,
   VmTimerPort
@@ -40,7 +33,7 @@ import {
   DeviceControlCoordinator
 } from './core/DeviceControlCoordinator';
 import { ThrottleGate } from './core/ThrottleGate';
-import type { DeviceControlCoordinatorPort } from './ViewModelPorts';
+import type { DeviceControlCoordinatorPort } from '../contracts/ControlPorts';
 
 const TAG: string = 'DeviceViewModel';
 const THROTTLE_MS: number = 55;

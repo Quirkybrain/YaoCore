@@ -17,7 +17,8 @@ import { AppError, AppErrors } from '../../common/types/AppError';
 import { NameValue } from '../../common/types/NameValue';
 import { DateTimeUtil } from '../../common/utils/DateTimeUtil';
 import { UuidUtil } from '../../common/utils/UuidUtil';
-import type { ClockPort, IdPort, LoggerPort } from '../../common/types/Ports';
+import type { ClockPort, IdPort } from '../../common/types/Ports';
+import type { LoggerPort } from '../../contracts/Ports';
 import {
   Family,
   FamilyMember,
@@ -27,10 +28,10 @@ import {
   MemberRole,
   MemberStatus
 } from '../../model/FamilyModels';
-import type { RdbStore, RdbTransaction } from '../storage/RdbStore';
+import type { RdbStore, RdbTransaction } from '../../contracts/RdbStore';
 import { FamilyRepository, InvitationPatch } from '../../repository/FamilyRepository';
-import type { GatewayRoutePort } from '../../repository/GatewayPorts';
-import type { RoomLookupPort } from '../../repository/DomainPorts';
+import type { GatewayRoutePort } from '../../contracts/GatewayPorts';
+import type { RoomLookupPort } from '../../contracts/RoomPorts';
 import { DomainOperationGate } from '../../repository/DomainOperationGate';
 import {
   AcceptedInvitation,

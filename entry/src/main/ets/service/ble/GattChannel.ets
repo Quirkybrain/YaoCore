@@ -21,9 +21,10 @@
 import { AppErrors } from '../../common/types/AppError';
 import { defaultBleDelay, isConfirmedWriteBusy, mapProvisioningError } from './BleSupport';
 import type { BleDelay } from './BleSupport';
-import type { BleCharacteristicRef, BleConnection } from './BleProvisioningPorts';
+import type { BleConnection } from '../../contracts/BleProvisioningPorts';
+import type { BleCharacteristicRef } from '../../model/ProvisioningModels';
 
-import { GattEndpointMap } from './GattEndpointMap';
+import { GattEndpointMap } from '../../model/GattEndpointMap';
 import { GattRequestQueue } from './GattRequestQueue';
 import type { Security1Session } from './Security1Session';
 

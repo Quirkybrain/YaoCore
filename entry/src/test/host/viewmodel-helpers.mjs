@@ -6,11 +6,7 @@
  */
 import { DeviceSnapshot, DeviceSnapshotInit, DeviceState } from '../../main/ets/model/DeviceState.ets';
 import { DeviceKey } from '../../main/ets/model/DeviceKey.ets';
-import {
-  DeviceMergeResult,
-  DeviceMergeState,
-  DeviceRecord
-} from '../../main/ets/repository/DomainModels.ets';
+import { DeviceMergeResult, DeviceMergeState, DeviceRecord } from '../../main/ets/model/DeviceRecord.ets';
 
 export const GATEWAY_ID = 'gw-1';
 export const FAMILY_ID = 'family-1';
