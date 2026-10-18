@@ -1,0 +1,47 @@
+i18n legacy triage summary
+rows: 615
+by category:
+  A 迁移: 606
+  C 废弃: 6
+  D 排除: 3
+by status:
+  ACCEPTED: 10
+  MIGRATED: 46
+  PENDING_REVIEW: 6
+  INLINE_LITERAL: 0
+  OBSOLETE_LEGACY: 544
+  DEPRECATED (heuristic): 6
+  EXCLUDED (brand data): 3
+pending_review:
+  - '关闭' | 'close' | candidates: common.close @ entry/src/main/resources/rawfile/i18n/zh-CN.json; common_close @ entry/src/main/resources/base/element/string.json
+  - '刷新' | 'Refresh' | candidates: common.refresh @ entry/src/main/resources/rawfile/i18n/zh-CN.json; common_refresh @ entry/src/main/resources/base/element/string.json
+  - '添加网关' | 'Add gateway' | candidates: profile.provisioning @ entry/src/main/resources/rawfile/i18n/zh-CN.json; provisioning.title @ entry/src/main/resources/rawfile/i18n/zh-CN.json; home_add_gateway @ entry/src/main/resources/base/element/string.json
+  - '执行中' | 'Executing' | candidates: card.state.pending @ entry/src/main/resources/rawfile/i18n/zh-CN.json; scene.running @ entry/src/main/resources/rawfile/i18n/zh-CN.json; scene.step.running @ entry/src/main/resources/rawfile/i18n/zh-CN.json
+  - '简体中文' | 'Simplified Chinese' | candidates: settings.language.zh_cn @ entry/src/main/resources/rawfile/i18n/zh-CN.json; settings_language_zh_cn @ entry/src/main/resources/base/element/string.json
+  - '语言' | 'Language' | candidates: settings.section.language @ entry/src/main/resources/rawfile/i18n/zh-CN.json; settings_language_title @ entry/src/main/resources/base/element/string.json
+inline_literal:
+  (none)
+b_rewrite_required:
+  - '本机安全档案保存失败' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '本机档案已解锁' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '本机使用档案' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '本机使用档案锁定失败' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '本机使用档案已锁定' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '本机已有使用档案，请直接解锁' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '创建本机档案' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '档案已创建，但解锁状态未保存，请重新解锁' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '该档案仅保存在本机，不是云端账号，不提供家庭成员身份或设备控制授权。' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '解锁本机档案' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+  - '锁定本机档案' | status=OBSOLETE_LEGACY | no matched current key; current en-US locale has 0 machine/file(s) occurrence(s) (profile terminology used)
+c_recheck:
+  - '版本' | RECHECK_REQUIRED
+  - '版本 1.1.0' | RECHECK_REQUIRED
+  - '关于 YaoCore' | RECHECK_REQUIRED
+  - '检测到开发协议模拟器，拒绝其控制响应' | SAFETY_RECHECK_REQUIRED
+  - '检测到开发协议模拟器，正式版禁止将其绑定为真实网关' | SAFETY_RECHECK_REQUIRED
+  - '旧版本机档案使用不安全的可逆存储，已失效并清除，请重新创建。' | RECHECK_REQUIRED
+d_excluded:
+  - 'Gree/格力'
+  - 'Haier/海尔'
+  - 'Midea/美的'
+csv_status: UP_TO_DATE

@@ -1,0 +1,19 @@
+{
+  "metric": "ack.total_ms",
+  "resultClass": "MOCK_ONLY",
+  "environment": "linux localhost Python stdlib simulator (HTTP)",
+  "profile": "P-HMAC / Light_01 / SET_BRIGHTNESS",
+  "samples": 100,
+  "warmup": 5,
+  "failures": [],
+  "p50Ms": 0.553,
+  "p95Ms": 0.609,
+  "maxMs": 0.65,
+  "minMs": 0.484,
+  "limitations": [
+    "not product ArkTS client code",
+    "excludes response signature verification and state application",
+    "excludes BLE, real LAN, TLS pinning and UI frames",
+    "must not be used as NFR 4.3 acceptance evidence"
+  ]
+}
