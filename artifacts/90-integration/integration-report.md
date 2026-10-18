@@ -947,3 +947,95 @@ RELEASE-001 的 Release Verdict 为 **`NOT_READY`**（不满足发布授权条�
 2. 合并未改写任何已评审提交；合并提交新增的只有两份 release 准备交付物。
 3. 本节只证明 1 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §19.2 的三项检查；不构成独立评审、release Gate PASS、发布授权、部署授权、签名授权或用户验收。发布相关裁定仍归 Orchestrator / 用户。
 4. 合并后证据更新与报告提交见 `state/reports/wp-113-merge-report.md`；handoff 为 `state/handoffs/wp-113-merge-release-plan.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 release 准备合并证据`。
+
+---
+
+## 20. Release 文档合并记录（2026-10-18，wp-120）
+
+> 本节由 `repository-manager` 在合并任务 `wp-120-merge-release-notes` 中追加，记录 `task/wp-118-release-consistency` → `feat/yaocore-app` 的本地合并与合并后复验。目的是把 v1.0.0 CHANGELOG、Release Notes、RELEASE-001 修正、发布检查单与复审/复评报告纳入集成分支，并留下可追溯的合并证据。**本节不构成发布授权、部署授权、签名授权、tag 授权、用户验收或 release Gate PASS。**
+
+### 20.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-118-release-consistency` @ `1e955a8d7f4fa8890c195f7097e7ee215104fe7e`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `b716207eee7ac07fe3b08edba9f9e193cb38f2c8`（合并前 = handoff `base_commit`；`docs(repo): 记录 release 准备合并证据`） |
+| 合并基 | `b716207`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `21c601d5234b1e313c811fb395140a09b5dd06d7`（`chore(merge): 合并 release 发布说明与修正`） |
+| 父提交 | `b716207`（目标，第一父）+ `1e955a8`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 21c601d 1e955a8` 退出 0 |
+| 合并范围 | 7 个路径（+1258 / −112）：`CHANGELOG.md`（+128/−0）、`README.md`（+29/−3）、`artifacts/70-review/t26-release-review.md`（+402/−0）、`artifacts/70-review/t26-release-rereview.md`（+276/−0）、`artifacts/85-release/release-plan.md`（+150/−62）、`docs/release-checklist.md`（+52/−47）、`docs/release-notes-v1.0.0.md`（+221/−0）；全部落在 handoff `writes` 内；未改 `input/`、产品代码、测试断言、工具、契约或构建配置 |
+
+源提交（`b716207..1e955a8`，6 个，与任务 handoff 一致）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `63d2235` | docs(release): 添加 CHANGELOG 与 v1.0.0 发布说明 |
+| 2 | `f1fbe0d` | docs(review): Release 准备资产独立复审 |
+| 3 | `972f177` | docs(release): 修正发布计划与检查单（F-01..F-06） |
+| 4 | `19df893` | docs(release): 同步发布说明 B-09 与身份分析 |
+| 5 | `3501f5e` | docs(release): 统一发布文档交叉引用 |
+| 6 | `1e955a8` | docs(review): Release 修正聚焦复评 |
+
+门禁证据：`artifacts/70-review/t26-release-rereview.md`（来源分支 blob sha256 `f4ed5a80a74df61c611bfab5a77407d773cf2fd08f85ca4fed59c2e8dc9cc476` = handoff `gate_evidence_path_sha256`；合并后文件字节一致）。该文件是 `3501f5e` 的聚焦复评报告，**不是发布批准**；本节不据此宣告 release Gate PASS。
+
+### 20.2 合并后验证矩阵（在 `21c601d` 上实际执行，早于任何证据改动）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | Host 测试 | `PYTHONDONTWRITEBYTECODE=1 entry/src/test/run-host-tests.sh` | **697/697 PASS**：`1..697`、`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；`duration_ms 3516.551613` | 0 |
+| 2 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | **`hard checks: ALL PASS`**：66 条 `[PASS]` / 0 条 `[FAIL]`；14 条既有 frozen-input `FINDING`（非阻塞） | 0 |
+| 3 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | **PASS**：`files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0` | 0 |
+
+补充：三项检查均在合并提交的干净工作树上运行；命令统一设置 `PYTHONDONTWRITEBYTECODE=1`；运行后 `git status --porcelain` 无输出，`__pycache__` 已在证据提交前清理；完整日志暂存于 `/tmp/opencode/wp120/`（未提交）。构建 / lint 未在本次合并中重跑，仍引用 TEST-002 @ `e74a181` 的 `BUILD SUCCESSFUL` 与 `codelinter 0 error / 25 warning`。合并未改变产品代码/构建配置：`git diff --stat b716207..21c601d -- entry/src tools contracts input build-profile.json5 AppScope/app.json5 oh-package.json5 entry/oh-package.json5 hvigorfile.ts` 为空。
+
+### 20.3 交付物存在性与内容检查
+
+| 文件 | 合并后状态 | sha256（合并后） | 说明 |
+|---|---|---|---|
+| `CHANGELOG.md` | 128 行；新建 | `d96d6df572f8b7d1cf3fc8414aae3d9f45abf12a3eb3c13f13a63d6a042a299d` | `Status: DRAFT`；`[1.0.0]` 明示为发布准备基线，不是发布记录 |
+| `docs/release-notes-v1.0.0.md` | 221 行；新建 | `4fdf237325dc6f336d9fad3f5548cedc3b71eafdfd30fa14e2ec8cb585b0467a` | `DRAFT / NOT_READY`；含 §1.1 公开旧版本身份/版本/许可证待决 |
+| `artifacts/85-release/release-plan.md` | 562 行 | `ea38c7ccf1fe3642b255a67103fc4e172fea6c977964795fbe65d91103b93dfc` | RELEASE-001；`Release Verdict: NOT_READY`；F-01..F-06 修订完成 |
+| `docs/release-checklist.md` | 312 行 | `b8a36d5366ffb890746575d019a616191232d3a0ca2e7d3333d1e5260dca004f` | RELEASE-CHECKLIST-001 v1.1；`Current verdict: NOT_READY` |
+
+占位扫描：`TODO` 仅出现在“许可证仍为 TODO / README 标 TODO”的**事实描述**（B-01），不是上述交付物的未完成占位；未发现 `TBD`、`FIXME`、`待填写` 或 Lorem 占位。越界表述扫描：未发现肯定式“已发布 / 已推送 / 已签名 / 已上架 / 生产就绪 / 可安装 / 可发布”等声明；命中均为否定、禁止、条件或状态要求语境（如 `## [Unreleased]`、“没有正式发布渠道”、“正式发布前必须…”）。`docs/` 受 `.gitignore` 忽略，但两个 `docs/release-*` 文件仍为已跟踪文件（`git ls-files` 可验证）。
+
+### 20.4 复评 PASS 的范围
+
+`artifacts/70-review/t26-release-rereview.md`（T26-RELEASE-REREVIEW，Producer `agent:quality-reviewer`）的 `PASS` 只覆盖 **`3501f5e` 的发布准备文档修正**：
+
+- F-01..F-06 核心闭环（公开旧版本事实、A/B/C 选项、B-07 状态、证据基线 vs 最终 revision、B-09、1.2.4/1.10.3、P1/P2 阈值提案）；
+- B-01..B-09 在 RELEASE-001、检查单、release notes 中编号连续、状态一致；5 个文档 53 条相对链接 0 broken；无越界肯定声明；
+- 回归复验 host 697/697、layering 221/0/6、crosscheck 66/66 hard ALL PASS、仿真器 20/20、fixture 27/27、i18n 0 blocking/0 missing、triage 615 行一致；
+- 非阻塞观察 O-01..O-04（README“开源”措辞、`972f177` pin、§4.1 候选措辞、§11.5 扫描措辞）保留待后续维护轮。
+
+**范围限制**：复评未重新 clean build、未重跑 codelinter、未做设备/签名/远端/用户验收，也未做法律级许可证审计。源 tip `1e955a8` 相对 `3501f5e` 只新增该复评报告本身；被审文档字节未变（`git diff --quiet 3501f5e 1e955a8 -- CHANGELOG.md README.md docs/ artifacts/85-release/` 退出 0）。该 `PASS` **不是 release 批准**；`NOT_READY` 未被改变。
+
+### 20.5 B-01..B-09 与发布未授权边界
+
+合并时点 **B-01..B-09 全部未关闭**（B-07 仅“草案已产出 @ `63d2235`，待评审/签核”的部分进展）：
+
+| # | 阻塞项 | 当前状态 |
+|---|---|---|
+| B-01 | 项目级许可证未定（公开旧版本 Apache-2.0 + NOTICE 关系未裁定） | 待用户 A/B/C 决定 |
+| B-02 | 无签名配置，未签名 HAP 不可安装 | 阻塞 |
+| B-03 | 设备/用户验收未执行（U-01..U-12、BLK-01..08） | 阻塞 |
+| B-04 | GAP-AC-01..03 未决 | 待用户接受或 bounded fix |
+| B-05 | 远端/发布通道未授权 | 阻塞 |
+| B-06 | 发布标识/版本/构建模式未冻结 | 待 A/B/C 决定 |
+| B-07 | CHANGELOG / Release Notes 已产出草案 | 部分进展；待评审/签核，不得写成已定稿 |
+| B-08 | 残余风险未逐项书面确认 | 阻塞 |
+| B-09 | 构建硬化 / API 14 运行时兼容未决 | 阻塞 |
+
+未授权边界（本任务严格遵守）：
+
+1. **仅本地合并**：未 fetch、未 pull、未 push、未创建 PR/MR、未创建或删除 tag、未签名、未安装、未执行任何应用市场或远端发布写操作。
+2. 未切换分支；`task/wp-118-release-consistency` 分支保留，未删除、未移动；未改动任何已评审提交。
+3. 合并与验证结果只证明 6 个源提交已以 `--no-ff` 进入 `feat/yaocore-app`，并在合并结果上重跑三项检查；**不构成 release Gate PASS、独立评审、发布授权、部署授权、签名授权、tag 授权或用户验收**。
+4. Release 仍为 `NOT_READY`；最终 release revision/tag 未冻结。发布相关裁定归 Orchestrator / 用户。
+
+### 20.6 证据与工作树声明
+
+1. 合并后证据更新与报告提交见 `state/reports/wp-120-merge-report.md`；handoff 为 `state/handoffs/wp-120-merge-release-notes.json`。证据提交为仅含两份 deliverable 的 `docs(repo): 记录 release 文档合并证据`。
+2. 本节只记录合并事实与实测证据；不改写 §1–§19 的历史结论。
