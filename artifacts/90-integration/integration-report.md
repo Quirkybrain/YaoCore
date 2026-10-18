@@ -491,3 +491,79 @@
 1. 本记录只证明上述 4 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §12.2 的七项检查；不构成 Stage Gate、Component Quality、设备验收或 release PASS。
 2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-096-i18n-triage` 仍保留。
 3. 合并后证据更新与报告提交见 `state/reports/wp-100-merge-report.md`；handoff 为 `state/handoffs/wp-100-merge-i18n.json`。
+
+---
+
+## 13. 检查器 RR 修复合并记录（2026-10-18，wp-103）
+
+> 本节由 `repository-manager` 在合并任务 `wp-103-merge-checker` 中追加，记录 `task/wp-101-checker-rr` → `feat/yaocore-app` 的本地合并与合并后验证。§1–§12 的历史结论仍针对各自标注的 revision，本节不回溯改写。本节只关闭 T-25 工具侧 RR-01/RR-02/RR-04 的合并；不关闭 RR-03、DES 状态同步或任何 Stage Gate。
+
+### 13.1 分支、合并与源提交
+
+| 项 | 值 |
+|---|---|
+| 源分支 | `task/wp-101-checker-rr` @ `eb73a2c246d4833c3d8ab24772fc6827589dfba5`（= handoff `source_commit`） |
+| 目标分支 | `feat/yaocore-app` @ `b7e1e24c7a18c135b971359232e368c10d62b763`（合并前 = handoff `base_commit`） |
+| 合并基 | `b7e1e24`（目标 tip 为来源 tip 的直接祖先，无分叉） |
+| 合并策略 | `git merge --no-ff`（`ort`，无冲突；未手工编辑冲突文件） |
+| 合并提交 | `6446a977d74455b06fac2ad0a72772296839a317`（`chore(merge): 合并检查器 RR 修复`） |
+| 父提交 | `b7e1e24`（目标，第一父）+ `eb73a2c`（来源，第二父） |
+| 结果树 | 与来源 tip 一致：`git diff --quiet 6446a97 eb73a2c` 退出 0 |
+| 合并范围 | 17 个路径（+505 / −11）：3 M + 14 A；全部落在 handoff `writes` 内；未改 `input/`、产品代码、构建配置或状态文件 |
+
+合并路径：
+
+| 状态 | 路径 |
+|---|---|
+| M | `tools/contract/check_layering.py` |
+| M | `tools/contract/layering_allowlist.json` |
+| M | `tools/contract/test_check_layering.py` |
+| A | `tools/contract/fixtures/layering/export-star-bad/**`（3 文件） |
+| A | `tools/contract/fixtures/layering/export-type-star-ok/**`（3 文件） |
+| A | `tools/contract/fixtures/layering/export-named-value-bad/**`（3 文件） |
+| A | `tools/contract/fixtures/layering/export-named-type-ok/**`（3 文件） |
+| A | `artifacts/50-implementation/t25-checker-rr.md` |
+| A | `artifacts/70-review/t25-checker-review.md` |
+
+源提交（`b7e1e24..eb73a2c`，2 个）：
+
+| # | Commit | Subject |
+|---|---|---|
+| 1 | `16b0f7c99a06ee773772df779ed5963373087617` | fix(contract): 补齐 export* 检查与诊断行号 |
+| 2 | `eb73a2c246d4833c3d8ab24772fc6827589dfba5` | docs(review): 检查器 RR 修复独立复审 |
+
+门禁证据：`artifacts/70-review/t25-checker-review.md`（Producer `agent:quality-reviewer`，Verdict **PASS（仅限 `16b0f7c` 与报告 §1 声明范围）**；blob sha256 `0c742cdb9d9b386e67ba797ec93514cf162b9ac2feb7d15d829efb2769abbadf` = handoff `gate_evidence_path_sha256`）。提交 `eb73a2c` 仅把该复审报告写入分支，不改变 `16b0f7c` 的被审内容。
+
+### 13.2 合并后验证矩阵（在 `6446a97` 上实际执行）
+
+| # | 检查 | 命令 | 实测结果 | 退出码 |
+|---|---|---|---|---|
+| 1 | 分层夹具自测 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py` | `Ran 27 tests in 2.428s`；`OK`（27/27；原 22 + 新增 5） | 0 |
+| 2 | 分层检查 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | `files=221 violations=0 exceptions_used=6 pending=0 pending_used=0 port_exceptions_used=0 port_pending=0 port_pending_used=0`；PASS | 0 |
+| 3 | Host 测试 | `entry/src/test/run-host-tests.sh` | `1..697`；`# tests 697 / # pass 697 / # fail 0 / # cancelled 0 / # skipped 0 / # todo 0`；≈3166.9 ms | 0 |
+| 4 | 协议资产交叉校验 | `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | `hard checks: ALL PASS`；14 条既有 frozen-input findings（非阻塞） | 0 |
+| 5 | i18n strict-ui | `PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui` | CHK-01..09 PASS；`blockingFailures=0 warnings=73 missingKeys=0 hardcoded=16` | 0 |
+| 6 | 构建 | `hvigorw clean assembleHap --no-daemon` | `BUILD SUCCESSFUL in 14 s 651 ms`；35 tasks（34 executed / 1 up-to-date）；unsigned HAP；仅既有 ArkTS 警告 | 0 |
+
+补充：六项命令均在合并提交的干净工作树上运行；Python 命令设置 `PYTHONDONTWRITEBYTECODE=1`；运行后清理 `__pycache__`，证据提交前 `git status --porcelain` 仅显示两份 deliverable（ignored 构建产物除外）。
+
+### 13.3 残余与边界
+
+| 项 | 状态 | 说明 |
+|---|---|---|
+| `V-01` `export * as ns` 无永久 fixture | **OPEN（Low，测试覆盖）** | 实现已覆盖且临时探针验证 exit 1；建议后续 bounded 任务补 fixture |
+| `V-02` 无空白 `export{…}from` 旁路 | **OPEN（Info，既有解析边界）** | 当前仓库无使用；长期可改 tokenizer |
+| `V-03` 内联 `export { type A }` / `import { type A }` 保守按值 | **已知保守（Info）** | 仓库当前无使用；可能误报 |
+| `V-04` 值再导出环文案仍写 “type-only import cycle” | **Info（诊断文案）** | path/line/spec 正确，不影响退出码 |
+| `V-05` `export type *` 仅解析器级正例 | **未验证（Info）** | 未经 ArkTS 编译器验证；当前仓库未使用 |
+| `V-06` `updated_by`/policy 无自动断言 | **Info（元数据测试）** | 本次手工验证；schema 与退出码语义未变 |
+| `RR-03` 实现报告历史章节一致性 | **OPEN（文档，非阻塞）** | 仍待后续文档同步任务统一 |
+| DES 文本状态同步 | **待同步（非阻塞）** | DES-A/DES-B 的 checker 债务状态未随本任务改写 |
+| `PORT-LOC-01`（`ClockPort`/`IdPort`） | **OPEN（已登记）** | 非本次范围；live `port_location_exceptions` 仍为 1 条 |
+| 设备/模拟器 ohosTest、真实 BLE/LAN/TLS/云/视觉/A11y/fps | **BLOCKED / NOT RUN** | 无 `hdc` target、无模拟器、无签名；不得用 host/build 结果外推为验收 PASS |
+
+### 13.4 边界声明
+
+1. 本记录只证明上述 2 个源提交已以 `--no-ff` 合并入 `feat/yaocore-app`，并在合并结果上重新执行了 §13.2 的六项检查；不构成 Stage Gate、Component Quality、设备验收或 release PASS。
+2. 合并与验证均在本地完成：未 push、未 fetch/pull、未 rebase、未改写任何已评审提交；未切换分支；`task/wp-101-checker-rr` 仍保留。
+3. 合并后证据更新与报告提交见 `state/reports/wp-103-merge-report.md`；handoff 为 `state/handoffs/wp-103-merge-checker.json`。
