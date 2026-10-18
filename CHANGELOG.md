@@ -4,18 +4,21 @@ YaoCore（爻构）的版本变更记录。格式参考 [Keep a Changelog](https
 
 - **Producer**: agent:technical-writer
 - **Status**: DRAFT（发布准备文档；不构成发布记录、发布授权或验收结论）
-- **Applies to**: `feat/yaocore-app` 的 v1.0.0 发布准备基线（RELEASE-001 @ `6cd9a88`；产品代码内容与 TEST-002 @ `e74a181` 一致）
+- **Applies to**: YaoCore v1.0.0 发布准备文档基线（RELEASE-001 @ `972f177`；代码证据基线 TEST-002 @ `e74a181`；产品代码/构建配置自 `e74a181` 至 `972f177` 无差异；**最终 release revision/tag 未冻结**）
+- **Document revision**: 2026-10-18 wp-117（同步 B-09、公开旧版本与身份/许可证待决定说明）
 - **Last updated**: 2026-10-18
 
 > ## 发布状态：未发布
 >
-> 本文件中的 `[1.0.0]` 条目是 **v1.0.0 发布准备基线**，不是对外发布版本。当前 Release Verdict 为 **`NOT_READY`**（B-01..B-08 未全部关闭）。
+> 本文件中的 `[1.0.0]` 条目是 **v1.0.0 发布准备基线**，不是对外发布版本。当前 Release Verdict 为 **`NOT_READY`**（B-01..B-09 未全部关闭）。
 >
 > 对外发布前至少需要：
 >
 > 1. 项目所有者完成**发布授权**（发布范围、通道、远端与 tag 策略）；
 > 2. 完成**签名**并产出可安装的签名 HAP（当前 `signingConfigs: []`，产物未签名）；
-> 3. 完成**设备/用户验收**（ACCEPT-001 U-01..U-12、维护计划 §4 BLK-01..08）。
+> 3. 完成**设备/用户验收**（ACCEPT-001 U-01..U-12、维护计划 §4 BLK-01..08）；
+> 4. 在项目所有者决定公开旧版本（`origin/main` @ `7d6f4c9`，`io.github.quirkybrain.yaocore`、versionCode `1000000`、Apache-2.0 + `NOTICE`）的身份/版本/许可证关系（沿用旧身份 / 新应用身份 / 迁移方案）之前，不得声称这是首个公开版本、当前无公开旧版本或可升级；
+> 5. 完成 **B-09** 构建硬化/兼容性决策：API 14 运行时验证或书面风险接受，并记录混淆/裁剪与符号化/回归方案。
 >
 > 许可证仍为 **TODO**；在许可证确定前，请勿假定本仓库内容可再分发。
 
@@ -27,7 +30,21 @@ YaoCore（爻构）的版本变更记录。格式参考 [Keep a Changelog](https
 
 > 该日期是 **release 准备基线日期**，不是发布日期。版本号 `1.0.0` / `versionCode 1000000` 仍待项目所有者冻结；包标识 `com.example.yaocore` / `vendor example` 同样待确认。
 >
-> 代码级证据基线：TEST-002 @ `e74a181`（11 项矩阵 exit 0）；RELEASE-001 在 `6cd9a88` 复跑关键矩阵。设备/真实环境与用户验收未执行。
+> 代码级证据基线：TEST-002 @ `e74a181`（11 项矩阵 exit 0）；RELEASE-001 在 `6cd9a88` 复跑关键矩阵，修订版见 `972f177`。设备/真实环境与用户验收未执行。
+>
+> **公开旧版本**：`origin/main` @ `7d6f4c9` 已有公开 YaoCore 1.0.0（`io.github.quirkybrain.yaocore`、versionCode `1000000`、Apache-2.0 + `NOTICE`）。本条目描述的是当前工作树的准备基线，**不代表对旧公开 1.0.0 的升级、覆盖或独立应用身份**；身份/版本/许可证待决定。
+
+### Upgrade / Identity（pending decision）
+
+> 本节只记录待决事实，不构成版本、身份或许可证决策。
+
+- **公开旧版本**：`origin/main` @ `7d6f4c9` 为公开 YaoCore 1.0.0（`io.github.quirkybrain.yaocore`、`vendor YaoCore`、versionCode `1000000`、Apache-2.0 + `NOTICE`，`Copyright 2026 Zhang HaoXuan`）。
+- **当前工作树**：`com.example.yaocore` / `example`、versionCode `1000000`、`1.0.0`，无项目级 `LICENSE`/`NOTICE`；本地 `main` 与 `origin/main` 历史不相关。
+- **待选路径（A/B/C，均未选择）**：
+  - **A 沿用旧公开身份**：旧公开用户可升级；`versionCode` 必须 **> 1000000**；需继承/落实 Apache-2.0 与 `NOTICE`，并重新构建、签名、验证覆盖升级与 AGC/Profile 同步。
+  - **B 新应用身份**：旧公开用户无法升级；需明确“独立应用”定位并由项目所有者确定许可证；若存在衍生关系，Apache-2.0 义务仍需评估。
+  - **C 混合/迁移方案**：需要数据迁移、兼容验证、商店策略与支持成本；方案明确前不可执行。
+- **影响**：在决定前，本 CHANGELOG 不声明升级兼容、不声明可覆盖旧版、不声明独立身份；安装/升级说明按分支表述。详见 [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) §1.1 与 RELEASE-001 §4.4。
 
 ### Added（新增）
 
@@ -64,6 +81,9 @@ YaoCore（爻构）的版本变更记录。格式参考 [Keep a Changelog](https
 | **设备/真实环境未验证** | 无真机、模拟器实例与签名；真实 BLE、LAN、TLS pin、华为云 IoTDA、视觉/动效/无障碍与 60/120fps 均未执行（BLK-01..08）。ACCEPT-001 的 U-01..U-12 未执行，**用户验收未完成**。 |
 | **ACK p95 仅 MOCK_ONLY** | localhost 测得 p50 0.553 ms / p95 0.609 ms / max 0.650 ms（N=100，warmup=5），随环境波动；不包含 ArkTS 验签、状态应用、真实 LAN/TLS/BLE/UI。**不是 NFR 4.3 验收数据**。 |
 | **未签名构建** | `signingConfigs: []`；当前 HAP 未签名、不可安装、不可发布。默认 `assembleHap` 为 `buildMode=debug`；发布候选需以 `buildMode=release` 重建并签名。 |
+| **B-09 构建硬化/API 14 兼容** | `RdbStoreAdapter` 使用 API 18 的 `ColumnType/TEXT/BLOB`，而最低兼容为 API 14；API 14 运行时**未验证**。混淆/裁剪未启用且未决定；符号化/崩溃定位与回归方案未记录。**不得仅以“构建成功”关闭**；需 API 14 验证或书面风险接受，并记录决策与回归结果。 |
+| **公开旧版本与身份/许可证待决定（B-01/B-05/B-06）** | `origin/main` @ `7d6f4c9` 已有公开 YaoCore 1.0.0（`io.github.quirkybrain.yaocore`、versionCode `1000000`、Apache-2.0 + `NOTICE`）；当前树为 `com.example.yaocore` / `1000000`，且无 `LICENSE`/`NOTICE`。沿用旧身份（A）、新应用身份（B）或迁移方案（C）以及许可证均待用户决定；B 路径下旧公开用户无法升级，A 路径下 `versionCode` 必须 **> 1000000**。 |
+| **回滚阈值未批准** | RELEASE-001 §8.1.1 的 P1/P2 量化阈值仅为提案，**未经用户批准**；批准前 P1/P2 仍按定性条件判断，且不构成回滚授权。 |
 | **GAP-AC-01..03** | `FR-HOME-001` 未显示 LAN IP；多家庭切换为跳转家庭管理页而非首页弹窗；`FR-ROOM-001` 房间图标未接线/展示。均为 Low，待用户书面接受为 v1 简化或派发 bounded fix。 |
 | **NFR partial** | NFR 4.1 / 4.2 / 4.3 均为 partial；4.3.3 的 60/120fps 无测量证据。P-HMAC 不提供载荷机密性；AES-256-GCM 载荷信封归档为 `EXT-GCM-001`，v1 不实现。 |
 | **TLS 依赖固件 v2.1** | 真实 LAN TLS / SPKI pin 需网关固件 v2.1 与 LAN TLS 档案；当前仅在 host/mock 验证，真实 TLS 未验证。 |
@@ -72,8 +92,8 @@ YaoCore（爻构）的版本变更记录。格式参考 [Keep a Changelog](https
 | **部分交互 DEFERRED** | 扫码/相机二维码、设备删除/改名、场景编辑、通知系统权限状态等未在 v1 UI 开放或仅保留诚实提示。 |
 | **测试 lint / 覆盖率** | `code-linter.json5` 忽略 `src/test/**`、`src/ohosTest/**`；无行/分支覆盖率；25 条 lint warning 为非阻断性能建议。 |
 | **构建可复现性** | 同一 release 代码的两次构建大小相同但 SHA-256 不同（归档时间戳/打包元数据）；不得承诺字节级可复现，证据须绑定 commit + 工具链 + 命令 + SHA-256。 |
-| **包标识/版本未冻结** | `bundleName=com.example.yaocore`、`vendor=example` 待项目所有者确认；`versionName 1.0.0` / `versionCode 1000000` 未冻结。 |
-| **许可证 TODO** | 仓库无项目级 `LICENSE`；在许可证确定前不得假定可再分发，也不得公开分发产物。 |
+| **包标识/版本未冻结** | 当前树 `bundleName=com.example.yaocore`、`vendor=example`、`versionName 1.0.0` / `versionCode 1000000` 未冻结；公开旧版本已使用 `io.github.quirkybrain.yaocore` / `1000000`。若沿用旧身份，`versionCode` 必须递增；若采用新身份，旧公开用户无法升级。 |
+| **许可证 TODO** | 当前树无项目级 `LICENSE`/`NOTICE`；公开旧版本为 Apache-2.0 + `NOTICE`。继承旧许可证、为新应用确定独立许可证，或采用迁移方案，均待项目所有者决定；在决定前不得假定可再分发，也不得公开分发产物。 |
 
 ### Verification（验证，代码级）
 
@@ -102,6 +122,7 @@ YaoCore（爻构）的版本变更记录。格式参考 [Keep a Changelog](https
 - 用户发布说明（草案）：[`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md)
 - 发布准备计划：[`artifacts/85-release/release-plan.md`](artifacts/85-release/release-plan.md)
 - 发布检查单：[`docs/release-checklist.md`](docs/release-checklist.md)
+- 发布准备独立复审：[`artifacts/70-review/t26-release-review.md`](artifacts/70-review/t26-release-review.md)
 - 项目 README：[`README.md`](README.md)
 
 *本文件为发布准备文档，不构成发布授权、签名授权、验收结论或法律意见。*
