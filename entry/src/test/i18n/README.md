@@ -1,7 +1,7 @@
 # i18n 资源、I18nService 与检查器（T-10）
 
 - **Producer**: agent:implementation-engineer
-- **Task**: T-10 / `wp-031-i18n`；评审修复 `wp-033-fix-t10`
+- **Task**: T-10 / `wp-031-i18n`；评审修复 `wp-033-fix-t10`；证据化 triage `wp-096-i18n-triage`
 - **Contract**: DES-B §7；`artifacts/20-architecture/i18n-resource-design.md`（I18N-DESIGN-001）；CB §4.4；PROJECT-CONSTRAINTS §5；`docs/internationalization.md`
 - **状态**: 产品代码/资源/host 逻辑测试/检查器完成；T-10 评审修复已落地；组件 `UNVERIFIED`（待独立复审与 CQG-T10）。设备侧执行 `BLOCKED`。
 
@@ -75,24 +75,37 @@ python3 entry/src/test/i18n/check_i18n.py \
 - 正负夹具：`entry/src/test/i18n/fixtures/good|bad/`；host 测试断言 good=0、bad=1 且 CHK-01/02/03/04/06/07/08/09 阻断；
   bad 夹具同时验证 `string.json` 的 `TODO` 与未闭合括号会被 CHK-04 命中。`fixtures/short-ui/` 专门验证
   `--strict-ui` 将短英文 UI 从 warning 提升为 blocking（默认 exit 0，strict exit 1）。
-- 当前生产树：0 阻断；CHK-07 不再对状态常量（如 `'LOADING'`/`'RECONFIGURE'`）误报，当前短英文 UI 告警为 0；
-  `--strict-ui` 用于门禁时仍会阻断未来真实短文案回归。CHK-05 的 0 告警依赖 keyPrefixes 与动态前缀，
-  不等于“无未使用键”。
+- 当前生产树（2026-10-18 实测）：`blockingFailures=0` / `missingKeys=0`；总 warnings=73（其中 CHK-07 16 条）。
+  `--strict-ui` 用于门禁时仍会阻断未来真实短文案回归。CHK-05 未使用键告警：**无 allowlist 57 条**；
+  **带 `allowlist.json` 39 条**（总 warnings=55）。该计数是当前基线，会随 key 引用变化，不等于
+  “无未使用键”；`--strict-ui` 下 CHK-05 仍为 warning，不阻断门禁。
 
 > **路径偏差（正式例外 T10-EX-01）**：DES-B §7.4.4 / delivery-plan 指定 `tools/i18n/check_i18n.py`、
 > `tools/i18n/allowlist.json`、`tools/i18n/legacy_migration.csv`、`reports/i18n/*`；`wp-031-i18n` handoff 的
 > 写范围未授权 `tools/`，因此检查器/allowlist/迁移表落在 `entry/src/test/i18n/`、报告落在
 > `entry/src/test/evidence/`。该偏差不影响 CHK 语义；后续工具任务迁移到契约路径，命令与报告 schema 不变。
+> `wp-096-i18n-triage` 已将 triage 工具落到契约目录 `tools/i18n/triage_legacy.py`；登记表仍留在
+> `entry/src/test/i18n/legacy-migration.csv`，`T10-EX-01` 对检查器/allowlist/迁移表继续有效。
 
-## 5. 迁移边界
+## 5. 迁移边界与登记表 triage
 
 - 旧 `input/existing/original_app/service/I18nService.ets` 的 615 条“中文即键”字典**不进入产品代码**；
   逐条登记表见 `legacy-migration.csv`（615 条），边界与批次见 `migration-boundary.md`。
-- T-10 只落服务/错误/通用文案（10 条旧文案已重键）；A 类共 606 条，其中 **596 条 `PENDING_REVIEW`**
-  待 T-17/T-18 逐页面/组件迁入；3 条品牌名 D 类排除，6 条旧版/模拟器启发式 C 类待复核。
+- **证据化 triage（wp-096）**：`tools/i18n/triage_legacy.py` 对 615 行逐条重算，结果：
+  - A 类 606：`ACCEPTED` 10（仅 T-10 人工复核）、`MIGRATED` 46（精确唯一当前键，机器证据）、
+    `PENDING_REVIEW` 6（多键歧义，需人工择一）、`INLINE_LITERAL` 0、`OBSOLETE_LEGACY` 544
+    （无精确当前引用；不等于业务废弃）；
+  - C 类 6：`DEPRECATED (heuristic)`，4 条 `RECHECK_REQUIRED` + 2 条 `SAFETY_RECHECK_REQUIRED`；
+  - D 类 3：`EXCLUDED (brand data)`。
+  - `MIGRATED` 不等于 `ACCEPTED`；本次 triage **未新增**任何 `ACCEPTED`。
 - B 类（重译）是 A 类的英文子审查，登记于 `重译审查` 列：11 条已识别 `B_REWRITE_REQUIRED`（`档案` →
-  `file(s)`/`machine`），585 条 `B_PENDING`；10 条 `ACCEPTED` 已复核。C 类模拟器/DEV-ONLY 两条标记
-  `SAFETY_RECHECK_REQUIRED`，不得按关键词删除。
+  `file(s)`/`machine`），585 条 `B_PENDING`；10 条 `B_REVIEWED_ACCEPTED`。这 11 条旧英文仍含
+  machine/file(s) 术语，当前 en-US 已不使用该术语（使用 `profile`）；triage 未改其 `审查结论` 为
+  `ACCEPTED`。B 行 `备注` 保留 `07895fd` 基线中的原备注，并在其后追加机器证据。C 类模拟器/DEV-ONLY
+  两条标记 `SAFETY_RECHECK_REQUIRED`，不得按关键词删除。
+- 工具命令：`python3 tools/i18n/triage_legacy.py --check`（只读重算；CSV 漂移、`旧中文/旧英文` 基线与
+  615 行/唯一性不变量、C/D `复核标记` 非法值均非零退出）与 `--summary`（状态计数 +
+  `PENDING_REVIEW`/`INLINE_LITERAL`/B 明细）；工具默认写入登记表。
 - 迁移完成判据：CHK-01..09 全通过、零硬编码、旧字典无构建引用、术语符合 CB 术语表。
 
 ## 6. 测试与设备限制
