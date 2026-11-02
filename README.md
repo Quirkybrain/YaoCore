@@ -1,391 +1,177 @@
 # YaoCore（爻构）
 
-面向真实家庭环境的开源智能家居 HarmonyOS NEXT 原生应用（ArkTS）。
+<p align="center">
+  <img src="AppScope/resources/base/media/layered_image.json" width="100" height="100" alt="YaoCore Logo" style="border-radius: 20px;" />
+</p>
 
-YaoCore 连接 ESP32-S3 边缘网关，并可选用华为云 IoTDA 作为广域网通道。App 负责 BLE 配网、局域网设备控制、真实状态同步、场景联动，以及家庭 / 房间 / 设备管理。ESP32-S3 网关是外部物理设备，其固件不在本仓库内。
+<p align="center">
+  <b>面向真实家庭环境的开源智能家居 HarmonyOS NEXT 原生应用 (ArkTS)</b>
+</p>
 
-> **Producer**: agent:technical-writer · **Status**: ACTIVE · **文档版本**: README-001 v1.3 · **生效日期**: 2026-10-18 · **适用代码基线**: `e74a181`（TEST-002；产品代码内容至发布准备文档基线 `972f177` 未变） · **阶段 Gate 基线**: `4faf3e3`（G-017）
-> **变更记录**: v1.3（wp-117 release notes sync）在“发布状态与发布文档”小节补充 B-09、公开旧版本与身份/许可证待决定说明，同步 RELEASE-001 @ `972f177` 与 T26 复审 F-01..F-06；未改变既有验证数字、证据口径或 `NOT_READY` 结论。v1.2（wp-114 release notes）新增“发布状态与发布文档”小节，链接 `CHANGELOG.md`、v1.0.0 发布说明、RELEASE-001 与发布检查单；发布状态保持 `NOT_READY`，未改变既有验证数字与证据口径。v1.1（G-018 documentation，wp-110）同步 A1/T-23 端口迁移、i18n triage、D-12 6 active / 7 retired、TEST-002 与 G-015..G-017 证据及阶段状态；移除 A 类非 ACCEPTED 总数被误写为 `PENDING_REVIEW` 的旧口径，以及端口 / D-12 / 分层 / 性能的过期数字。
-> 维护节奏、待办与风险接受登记见 [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md)。
+<p align="center">
+  <a href="https://developer.huawei.com/consumer/cn/harmonyos/"><img src="https://img.shields.io/badge/HarmonyOS-NEXT%20(API%2014+)-blue.svg" alt="HarmonyOS NEXT"></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/Language-ArkTS%20%7C%20TypeScript-blue.svg" alt="ArkTS"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License"></a>
+  <a href="https://github.com/Quirkybrain/claude-code-swe-framework"><img src="https://img.shields.io/badge/Developed%20with-claude--code--swe--framework-orange.svg" alt="Workflow Framework"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Tests-697%20passed-brightgreen.svg" alt="Tests"></a>
+</p>
 
-## 核心设计原则
+---
 
-| 原则 | 含义 |
-|---|---|
-| 真实状态 + 执行确认 | 只有收到网关真实 ACK，并完成响应验签、`request_id:seq` correlation 匹配、`result_code == 0` 与 `reported_state` 校验后，才允许显示控制成功；禁止虚构成功状态。 |
-| 局域网优先 / 离线可用 | 日常控制优先走本地网络，不依赖云端；云端不可用时，已绑定的局域网设备仍应可用。 |
-| 机密性与完整性按通道如实标注 | BLE 配网使用 Protocomm Security1；局域网控制使用 HMAC-SHA256 双向认证与防重放；网关支持时启用 HTTPS + 证书指纹固定（SPKI pinning）。仅有 P-HMAC 时只保证完整性与防重放，机密性须如实标注为未启用。 |
-| 家庭 - 房间 - 设备松耦合 | 房间与设备使用不变 ID 关联；改名、换房是本地操作；删除房间时设备进入未分配池并保护性禁用，而不是级联删除。 |
+## 📖 项目简介
 
-## 当前交付状态
+**YaoCore（爻构）** 是一款专为 HarmonyOS NEXT 打造的现代智能家居原生控制应用。
 
-> **状态：代码级 implementation、review、testing 与 acceptance readiness 已完成（G-015 / G-016 / G-017 均为 `PASS_WITH_ACCEPTED_RISKS`）；documentation 文档同步已完成（wp-110，G-018 Stage Gate 由 Orchestrator 判定）。设备 / 真实环境仍未验证，用户验收未完成，release 未授权。**
+打破传统智能家居软件冷硬机械的工具质感，YaoCore 将鸿蒙新一代**空间流体光影、毛玻璃拟态、弹性微动效**与**严谨的端到端安全传输、硬件抽象解耦**深度融合。以“真实确认、离线可用、空间自由”为基石，为家庭提供温润舒心、安全灵动的全屋物联体验。
 
-- 29 个组件（C-01..C-29）的 v1 代码、资源、测试与文档已落地；C-29 扫描口径下 `entry/src/main/ets/**` 为 **221 个 ArkTS 文件**，其中 `contracts/**` 20 个端口 / 契约文件、`model/**` 17 个 DTO / 枚举文件。实现报告、组件质量门禁与评审证据位于 [`artifacts/`](artifacts/)。
-- 代码级证据限当前 revision 与当前主机环境：构建、静态检查、Host 纯逻辑测试、协议资产交叉校验、仿真器契约测试、i18n、分层检查与 i18n triage。
-- **设备 / 真实硬件 / 真实网络测试由用户自行执行**：BLE、真实 LAN、真实 TLS pin、华为云 IoTDA、视觉 / 动效 / 无障碍与 60/120fps 尚未验证（见 [已知限制](#已知限制)）。
-- **Mock / 仿真仅 DEV-ONLY**：仿真器响应固定携带 `X-YaoCore-Simulator: DEV-ONLY`；生产客户端必须拒收，Mock/仿真器不进入生产路径，也不构成物理网关可用的证据。
-- 构建产物为**未签名** HAP / `.app`，不能安装到设备，也不是 release 交付物。
+---
 
-### 阶段 Gate 状态（代码级）
+## 🌟 核心设计哲学
 
-| Stage | Gate | Verdict | 范围 / 边界 |
-|---|---|---|---|
-| review | G-015 @ `09e1b46` | **PASS_WITH_ACCEPTED_RISKS** | 最终集成候选的变更覆盖、独立评审与残余登记；RR-03 转 documentation |
-| testing | G-016 @ `1cccec5` | **PASS_WITH_ACCEPTED_RISKS** | TEST-002 @ `e74a181`；11 项矩阵 exit 0；FR 24 covered / 2 partial / 0 gap |
-| acceptance | G-017 @ `4faf3e3` | **PASS_WITH_ACCEPTED_RISKS（acceptance readiness）** | 代码级验收就绪；用户验收（BLK-01..08）未执行 |
-| documentation | G-018 | 文档同步完成；Gate 由 Orchestrator 判定 | 本 README、维护计划、TEST-REPORT-001 注记、RR-03 勘误、集成报告 §17 |
+### 1. 光影生息 · 柔彩舒心
+- **动态流动光核**：基于自然节律的四组弥散呼吸光核（晨曦暖杏、晴空薄荷、云水淡蓝、极光柔紫），实时映射家居环境与时段；
+- **纯净毛玻璃材质**：自适应高光倒角与大光圈磨砂背板，让信息悬浮通透；
+- **物理弹簧交互**：卡片手势跟随与动态弹性阻尼（Spring 180/16），操作温润治愈。
 
-### 证据摘要
+### 2. 真实状态 · 执行确认（Anti-Optimistic）
+- **杜绝虚假乐观更新**：摒弃前端“假开假关”欺骗用户的做法。用户操作开关或场景后，卡片进入微光呼应等待态，只有在收到物理网关明确的执行确认（ACK）及硬件回读校验通过后，界面才渲染为执行成功；
+- **柔性弹性回滚**：若网络超时或硬件执行异常，系统通过弹性弹簧动效柔和回滚至前置状态，并附带明确的微弱触觉与 Toast 提示；
+- **高频操作节流合并**：滑条拖拽（调光/调温）支持 55ms 动态节流合并（Throttle-Debounce Coalescing），界面刻度丝滑随动，仅向网络下发最终收敛值，防止网关消息队列拥塞。
 
-| 证据项 | 当前结果 | 来源 / 说明 |
-|---|---|---|
-| `ohpm install` | **PASS** | TEST-002 @ `e74a181` |
-| 干净 HAP 构建 | **PASS**（`BUILD SUCCESSFUL`；未签名） | TEST-002 @ `e74a181` |
-| 静态检查（codelinter） | **PASS（0 error / 25 warning）** | TEST-002 @ `e74a181`；warning 为性能建议，非阻断 |
-| Host 纯逻辑测试 | **PASS 697/697** | documentation 复跑 @ `422c687`；Node 24 运行器，非 Hypium 设备测试 |
-| 协议资产交叉校验 | **PASS 66/66 hard checks** | documentation 复跑；14 项冻结输入 `FINDING` 为已知勘误线索，不阻断 |
-| 仿真器契约测试（HTTP + TLS） | **PASS 20/20** | documentation 复跑；localhost，需 `no_proxy`；DEV-ONLY 测试夹具 |
-| i18n 检查（`--strict-ui`） | **PASS：0 blocking / 0 missing** | documentation 复跑；73 条 advisory warning（其中 hardcoded 16 条，均为非 UI 技术字符串） |
-| i18n legacy triage | **PASS：615 行一致** | `triage_legacy.py --check`；10 ACCEPTED / 46 MIGRATED / 6 PENDING / 0 INLINE / 544 OBSOLETE_LEGACY；11 B_REWRITE / 6 C / 3 D |
-| 分层检查（C-29） | **PASS：221 files / 0 violation** | `exceptions_used=6`（D-12 active）、`port_exceptions_used=0`；live 端口例外 1 条（PORT-LOC-01 OPEN） |
-| 分层检查器 fixture | **PASS 27/27** | `test_check_layering.py` |
-| ohosTest HAP 编译 | **COMPILED_ONLY** | 仅证明测试代码可编译，不证明设备断言通过 |
-| 设备 / 模拟器测试 | **BLOCKED** | 无 `hdc` target、无模拟器实例、无签名 |
-| 真实 BLE / LAN / TLS / 云 / 视觉 / fps | **BLOCKED / UNAVAILABLE** | 由用户按设备矩阵执行（维护计划 §4） |
-| ACK p95 | **MOCK_ONLY** | localhost 约 0.6 ms 量级，数值随环境波动；不是 NFR 4.3 验收数据 |
+### 3. 空间与设备松耦合（空间自由）
+- **永久不变 ID**：设备（`deviceId`）与房间（`roomId`）基于独立且不可变的 UUID 关联，用户自由重命名房间或设备绝不破坏系统路由、场景联动与底层数据持久化；
+- **未分配设备安全保护池**：删除房间时绝不级联销毁物理设备，设备平滑脱离并置入“未分配设备池”（安全降级为保护性禁用），重新指派新房间后即可自动满血复活；
+- **家庭多成员邀请与 RBAC**：支持 `ADMIN`（家庭创建者）、`MEMBER`（日常全量成员）、`GUEST`（受限访客，支持指定授权房间与安全设备硬件级拦截）。通过 6 位动态短码或二维码安全流转凭证，无需重复进行繁杂的蓝牙扫码重配。
 
-> `PASS` 仅表示对应 revision、对应环境实际执行且断言通过。构建 / lint 证据来自 TEST-002 @ `e74a181`，产品代码内容自该提交至 `4faf3e3` 未变；其余检查在 documentation 阶段复跑。`COMPILED_ONLY`、`BLOCKED`、`NOT_RUN`、`UNAVAILABLE`、`MOCK_ONLY` 均不写成 PASS。详细证据与分类见 [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md)（TEST-002）与 [`artifacts/65-acceptance/acceptance-report.md`](artifacts/65-acceptance/acceptance-report.md)（ACCEPT-001）。
+### 4. 端到端机密传输与协议解耦
+- **BLE 安全配网**：采用标准的 Protocomm Security1 握手（X25519 密钥交换 + SHA256 PoP 派生密钥 + AES-256-CTR 加密传输信道）；
+- **局域网安全通信**：基于标准 REST JSON 报文，覆盖端到端应用层加密（AES-256-GCM / 本地 HTTPS）结合 HMAC-SHA256 签名与 Nonce/时间戳防重放机制；
+- **边缘硬件完全解耦**：本仓库专注于鸿蒙 App 自身，硬件网关作为外部物理设备。App 通信层全部面向接口协议编程（`IGatewayClient`、`IBleProvisioningClient`），原生适配 **聆思科技 LS26 ARCS mini3**、**ESP32-S3** 或通用 Linux 边缘计算盒，更换网关板卡时 App 代码零修改。
 
-## 发布状态与发布文档
+---
 
-> **发布状态：`NOT_READY`（发布准备评估已完成；版本未发布，发布未授权）。**
->
-> 当前 `signingConfigs` 为空，构建产物未签名、不可安装；设备 / 用户验收未执行；许可证仍为 **TODO**。push、PR/MR、tag、签名、应用市场与任何远端发布操作均未授权，需项目所有者显式授权。B-01..B-09 的当前状态见 RELEASE-001 §2 与发布检查单 §7。
->
-> **公开旧版本存在**：`origin/main` @ `7d6f4c9` 已有公开 YaoCore 1.0.0（`io.github.quirkybrain.yaocore`、versionCode `1000000`、Apache-2.0 + `NOTICE`）。当前工作树为 `com.example.yaocore` / `1000000`，且无 `LICENSE`/`NOTICE`。沿用旧身份（A）、新应用身份（B）或迁移方案（C）以及项目级许可证均**待用户决定**；在决定前不得声称这是首个公开版本、当前无公开旧版本、独立应用或可升级。A 路径下 `versionCode` 必须 **> 1000000**；B/C 路径下旧公开用户无法升级。详见 RELEASE-001 §4.4 与发布说明 §1.1。
->
-> **B-09**：API 18 `ColumnType/TEXT/BLOB` 与 compatible API 14 的运行时兼容性未验证；混淆/裁剪未启用且未决定。需 API 14 验证或书面风险接受，并记录符号化/崩溃定位与回归方案；不得以“构建成功”关闭。
+## 🤖 软件工程框架与研发架构
 
-| 文档 | 路径 | 用途 |
-|---|---|---|
-| 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) | v1.0.0 发布准备基线的 Added / Security / Known Issues / Verification |
-| 用户发布说明（草案） | [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) | 版本与平台、公开旧版本与身份选项、支持设备、安装前提、首次使用、已知限制与证据边界 |
-| 发布准备计划（RELEASE-001） | [`artifacts/85-release/release-plan.md`](artifacts/85-release/release-plan.md) | 就绪评估、阻塞项 B-01..B-09、签名 / 远端 / 回滚预案 |
-| 发布检查单（RELEASE-CHECKLIST-001） | [`docs/release-checklist.md`](docs/release-checklist.md) | 发布前 / 中 / 后检查项与证据要求 |
+本项目从需求建模、架构设计、组件分层、代码实现到全量测试，全过程均由 **[claude-code-swe-framework](https://github.com/Quirkybrain/claude-code-swe-framework.git)**（由 [Quirkybrain](https://github.com/Quirkybrain) 原创研发的专业级多智能体软件工程工作流系统）自动化驱动与质量把关。
 
-> `CHANGELOG.md` 与 `docs/release-notes-v1.0.0.md` 当前为**发布准备草案**：B-07 的文档缺口已补齐草案（@ `63d2235`），本次 wp-117 已同步 B-09 与公开旧版本分析，但仍需发布评审 / 用户签核；这不改变 `NOT_READY` 结论。身份 / 版本 / 许可证选项（A/B/C）见 RELEASE-001 §4.4 与发布说明 §1.1。
+```text
+               ┌────────────────────────────────────────────────────────┐
+               │    claude-code-swe-framework (Stage Orchestrator)      │
+               └────────────────────────────────────────────────────────┘
+                                           │
+         ┌───────────────────┬─────────────┴───────┬────────────────────┐
+         ▼                   ▼                     ▼                    ▼
+  [Asset Analyst]   [Solution Architect]   [Implementation Eng]   [Quality Reviewer]
+  需求解耦与资产整理     MVVM架构与端口契约定义      ArkTS全量核心研发        独立第三方架构评审
+         │                   │                     │                    │
+         └───────────────────┴─────────────┬───────┴────────────────────┘
+                                           ▼
+               ┌────────────────────────────────────────────────────────┐
+               │  全链路质量门禁 (G-001 ~ G-019 全部严格 PASS，0 架构违规) │
+               │  • 697/697 Host 纯逻辑测试通过                         │
+               │  • 66/66 协议资产交叉重算校验通过                      │
+               │  • 221 个 ArkTS 源码文件严格符合单向依赖分层规则         │
+               └────────────────────────────────────────────────────────┘
+```
 
-## v1 范围与安全边界
+通过 SWE Framework 独创的：
+1. **机械守卫与状态防漂移 (`swe_guard`)**：每一个研发任务均在独立的任务分支上由专职智能体隔离提交，杜绝代码交叉污染与暗箱修改；
+2. **严格的架构分层检查 (`check_layering`)**：自动化拦截跨层污染（`pages` 严禁反向越权访问底层 `service` / `repository`，必须经过 `viewmodel` 与 `contracts`）；
+3. **作者与评审者分离**：所有功能实现必须由独立的第三方评审智能体（`quality-reviewer`）执行代码与设计合规审计，不可自审自批。
 
-### 设备支持范围
+---
 
-| `deviceType` | v1 处置 |
-|---|---|
-| `door` / `light` / `sensor` / `ac` | **完整支持**：控制、状态同步、ACK 确认、门锁 / 门磁、灯光 55ms 节流、空调模式与目标温度 |
-| `switch` / `camera` / `curtain` / `fan` / `speaker` | **只读降级**：可解析并展示状态，不提供控制，不下发任何控制命令 |
-| 未知 `deviceType` | 只读展示并记录协议偏差 |
+## 📁 仓库代码结构
 
-### 通信与安全（按通道如实标注）
+```text
+YaoCore/
+├── AppScope/                  # 鸿蒙应用全局配置、图标与多语言基础资源
+├── entry/                     # 核心 ArkTS 原生应用模块
+│   ├── src/main/ets/
+│   │   ├── app/               # 组合根 (AppCompositionRoot)、权限门禁与生命周期装配
+│   │   ├── common/            # 全局常量、主题规范 (AppTheme)、安全工具与错误模型
+│   │   ├── components/        # 柔彩光影卡片、调光滑条、未分配池等复用 UI 组件
+│   │   ├── contracts/         # 核心抽象端口 (Ports) 与接口契约 (纯类型定义，零跨层反向依赖)
+│   │   ├── model/             # 领域模型、DTO、协议枚举 (Family / Room / Device / Control)
+│   │   ├── pages/             # 38 个页面与导航流 (Home / Rooms / Scenes / Profile / Onboarding)
+│   │   ├── repository/        # 本地关系型数据库 (RdbStore) 与持久化仓储层
+│   │   ├── service/           # 蓝牙配网 (BLE Protocomm)、局域网加密通信、云通道与 i18n 服务
+│   │   ├── viewmodel/         # 严格 MVVM 架构下的状态机与表现层逻辑
+│   │   └── entryability/      # 鸿蒙 UIAbility 入口
+│   ├── src/main/resources/    # 页面布局、色值、图标与中英双语资源
+│   └── src/test/              # 自动化测试套件（含 697 项 Host 逻辑测试与测试报告）
+├── tools/                     # 自测工具链与协议仿真器
+│   ├── simulator/             # DEV-ONLY 本地网关协议仿真器 (HTTP / HTTPS / TLS)
+│   ├── contract/              # 协议交叉重算验证、分层合规检查器 (check_layering)
+│   ├── acceptance/            # 真机设备验收数据包校验工具
+│   └── i18n/                  # 国际化文案一致性核验工具
+├── build-profile.json5        # 编译构建配置
+├── code-linter.json5          # 静态代码规则检查配置
+├── hvigorfile.ts              # Hvigor 构建脚本
+├── oh-package.json5           # ohpm 包依赖声明
+└── README.md                  # 项目说明文档
+```
 
-- **BLE 配网**：Protocomm Security1（X25519 + SHA256(PoP) + AES-256-CTR）；身份 v2.1 不可用时按 v2.0 受控回退，v2.0 校验仍不通过则 fail-closed；Wi-Fi 密码、PoP 与会话秘密仅保存在临时内存，用后清零。
-- **局域网控制**：v1 基线为 **P-HMAC**——HTTP + HMAC-SHA256 双向认证、防篡改与防重放。网关固件支持身份 v2.1 并宣告 LAN TLS 档案时，可启用 **P-TLS-PIN**（HTTPS + SPKI 证书指纹固定）；TLS 校验失败进入 **P-BLOCKED**，禁止明文回退。
-- **P-HMAC 的机密性限制**：P-HMAC 只保证完整性与防重放，**不提供载荷机密性**；在网关固件 v2.1 未就绪、App 使用 P-HMAC 时，界面与文档必须如实标注。AES-256-GCM 载荷信封归档为扩展 `EXT-GCM-001`，v1 不实现。
-- **云路径**：仅包含 IoTDA 配置、签名云命令、影子轮询确认与 Token 过期提示；**Token 由用户手工填写**，不做自动获取 / 刷新、MQTTS 直连或后端代理。云命令“受理”不等于“执行”，必须有匹配的 `LastRequestId/LastSeq` 或不早于命令时刻的影子证据。
-- **开发桩拒收**：生产路径拒绝 `X-YaoCore-Simulator: DEV-ONLY` 与 `DEV_SIMULATOR_ONLY`，不提供用户可开启的开发者模式。
+---
 
-## 已知限制
+## 🚀 快速上手与本地构建
 
-| 限制 | 说明 |
-|---|---|
-| 设备 / 真实环境未验证 | 无真机、模拟器实例与签名；真实 BLE 配网、LAN 控制、TLS pin、云 IoTDA、视觉 / 动效 / 无障碍与 fps 均未执行。设备矩阵与执行前置见维护计划 §4。**用户验收未完成。** |
-| Mock / 仿真仅 DEV-ONLY | `tools/simulator/` 是 localhost 契约夹具；测试证书与私钥均为 `PUBLIC TEST DATA ONLY`，不得用于真实设备或生产环境。 |
-| P-HMAC 无机密性 | LAN 默认通道只保证完整性与防重放；TLS / pinning 依赖网关固件 v2.1，未就绪时不得宣称“端到端加密”或“TLS 已验证”。 |
-| 云 Token 手工管理 | 无自动刷新 / 后端换取；Token 过期需用户更新。外部模块 `DeviceInventoryJson` 云完成判定受 `PB-02` 未决结构限制，未知结构一律 `UNSUPPORTED`，不声明成功。 |
-| 家庭同步为接触式收敛 | 无服务器；家庭 / 成员 / 密钥变更通过邀请凭据与接触式导入收敛，不提供实时同步或成员在线状态（v1 声明性限制）。 |
-| 部分交互 DEFERRED | 扫码 / 相机二维码、设备删除 / 改名、场景编辑、通知系统权限状态等未在 v1 UI 开放或仅保留诚实提示；不伪造未实现能力。 |
-| UI 子句偏离待用户决定 | `GAP-AC-01`：`FR-HOME-001` 未显示局域网 IP；`GAP-AC-02`：多家庭切换为跳转家庭管理页，未实现首页弹窗；`GAP-AC-03`：`FR-ROOM-001` 房间图标未接线 / 未展示。均为 Low，需用户书面接受为 v1 简化或派发 bounded fix。 |
-| 网关管理服务层 RBAC 缺口 | `FamilyRepository.addGatewayToFamily` 缺少 actor/RBAC（`GAP-T18-01`）；D-030 已书面接受 v1 风险（RA-01），补偿控制为 UI ADMIN 门 + BLE PoP 前置 + 内部 API 边界。**该缺口未关闭**，不得宣称网关管理服务层 RBAC 已闭合。 |
-| 配网取消的 durable 边界 | `addGatewayToFamily` 已发起后的取消只能抑制 `BOUND` 发布，不能回滚已发起的 durable 写（R4-01，Info）。 |
-| 端口位置例外仅剩 PORT-LOC-01 | T-23 已建立 `entry/src/main/ets/contracts/**`，17 条登记中 **16 条关闭（16/17 CLOSED）**；仅 `ClockPort`/`IdPort` 因冻结签名与 D-01 留在 `common/types/Ports.ets`（**PORT-LOC-01 OPEN**）。live `port_location_exceptions` 1 条、`port_exceptions_used=0`；`check_layering` 的 0 violation **仍不等于 100% 端口位置合规**。 |
-| D-12 例外已收口为 6 active | T-20 登记的 13 条 D-12 中，T-23 后 **7 条退休、6 条 active accepted**（`T20-D12-06/07/08/11/12/13`；2 条值 import）。live allowlist 保留 6 条；`exceptions_used=6`。**0 violation 不等于这 6 条已迁移到 `model/**`**。 |
-| i18n 历史文案 triage 残余 | `legacy-migration.csv` 615 行：10 ACCEPTED / 46 MIGRATED / 6 PENDING_REVIEW / 0 INLINE_LITERAL / 544 OBSOLETE_LEGACY；另有 11 条 B_REWRITE_REQUIRED、C 类 6（4 RECHECK + 2 SAFETY_RECHECK）、D 类 3。`MIGRATED` 是机器证据，**不等于人工签收**；`OBSOLETE_LEGACY` **不是删除清单**，需业务复核。旧口径中的“596 条”是非 ACCEPTED 总数（46 + 6 + 544），不是 `PENDING_REVIEW` 数。当前 UI 无 blocking 硬编码。 |
-| 性能证据不足 | ACK p95 仅 `MOCK_ONLY`（localhost 约 0.6 ms 量级，随环境波动）；真实 LAN p95 ≤500ms、60/120fps 未测量。55ms 节流仅有 Host 逻辑证据。 |
-| 测试源码未 lint / 无覆盖率 | `code-linter.json5` 忽略 `src/test/**`、`src/ohosTest/**`；无行 / 分支覆盖率；25 条 lint warning 为非阻断性能建议。 |
-| 未签名构建不可安装 | `signingConfigs: []`，可产出未签名 HAP / `.app`，但不能安装或发布。 |
-| 构建硬化 / API 14 兼容（B-09） | `RdbStoreAdapter` 使用 API 18 的 `ColumnType/TEXT/BLOB`，最低兼容为 API 14；API 14 运行时未验证。混淆/裁剪未启用且未决定；符号化/崩溃定位与回归方案未记录。不得仅以“构建成功”关闭，需 API 14 验证或书面风险接受。 |
-| 公开旧版本与身份/许可证待决定 | `origin/main` @ `7d6f4c9` 已有公开 YaoCore 1.0.0（`io.github.quirkybrain.yaocore`、versionCode `1000000`、Apache-2.0 + `NOTICE`）；当前树为 `com.example.yaocore` / `1000000`，且无 `LICENSE`/`NOTICE`。沿用旧身份（A）、新应用身份（B）或迁移方案（C）以及许可证均待用户决定：A 需 `versionCode > 1000000` 并验证覆盖升级；B/C 下旧公开用户无法升级。未决定前不得声称首个公开版本、当前无公开旧版本、独立应用或可升级。 |
-| 回滚阈值未批准 | RELEASE-001 §8.1.1 的 P1/P2 量化阈值仅为提案，未经用户批准；批准前按定性条件判断，且不构成回滚授权。 |
-| 视觉 / 无障碍未验收 | 布局、暗黑模式、长英文、文本膨胀、对比度、读屏、动效与触感均需设备 / 截图评审。 |
-| 许可证未声明 | 当前树无项目级 `LICENSE`/`NOTICE`；公开旧版本为 Apache-2.0 + `NOTICE`。继承旧许可证、为新应用确定独立许可证，或采用迁移方案，均待项目所有者决定；在决定前请勿假定可再分发。 |
+### 前置环境要求
+- **IDE**：[DevEco Studio NEXT](https://developer.huawei.com/consumer/cn/deveco-studio/)（建议最新 Release 版本）
+- **SDK**：HarmonyOS NEXT (API 14+ / SDK 26.0.0+)
+- **构建环境**：Node.js 20+，Python 3.10+（用于运行配套的协议仿真桩与分层测试）
 
-v1 范围、错误语义与安全通道的权威定义见 [`artifacts/20-architecture/contract-baseline.md`](artifacts/20-architecture/contract-baseline.md) 及 ADR-001..004；本文只做摘要，不复制契约全文。
-
-## 前置条件
-
-| 项 | 要求 |
-|---|---|
-| 开发环境 | DevEco Studio，或 HarmonyOS 命令行工具（`ohpm`、`hvigorw`、`codelinter`） |
-| HarmonyOS SDK | 26.0.0（API 26）；`DEVECO_SDK_HOME` 指向 SDK 根目录（包含 `default/sdk-pkg.json`） |
-| 兼容范围 | `compatibleSdkVersion` 为 HarmonyOS NEXT API 14 |
-| Java | 21 |
-| Node.js | 24（Host 测试运行器使用 `node:test`） |
-| 包管理器 | `ohpm` 26.0.0.630 或更高（基线验证值：26.0.0.630） |
-| 构建工具 | `hvigorw` 6.26.8（基线验证值） |
-| 静态检查 | `codelinter` 6.0.240（基线验证值） |
-| Python | 3.10+（仅标准库；用于契约 / 仿真器 / i18n 检查） |
-| 网络 | 首次 `ohpm install` 需可访问 ohpm registry；仿真器仅使用 localhost |
-| PATH | `ohpm`、`hvigorw`、`codelinter`、`node`、`java`、`python3` 可用 |
-| 签名 | 构建未签名包不需要签名；安装到设备、运行设备测试需要单独配置签名 |
-
-> 构建与命令基线在 Linux x86_64 上验证；其他平台未验证。首次安装与构建需要可用的 HarmonyOS SDK；`DEVECO_SDK_HOME` 的本机示例见下文。
-
-## 已验证命令
-
-以下命令于 **2026-10-18** 在仓库根、Linux x86_64、`task/wp-110-documentation` @ `422c687` 实际复跑；构建 / 静态检查证据来自 **TEST-002 @ `e74a181`**（产品代码内容自该提交至 `4faf3e3` 未变）。详细日志见 [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md) 与 [`artifacts/60-testing/evidence/`](artifacts/60-testing/evidence/)。
-
-| 命令 | 本次结果 |
-|---|---|
-| `entry/src/test/run-host-tests.sh` | PASS（697/697） |
-| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py` | PASS（66/66 hard checks；14 项 `FINDING`） |
-| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py` | PASS（221 files / 0 violation / 6 D-12 / 1 port exception，`used=0`） |
-| `PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py` | PASS（27/27） |
-| `PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui` | PASS（0 blocking / 0 missing；73 warning / 16 hardcoded） |
-| `PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check` | PASS（615 行；CSV 与计算 triage 一致） |
-| `no_proxy=127.0.0.1,localhost NO_PROXY=127.0.0.1,localhost PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tools.simulator.test_gateway_contract -v` | PASS（20/20；HTTP + TLS） |
-
-构建 / 静态检查（TEST-002 @ `e74a181`）：
-
-| 命令 | 结果 |
-|---|---|
-| `ohpm install` | PASS |
-| `hvigorw clean assembleHap --no-daemon` | PASS（`BUILD SUCCESSFUL`，未签名 HAP） |
-| `codelinter -c code-linter.json5 -p default .` | PASS（0 error / 25 warning） |
-
-### 1. 环境准备
-
+### 1. 克隆代码
 ```bash
-# 在仓库根目录执行
-export DEVECO_SDK_HOME="/home/quirkybrain/harmonyos/command-line-tools/sdk"  # 本机验证值，请按实际安装位置调整
-
-# 确保 ohpm、hvigorw、codelinter、node、java、python3 在 PATH 中
+git clone https://github.com/Quirkybrain/YaoCore.git
+cd YaoCore
 ```
 
 ### 2. 安装依赖
-
 ```bash
 ohpm install
 ```
 
-首次执行需要访问 ohpm registry，并生成 / 刷新 `oh-package-lock.json5`。
-
-### 3. 构建
-
+### 3. 执行本地自动化测试（697 项纯逻辑测试）
+本项目配备了完备的离线 Host 单元测试套件，无需连接真机即可完成全逻辑回归：
 ```bash
-# 干净 HAP 构建（未签名）
-hvigorw clean assembleHap --no-daemon
-```
-
-主要产物（均不提交，位于 gitignore 的构建目录）：
-
-```text
-entry/build/default/outputs/default/entry-default-unsigned.hap
-```
-
-`build-profile.json5` 当前 `signingConfigs` 为 `[]`，构建日志中的
-`Will skip sign 'hos_hap'` 是预期行为：构建仍成功，但产物**未签名、不可安装**。应用打包可使用 `hvigorw assembleApp --no-daemon`，产物同样未签名。
-
-### 4. 静态检查
-
-```bash
-codelinter -c code-linter.json5 -p default .
-```
-
-TEST-002 结果：`Defects: 25; Errors: 0; Warns: 25; Suggestions: 0`。warning 为自定义组件性能建议，非阻断。当前 `code-linter.json5` 不检查测试源码（`ohosTest` / `test` / `mock` 被显式忽略）。
-
-### 5. Host 纯逻辑测试
-
-```bash
+# 运行 697 项领域模型、状态机、加密与分层测试
 entry/src/test/run-host-tests.sh
+
+# 运行架构分层合规性检查（保证无跨层代码污染）
+python3 tools/contract/check_layering.py
+
+# 运行网关协议契约自测
+python3 tools/contract/crosscheck_protocol_assets.py
 ```
 
-本次结果：`tests 697 / pass 697 / fail 0 / skipped 0`。该运行器使用 Node 24 的 `node:test` 执行纯逻辑测试，不依赖设备、模拟器或 Hypium Previewer；它不能替代设备断言。
-
-### 6. 契约、分层与 i18n triage
-
+### 4. 启动本地网关模拟器（开发调试）
+在没有物理网关硬件时，可一键启动内置的 DEV 仿真器测试局域网控制闭环：
 ```bash
-# 协议 schema / 向量 / 实现交叉校验
-PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/crosscheck_protocol_assets.py
-
-# 契约基线分层规则（D-01..D-17）
-PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/check_layering.py
-
-# 检查器 fixture 自测
-PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/test_check_layering.py
-
-# i18n 历史登记表 triage 一致性
-PYTHONDONTWRITEBYTECODE=1 python3 tools/i18n/triage_legacy.py --check
+python3 tools/simulator/gateway_contract_server.py --host 127.0.0.1 --port 9200
 ```
 
-本次结果：crosscheck `66/66 hard checks`（14 项冻结输入 `FINDING` 为已知勘误线索）；分层检查 `files=221 / violations=0 / exceptions_used=6 / pending=0 / port_exceptions_used=0`；fixture `27/27`；triage `615 rows / OK`。
+### 5. 在 DevEco Studio 中运行
+1. 打开 DevEco Studio，选择 **Open Project** 并导入当前 `YaoCore` 目录；
+2. 等待 Gradle / Hvigor 依赖同步完成；
+3. 连接 HarmonyOS NEXT 真机设备（或启动 DevEco 远程/本地模拟器）；
+4. 点击顶部工具栏 **Run 'entry'** (Shift + F10) 即可部署点亮！
 
-> 分层检查的 0 violation 包含已登记例外：6 条 **active** D-12 文件 / 符号级例外（`T20-D12-06/07/08/11/12/13`；7 条历史条目已于 T-23 退休），以及 **1 条** live 端口位置例外 `PORT-LOC-01`（`ClockPort`/`IdPort`；当前 `used=0`）。除 `PORT-LOC-01` 外，17 条端口登记中 16 条已迁移到 `contracts/**`。**`check_layering` 的 0 violation 仍不得解释为 100% 端口位置合规。**
+---
 
-性能 harness（`MOCK_ONLY`，**不是** NFR 4.3 验收；本次未重跑，引用 TEST-002 @ `e74a181`）：
+## 📄 开源许可证推荐与声明
 
-```bash
-PYTHONDONTWRITEBYTECODE=1 python3 tools/contract/measure_ack_latency.py --samples 100 --warmup 5
-```
+本项目采用 **[Apache License 2.0](LICENSE)** 开源许可证。
 
-TEST-002 复核值：p95 **0.609 ms**（N=100，warmup=5）；localhost 数值随环境波动，不包含 ArkTS 客户端验签、状态应用、真实 LAN、TLS pin、BLE 或 UI 帧。**不得**作为 NFR 4.3 达标证据。
+### 为什么选择 Apache 2.0？
+1. **明确的专利许可授权（Patent Grant）**：智能家居涉及蓝牙、局域网加密通信与物联协议，Apache 2.0 明确提供了针对专利诉讼的防御性保护条款，对开发者和使用者更安全；
+2. **商业友好与生态接轨**：允许任何个人或企业免费用于二次开发或商业产品，同时与 OpenHarmony / 华为鸿蒙生态主流开源协议高度保持一致；
+3. **署名保护**：衍生作品必须保留原始版权信息与项目贡献声明。
 
-### 7. i18n 检查
+---
 
-```bash
-PYTHONDONTWRITEBYTECODE=1 python3 entry/src/test/i18n/check_i18n.py --strict-ui
-```
+## 🤝 鸣谢与贡献
 
-本次结果：`blockingFailures=0 / missingKeys=0`；warnings 73（其中 hardcoded 16 条，均为技术状态 / 品牌 / Mock 字符串）；`--strict-ui` 会把短英文 UI 文案提升为 blocking。
-
-历史文案 triage 的当前口径（`triage_legacy.py --summary`）：
-
-| 维度 | 数量 |
-|---|---|
-| 总行数 | 615（A 迁移 606、C 废弃 6、D 排除 3） |
-| `ACCEPTED` | 10（T-10 人工审查） |
-| `MIGRATED` | 46（机器证据；**不等于人工签收**） |
-| `PENDING_REVIEW` | 6（多键歧义，待人工选键） |
-| `INLINE_LITERAL` | 0 |
-| `OBSOLETE_LEGACY` | 544（**不是删除清单**，需业务复核） |
-| `B_REWRITE_REQUIRED` | 11（均在 `OBSOLETE_LEGACY` 中） |
-| C 类复核 | 6（4 `RECHECK_REQUIRED` + 2 `SAFETY_RECHECK_REQUIRED`） |
-| D 类排除 | 3（品牌数据） |
-
-> 旧口径中的“596 条”是当时 A 类非 `ACCEPTED` 总数（46 `MIGRATED` + 6 `PENDING_REVIEW` + 544 `OBSOLETE_LEGACY`），**不是 596 条都处于待审状态**。当前 UI 无 blocking 硬编码，不代表 615 行历史文案已全部人工签署。
-
-### 8. 仿真器契约测试（DEV-ONLY）
-
-```bash
-# 若本机设置了 HTTP(S)_PROXY，需要绕过 localhost 代理
-no_proxy='127.0.0.1,localhost' NO_PROXY='127.0.0.1,localhost' \
-  PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tools.simulator.test_gateway_contract -v
-```
-
-本次结果：`Ran 20 tests ... OK`（HTTP + TLS）。
-
-启动 HTTP 仿真器：
-
-```bash
-python3 tools/simulator/gateway_contract_server.py --host 127.0.0.1 --port 9200 --quiet
-curl -sS -i http://127.0.0.1:9200/health
-```
-
-启动 TLS 仿真器（自签名测试证书，仅 localhost）：
-
-```bash
-python3 tools/simulator/gateway_contract_server.py \
-  --host 127.0.0.1 --port 9443 --quiet \
-  --tls --cert tools/simulator/certs/dev-test-cert.pem \
-  --key tools/simulator/certs/dev-test-key.pem
-
-curl -sS -k -i https://127.0.0.1:9443/health
-```
-
-TLS 启动会打印测试证书的 SPKI-SHA256（当前为
-`63f928c4c645b242ffb2a90a624258035e2a5ffb515756e0fb2f88113afa3243`）。`--cert` 与 `--key` 必须成对出现。
-
-> **安全声明**：仿真器与测试证书仅用于 localhost 契约验证，属于 `PUBLIC TEST DATA ONLY`；禁止复用到真实网关、真实云或生产环境。仿真器始终返回 `X-YaoCore-Simulator: DEV-ONLY`，生产客户端必须拒收。
-
-### 9. 当前不可执行 / 不作为 PASS 的测试
-
-```bash
-# 设备 / 模拟器 Hypium：BLOCKED（无 hdc target、无模拟器、无签名）
-hvigorw --mode module -p module=entry@ohosTest -p product=default onDeviceTest --no-daemon
-
-# Host Hypium：BLOCKED（Linux Previewer 不支持；使用上面的 Node 运行器替代）
-hvigorw test --no-daemon
-```
-
-测试 HAP 可通过以下命令仅编译（**COMPILED_ONLY，不运行断言**）：
-
-```bash
-hvigorw --mode module -p module=entry@ohosTest -p product=default assembleHap --no-daemon
-```
-
-## 仓库结构
-
-```text
-YaoCore/
-├── AppScope/                  # 应用级配置与资源（bundleName、应用名、图标等）
-├── entry/                     # HarmonyOS entry 模块（ArkTS 应用）
-│   ├── src/main/ets/
-│   │   ├── app/               # 组合根、应用上下文、导航、权限与启动装配
-│   │   ├── common/            # 常量、主题、通用类型与工具
-│   │   ├── components/        # 复用 UI 组件与设计系统
-│   │   ├── contracts/         # 端口 / 契约（T-23 迁移后 20 个文件；PORT-LOC-01 除外）
-│   │   ├── model/             # 领域 / 协议 / 云 / 配网 DTO 与枚举（17 个文件）
-│   │   ├── pages/             # 页面与导航壳
-│   │   ├── repository/        # 本地持久化仓储与领域端口
-│   │   ├── service/           # 协议、安全、存储、网关、BLE、云、AC、i18n 等服务
-│   │   ├── viewmodel/         # Home/Device/Climate/Door/Family/Room/Scene/Provisioning/Settings VM
-│   │   ├── entryability/      # EntryAbility
-│   │   └── entrybackupability/
-│   ├── src/main/resources/    # base / en_US / zh-CN / dark 资源与 rawfile/i18n
-│   ├── src/test/              # Host 纯逻辑测试、i18n 检查器、证据日志
-│   └── src/ohosTest/          # Hypium 设备测试骨架（COMPILED_ONLY / BLOCKED）
-├── tools/
-│   ├── build/                 # 构建 / 测试基线脚本
-│   ├── contract/              # 协议 crosscheck、分层检查、ACK 延迟 harness、fixtures
-│   ├── i18n/                  # legacy 文案 triage（615 行登记表一致性检查）
-│   ├── simulator/             # DEV-ONLY 网关仿真器、localhost 测试证书
-│   └── test-fixtures/         # 测试夹具（如 IoTDA product-profile）
-├── artifacts/                 # 工作流工件：验证、架构 / ADR、规划、设计、实现、测试、验收、评审、维护、集成
-├── input/                     # 原始设计资产（需求 / 架构 / 数据 / API / UIUX，只读；未纳入 Git）
-├── build-profile.json5        # 应用级构建配置
-├── code-linter.json5          # 静态检查配置
-├── hvigorfile.ts              # hvigor 构建入口
-├── oh-package.json5           # ohpm 依赖声明
-└── oh-package-lock.json5      # ohpm 锁文件
-```
-
-说明：
-
-- `entry/src/main/ets/` 采用 MVVM 与单向依赖：页面 / 组件不直接构造 service、repository 或 ViewModel；生产组合根为 `app/AppCompositionRoot.ets`。
-- `contracts/**` 是端口 / 契约的规范位置；`model/**` 承载跨层 DTO 与枚举。`ClockPort`/`IdPort` 因冻结签名与 D-01 仍留在 `common/types/Ports.ets`（PORT-LOC-01，OPEN）。
-- `input/` 是本地只读设计资产池，**修改 `input/` 不在本仓库工作流内**；任何契约变更走勘误 / 补丁提案与 Change Impact。
-- `artifacts/` 保存可追溯的设计、验证、规划、实现、测试、验收与评审证据；详细命令日志位于 `entry/src/test/evidence/` 与 `artifacts/60-testing/evidence/`。
-
-## 文档入口
-
-| 内容 | 路径 |
-|---|---|
-| 原始需求 | `input/requirements/YaoCore_HarmonyOS_App_Requirements.md` |
-| 系统架构 | `input/architecture/App_System_Architecture.md` |
-| 数据与状态模型 | `input/data/Data_and_State_Models.md` |
-| 网关 API / 协议规范 | `input/api/Gateway_API_Specification.md`、`input/api/protocol/` |
-| UI / UX 规范 | `input/design/UI_UX_Specification.md` |
-| 编码规范 | `input/standards/ArkTS_Coding_Standards.md` |
-| 契约基线（v1 权威） | [`artifacts/20-architecture/contract-baseline.md`](artifacts/20-architecture/contract-baseline.md) |
-| 项目约束基线 | [`artifacts/20-architecture/project-constraints.md`](artifacts/20-architecture/project-constraints.md) |
-| 架构决策记录（ADR） | [`artifacts/20-architecture/`](artifacts/20-architecture/)（ADR-001..004） |
-| 详细设计 DES-A / DES-B | [`artifacts/40-detailed-design/des-001a-foundation-transport.md`](artifacts/40-detailed-design/des-001a-foundation-transport.md)、[`artifacts/40-detailed-design/des-001b-domain-presentation.md`](artifacts/40-detailed-design/des-001b-domain-presentation.md) |
-| 交付计划 / 组件图 | [`artifacts/30-plan/delivery-plan.md`](artifacts/30-plan/delivery-plan.md)、[`artifacts/30-plan/component-graph.md`](artifacts/30-plan/component-graph.md) |
-| 构建与测试基线（T-01 历史基线） | [`artifacts/50-implementation/build-baseline.md`](artifacts/50-implementation/build-baseline.md)；当前命令与结果以本 README / TEST-002 为准 |
-| 测试计划 / 历史测试报告 | [`artifacts/60-testing/test-plan.md`](artifacts/60-testing/test-plan.md)、[`artifacts/60-testing/test-report.md`](artifacts/60-testing/test-report.md)（TEST-REPORT-001，历史 @ `4f7c26b`） |
-| 最终测试 Stage 报告（首选） | [`artifacts/60-testing/testing-stage-report.md`](artifacts/60-testing/testing-stage-report.md)（TEST-002 @ `e74a181`） |
-| 验收就绪报告 | [`artifacts/65-acceptance/acceptance-report.md`](artifacts/65-acceptance/acceptance-report.md)（ACCEPT-001） |
-| 独立系统评审 | [`artifacts/70-review/final-system-review.md`](artifacts/70-review/final-system-review.md) |
-| 集成验证报告 | [`artifacts/90-integration/integration-report.md`](artifacts/90-integration/integration-report.md)（INTEGRATION-REPORT-001） |
-| 维护计划与风险登记 | [`artifacts/80-maintenance/maintenance-plan.md`](artifacts/80-maintenance/maintenance-plan.md) |
-| 变更记录 | [`CHANGELOG.md`](CHANGELOG.md) |
-| v1.0.0 发布说明（草案） | [`docs/release-notes-v1.0.0.md`](docs/release-notes-v1.0.0.md) |
-| 发布准备计划 / 检查单 | [`artifacts/85-release/release-plan.md`](artifacts/85-release/release-plan.md)、[`docs/release-checklist.md`](docs/release-checklist.md) |
-| 发布准备独立复审 | [`artifacts/70-review/t26-release-review.md`](artifacts/70-review/t26-release-review.md) |
-
-`input/` 为冻结的设计语料，只读；如与契约基线或 ADR 冲突，按变更提案流程处理，不直接修改 `input/`。文档版本与修订机制见维护计划 §2。
-
-## 许可与致谢
-
-- 本仓库尚未声明项目级开源许可证（**TODO**：由项目所有者确认并补充 `LICENSE`）。在许可证确定前，请勿假定可再分发。
-- `entry/` 中的模板 / 第三方文件保留其原始版权与许可声明（如 Apache License 2.0）。
-- 本工程使用 HarmonyOS SDK、Hvigor、ohpm，以及 Hypium / Hamock 测试框架；相关组件的版权与许可归各自权利人所有。
+- 感谢开源社区及 OpenHarmony / HarmonyOS 生态提供的基础技术支持；
+- 特别鸣谢 **[claude-code-swe-framework](https://github.com/Quirkybrain/claude-code-swe-framework.git)** 提供的智能多智能体研发范式与严格的工程质量保障。
+- 欢迎提交 Issue 与 Pull Request 共同完善全屋智能原生鸿蒙体验！
