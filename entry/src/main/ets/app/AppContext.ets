@@ -140,19 +140,27 @@ export class AppContext {
     return this.root.pageVms;
   }
 
-  initialize(): Promise<void> {
+  isInitialized(): boolean {
+    return this.root.isInitialized();
+  }
+
+  async initialize(): Promise<void> {
+    if (this.root.isInitialized() || this.initializationErrorValue !== undefined) {
+      return;
+    }
     if (this.initPromise !== undefined) {
-      return this.initPromise;
+      await this.initPromise;
+      return;
     }
     this.initPromise = this.doInitialize();
-    return this.initPromise;
+    await this.initPromise;
   }
 
   /** StartupErrorView retry: re-runs a failed root initialization once. */
-  retryInitialization(): Promise<void> {
+  async retryInitialization(): Promise<void> {
     this.initPromise = undefined;
     this.initializationErrorValue = undefined;
-    return this.initialize();
+    await this.initialize();
   }
 
   async refreshSessionGate(): Promise<void> {

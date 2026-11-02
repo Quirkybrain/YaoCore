@@ -64,7 +64,7 @@ struct Index {
       this.motionEnabled = true;
     });
 
-    context.initialize().then((): void => {
+    const finishInit = (): void => {
       const current = this.appContext;
       if (current === undefined) {
         return;
@@ -72,11 +72,19 @@ struct Index {
       this.startupError = current.initializationError;
       this.sessionGate = current.sessionGate;
       this.ready = true;
-    }, (error: Object): void => {
-      this.startupError = error instanceof AppError
-        ? error as AppError : AppErrors.of('INTERNAL_ERROR', []);
-      this.ready = true;
-    });
+    };
+
+    if (context.isInitialized() || context.initializationError !== undefined) {
+      finishInit();
+    } else {
+      context.initialize().then((): void => {
+        finishInit();
+      }, (error: Object): void => {
+        this.startupError = error instanceof AppError
+          ? error as AppError : AppErrors.of('INTERNAL_ERROR', []);
+        this.ready = true;
+      });
+    }
   }
 
   aboutToDisappear(): void {
