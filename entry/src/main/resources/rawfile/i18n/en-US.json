@@ -341,10 +341,10 @@
       "cancel": "Cancel join",
       "code_optional": "6-digit code (optional)",
       "complete": "Create profile",
-      "display_name": "Display name",
+      "display_name": "Nickname (e.g., Dad, Admin)",
       "hint": "Joining is two steps: the member shows YCR1, the admin returns YCI1.",
       "invitation": "YCI1 invitation",
-      "password": "Profile password",
+      "password": "Profile password (8+ chars)",
       "phase": {
         "applying": "Joining",
         "cancelled": "Cancelled",
@@ -488,8 +488,8 @@
       "title": "Create a family"
     },
     "create_action": "Create family and profile",
-    "display_name": "Display name",
-    "family_name": "Family name",
+    "display_name": "Nickname (e.g., Dad, Admin)",
+    "family_name": "Family name (e.g., My Home)",
     "invitation_code": "Invitation code (weak mode only)",
     "invitation_text": "Paste the invitation from the admin",
     "join": {
